@@ -7,7 +7,7 @@ web browser environment.
 ```
 npm install
 ```
-####Node.js
+#### Node.js
 Make sure you have Node.js and Node Package Manager ([npm](https://npmjs.org/)) installed before start 
 working with the library.
 ```
@@ -41,5 +41,5 @@ npm run build
 ### Prerequisites
 Node > 8
 
-###License
+### License
 [LICENSE](LICENSE)
