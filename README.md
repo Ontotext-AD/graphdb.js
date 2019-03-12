@@ -29,13 +29,13 @@ npm run build
 ### Tests build
 
 ```
-  npm run test
+npm run test
 ```
 
 ### Eslint build
 
 ```
-  npm run lint
+npm run lint
 ```
 
 ### Prerequisites
