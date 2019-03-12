@@ -5,11 +5,12 @@
   "main": "lib/rdf4js.js",
   "module": "src/index.js",
   "scripts": {
-    "build": "rimraf lib/ && cross-env NODE_ENV=production webpack --mode production",
+    "build": "rimraf lib/ && cross-env NODE_ENV=production webpack --mode production && npm run doc",
     "build:dev": "rimraf lib/ && cross-env NODE_ENV=development webpack --mode development",
     "watch": "rimraf lib/ && cross-env NODE_ENV=development webpack --mode development --watch",
     "test": "exit 0",
-    "lint": "exit 0"
+    "lint": "exit 0",
+    "doc": "jsdoc -c jsdoc.conf.json"
   },
   "husky": {
     "hooks": {
@@ -24,6 +25,7 @@
     "babel-loader": "^8.0.5",
     "cross-env": "^5.2.0",
     "husky": "^1.3.1",
+    "jsdoc": "^3.5.5",
     "webpack": "^4.29.6",
     "webpack-cli": "^3.2.3"
   },
