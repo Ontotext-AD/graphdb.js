@@ -1,2 +1,12 @@
 node_modules
 lib
+npm-debug.log
+
+.DS_Store
+.DS_Store?
+
+.idea
+package-lock
+dist
+.vscode
+
