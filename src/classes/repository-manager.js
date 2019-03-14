@@ -1,4 +1,4 @@
-import {axiosInstance} from '../constants/configurations/axios';
+const axios = require('../constants/configurations/axios');
 
 /**
  * A class for repository management.
@@ -8,7 +8,7 @@ class RepositoryManager {
    * Constructor for Repository Manager class
    */
   constructor() {
-    this.axios = axiosInstance;
+    this.axios = axios;
   }
 
   /**
@@ -16,12 +16,15 @@ class RepositoryManager {
    * @throws Error
    */
   getRepositories() {
-    this.axios.get('repositories').then((response) => {
-      return JSON.stringify(response);
-    }).catch((err) => {
-      throw new Error(err);
+    const request = this.axios.get('repositories');
+    request.then( (response) => {
+      console.log(response.data);
+      // return response.data;
+    }, (err) => {
+      console.error(err);
+      // throw err;
     });
   }
 }
 
-export default RepositoryManager;
+module.exports = RepositoryManager;

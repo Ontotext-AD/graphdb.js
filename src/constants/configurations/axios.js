@@ -1,8 +1,9 @@
-import axios from 'axios';
+const axios = require('axios');
 
-export const axiosInstance = axios.create({
-  baseURL: '/',
+const axiosInstance = axios.create({
+  baseURL: 'http://ff-dev.ontotext.com/',
   timeout: 3000,
-  headers: {'Accept': 'application/sparql-results+json'},
-  responseType: 'application/json',
+  headers: {'Accept': 'application/sparql-results+xml'},
 });
+
+module.exports = axiosInstance;
