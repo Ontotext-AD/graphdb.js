@@ -1,14 +1,14 @@
-const axios = require('../constants/configurations/axios');
-
+import Axios from '../helpers';
 /**
  * A class for repository management.
  */
 class RepositoryManager {
   /**
    * Constructor for Repository Manager class
+   * @param { object } options for the repository manager
    */
-  constructor() {
-    this.axios = axios;
+  constructor(options) {
+    this.axios = Axios.createInstance(options);
   }
 
   /**
@@ -27,4 +27,4 @@ class RepositoryManager {
   }
 }
 
-module.exports = RepositoryManager;
+export default RepositoryManager;
