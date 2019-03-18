@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Source: index.js</title>
+    <title>JSDoc: Source: classes/repository.js</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Source: index.js</h1>
+    <h1 class="page-title">Source: classes/repository.js</h1>
 
     
 
@@ -26,15 +26,39 @@
     
     <section>
         <article>
-            <pre class="prettyprint source linenums"><code>export { default as Repository } from './classes/repository';
+            <pre class="prettyprint source linenums"><code>import { Axios } from '../helpers';
 
 /**
- * This is a description of the RDF4JS class.
+ * Repository class.
  */
-class RDF4JS {
+class Repository {
+  /**
+   * Constructor for Repository  class
+   * @param { object } options for the repository manager
+   */
+  constructor(options) {
+    this.axios = Axios.createInstance(options);
+  }
+
+  /**
+   * Get the size of the repository.
+   * @param {string} repositoryID - The ID of the repository.
+   * @throws Error
+   */
+  getRepositorySize(repositoryID='DBP-Orgs') {
+    const pathname = `repositories/${repositoryID}/size`;
+    const request = this.axios.get(pathname);
+    request.then( (response) => {
+      console.log(response.data);
+      // return response.data;
+    }, (err) => {
+      console.error(err);
+      // throw err;
+    });
+  }
 }
 
-export default RDF4JS;
+export default Repository;
 </code></pre>
         </article>
     </section>
