@@ -1,14 +1,17 @@
 {
   "extends": ["eslint:recommended", "google"],
-  "rules": {},
+  "rules": {
+    "no-console" : "off"
+  },
   "settings": {
     "import/resolver": "webpack"
   },
   "parserOptions": {
-    "ecmaVersion": 6,
+    "ecmaVersion": 9,
     "sourceType": "module"
   },
   "env": {
+    "es6": true,
     "node": true,
     "browser": true
   }
