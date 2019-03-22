@@ -1,4 +1,5 @@
 import {Axios} from '../helpers';
+import convert from 'xml-js';
 
 /**
  * Class for Server.
@@ -20,8 +21,8 @@ class Server {
    * @param { Object } config for the overridable repository configuration.
    */
   createRepository(id, config) {
-    /* return new Promise((id, config) => {
-      new Repository(id, config);
+    /* return new Promise((resolve, reject) => {
+      new BaseRepository(id, config);
     });*/
   }
 
@@ -31,8 +32,12 @@ class Server {
    * @return { Promise } promise with axios delete result.
    */
   deleteRepository(id) {
-    return new Promise((id) => {
-      this.axios.delete(`repositories/${id}`);
+    return new Promise((resolve, reject) => {
+      this.axios.delete(`repositories/${id}`).then(() => {
+        resolve('Repository successfully deleted.');
+      }, (err) => {
+        reject(err);
+      });
     });
   }
 
@@ -43,26 +48,26 @@ class Server {
    * @return { Promise } promise with axios get result.
    */
   getRepository(id, config) {
-    return new Promise((id, config) => {
-      const request = this.axios.get(`repositories/${id}`);
-      request.then((response) => {
-        console.log(response);
+    return new Promise((resolve, reject) => {
+      this.axios.get(`repositories/${id}`).then((response) => {
+        resolve(response.data);
+      }, (err) => {
+        reject(err);
       });
     });
   }
 
   /**
    * Get an array of repository ids.
-   * @throws Error
+   * @return { Promise } promise with get repository result.
    */
   getRepositoryIDs() {
-    const request = this.axios.get('repositories');
-    request.then((response) => {
-      console.log(response.data);
-      // return response.data;
-    }, (err) => {
-      console.error(err);
-      // throw err;
+    return new Promise((resolve, reject) => {
+      this.axios.get('repositories').then((response) => {
+        resolve(convert.xml2json(response.data, {compact: true, space: 4}));
+      }, (err) => {
+        reject(err);
+      });
     });
   }
 }

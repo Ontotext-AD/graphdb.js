@@ -17,6 +17,9 @@
       "pre-commit": "npm run lint"
     }
   },
+  "jest": {
+    "setupTestFrameworkScriptFile": "./src/tests/setup.js"
+  },
   "author": "",
   "license": "ISC",
   "devDependencies": {
@@ -33,6 +36,7 @@
     "webpack-cli": "^3.2.3"
   },
   "dependencies": {
-    "axios": "^0.18.0"
+    "axios": "^0.18.0",
+    "xml-js": "^1.6.11"
   }
 }

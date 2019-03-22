@@ -1,17 +1,10 @@
 /**
- * Class for server configuration
- * @class ServerConfig
+ * Interface for server configuration
+ * @interface ServerConfig
+ * @param { String } url
+ * @param { Object } defaultRepositoryConfig
  */
-class ServerConfig {
-  /**
-   * Constructor for Server Config class
-   * @param { String } url
-   * @param { Object} repositoryConfig
-   */
-  constructor(url, repositoryConfig) {
-    this.url = url;
-    this.defaultRepositoryConfig = repositoryConfig;
-  }
-}
-
-export default ServerConfig;
+export const ServerConfig = (url, defaultRepositoryConfig) => ({
+  url,
+  defaultRepositoryConfig,
+});
