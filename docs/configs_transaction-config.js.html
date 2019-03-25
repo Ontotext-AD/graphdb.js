@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Source: configs/server-config.js</title>
+    <title>JSDoc: Source: configs/transaction-config.js</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Source: configs/server-config.js</h1>
+    <h1 class="page-title">Source: configs/transaction-config.js</h1>
 
     
 
@@ -27,14 +27,20 @@
     <section>
         <article>
             <pre class="prettyprint source linenums"><code>/**
- * Interface for server configuration
- * @interface ServerConfig
- * @param { String } url
- * @param { Object } defaultRepositoryConfig
+ * Interface for repository configuration
+ * @interface TransactionConfig
+ * @param { number } readTimeout
+ * @param { number } writeTimeout
+ * @param { Object } headers
+ * @param { string } url
  */
-export const ServerConfig = (url, defaultRepositoryConfig) => ({
+export const TransactionConfig = (
+    readTimeout, writeTimeout, headers, url
+) => ({
+  readTimeout,
+  writeTimeout,
+  headers,
   url,
-  defaultRepositoryConfig,
 });
 </code></pre>
         </article>

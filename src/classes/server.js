@@ -1,5 +1,4 @@
 import {Axios} from '../helpers';
-import convert from 'xml-js';
 
 /**
  * Class for Server.
@@ -9,9 +8,10 @@ class Server {
   /**
    * Constructor for Server class.
    * @param { Object } config for the server configuration.
-   */
-  constructor(config) {
-    this.axios = Axios.createInstance();
+   * @param { object } options for the axios configuration.
+   **/
+  constructor(config, options) {
+    this.axios = Axios.createInstance(options);
     this.config = config;
   }
 
@@ -19,11 +19,35 @@ class Server {
    * Create repository.
    * @param { String } id
    * @param { Object } config for the overridable repository configuration.
+   * @return { Promise } promise with new Repository instance.
    */
   createRepository(id, config) {
-    /* return new Promise((resolve, reject) => {
-      new BaseRepository(id, config);
-    });*/
+    return new Promise((resolve, reject) => {
+      this.isRepositoryExist(id).then((result) => {
+        result ?
+          resolve(/* new Repository(config) */) :
+          this.axios.post('repositories', {}).then((response) => {
+            resolve(/* new Repository(config) */);
+          }, (err) => {
+            reject(err);
+          });
+      });
+    });
+  }
+
+  /**
+   * Check if repository exists.
+   * @param { String } id
+   * @return { Promise } promise with boolean value.
+   */
+  isRepositoryExist(id) {
+    return new Promise((resolve, reject) => {
+      this.getRepositoryIDs().then((result) => {
+        resolve(result.includes(id));
+      }, (err) => {
+        reject(err);
+      });
+    });
   }
 
   /**
@@ -45,14 +69,14 @@ class Server {
    * Get repository
    * @param { String } id
    * @param { Object } config for the overridable repository configuration.
-   * @return { Promise } promise with axios get result.
+   * @return { Promise } promise with new Repository instance.
    */
   getRepository(id, config) {
     return new Promise((resolve, reject) => {
-      this.axios.get(`repositories/${id}`).then((response) => {
-        resolve(response.data);
-      }, (err) => {
-        reject(err);
+      this.isRepositoryExist(id).then((result) => {
+        result ?
+          resolve(/* new Repository(config)*/) :
+          reject(new Error('There is no such repository.'));
       });
     });
   }
@@ -64,7 +88,7 @@ class Server {
   getRepositoryIDs() {
     return new Promise((resolve, reject) => {
       this.axios.get('repositories').then((response) => {
-        resolve(convert.xml2json(response.data, {compact: true, space: 4}));
+        resolve(response.data.results.bindings.map(({id}) => id.value));
       }, (err) => {
         reject(err);
       });
