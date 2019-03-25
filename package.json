@@ -33,6 +33,7 @@
     "webpack-cli": "^3.2.3"
   },
   "dependencies": {
-    "axios": "^0.18.0"
+    "axios": "^0.18.0",
+    "n3": "^1.0.4"
   }
 }
