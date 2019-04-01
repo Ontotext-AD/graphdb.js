@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Interface: ServerConfig</title>
+    <title>JSDoc: Source: configs/transaction-config.js</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,99 +17,34 @@
 
 <div id="main">
 
-    <h1 class="page-title">Interface: ServerConfig</h1>
+    <h1 class="page-title">Source: configs/transaction-config.js</h1>
 
     
 
 
 
-
-<section>
-
-<header>
     
-        <h2>ServerConfig</h2>
-        
-    
-</header>
-
-<article>
-    <div class="container-overview">
-    
-        
-            <div class="description"><p>Interface for server configuration</p></div>
-        
-
-        
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="configs_server-config.js.html">configs/server-config.js</a>, <a href="configs_server-config.js.html#line1">line 1</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-        
-    
-    </div>
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</article>
-
-</section>
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * Interface for repository configuration
+ * @interface TransactionConfig
+ * @param { number } readTimeout
+ * @param { number } writeTimeout
+ * @param { Object } headers
+ * @param { string } url
+ */
+export const TransactionConfig = (
+    readTimeout, writeTimeout, headers, url
+) => ({
+  readTimeout,
+  writeTimeout,
+  headers,
+  url,
+});
+</code></pre>
+        </article>
+    </section>
 
 
 
