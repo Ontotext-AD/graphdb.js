@@ -17,6 +17,9 @@
       "pre-commit": "npm run lint"
     }
   },
+  "jest": {
+    "setupTestFrameworkScriptFile": "./src/tests/setup.js"
+  },
   "author": "",
   "license": "ISC",
   "devDependencies": {
