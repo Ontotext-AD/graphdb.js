@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Interface: ServerConfig</title>
+    <title>JSDoc: Source: configs/repository-endpoint-config.js</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,99 +17,41 @@
 
 <div id="main">
 
-    <h1 class="page-title">Interface: ServerConfig</h1>
+    <h1 class="page-title">Source: configs/repository-endpoint-config.js</h1>
 
     
 
 
 
-
-<section>
-
-<header>
     
-        <h2>ServerConfig</h2>
-        
-    
-</header>
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import BaseRepositoryConfig from './base-repository-config';
 
-<article>
-    <div class="container-overview">
-    
-        
-            <div class="description"><p>Interface for server configuration</p></div>
-        
+/**
+ * Class for repository endpoint configuration.
+ * @class RepositoryEndpointConfig
+ * @extends BaseRepositoryConfig
+ */
+class RepositoryEndpointConfig extends BaseRepositoryConfig {
+  /**
+   * Constructor for repository endpoint configuration class.
+   * @param { number } retryInterval
+   * @param { number } readTimeout
+   * @param { number } writeTimeout
+   * @param { object } headers
+   * @param { string } url
+   */
+  constructor(retryInterval, readTimeout, writeTimeout, headers, url) {
+    super(retryInterval, readTimeout, writeTimeout, headers);
+    this.url = url;
+  }
+}
 
-        
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="configs_server-config.js.html">configs/server-config.js</a>, <a href="configs_server-config.js.html#line1">line 1</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-        
-    
-    </div>
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</article>
-
-</section>
+export default RepositoryEndpointConfig;
+</code></pre>
+        </article>
+    </section>
 
 
 
