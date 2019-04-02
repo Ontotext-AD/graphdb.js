@@ -18,7 +18,7 @@
     }
   },
   "jest": {
-    "setupTestFrameworkScriptFile": "./src/tests/setup.js"
+    "setupTestFrameworkScriptFile": "./test/setup.js"
   },
   "author": "",
   "license": "ISC",

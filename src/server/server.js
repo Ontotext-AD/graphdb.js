@@ -1,4 +1,6 @@
-import {Axios} from '../helpers';
+import {Axios} from '../http';
+
+export const SERVICE_URL = 'repositories';
 
 /**
  * Class for Server.
@@ -26,7 +28,7 @@ class Server {
       this.isRepositoryExist(id).then((result) => {
         result ?
           resolve(/* new Repository(config) */) :
-          this.axios.post('repositories', {}).then((response) => {
+          this.axios.post(SERVICE_URL, {}).then((response) => {
             resolve(/* new Repository(config) */);
           }, (err) => {
             reject(err);
@@ -57,7 +59,7 @@ class Server {
    */
   deleteRepository(id) {
     return new Promise((resolve, reject) => {
-      this.axios.delete(`repositories/${id}`).then(() => {
+      this.axios.delete(`${SERVICE_URL}/${id}`).then(() => {
         resolve('Repository successfully deleted.');
       }, (err) => {
         reject(err);
@@ -87,7 +89,7 @@ class Server {
    */
   getRepositoryIDs() {
     return new Promise((resolve, reject) => {
-      this.axios.get('repositories').then((response) => {
+      this.axios.get(SERVICE_URL).then((response) => {
         resolve(response.data.results.bindings.map(({id}) => id.value));
       }, (err) => {
         reject(err);

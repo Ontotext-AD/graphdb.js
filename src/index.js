@@ -1,1 +1,1 @@
-export {default as Server} from './classes/server';
+export {default as Server} from './server/server';

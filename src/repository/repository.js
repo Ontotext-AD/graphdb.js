@@ -1,18 +1,18 @@
-import {Axios} from '../helpers';
+import {Axios} from '../http';
 
 /**
- * Class for BaseRepository.
- * @class BaseRepository
+ * Repository class.
+ * @Class Repository
  */
-class BaseRepository {
+class Repository {
   /**
    * Constructor for Repository  class
-   * @param { RepositoryConfig } RepositoryConfig Default config for the server
+   * @param { object } options for the repository manager
    */
-  constructor(RepositoryConfig) {
-    this.axios = Axios.createInstance();
-    this.config = RepositoryConfig;
+  constructor(options) {
+    this.axios = Axios.createInstance(options);
   }
+
 
   /**
    * Get the size of the repository.
@@ -20,7 +20,7 @@ class BaseRepository {
    * @throws Error
    * @return {Promise}
    */
-  getSize(repositoryID = 'DBP-Orgs') {
+  getRepositorySize(repositoryID = 'DBP-Orgs') {
     return new Promise((resolve, reject) => {
       const pathname = `repositories/${repositoryID}/size`;
       const request = this.axios.get(pathname);
@@ -35,4 +35,4 @@ class BaseRepository {
   }
 }
 
-export default BaseRepository;
+export default Repository;
