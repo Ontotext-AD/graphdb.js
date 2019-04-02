@@ -1,4 +1,4 @@
-import { Axios } from '../helpers';
+import {Axios} from '../helpers';
 /**
  * Repository class.
  */
@@ -7,27 +7,10 @@ class Repository {
    * Constructor for Repository  class
    * @param { object } options for the repository manager
    */
-  constructor(options, repositoryConfigs, clientConfig) {
+  constructor(options) {
     this.axios = Axios.createInstance(options);
-    this.repositoryConfigs = repositoryConfigs;
-    this.clientConfig = clientConfig;
   }
 
-  getRepositoryConnection() {
-
-  }
-
-  setClientConfig(clientConfig) {
-
-  }
-
-  setHeaders(headers) {
-
-  }
-
-  addHeaders(headers) {
-
-  }
 
   /**
    * Get the size of the repository.
