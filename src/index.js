@@ -1,1 +1,1 @@
-export {default as Server} from './server/server';
+export {default as ServerClient} from './server/server-client';

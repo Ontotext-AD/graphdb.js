@@ -1,22 +1,22 @@
 import axios from 'axios';
 // TODO: base path should be configured somewhere in webpack!
-import Server from '../../src/server/server';
-import {ServerConfig} from '../../src/server/server-config';
+import ServerClient from '../../src/server/server-client';
+import {ServerClientConfig} from '../../src/server/server-client-config';
 
 jest.mock('axios');
 
-describe('Server', () => {
+describe('ServerClient', () => {
   describe('initialization', () => {
-    test('new Server instance should not return null', () => {
-      expect(new Server(null, null)).not.toBeNull();
+    test('new ServerClient instance should not return null', () => {
+      expect(new ServerClient(null, null)).not.toBeNull();
     });
 
     test('should set required class member fields', () => {
       const config = new TestServerConfig('server/url', {});
-      const server = new Server(config);
+      const server = new ServerClient(config);
       expect(server.config).toEqual({
         url: 'server/url',
-        defaultRepositoryConfig: {},
+        headers: {},
       });
     });
   });
@@ -32,7 +32,7 @@ describe('Server', () => {
       }));
 
       const config = new TestServerConfig('server/url', {});
-      const server = new Server(config);
+      const server = new ServerClient(config);
       server.axios = axios;
 
       return server.getRepositoryIDs().then(() => {
@@ -52,7 +52,7 @@ describe('Server', () => {
 });
 
 /**
- * Test implementation for the {@link ServerConfig}
+ * Test implementation for the {@link ServerClientConfig}
  */
-class TestServerConfig extends ServerConfig {
+class TestServerConfig extends ServerClientConfig {
 }
