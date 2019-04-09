@@ -9,7 +9,9 @@ const config = {
   entry: {
     main: './src/index.js',
   },
-  node: {process: false},
+  node: {
+    process: false
+  },
   target: 'node',
   output: {
     path: DIST_PATH,
@@ -17,7 +19,7 @@ const config = {
     libraryTarget: 'umd',
     library: 'lib',
     umdNamedDefine: true,
-    globalObject: `(typeof self !== 'undefined' ? self : this)`,
+    globalObject: `(typeof self !== 'undefined' ? self : this)`
   },
   watchOptions: {
     poll: 1000,
@@ -30,9 +32,9 @@ const config = {
         exclude: /node_modules/,
         use: {
           loader: 'babel-loader',
-        },
-      },
-    ],
+        }
+      }
+    ]
   },
   plugins: [
     new webpack.DefinePlugin({

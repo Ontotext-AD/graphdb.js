@@ -7,7 +7,7 @@
     "import/resolver": "webpack"
   },
   "parserOptions": {
-    "ecmaVersion": 9,
+    "ecmaVersion": 2016,
     "sourceType": "module"
   },
   "env": {

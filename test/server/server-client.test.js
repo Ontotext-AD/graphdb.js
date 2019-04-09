@@ -1,5 +1,4 @@
 import axios from 'axios';
-// TODO: base path should be configured somewhere in webpack!
 import ServerClient from '../../src/server/server-client';
 import {ServerClientConfig} from '../../src/server/server-client-config';
 
@@ -16,7 +15,7 @@ describe('ServerClient', () => {
       const server = new ServerClient(config);
       expect(server.config).toEqual({
         url: 'server/url',
-        headers: {},
+        defaultRepositoryConfig: {},
       });
     });
   });
