@@ -1,5 +1,4 @@
 import axios from 'axios';
-// TODO: base path should be configured somewhere in webpack!
 import Server from '../../src/server/server';
 import {ServerConfig} from '../../src/server/server-config';
 
