@@ -15,7 +15,7 @@ describe('ServerClient', () => {
       const server = new ServerClient(config);
       expect(server.config).toEqual({
         url: 'server/url',
-        defaultRepositoryConfig: {},
+        headers: {},
       });
     });
   });
