@@ -5,11 +5,14 @@
  */
 export class ServerClientConfig {
   /**
-   * @param {string} url Endpoint url.
-   * @param {Map<string, string>} headers http headers map.
+   * @param {string} endpoint Endpoint url.
+   * @param {number} timeout Specifies the number of milliseconds before the
+   *                         request times out.
+   * @param {Map<string, string>} headers An http headers map.
    */
-  constructor(url, headers) {
-    this.url = url;
+  constructor(endpoint, timeout, headers) {
+    this.endpoint = endpoint;
+    this.timeout = timeout;
     this.headers = headers;
   }
 }

@@ -1,7 +1,9 @@
-import {Axios} from '../http';
+import {HttpClient} from '../http/http-client';
 import {ConsoleLogger} from '../logging/console-logger';
+import {RDFRepositoryClient} from '../repository/rdf-repository-client';
+import {RepositoryClientConfig} from '../repository/repository-client-config';
 
-export const SERVICE_URL = 'repositories';
+export const SERVICE_URL = '/repositories';
 
 /**
  * Implementation of the RDF server operations.
@@ -10,11 +12,8 @@ export const SERVICE_URL = 'repositories';
 export default class ServerClient {
   /**
    * @param {ServerClientConfig} config for the server client.
-   * @param {Object} options for the http client.
    **/
-  constructor(config, options) {
-    // TODO: remove after http client is ready
-    this.axios = Axios.createInstance(options);
+  constructor(config) {
     this.config = config;
 
     this.initHttpClient();
@@ -22,90 +21,72 @@ export default class ServerClient {
   }
 
   /**
-   * Create repository.
-   * @param {string} id
-   * @param {Object} config for the overridable repository configuration.
-   * @return {Promise} promise with new Repository instance.
-   */
-  createRepository(id, config) {
-    return new Promise((resolve, reject) => {
-      this.isRepositoryExist(id).then((result) => {
-        result ?
-          resolve(/* new Repository(config) */) :
-          this.axios.post(SERVICE_URL, {}).then((response) => {
-            resolve(/* new Repository(config) */);
-          }, (err) => {
-            reject(err);
-          });
-      });
-    });
-  }
-
-  /**
-   * Check if repository exists.
-   * @param {string} id
-   * @return {Promise} promise with boolean value.
-   */
-  isRepositoryExist(id) {
-    return new Promise((resolve, reject) => {
-      this.getRepositoryIDs().then((result) => {
-        resolve(result.includes(id));
-      }, (err) => {
-        reject(err);
-      });
-    });
-  }
-
-  /**
-   * Delete repository
-   * @param {string} id
-   * @return {Promise} promise with axios delete result.
-   */
-  deleteRepository(id) {
-    return new Promise((resolve, reject) => {
-      this.axios.delete(`${SERVICE_URL}/${id}`).then(() => {
-        resolve('Repository successfully deleted.');
-      }, (err) => {
-        reject(err);
-      });
-    });
-  }
-
-  /**
-   * Get repository
-   * @param {string} id
-   * @param {Object} config for the overridable repository configuration.
-   * @return {Promise} promise with new Repository instance.
-   */
-  getRepository(id, config) {
-    return new Promise((resolve, reject) => {
-      this.isRepositoryExist(id).then((result) => {
-        result ?
-          resolve(/* new Repository(config)*/) :
-          reject(new Error('There is no such repository.'));
-      });
-    });
-  }
-
-  /**
-   * Get an array of repository ids.
-   * @return {Promise} promise with get repository result.
+   * Get an array of repository ids available in the server.
+   * @return {Promise} promise which resolves with an Array with repository ids.
    */
   getRepositoryIDs() {
-    return new Promise((resolve, reject) => {
-      this.axios.get(SERVICE_URL).then((response) => {
-        resolve(response.data.results.bindings.map(({id}) => id.value));
-      }, (err) => {
-        reject(err);
-      });
+    return this.httpClient.get(SERVICE_URL).then((response) => {
+      return response.data.results.bindings.map(({id}) => id.value);
     });
+  }
+
+  /**
+   * Check if repository with the provided id exists.
+   * @param {string} id of the repository which should be checked.
+   * @return {Promise<boolean>} promise which resolves with boolean value.
+   */
+  hasRepository(id) {
+    if (!id) {
+      return Promise.reject(new Error('Repository id is required parameter!'));
+    }
+    return this.getRepositoryIDs().then((repositoryIds) => {
+      return repositoryIds.indexOf(id) !== -1;
+    });
+  }
+
+  /**
+   * Creates a repository client instance with the provided id and
+   * configuration.
+   * @param {string} id of the repository
+   * @param {RepositoryClientConfig} config for the overridable repository
+   *    configuration.
+   * @return {Promise<RDFRepositoryClient>} promise which resolves with
+   *    new RDFRepositoryClient instance.
+   */
+  getRepository(id, config) {
+    if (!id) {
+      return Promise.reject(new Error('Repository id is required parameter!'));
+    }
+    if (!config || !(config instanceof RepositoryClientConfig)) {
+      return Promise
+          .reject(new Error('RepositoryClientConfig is required parameter!'));
+    }
+    return this.hasRepository(id).then((exists) => {
+      if (exists) {
+        return new RDFRepositoryClient(config);
+      }
+      return Promise
+          .reject(new Error(`Repository with id ${id} does not exists.`));
+    });
+  }
+
+  /**
+   * Delete repository with the provided id.
+   * @param {string} id of the repository which should be deleted.
+   * @return {Promise<any>} promise which resolves with the delete result.
+   */
+  deleteRepository(id) {
+    if (!id) {
+      return Promise.reject(new Error('Repository id is required parameter!'));
+    }
+    return this.httpClient.delete(`${SERVICE_URL}/${id}`);
   }
 
   /**
    * Initializes the http client.
    */
   initHttpClient() {
-
+    this.httpClient = new HttpClient(this.config.endpoint, this.config.timeout);
   }
 
   /**

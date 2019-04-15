@@ -1,0 +1,82 @@
+{
+  "repositories": {
+    "GET": {
+      "results": {
+        "bindings": [
+          {
+            "readable": {
+              "datatype": "http://www.w3.org/2001/XMLSchema#boolean",
+              "type": "literal",
+              "value": "true"
+            },
+            "id": {
+              "type": "literal",
+              "value": "ff-news"
+            },
+            "title": {
+              "type": "literal",
+              "value": "ff-news"
+            },
+            "uri": {
+              "type": "uri",
+              "value": "http://turing:7300/repositories/ff-news"
+            },
+            "writable": {
+              "datatype": "http://www.w3.org/2001/XMLSchema#boolean",
+              "type": "literal",
+              "value": "true"
+            }
+          },
+          {
+            "readable": {
+              "datatype": "http://www.w3.org/2001/XMLSchema#boolean",
+              "type": "literal",
+              "value": "true"
+            },
+            "id": {
+              "type": "literal",
+              "value": "automotive"
+            },
+            "title": {
+              "type": "literal",
+              "value": ""
+            },
+            "uri": {
+              "type": "uri",
+              "value": "http://turing:7300/repositories/automotive"
+            },
+            "writable": {
+              "datatype": "http://www.w3.org/2001/XMLSchema#boolean",
+              "type": "literal",
+              "value": "true"
+            }
+          },
+          {
+            "readable": {
+              "datatype": "http://www.w3.org/2001/XMLSchema#boolean",
+              "type": "literal",
+              "value": "true"
+            },
+            "id": {
+              "type": "literal",
+              "value": "OscarsNominees"
+            },
+            "title": {
+              "type": "literal",
+              "value": "Oscars Nominees"
+            },
+            "uri": {
+              "type": "uri",
+              "value": "http://turing:7300/repositories/OscarsNominees"
+            },
+            "writable": {
+              "datatype": "http://www.w3.org/2001/XMLSchema#boolean",
+              "type": "literal",
+              "value": "true"
+            }
+          }
+        ]
+      }
+    }
+  }
+}

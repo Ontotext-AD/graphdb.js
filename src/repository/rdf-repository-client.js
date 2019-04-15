@@ -1,4 +1,4 @@
-import {BaseRepositoryClient} from '/base-repository-client';
+import {BaseRepositoryClient} from './base-repository-client';
 
 /**
  * RDF repository client implementation realizing specific operations.
