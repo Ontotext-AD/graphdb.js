@@ -1,12 +1,12 @@
-import {ParserRegistry} from '../parser/parser-registry';
-import {ConsoleLogger} from '../logging/console-logger';
+const ParserRegistry = require('../parser/parser-registry');
+const ConsoleLogger = require('../logging/console-logger');
 
 /**
  * Implementation of the RDF repository operations.
  * @abstract
  * @class
  */
-export class BaseRepositoryClient {
+class BaseRepositoryClient {
   /**
    * @param {RepositoryClientConfig} repositoryClientConfig
    */
@@ -47,3 +47,5 @@ export class BaseRepositoryClient {
 
   }
 }
+
+module.exports = BaseRepositoryClient;

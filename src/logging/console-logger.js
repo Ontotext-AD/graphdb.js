@@ -1,9 +1,11 @@
-import {Logger} from './logger';
+const Logger = require('./logger');
 
 /**
  * Base implementation of logger writing in console.
  * @class
  */
-export class ConsoleLogger extends Logger {
+class ConsoleLogger extends Logger {
 
 }
+
+module.exports = ConsoleLogger;

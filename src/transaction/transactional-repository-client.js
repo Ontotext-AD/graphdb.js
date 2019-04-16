@@ -1,11 +1,11 @@
-import {BaseRepositoryClient} from '/base-repository-client';
+const BaseRepositoryClient = require('/base-repository-client');
 
 /**
  * Transactional RDF repository client implementation realizing transaction
  * specific operations.
  * @class
  */
-export class TransactionalRepositoryClient extends BaseRepositoryClient {
+class TransactionalRepositoryClient extends BaseRepositoryClient {
   /**
    * @param {RepositoryClientConfig} repositoryClientConfig
    * @param {string} transactionUri
@@ -22,3 +22,5 @@ export class TransactionalRepositoryClient extends BaseRepositoryClient {
     return null;
   }
 }
+
+module.exports = TransactionalRepositoryClient;

@@ -1,10 +1,10 @@
-import {BaseRepositoryClient} from './base-repository-client';
+const BaseRepositoryClient = require('../repository/base-repository-client');
 
 /**
  * RDF repository client implementation realizing specific operations.
  * @class
  */
-export class RDFRepositoryClient extends BaseRepositoryClient {
+class RDFRepositoryClient extends BaseRepositoryClient {
   /**
    * @inheritdoc
    */
@@ -19,3 +19,5 @@ export class RDFRepositoryClient extends BaseRepositoryClient {
     return null;
   }
 }
+
+module.exports = RDFRepositoryClient;

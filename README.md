@@ -4,16 +4,31 @@ A GraphDB data access library written in JavaScript to be used in Node.js and/or
 web browser environment.  
 
 ## Installation
-```
-npm install
-```
-#### Node.js
 Make sure you have Node.js and Node Package Manager ([npm](https://npmjs.org/)) installed before start 
 working with the library.
 ```
 npm install --save rdf4js
 ```
- 
+
+## Usage
+```javascript
+const ServerClient = require('rdf4js/src/server/server-client');
+const ServerClientConfig = require('rdf4js/src/server/server-client-config');
+
+const serverConfig = new ServerClientConfig('http://rdf4j-compliant-server/', 0, {
+    'Accept': 'application/sparql-results+json'
+});
+const server = new ServerClient(serverConfig);
+server.getRepositoryIDs().then(ids => {
+    // work with ids
+}).catch(err => console.log(err));
+```
+
+## Setup Development
+```
+npm install
+```
+
 ### Dev build
 
 ```

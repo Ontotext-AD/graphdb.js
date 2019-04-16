@@ -1,4 +1,4 @@
-import axios from 'axios';
+const axios = require('axios');
 
 /**
  * Promise based HTTP client that delegates requests to Axios.
@@ -9,18 +9,18 @@ import axios from 'axios';
  * @class
  * @author Mihail Radkov
  */
-export class HttpClient {
+class HttpClient {
   /**
    * Instantiates new HTTP client with the supplied base URL and default
    * request timeout.
    *
    * @constructor
-   * @param {string} baseUrl base URL that will be prepend to all requests
+   * @param {string} baseURL base URL that will be prepend to all requests
    * @param {number} timeout default timeout for all requests; if 0 or negative
    *                         there will be no timeout
    */
-  constructor(baseUrl, timeout) {
-    this.axios = axios.create({baseUrl, timeout});
+  constructor(baseURL, timeout) {
+    this.axios = axios.create({baseURL, timeout});
   }
 
   /**
@@ -89,3 +89,5 @@ export class HttpClient {
     return this.axios.delete(url, config);
   }
 }
+
+module.exports = HttpClient;

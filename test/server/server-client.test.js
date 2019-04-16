@@ -1,7 +1,7 @@
-import ServerClient from '../../src/server/server-client';
-import {ServerClientConfig} from '../../src/server/server-client-config';
-import {RDFRepositoryClient} from '../../src/repository/rdf-repository-client';
-import {RepositoryClientConfig} from '../../src/repository/repository-client-config';
+const ServerClient = require('../../src/server/server-client');
+const ServerClientConfig = require('../../src/server/server-client-config');
+const RDFRepositoryClient = require('../../src/repository/rdf-repository-client');
+const RepositoryClientConfig = require('../../src/repository/repository-client-config');
 
 import data from '../../test/server/server-client.data';
 
@@ -43,7 +43,9 @@ describe('ServerClient', () => {
     test('should make request with required service url parameter', () => {
       return server.getRepositoryIDs().then(() => {
         expect(server.httpClient.get).toHaveBeenCalledTimes(1);
-        expect(server.httpClient.get).toHaveBeenCalledWith('/repositories');
+        expect(server.httpClient.get).toHaveBeenCalledWith('/repositories', {
+          headers: {'Accept': 'application/sparql-results+json'},
+        });
       });
     });
 

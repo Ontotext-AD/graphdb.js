@@ -1,1 +1,1 @@
-export {default as ServerClient} from './server/server-client';
+module.exports.ServerClient = require('./server/server-client');

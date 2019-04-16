@@ -2,7 +2,7 @@
  * Defines an error type wrapper.
  * @class
  */
-export class Error {
+class Error {
   /**
    * @param {ErrorCode} code
    * @param {string} message
@@ -12,3 +12,5 @@ export class Error {
     this.message = message;
   }
 }
+
+module.exports = Error;

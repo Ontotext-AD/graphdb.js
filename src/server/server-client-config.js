@@ -3,7 +3,7 @@
  * instances.
  * @class
  */
-export class ServerClientConfig {
+class ServerClientConfig {
   /**
    * @param {string} endpoint Endpoint url.
    * @param {number} timeout Specifies the number of milliseconds before the
@@ -16,3 +16,5 @@ export class ServerClientConfig {
     this.headers = headers;
   }
 }
+
+module.exports = ServerClientConfig;
