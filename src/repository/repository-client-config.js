@@ -3,7 +3,7 @@
  * implementations.
  * @class
  */
-export class RepositoryClientConfig {
+class RepositoryClientConfig {
   /**
    * @param {string[]} endpoints
    * @param {Map<string, string>} headers
@@ -22,3 +22,5 @@ export class RepositoryClientConfig {
     this.retryInterval = retryInterval;
   }
 }
+
+module.exports = RepositoryClientConfig;

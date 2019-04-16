@@ -3,7 +3,7 @@
  * providing interface for registering and access.
  * @class
  */
-export class ParserRegistry {
+class ParserRegistry {
   /**
    * @param {Map<string, ContentTypeParser>} parsers
    */
@@ -11,3 +11,5 @@ export class ParserRegistry {
     this.parsers = parsers;
   }
 }
+
+module.exports = ParserRegistry;

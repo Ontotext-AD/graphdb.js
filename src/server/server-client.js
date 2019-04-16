@@ -1,15 +1,16 @@
-import {HttpClient} from '../http/http-client';
-import {ConsoleLogger} from '../logging/console-logger';
-import {RDFRepositoryClient} from '../repository/rdf-repository-client';
-import {RepositoryClientConfig} from '../repository/repository-client-config';
+const HttpClient = require('../http/http-client');
+const ConsoleLogger = require('../logging/console-logger');
+const RDFRepositoryClient = require('../repository/rdf-repository-client');
+const RepositoryClientConfig =
+  require('../repository/repository-client-config');
 
-export const SERVICE_URL = '/repositories';
+const SERVICE_URL = '/repositories';
 
 /**
  * Implementation of the RDF server operations.
  * @class
  */
-export default class ServerClient {
+class ServerClient {
   /**
    * @param {ServerClientConfig} config for the server client.
    **/
@@ -25,7 +26,9 @@ export default class ServerClient {
    * @return {Promise} promise which resolves with an Array with repository ids.
    */
   getRepositoryIDs() {
-    return this.httpClient.get(SERVICE_URL).then((response) => {
+    return this.httpClient.get(SERVICE_URL, {
+      headers: {'Accept': 'application/sparql-results+json'},
+    }).then((response) => {
       return response.data.results.bindings.map(({id}) => id.value);
     });
   }
@@ -96,3 +99,5 @@ export default class ServerClient {
     this.logger = new ConsoleLogger();
   }
 }
+
+module.exports = ServerClient;

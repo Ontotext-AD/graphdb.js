@@ -1,5 +1,5 @@
-import axios from 'axios';
-import {HttpClient} from 'http/http-client';
+const axios = require('axios');
+const HttpClient = require('http/http-client');
 
 jest.mock('axios');
 
@@ -41,7 +41,7 @@ describe('HttpClient', () => {
     expect(httpClient).not.toBeNull();
     expect(httpClient.axios).not.toBeNull();
     expect(axios.create).toHaveBeenCalledTimes(1);
-    expect(axios.create).toHaveBeenCalledWith({baseUrl: '/base/url', timeout: 1000});
+    expect(axios.create).toHaveBeenCalledWith({baseURL: '/base/url', timeout: 1000});
   });
 
   test('should perform GET requests with the supplied params', () => {

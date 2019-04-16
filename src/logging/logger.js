@@ -2,5 +2,7 @@
  * Interface defining the API for logging implementations.
  * @interface
  */
-export class Logger {
+class Logger {
 }
+
+module.exports = Logger;
