@@ -8,3 +8,5 @@ npm-debug.log
 .idea
 dist
 .vscode
+docs/
+report/

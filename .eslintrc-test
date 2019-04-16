@@ -1,8 +1,11 @@
 {
-  "extends": ["eslint:recommended", "google"],
+  "plugins": [
+    "no-only-tests"
+  ],
   "rules": {
     "no-console" : "error",
-    "no-debugger": "error"
+    "no-debugger": "error",
+    "no-only-tests/no-only-tests": "error"
   },
   "settings": {
     "import/resolver": "webpack"
