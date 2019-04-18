@@ -7,5 +7,5 @@ export const QueryType = {
   SELECT: 'SELECT',
   CONSTRUCT: 'CONSTRUCT',
   DESCRIBE: 'DESCRIBE',
-  ASK: 'ASK',
+  ASK: 'ASK'
 };
