@@ -1,0 +1,174 @@
+{
+  "GET": {
+    "head": {
+      "vars": [
+        "prefix",
+        "namespace"
+      ]
+    },
+    "results": {
+      "bindings": [
+        {
+          "prefix": {
+            "type": "literal",
+            "value": "wgs"
+          },
+          "namespace": {
+            "type": "literal",
+            "value": "http://www.w3.org/2003/01/geo/wgs84_pos#"
+          }
+        },
+        {
+          "prefix": {
+            "type": "literal",
+            "value": "owl"
+          },
+          "namespace": {
+            "type": "literal",
+            "value": "http://www.w3.org/2002/07/owl#"
+          }
+        },
+        {
+          "prefix": {
+            "type": "literal",
+            "value": "gn"
+          },
+          "namespace": {
+            "type": "literal",
+            "value": "http://www.geonames.org/ontology#"
+          }
+        },
+        {
+          "prefix": {
+            "type": "literal",
+            "value": "xsd"
+          },
+          "namespace": {
+            "type": "literal",
+            "value": "http://www.w3.org/2001/XMLSchema#"
+          }
+        },
+        {
+          "prefix": {
+            "type": "literal",
+            "value": "fn"
+          },
+          "namespace": {
+            "type": "literal",
+            "value": "http://www.w3.org/2005/xpath-functions#"
+          }
+        },
+        {
+          "prefix": {
+            "type": "literal",
+            "value": "skos"
+          },
+          "namespace": {
+            "type": "literal",
+            "value": "http://www.w3.org/2004/02/skos/core#"
+          }
+        },
+        {
+          "prefix": {
+            "type": "literal",
+            "value": "rdfs"
+          },
+          "namespace": {
+            "type": "literal",
+            "value": "http://www.w3.org/2000/01/rdf-schema#"
+          }
+        },
+        {
+          "prefix": {
+            "type": "literal",
+            "value": "geo"
+          },
+          "namespace": {
+            "type": "literal",
+            "value": "http://www.w3.org/2003/01/geo/wgs84_pos#"
+          }
+        },
+        {
+          "prefix": {
+            "type": "literal",
+            "value": "dwc"
+          },
+          "namespace": {
+            "type": "literal",
+            "value": "http://rs.tdwg.org/dwc/terms/"
+          }
+        },
+        {
+          "prefix": {
+            "type": "literal",
+            "value": "rdf"
+          },
+          "namespace": {
+            "type": "literal",
+            "value": "http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+          }
+        },
+        {
+          "prefix": {
+            "type": "literal",
+            "value": "dcterms"
+          },
+          "namespace": {
+            "type": "literal",
+            "value": "http://purl.org/dc/terms/"
+          }
+        },
+        {
+          "prefix": {
+            "type": "literal",
+            "value": "bibo"
+          },
+          "namespace": {
+            "type": "literal",
+            "value": "http://purl.org/ontology/bibo/"
+          }
+        },
+        {
+          "prefix": {
+            "type": "literal",
+            "value": "sesame"
+          },
+          "namespace": {
+            "type": "literal",
+            "value": "http://www.openrdf.org/schema/sesame#"
+          }
+        },
+        {
+          "prefix": {
+            "type": "literal",
+            "value": "foaf"
+          },
+          "namespace": {
+            "type": "literal",
+            "value": "http://xmlns.com/foaf/0.1/"
+          }
+        },
+        {
+          "prefix": {
+            "type": "literal",
+            "value": "sioc"
+          },
+          "namespace": {
+            "type": "literal",
+            "value": "http://rdfs.org/sioc/ns#"
+          }
+        },
+        {
+          "prefix": {
+            "type": "literal",
+            "value": "dc"
+          },
+          "namespace": {
+            "type": "literal",
+            "value": "http://purl.org/dc/elements/1.1/"
+          }
+        }
+      ]
+    }
+  }
+}
