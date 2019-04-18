@@ -104,14 +104,19 @@ describe('ServerClient', () => {
     });
 
     test('should reject with error if repository with provided id does not exists', () => {
-      const repositoryClientConfig = new RepositoryClientConfig([], [], '', 3000, 3000, 5000);
+      const repositoryClientConfig = new RepositoryClientConfig(['endpoint'], {}, '', 3000, 3000, 5000, 3);
       return expect(server.getRepository('non_existing', repositoryClientConfig)).rejects.toEqual(Error('Repository with id non_existing does not exists.'));
     });
 
     test('should resolve with a RDFRepositoryClient instance if repository with provided id exists', () => {
-      const repositoryClientConfig = new RepositoryClientConfig([], [], '', 3000, 3000, 5000);
+      const repositoryClientConfig = new RepositoryClientConfig(['endpoint'], {}, '', 3000, 3000, 5000, 3);
       const expected = new RDFRepositoryClient(repositoryClientConfig);
-      return expect(server.getRepository('automotive', repositoryClientConfig)).resolves.toEqual(expected);
+      return server.getRepository('automotive', repositoryClientConfig).then((actual) => {
+        // Omit axios instances, they fail the deep equal check
+        actual.httpClients.forEach(client => delete client.axios);
+        expected.httpClients.forEach(client => delete client.axios);
+        expect(actual).toEqual(expected);
+      });
     });
   });
 

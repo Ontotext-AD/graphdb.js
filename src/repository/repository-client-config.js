@@ -11,15 +11,17 @@ class RepositoryClientConfig {
    * @param {number} readTimeout
    * @param {number} writeTimeout
    * @param {number} retryInterval
+   * @param {number} retryCount
    */
   constructor(endpoints, headers, defaultRDFContentType, readTimeout,
-      writeTimeout, retryInterval) {
+      writeTimeout, retryInterval, retryCount) {
     this.endpoints = endpoints;
     this.headers = headers;
     this.defaultRDFContentType = defaultRDFContentType;
     this.readTimeout = readTimeout;
     this.writeTimeout = writeTimeout;
     this.retryInterval = retryInterval;
+    this.retryCount = retryCount;
   }
 }
 
