@@ -9,6 +9,7 @@
     "build:dev": "rimraf lib/ && cross-env NODE_ENV=development webpack --mode development",
     "watch": "rimraf lib/ && cross-env NODE_ENV=development webpack --mode development --watch",
     "test": "jest",
+    "test:watch": "jest --watch",
     "test:report": "rimraf report/ && jest --config jest-report.config.js",
     "lint": "eslint ./src",
     "lint:test": "eslint --no-eslintrc --config .eslintrc-test ./test",
