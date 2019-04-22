@@ -1,8 +1,8 @@
-const HttpClient = require('../http/http-client');
-const ConsoleLogger = require('../logging/console-logger');
-const RDFRepositoryClient = require('../repository/rdf-repository-client');
-const RepositoryClientConfig =
-  require('../repository/repository-client-config');
+const HttpClient = require('http/http-client');
+const ConsoleLogger = require('logging/console-logger');
+const RDFRepositoryClient = require('repository/rdf-repository-client');
+const RepositoryClientConfig = require('repository/repository-client-config');
+const RDFContentType = require('http/rdf-content-type');
 
 const SERVICE_URL = '/repositories';
 
@@ -27,7 +27,7 @@ class ServerClient {
    */
   getRepositoryIDs() {
     return this.httpClient.get(SERVICE_URL, {
-      headers: {'Accept': 'application/sparql-results+json'},
+      headers: {'Accept': RDFContentType.SPARQL_RESULTS_JSON}
     }).then((response) => {
       return response.data.results.bindings.map(({id}) => id.value);
     });
@@ -82,7 +82,7 @@ class ServerClient {
     if (!id) {
       return Promise.reject(new Error('Repository id is required parameter!'));
     }
-    return this.httpClient.delete(`${SERVICE_URL}/${id}`);
+    return this.httpClient.deleteResource(`${SERVICE_URL}/${id}`);
   }
 
   /**

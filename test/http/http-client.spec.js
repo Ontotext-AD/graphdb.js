@@ -33,6 +33,7 @@ describe('HttpClient', () => {
     axiosMock.post.mockResolvedValue();
     axiosMock.put.mockResolvedValue();
     axiosMock.delete.mockResolvedValue();
+    axiosMock.defaults = {};
 
     httpClient = new HttpClient('/base/url', 1000);
   });
@@ -42,6 +43,12 @@ describe('HttpClient', () => {
     expect(httpClient.axios).not.toBeNull();
     expect(axios.create).toHaveBeenCalledTimes(1);
     expect(axios.create).toHaveBeenCalledWith({baseURL: '/base/url', timeout: 1000});
+  });
+
+  test('should allow to set default request headers', () => {
+    let headers = {'Accept': 'application/json'};
+    httpClient.setDefaultHeaders(headers);
+    expect(axiosMock.defaults.headers).toEqual(headers);
   });
 
   test('should perform GET requests with the supplied params', () => {

@@ -16,11 +16,25 @@ class HttpClient {
    *
    * @constructor
    * @param {string} baseURL base URL that will be prepend to all requests
-   * @param {number} timeout default timeout for all requests; if 0 or negative
-   *                         there will be no timeout
+   * @param {number} [timeout=0] default timeout for all requests; if 0 or
+   *                             negative there will be no timeout;
    */
-  constructor(baseURL, timeout) {
+  constructor(baseURL, timeout = 0) {
     this.axios = axios.create({baseURL, timeout});
+  }
+
+  /**
+   * Sets the provided header map as default for all requests.
+   *
+   * Any additional headers provided in the request configuration will
+   * be merged with this default map.
+   *
+   * @param {Map<string, string>} headers map with default headers
+   * @return {HttpClient} the current client for method chaining
+   */
+  setDefaultHeaders(headers) {
+    this.axios.defaults.headers = headers;
+    return this;
   }
 
   /**
@@ -31,11 +45,11 @@ class HttpClient {
    * given URL.
    *
    * @param {string} url URL to the requested resource
-   * @param {object} config request configuration that can include params
+   * @param {object} [config={}] request configuration that can include params
    *                        and headers
    * @return {Promise<any>} a promise resolving to the request's response
    */
-  get(url, config) {
+  get(url, config = {}) {
     return this.axios.get(url, config);
   }
 
@@ -48,11 +62,11 @@ class HttpClient {
    *
    * @param {string} url URL to the requested resource
    * @param {object} data the request body
-   * @param {object} config request configuration that can include params
+   * @param {object} [config={}] request configuration that can include params
    *                        and headers
    * @return {Promise<any>} a promise resolving to the request's response
    */
-  post(url, data, config) {
+  post(url, data, config = {}) {
     return this.axios.post(url, data, config);
   }
 
@@ -65,11 +79,11 @@ class HttpClient {
    *
    * @param {string} url URL to the requested resource
    * @param {object} data the request body
-   * @param {object} config request configuration that can include params
+   * @param {object} [config={}] request configuration that can include params
    *                        and headers
    * @return {Promise<any>} a promise resolving to the request's response
    */
-  put(url, data, config) {
+  put(url, data, config = {}) {
     return this.axios.put(url, data, config);
   }
 
@@ -81,11 +95,11 @@ class HttpClient {
    * given URL.
    *
    * @param {string} url URL to the requested resource
-   * @param {object} config request configuration that can include params
+   * @param {object} [config={}] request configuration that can include params
    *                        and headers
    * @return {Promise<any>} a promise resolving to the request's response
    */
-  deleteResource(url, config) {
+  deleteResource(url, config = {}) {
     return this.axios.delete(url, config);
   }
 }

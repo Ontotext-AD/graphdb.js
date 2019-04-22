@@ -2,7 +2,10 @@
   "extends": ["eslint:recommended", "google"],
   "rules": {
     "no-console" : "error",
-    "no-debugger": "error"
+    "no-debugger": "error",
+    "comma-dangle": ["error", {
+      "objects": "never"
+    }]
   },
   "settings": {
     "import/resolver": "webpack"
