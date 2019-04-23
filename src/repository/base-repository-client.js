@@ -7,11 +7,18 @@ const Iterable = require('util/iterable');
 /**
  * Set of HTTP status codes for which requests could be re-attempted.
  *
- * @enum {number}
+ * @type {number[]}
  */
 const RETRIABLE_STATUSES = [
   503 // Server busy
 ];
+
+/**
+ * Defines a path segment for statements rest endpoint
+ *
+ * @type {string}
+ */
+const PATH_STATEMENTS = '/statements';
 
 /**
  * Implementation of the RDF repository operations.
@@ -62,6 +69,35 @@ class BaseRepositoryClient {
       return new HttpClient(endpoint).setDefaultHeaders(config.headers);
     });
   }
+
+  /**
+   * Fetch rdf data from statements endpoint using provided parameters.
+   *
+   * @param {Object} params is an object holding request parameters as returned
+   *                 by {@link GetStatementsPayload}#get()
+   * @return {Promise<string|Quad>} resolves with plain string or Quad according
+   *      to provided response type.
+   */
+  get(params) {
+    return this.execute((http) => {
+      return http.get(PATH_STATEMENTS, {
+        params: {
+          subj: params.subject,
+          pred: params.predicate,
+          obj: params.object,
+          context: params.context,
+          infer: params.inference,
+          timeout: this.repositoryClientConfig.readTimeout
+        },
+        headers: {
+          'Accept': params.responseType
+        }
+      });
+    }).then((response) => {
+      return response.data;
+    });
+  }
+
 
   /**
    * Executor for http requests. It supplies the provided HTTP client consumer

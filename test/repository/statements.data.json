@@ -1,0 +1,12 @@
+{
+  "repositories": {
+    "repo1": {
+      "statements": {
+        "GET": {
+          "single": "<?xml version=\"1.0\" encoding=\"UTF-8\"?><rdf:RDF xmlns=\"http://eunis.eea.europa.eu/rdf/schema.rdf#\"><rdf:Description rdf:about=\"http://eunis.eea.europa.eu/countries/AZ\"><population rdf:datatype=\"http://www.w3.org/2001/XMLSchema#integer\">7931000</population></rdf:Description></rdf:RDF>",
+          "all": "<?xml version=\"1.0\" encoding=\"UTF-8\"?><rdf:RDF xmlns=\"http://eunis.eea.europa.eu/rdf/schema.rdf#\"><rdf:Description rdf:about=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#type\"><rdf:type rdf:resource=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#Property\"/></rdf:Description><rdf:Description rdf:about=\"http://www.w3.org/2000/01/rdf-schema#subPropertyOf\"><rdf:type rdf:resource=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#Property\"/><rdf:type rdf:resource=\"http://www.w3.org/2002/07/owl#TransitiveProperty\"/></rdf:Description><rdf:Description rdf:about=\"http://www.w3.org/2000/01/rdf-schema#subClassOf\"><rdf:type rdf:resource=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#Property\"/><rdf:type rdf:resource=\"http://www.w3.org/2002/07/owl#TransitiveProperty\"/></rdf:Description><rdf:Description rdf:about=\"http://www.w3.org/2000/01/rdf-schema#domain\"><rdf:type rdf:resource=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#Property\"/></rdf:Description></rdf:RDF>"
+        }
+      }
+    }
+  }
+}
