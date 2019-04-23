@@ -71,6 +71,15 @@ class BaseRepositoryClient {
   }
 
   /**
+   * Register provided parser in the internal parser registry.
+   *
+   * @param {ContentTypeParser} parser implementation wrapper.
+   */
+  registerParser(parser) {
+    this.parserRegistry.register(parser);
+  }
+
+  /**
    * Fetch rdf data from statements endpoint using provided parameters.
    *
    * @param {Object} params is an object holding request parameters as returned
@@ -86,18 +95,37 @@ class BaseRepositoryClient {
           pred: params.predicate,
           obj: params.object,
           context: params.context,
-          infer: params.inference,
-          timeout: this.repositoryClientConfig.readTimeout
+          infer: params.inference
         },
         headers: {
           'Accept': params.responseType
-        }
+        },
+        timeout: this.repositoryClientConfig.readTimeout
       });
     }).then((response) => {
-      return response.data;
+      return this.parse(response.data, params.responseType);
     });
   }
 
+  /**
+   * Parses provided content with registered parser if there is one. Otherwise
+   * returns the content untouched. If <code>contentType</code> is provided it
+   * should be an instance of {@link RdfContentType} enum and is used as a key
+   * for selecting appropriate parser from the parsers registry.
+   * Parsing is done synchronously!
+   *
+   * @private
+   * @param {string} content
+   * @param {string} responseType
+   * @return {(string|Term|Term[])}
+   */
+  parse(content, responseType) {
+    if (!this.parserRegistry.get(responseType)) {
+      return content;
+    }
+    const parser = this.parserRegistry.get(responseType);
+    return parser.parse(content);
+  }
 
   /**
    * Executor for http requests. It supplies the provided HTTP client consumer

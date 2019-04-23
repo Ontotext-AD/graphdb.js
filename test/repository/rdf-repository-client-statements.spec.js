@@ -3,6 +3,18 @@ const RDFRepositoryClient = require('repository/rdf-repository-client');
 const RepositoryClientConfig = require('repository/repository-client-config');
 const GetStatementsPayload = require('repository/get-statements-payload');
 const RDFContentType = require('http/rdf-content-type');
+const TurtleParser = require('parser/turtle-parser');
+const NTriplesParser = require('parser/n-triples-parser');
+const NQuadsParser = require('parser/n-quads-parser');
+const N3Parser = require('parser/n3-parser');
+const TriGParser = require('parser/trig-parser');
+
+const DataFactory = require('n3').DataFactory;
+const namedNode = DataFactory.namedNode;
+const literal = DataFactory.literal;
+const defaultGraph = DataFactory.defaultGraph;
+const quad = DataFactory.quad;
+
 const httpClientStub = require('../http/http-client.stub');
 
 jest.mock('http/http-client');
@@ -20,15 +32,90 @@ describe('RDFRepositoryClient - statements', () => {
   const retryInterval = 1000;
   const retryCount = 1;
 
-  beforeEach(() => {
-    HttpClient.mockImplementation(() => httpClientStub());
+  describe('statements#get returning Quads', () => {
+    beforeEach(() => {
+      HttpClient.mockImplementation(() => httpClientStub());
 
-    config = new RepositoryClientConfig(endpoints, headers, contentType,
-      readTimeout, writeTimeout, retryInterval, retryCount);
-    repository = new RDFRepositoryClient(config);
+      config = new RepositoryClientConfig(endpoints, headers, contentType,
+        readTimeout, writeTimeout, retryInterval, retryCount);
+      repository = new RDFRepositoryClient(config);
+    });
+
+    const expected = [quad(
+      namedNode('http://eunis.eea.europa.eu/countries/AZ'),
+      namedNode('http://eunis.eea.europa.eu/rdf/schema.rdf#population'),
+      literal(7931000),
+      defaultGraph())];
+
+    function mockHttpGET(type) {
+      repository.httpClients[0].get.mockImplementation(() => Promise.resolve({
+        data: data.repositories.repo1.statements.GET[type]
+      }));
+    }
+
+    function buildPayload(type) {
+      return new GetStatementsPayload()
+        .setSubject('<http://eunis.eea.europa.eu/countries/AZ>')
+        .setPredicate('<http://eunis.eea.europa.eu/rdf/schema.rdf#population>')
+        .setResponseType(type)
+        .get();
+    }
+
+    test('should fetch statement in N-Triples format and return it converted to quads', () => {
+      repository.registerParser(new NTriplesParser());
+
+      mockHttpGET(RDFContentType.N_TRIPLES);
+
+      const payload = buildPayload(RDFContentType.N_TRIPLES);
+      return expect(repository.get(payload)).resolves.toEqual(expected);
+    });
+
+    test('should fetch statement in N3 format and return it converted to quads', () => {
+      repository.registerParser(new N3Parser());
+
+      mockHttpGET(RDFContentType.N3);
+
+      const payload = buildPayload(RDFContentType.N3);
+      return expect(repository.get(payload)).resolves.toEqual(expected);
+    });
+
+    test('should fetch statement in TriG format and return it converted to quads', () => {
+      repository.registerParser(new TriGParser());
+
+      mockHttpGET(RDFContentType.TRIG);
+
+      const payload = buildPayload(RDFContentType.TRIG);
+      return expect(repository.get(payload)).resolves.toEqual(expected);
+    });
+
+    test('should fetch statement in N-Quads format and return it converted to quads', () => {
+      repository.registerParser(new NQuadsParser());
+
+      mockHttpGET(RDFContentType.N_QUADS);
+
+      const payload = buildPayload(RDFContentType.N_QUADS);
+      return expect(repository.get(payload)).resolves.toEqual(expected);
+    });
+
+    test('should fetch statement in Turtle format and return it converted to quads', () => {
+      repository.registerParser(new TurtleParser());
+
+      mockHttpGET(RDFContentType.TURTLE);
+
+      const payload = buildPayload(RDFContentType.TURTLE);
+      return expect(repository.get(payload)).resolves.toEqual(expected);
+    });
   });
 
-  describe('statements#get', () => {
+  describe('statements#get returning plain string', () => {
+    beforeEach(() => {
+      HttpClient.mockImplementation(() => httpClientStub());
+
+      config = new RepositoryClientConfig(endpoints, headers, contentType,
+        readTimeout, writeTimeout, retryInterval, retryCount);
+      repository = new RDFRepositoryClient(config);
+    });
+
     test('should reject with error if response fails', () => {
       repository.httpClients[0].get.mockImplementation(() => Promise.reject({response: 'Server error'}));
 
@@ -59,16 +146,16 @@ describe('RDFRepositoryClient - statements', () => {
             infer: true,
             obj: '"7931000"^^http://www.w3.org/2001/XMLSchema#integer',
             pred: '<http://eunis.eea.europa.eu/rdf/schema.rdf#population>',
-            subj: '<http://eunis.eea.europa.eu/countries/AZ>',
-            timeout: 1000
-          }
+            subj: '<http://eunis.eea.europa.eu/countries/AZ>'
+          },
+          timeout: 1000
         });
       });
     });
 
     test('should fetch and return single statement as plain string', () => {
       repository.httpClients[0].get.mockImplementation(() => Promise.resolve({
-        data: data.repositories.repo1.statements.GET.single
+        data: data.repositories.repo1.statements.GET['single_application/rdf+xml']
       }));
 
       const payload = new GetStatementsPayload()
@@ -90,7 +177,7 @@ describe('RDFRepositoryClient - statements', () => {
 
     test('should fetch and return all statement as plain string', () => {
       repository.httpClients[0].get.mockImplementation(() => Promise.resolve({
-        data: data.repositories.repo1.statements.GET.all
+        data: data.repositories.repo1.statements.GET['all_application/rdf+xml']
       }));
       const expected = '<?xml version="1.0" encoding="UTF-8"?><rdf:RDF xmlns="http://eunis.eea.europa.eu/rdf/schema.rdf#"><rdf:Description rdf:about="http://www.w3.org/1999/02/22-rdf-syntax-ns#type"><rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"/></rdf:Description><rdf:Description rdf:about="http://www.w3.org/2000/01/rdf-schema#subPropertyOf"><rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"/><rdf:type rdf:resource="http://www.w3.org/2002/07/owl#TransitiveProperty"/></rdf:Description><rdf:Description rdf:about="http://www.w3.org/2000/01/rdf-schema#subClassOf"><rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"/><rdf:type rdf:resource="http://www.w3.org/2002/07/owl#TransitiveProperty"/></rdf:Description><rdf:Description rdf:about="http://www.w3.org/2000/01/rdf-schema#domain"><rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"/></rdf:Description></rdf:RDF>';
 
