@@ -3,6 +3,7 @@ const RdfRepositoryClient = require('repository/rdf-repository-client');
 const ServerClientConfig = require('server/server-client-config');
 const HttpClient = require('http/http-client');
 const httpClientStub = require('../http/http-client.stub');
+const {when} = require('jest-when');
 
 jest.mock('http/http-client');
 
@@ -56,6 +57,54 @@ describe('RdfRepositoryClient', () => {
     expect(() => new RdfRepositoryClient({})).toThrow(Error);
     expect(() => new RdfRepositoryClient(new ServerClientConfig('', 1, {}))).toThrow(Error);
     expect(() => new RdfRepositoryClient(new RepositoryClientConfig([]))).toThrow(Error);
+  });
+
+  describe('getSize()', () => {
+
+    let rdfRepositoryClient;
+    let get;
+
+    beforeEach(() => {
+      let repoClientConfig = new RepositoryClientConfig([
+        'http://localhost:8080/repositories/test'
+      ], defaultHeaders, 'application/json', 100, 200, 300, 4);
+      rdfRepositoryClient = new RdfRepositoryClient(repoClientConfig);
+      get = rdfRepositoryClient.httpClients[0].get;
+      when(get).calledWith('/size').mockResolvedValue({data: 123});
+    });
+
+    test('should retrieve the number of statements in the repository', () => {
+      return expect(rdfRepositoryClient.getSize()).resolves.toEqual(123);
+    });
+
+    test('should properly request the number of statements in the repository', () => {
+      return rdfRepositoryClient.getSize().then(() => {
+        expect(get).toHaveBeenCalledTimes(1);
+        expect(get).toHaveBeenCalledWith('/size', {
+          timeout: 100,
+          params: {
+            context: undefined
+          }
+        });
+      });
+    });
+
+    test('should properly request the number of statements in the repository for the specified contexts', () => {
+      return rdfRepositoryClient.getSize(['context-1']).then(() => {
+        expect(get).toHaveBeenCalledTimes(1);
+        expect(get).toHaveBeenCalledWith('/size', {
+          timeout: 100,
+          params: {
+            context: ['context-1']
+          }
+        });
+      });
+    });
+
+    test('should reject size retrieving when the server request is unsuccessful', () => {
+      when(get).calledWith('/size').mockRejectedValue('get-size-error');
+      return expect(rdfRepositoryClient.getSize()).rejects.toEqual('get-size-error');
+    });
   });
 
 });
