@@ -153,6 +153,45 @@ class BaseRepositoryClient {
   }
 
   /**
+   * Deletes statements in the repository based on the provided subject,
+   * predicate, object and or contexts. Each of them is optional and acts as
+   * statements filter which effectively narrows the scope of the deletion.
+   *
+   * Providing context or contexts will restricts the operation to one or more
+   * specific contexts in the repository.
+   *
+   * @param {String} [subject] N-Triples encoded resource subject
+   * @param {String} [predicate] N-Triples encoded resource predicate
+   * @param {String} [object] N-Triples encoded resource object
+   * @param {String[]|String} [contexts] N-Triples encoded resource or resources
+   * @return {Promise} promise that will be resolved if the deletion is
+   *                         successful or rejected in case of failure
+   */
+  deleteStatements(subject, predicate, object, contexts) {
+    return this.execute((http) => http.deleteResource(PATH_STATEMENTS, {
+      timeout: this.repositoryClientConfig.writeTimeout,
+      params: {
+        subj: subject,
+        pred: predicate,
+        obj: object,
+        context: contexts
+      }
+    }));
+  }
+
+  /**
+   * Deletes all statements in the repository.
+   *
+   * @return {Promise} promise that will be resolved if the deletion is
+   *                   successful or rejected in case of failure
+   */
+  deleteAllStatements() {
+    return this.execute((http) => http.deleteResource(PATH_STATEMENTS, {
+      timeout: this.repositoryClientConfig.writeTimeout
+    }));
+  }
+
+  /**
    * Executor for http requests. It supplies the provided HTTP client consumer
    * with a HTTP client for executing requests.
    *
