@@ -1,3 +1,4 @@
+const {defaults} = require('jest-config');
 const CONFIG = require('./jest.config');
 const REPORT_DIR = 'report';
 
@@ -13,6 +14,8 @@ module.exports = Object.assign({
 
   coverageReporters: ['text', 'lcov'],
 
-  reporters: ['default', ['jest-junit', {outputDirectory: REPORT_DIR}]]
+  reporters: ['default', ['jest-junit', {outputDirectory: REPORT_DIR}]],
+
+  coveragePathIgnorePatterns: [...defaults.coveragePathIgnorePatterns, 'test/']
 
 }, CONFIG);
