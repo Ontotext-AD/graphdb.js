@@ -47,6 +47,7 @@ class BaseRepositoryClient {
 
   /**
    * Initializes the parser registry with default supported parsers.
+   * @private
    */
   initParsers() {
     this.parserRegistry = new ParserRegistry();
@@ -54,6 +55,7 @@ class BaseRepositoryClient {
 
   /**
    * Initializes a logger instance.
+   * @private
    */
   initLogger() {
     this.logger = new ConsoleLogger();
@@ -61,6 +63,7 @@ class BaseRepositoryClient {
 
   /**
    * Initializes http clients depending on the provided endpoints.
+   * @private
    */
   initHttpClients() {
     const config = this.repositoryClientConfig;
@@ -77,6 +80,28 @@ class BaseRepositoryClient {
    */
   registerParser(parser) {
     this.parserRegistry.register(parser);
+  }
+
+  /**
+   * Retrieves the size of the repository.
+   *
+   * Effectively returns how much statements are in the repository.
+   *
+   * If one or multiple context are provided, the operation will be restricted
+   * upon each of them.
+   *
+   * @param {string|string[]} [context] context or contexts to restrict the
+   *                            size calculation
+   * @return {Promise<number>} a promise resolving to the total number of
+   *                           statements in the repository
+   */
+  getSize(context) {
+    return this.execute((http) => http.get('/size', {
+      timeout: this.repositoryClientConfig.readTimeout,
+      params: {
+        context
+      }
+    })).then((response) => response.data);
   }
 
   /**
