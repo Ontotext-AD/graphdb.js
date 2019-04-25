@@ -3,6 +3,8 @@ const ConsoleLogger = require('logging/console-logger');
 const HttpClient = require('http/http-client');
 const RepositoryClientConfig = require('repository/repository-client-config');
 const Iterable = require('util/iterable');
+const RDFContentType = require('http/rdf-content-type');
+const TermConverter = require('model/term-converter');
 
 /**
  * Set of HTTP status codes for which requests could be re-attempted.
@@ -153,6 +155,25 @@ class BaseRepositoryClient {
   }
 
   /**
+   * Serializes the provided quads to Turtle format and sends them to the
+   * repository as payload.
+   *
+   * @param {Quad[]} quads collection of quads to be sent as Turtle text
+   * @return {Promise} promise that will be resolved if the addition is
+   *                    successful or rejected in case of failure
+   */
+  addQuads(quads) {
+    return TermConverter.toTurtle(quads).then((payload) => {
+      return this.execute((http) => http.post(PATH_STATEMENTS, payload, {
+        timeout: this.repositoryClientConfig.writeTimeout,
+        headers: {
+          'Content-Type': RDFContentType.TURTLE
+        }
+      }));
+    });
+  }
+
+  /**
    * Deletes statements in the repository based on the provided subject,
    * predicate, object and or contexts. Each of them is optional and acts as
    * statements filter which effectively narrows the scope of the deletion.
@@ -257,6 +278,10 @@ class BaseRepositoryClient {
    *                    <code>false</code> otherwise
    */
   static canRetryExecution(error) {
+    // Not an error from the HTTP client, do not retry
+    if (!error.request) {
+      return false;
+    }
     // The current client couldn't get a response from the server, try again
     if (!error.response) {
       return true;

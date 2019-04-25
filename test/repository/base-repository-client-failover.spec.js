@@ -130,13 +130,13 @@ describe('BaseRepositoryClient', () => {
 
     test('should reject if the repository endpoint(s) is unreachable', () => {
       let httpClient1 = repositoryClient.httpClients[0];
-      httpClient1.get.mockRejectedValue({});
+      stubHttpClientRejection(httpClient1);
 
       let httpClient2 = repositoryClient.httpClients[1];
-      httpClient2.get.mockRejectedValue({});
+      stubHttpClientRejection(httpClient2);
 
       let httpClient3 = repositoryClient.httpClients[2];
-      httpClient3.get.mockRejectedValue({});
+      stubHttpClientRejection(httpClient3);
 
       return repositoryClient.execute((client) => client.get('url')).catch(() => {
         expect(httpClient1.get).toHaveBeenCalledTimes(3);
@@ -147,10 +147,10 @@ describe('BaseRepositoryClient', () => {
 
     test('should automatically switch to another repository endpoint if the previous is unreachable', () => {
       let httpClient1 = repositoryClient.httpClients[0];
-      httpClient1.get.mockRejectedValue({});
+      stubHttpClientRejection(httpClient1);
 
       let httpClient2 = repositoryClient.httpClients[1];
-      httpClient2.get.mockRejectedValue({});
+      stubHttpClientRejection(httpClient2);
 
       // Should manage to the response on the first retry
       let httpClient3 = repositoryClient.httpClients[2];
@@ -170,8 +170,17 @@ describe('BaseRepositoryClient', () => {
       if (status < 400) {
         client.get.mockResolvedValueOnce({});
       } else {
-        client.get.mockRejectedValueOnce({response: {status: status}});
+        client.get.mockRejectedValueOnce({
+          request: {},
+          response: {status}
+        });
       }
+    });
+  }
+
+  function stubHttpClientRejection(client) {
+    client.get.mockRejectedValue({
+      request: {}
     });
   }
 

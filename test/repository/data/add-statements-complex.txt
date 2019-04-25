@@ -1,0 +1,14 @@
+<http://domain/resource/resource-1> <http://domain/property/relation-1> <http://domain/value/uri-1>;
+    <http://domain/property/relation-2> <http://domain/value/uri-2>;
+    <http://domain/property/boolean-property> "true"^^<xsd:boolean>;
+    <http://domain/property/title> "Title"@en, "Titel"@de.
+<http://domain/graph/data-graph-1> {
+<http://domain/resource/resource-2> <http://domain/property/relation-1> <http://domain/value/uri-2>;
+    <http://domain/property/relation-2> <http://domain/value/uri-3>
+}
+<http://domain/graph/data-graph-2> {
+<http://domain/resource/resource-2> <http://domain/property/title> "Title"@en, "Titel"@de
+}
+<http://domain/graph/data-graph-1> {
+<http://domain/resource/resource-3> <http://domain/property/relation-1> <http://domain/value/uri-4>
+}
