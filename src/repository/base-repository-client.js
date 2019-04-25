@@ -220,12 +220,8 @@ class BaseRepositoryClient {
    * HTTP client in case the request's status is one of
    * {@link RETRIABLE_STATUSES} or if the host is currently unreachable.
    *
-   * If the retry was unsuccessful with all available endpoint clients, then the
-   * execution will perform a timeout retry based on the configured timeout
-   * amount and count. This will start from the first http client.
-   *
-   * If all of the endpoints & timeout are unsuccessful then the execution will
-   * fail with promise rejection.
+   * If all of the endpoints are unsuccessful then the execution will fail
+   * with promise rejection.
    *
    * @protected
    * @param {Function} httpClientConsumer the consumer of supplied http client
@@ -234,36 +230,26 @@ class BaseRepositoryClient {
    */
   execute(httpClientConsumer) {
     const httpClients = new Iterable(this.httpClients);
-    return this.retryExecution(httpClients, httpClientConsumer, 0);
+    return this.retryExecution(httpClients, httpClientConsumer);
   }
 
   /**
-   * Retries HTTP request execution until successful or until no more retries
-   * and/or clients are left.
+   * Retries HTTP request execution until successful or until no more clients
+   * are left if the status is allowed for retry.
    *
    * @private
    * @param {Iterable} httpClients iterable collection of http clients
    * @param {Function} httpClientConsumer the consumer of supplied http client
    *                                      that performs the request execution
-   * @param {number} retries current amounts of attempted retries
    * @return {Promise<any>} a promise which resolves to http request response
    */
-  retryExecution(httpClients, httpClientConsumer, retries) {
+  retryExecution(httpClients, httpClientConsumer) {
     return httpClientConsumer(httpClients.next()).catch((error) => {
-      if (BaseRepositoryClient.canRetryExecution(error)) {
+      if (BaseRepositoryClient.canRetryExecution(error)
+          && httpClients.hasNext()) {
         // Try the next endpoint client (if any)
-        if (httpClients.hasNext()) {
-          return this.retryExecution(httpClients, httpClientConsumer, retries);
-        }
-
-        // If there are no clients left to retry with -> timeout and try again
-        // from the first endpoint client
-        if (retries < this.repositoryClientConfig.retryCount) {
-          return this.retryWithTimeout(httpClients.reset(), httpClientConsumer,
-              ++retries);
-        }
+        return this.retryExecution(httpClients, httpClientConsumer);
       }
-
       // Not retriable
       return Promise.reject(error);
     });
@@ -279,7 +265,7 @@ class BaseRepositoryClient {
    */
   static canRetryExecution(error) {
     // Not an error from the HTTP client, do not retry
-    if (!error.request) {
+    if (!error || !error.request) {
       return false;
     }
     // The current client couldn't get a response from the server, try again
@@ -288,26 +274,6 @@ class BaseRepositoryClient {
     }
     const status = error.response.status;
     return RETRIABLE_STATUSES.indexOf(status) > -1;
-  }
-
-  /**
-   * Retries the HTTP request execution after the configured repository
-   * retry timeout.
-   *
-   * @private
-   * @param {Iterable} httpClients iterable collection of http clients
-   * @param {Function} httpClientConsumer the consumer of supplied http client
-   *                                      that performs the request execution
-   * @param {number} retries current amounts of attempted retries
-   * @return {Promise<any>} a promise which resolves to http request response
-   */
-  retryWithTimeout(httpClients, httpClientConsumer, retries) {
-    return new Promise((resolve, reject) => {
-      setTimeout(() => {
-        this.retryExecution(httpClients, httpClientConsumer, retries)
-            .then(resolve, reject);
-      }, this.repositoryClientConfig.retryInterval);
-    });
   }
 
   /**
