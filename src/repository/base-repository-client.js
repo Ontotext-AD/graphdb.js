@@ -110,7 +110,7 @@ class BaseRepositoryClient {
    * Fetch rdf data from statements endpoint using provided parameters.
    *
    * @param {Object} params is an object holding request parameters as returned
-   *                 by {@link GetStatementsPayload}#get()
+   *                 by {@link GetStatementsPayload#get()}
    * @return {Promise<string|Quad>} resolves with plain string or Quad according
    *      to provided response type.
    */
@@ -132,6 +132,45 @@ class BaseRepositoryClient {
     }).then((response) => {
       return this.parse(response.data, params.responseType);
     });
+  }
+
+  /**
+   * Executes request to query a repository.
+   *
+   * Only POST request with a valid QueryPayload is supported.
+   *
+   * @param {QueryPayload} payload is an object holding request parameters
+   * required by the query POST endpoint.
+   * @return {Promise} stream that emits string or Quad depending on the
+   * provided response type as soon as they are available.
+   */
+  query(payload) {
+    return this.execute((http) => {
+      return http.post('',
+          payload.getParams(),
+          this.getQueryPostConfig(payload));
+    }).then((response) => {
+      return response.data;
+    });
+  }
+
+  /**
+   * Creates a configuration object for the http client which contains http
+   * headers, timeout and the responseType.
+   *
+   * @private
+   * @param {QueryPayload} payload
+   * @return {Object}
+   */
+  getQueryPostConfig(payload) {
+    return {
+      headers: {
+        'Accept': payload.getResponseType(),
+        'Content-Type': payload.getContentType()
+      },
+      timeout: this.repositoryClientConfig.readTimeout,
+      responseType: 'stream'
+    };
   }
 
   /**
