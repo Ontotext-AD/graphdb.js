@@ -10,56 +10,7 @@ describe('BaseRepositoryClient', () => {
   let repoClientConfig;
   let repositoryClient;
 
-  describe('Automatic failover - retrying', () => {
-    beforeEach(() => {
-      repoClientConfig = new RepositoryClientConfig([
-        'http://localhost:8080/repositories/test'
-      ], {}, '', 100, 200, 50, 4);
-
-      HttpClient.mockImplementation(() => httpClientStub());
-
-      repositoryClient = new TestRepositoryClient(repoClientConfig);
-    });
-
-    test('should automatically retry for 503 server busy', () => {
-      let httpClient = repositoryClient.httpClients[0];
-      // The 4th retry should be successful -> 5 calls in total
-      stubHttpClient(httpClient, [503, 503, 503, 503, 200]);
-      return repositoryClient.execute((client) => client.get('url')).then(() => {
-        expect(httpClient.get).toHaveBeenCalledTimes(5);
-      });
-    });
-
-    test('should reject automatic retry if the status is not retriable', () => {
-      let httpClient = repositoryClient.httpClients[0];
-      stubHttpClient(httpClient, [404]);
-      return repositoryClient.execute((client) => client.get('url')).catch(() => {
-        expect(httpClient.get).toHaveBeenCalledTimes(1);
-      });
-    });
-
-    test('should reject if all retry attempts were unsuccessful', () => {
-      let httpClient = repositoryClient.httpClients[0];
-      // The 4th retry should NOT be successful
-      stubHttpClient(httpClient, [503, 503, 503, 503, 503, 503]);
-      return repositoryClient.execute((client) => client.get('url')).catch(() => {
-        expect(httpClient.get).toHaveBeenCalledTimes(5);
-      });
-    });
-
-    test('should reject if there are no configured retries', () => {
-      repoClientConfig.retryCount = 0;
-      repositoryClient = new TestRepositoryClient(repoClientConfig);
-
-      let httpClient = repositoryClient.httpClients[0];
-      stubHttpClient(httpClient, [503]);
-      return repositoryClient.execute((client) => client.get('url')).catch(() => {
-        expect(httpClient.get).toHaveBeenCalledTimes(1);
-      });
-    });
-  });
-
-  describe('Automatic failover - switching repo endpoints', () => {
+  describe('Automatic failover - retrying with different repo endpoint', () => {
     beforeEach(() => {
       repoClientConfig = new RepositoryClientConfig([
         'http://localhost:8081/repositories/test1',
@@ -72,113 +23,121 @@ describe('BaseRepositoryClient', () => {
       repositoryClient = new TestRepositoryClient(repoClientConfig);
     });
 
-    test('should automatically switch to another repository endpoint if retry attempts were unsuccessful', () => {
+    test('should automatically switch to another repository endpoint if the status is allowed for retry', () => {
       let httpClient1 = repositoryClient.httpClients[0];
-      stubHttpClient(httpClient1, [503, 503, 503]);
+      stubHttpClient(httpClient1, 503);
 
       let httpClient2 = repositoryClient.httpClients[1];
-      stubHttpClient(httpClient2, [503, 503, 503]);
+      stubHttpClient(httpClient2, 503);
 
       // The last retry on the last client should be successful
       let httpClient3 = repositoryClient.httpClients[2];
-      stubHttpClient(httpClient3, [503, 503, 200]);
-
-      return repositoryClient.execute((client) => client.get('url')).then(() => {
-        expect(httpClient1.get).toHaveBeenCalledTimes(3);
-        expect(httpClient2.get).toHaveBeenCalledTimes(3);
-        expect(httpClient3.get).toHaveBeenCalledTimes(3);
-      });
-    });
-
-    test('should automatically switch to another repository endpoint if there are no retries configured', () => {
-      repoClientConfig.retryCount = 0;
-      repositoryClient = new TestRepositoryClient(repoClientConfig);
-
-      let httpClient1 = repositoryClient.httpClients[0];
-      stubHttpClient(httpClient1, [503]);
-
-      // Second endpoint should be successful
-      let httpClient2 = repositoryClient.httpClients[1];
-      stubHttpClient(httpClient2, [200]);
-
-      let httpClient3 = repositoryClient.httpClients[2];
-      stubHttpClient(httpClient3, [503]);
+      stubHttpClient(httpClient3, 200);
 
       return repositoryClient.execute((client) => client.get('url')).then(() => {
         expect(httpClient1.get).toHaveBeenCalledTimes(1);
         expect(httpClient2.get).toHaveBeenCalledTimes(1);
-        expect(httpClient3.get).toHaveBeenCalledTimes(0);
+        expect(httpClient3.get).toHaveBeenCalledTimes(1);
       });
     });
 
     test('should reject if all repository endpoint have unsuccessful responses', () => {
       let httpClient1 = repositoryClient.httpClients[0];
-      stubHttpClient(httpClient1, [503, 503, 503]);
+      stubHttpClient(httpClient1, 503);
 
       let httpClient2 = repositoryClient.httpClients[1];
-      stubHttpClient(httpClient2, [503, 503, 503]);
+      stubHttpClient(httpClient2, 503);
 
       let httpClient3 = repositoryClient.httpClients[2];
-      stubHttpClient(httpClient3, [503, 503, 503]);
+      stubHttpClient(httpClient3, 503);
 
       return repositoryClient.execute((client) => client.get('url')).catch(() => {
-        expect(httpClient1.get).toHaveBeenCalledTimes(3);
-        expect(httpClient2.get).toHaveBeenCalledTimes(3);
-        expect(httpClient3.get).toHaveBeenCalledTimes(3);
+        expect(httpClient1.get).toHaveBeenCalledTimes(1);
+        expect(httpClient2.get).toHaveBeenCalledTimes(1);
+        expect(httpClient3.get).toHaveBeenCalledTimes(1);
       });
     });
 
-    test('should reject if the repository endpoint(s) is unreachable', () => {
+    test('should automatically switch to another repository endpoint if the previous is/are unreachable', () => {
       let httpClient1 = repositoryClient.httpClients[0];
-      stubHttpClientRejection(httpClient1);
+      stubHttpClientWithoutResponse(httpClient1);
 
       let httpClient2 = repositoryClient.httpClients[1];
-      stubHttpClientRejection(httpClient2);
+      stubHttpClientWithoutResponse(httpClient2);
 
+      // Should manage to get response from the 3rd endpoint
       let httpClient3 = repositoryClient.httpClients[2];
-      stubHttpClientRejection(httpClient3);
-
-      return repositoryClient.execute((client) => client.get('url')).catch(() => {
-        expect(httpClient1.get).toHaveBeenCalledTimes(3);
-        expect(httpClient2.get).toHaveBeenCalledTimes(3);
-        expect(httpClient3.get).toHaveBeenCalledTimes(3);
-      });
-    });
-
-    test('should automatically switch to another repository endpoint if the previous is unreachable', () => {
-      let httpClient1 = repositoryClient.httpClients[0];
-      stubHttpClientRejection(httpClient1);
-
-      let httpClient2 = repositoryClient.httpClients[1];
-      stubHttpClientRejection(httpClient2);
-
-      // Should manage to the response on the first retry
-      let httpClient3 = repositoryClient.httpClients[2];
-      stubHttpClient(httpClient3, [503, 200, 200]);
+      stubHttpClient(httpClient3, 200);
 
       return repositoryClient.execute((client) => client.get('url')).then(() => {
-        expect(httpClient1.get).toHaveBeenCalledTimes(2);
-        expect(httpClient2.get).toHaveBeenCalledTimes(2);
-        expect(httpClient3.get).toHaveBeenCalledTimes(2);
+        expect(httpClient1.get).toHaveBeenCalledTimes(1);
+        expect(httpClient2.get).toHaveBeenCalledTimes(1);
+        expect(httpClient3.get).toHaveBeenCalledTimes(1);
+      });
+    });
+
+    test('should reject if all repository endpoints are unreachable', () => {
+      // Stub with request but without response object
+      let httpClient1 = repositoryClient.httpClients[0];
+      stubHttpClientWithoutResponse(httpClient1);
+
+      let httpClient2 = repositoryClient.httpClients[1];
+      stubHttpClientWithoutResponse(httpClient2);
+
+      let httpClient3 = repositoryClient.httpClients[2];
+      stubHttpClientWithoutResponse(httpClient3);
+
+      return repositoryClient.execute((client) => client.get('url')).catch(() => {
+        expect(httpClient1.get).toHaveBeenCalledTimes(1);
+        expect(httpClient2.get).toHaveBeenCalledTimes(1);
+        expect(httpClient3.get).toHaveBeenCalledTimes(1);
+      });
+    });
+
+    test('should reject if the error is not from the HTTP request', () => {
+      //
+      let httpClient1 = repositoryClient.httpClients[0];
+      httpClient1.get.mockRejectedValue(new Error('Error before/after request'));
+
+      let httpClient2 = repositoryClient.httpClients[1];
+      let httpClient3 = repositoryClient.httpClients[2];
+
+      return repositoryClient.execute((client) => client.get('url')).catch(() => {
+        expect(httpClient1.get).toHaveBeenCalledTimes(1);
+        expect(httpClient2.get).toHaveBeenCalledTimes(0);
+        expect(httpClient3.get).toHaveBeenCalledTimes(0);
+      });
+    });
+
+    test('should reject if there is no provided error', () => {
+      // No error/response
+      let httpClient1 = repositoryClient.httpClients[0];
+      httpClient1.get.mockRejectedValue();
+
+      let httpClient2 = repositoryClient.httpClients[1];
+      let httpClient3 = repositoryClient.httpClients[2];
+
+      return repositoryClient.execute((client) => client.get('url')).catch(() => {
+        expect(httpClient1.get).toHaveBeenCalledTimes(1);
+        expect(httpClient2.get).toHaveBeenCalledTimes(0);
+        expect(httpClient3.get).toHaveBeenCalledTimes(0);
       });
     });
   });
 
-  function stubHttpClient(client, statuses) {
+  function stubHttpClient(client, status) {
     client.get = jest.fn();
-    statuses.forEach(status => {
-      if (status < 400) {
-        client.get.mockResolvedValueOnce({});
-      } else {
-        client.get.mockRejectedValueOnce({
-          request: {},
-          response: {status}
-        });
-      }
-    });
+    if (status < 400) {
+      client.get.mockResolvedValueOnce({});
+    } else {
+      client.get.mockRejectedValueOnce({
+        request: {},
+        response: {status}
+      });
+    }
   }
 
-  function stubHttpClientRejection(client) {
+  function stubHttpClientWithoutResponse(client) {
     client.get.mockRejectedValue({
       request: {}
     });
