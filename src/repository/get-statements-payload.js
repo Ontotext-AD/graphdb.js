@@ -1,3 +1,4 @@
+const StatementPayload = require('repository/statement-payload');
 const RDFMimeType = require('http/rdf-mime-type');
 
 /**
@@ -12,50 +13,13 @@ const RDFMimeType = require('http/rdf-mime-type');
  *
  * @class
  */
-class GetStatementsPayload {
+class GetStatementsPayload extends StatementPayload {
   /**
    * Constructs this payload class populating some reasonable defaults.
    */
   constructor() {
-    this.payload = {
-      responseType: RDFMimeType.RDF_JSON
-    };
-  }
-
-  /**
-   * @param {(string|Term)} [subject]
-   * @return {GetStatementsPayload}
-   */
-  setSubject(subject) {
-    this.payload.subject = subject;
-    return this;
-  }
-
-  /**
-   * @param {(string|Term)} [predicate]
-   * @return {GetStatementsPayload}
-   */
-  setPredicate(predicate) {
-    this.payload.predicate = predicate;
-    return this;
-  }
-
-  /**
-   * @param {(string|Term)} [object]
-   * @return {GetStatementsPayload}
-   */
-  setObject(object) {
-    this.payload.object = object;
-    return this;
-  }
-
-  /**
-   * @param {(NamedNode[]|string[])} [context]
-   * @return {GetStatementsPayload}
-   */
-  setContext(context) {
-    this.payload.context = context;
-    return this;
+    super();
+    this.setResponseType(RDFMimeType.RDF_JSON);
   }
 
   /**
@@ -76,14 +40,6 @@ class GetStatementsPayload {
   setResponseType(responseType) {
     this.payload.responseType = responseType;
     return this;
-  }
-
-  /**
-   * Get the payload object.
-   * @return {Object}
-   */
-  get() {
-    return this.payload;
   }
 }
 
