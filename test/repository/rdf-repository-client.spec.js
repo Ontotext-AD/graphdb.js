@@ -1,5 +1,5 @@
 const RepositoryClientConfig = require('repository/repository-client-config');
-const RdfRepositoryClient = require('repository/rdf-repository-client');
+const RDFRepositoryClient = require('repository/rdf-repository-client');
 const ServerClientConfig = require('server/server-client-config');
 const HttpClient = require('http/http-client');
 const httpClientStub = require('../http/http-client.stub');
@@ -8,9 +8,9 @@ const {when} = require('jest-when');
 jest.mock('http/http-client');
 
 /*
- * Tests the initialization logic in RdfRepositoryClient
+ * Tests the initialization logic in RDFRepositoryClient
  */
-describe('RdfRepositoryClient', () => {
+describe('RDFRepositoryClient', () => {
 
   HttpClient.mockImplementation(() => httpClientStub());
 
@@ -21,9 +21,9 @@ describe('RdfRepositoryClient', () => {
   test('should initialize according the provided client configuration', () => {
     let repoClientConfig = new RepositoryClientConfig([
       'http://localhost:8080/repositories/test'
-    ], defaultHeaders, 'application/json', 100, 200, 300, 4);
+    ], defaultHeaders, 'application/json', 100, 200);
 
-    let rdfRepositoryClient = new RdfRepositoryClient(repoClientConfig);
+    let rdfRepositoryClient = new RDFRepositoryClient(repoClientConfig);
 
     expect(rdfRepositoryClient.repositoryClientConfig).toBeDefined();
     expect(rdfRepositoryClient.repositoryClientConfig).toEqual(repoClientConfig);
@@ -40,9 +40,9 @@ describe('RdfRepositoryClient', () => {
       'http://localhost:8083/repositories/test3'
     ], {
       'Accept': 'application/json'
-    }, 'application/json', 100, 200, 300, 4);
+    }, 'application/json', 100, 200);
 
-    let rdfRepositoryClient = new RdfRepositoryClient(repoClientConfig);
+    let rdfRepositoryClient = new RDFRepositoryClient(repoClientConfig);
 
     expect(rdfRepositoryClient.httpClients).toBeDefined();
     expect(rdfRepositoryClient.httpClients.length).toEqual(3);
@@ -53,10 +53,10 @@ describe('RdfRepositoryClient', () => {
   });
 
   test('should not allow to be instantiated with improper configuration', () => {
-    expect(() => new RdfRepositoryClient()).toThrow(Error);
-    expect(() => new RdfRepositoryClient({})).toThrow(Error);
-    expect(() => new RdfRepositoryClient(new ServerClientConfig('', 1, {}))).toThrow(Error);
-    expect(() => new RdfRepositoryClient(new RepositoryClientConfig([]))).toThrow(Error);
+    expect(() => new RDFRepositoryClient()).toThrow(Error);
+    expect(() => new RDFRepositoryClient({})).toThrow(Error);
+    expect(() => new RDFRepositoryClient(new ServerClientConfig('', 1, {}))).toThrow(Error);
+    expect(() => new RDFRepositoryClient(new RepositoryClientConfig([]))).toThrow(Error);
   });
 
   describe('getSize()', () => {
@@ -67,8 +67,8 @@ describe('RdfRepositoryClient', () => {
     beforeEach(() => {
       let repoClientConfig = new RepositoryClientConfig([
         'http://localhost:8080/repositories/test'
-      ], defaultHeaders, 'application/json', 100, 200, 300, 4);
-      rdfRepositoryClient = new RdfRepositoryClient(repoClientConfig);
+      ], defaultHeaders, 'application/json', 100, 200);
+      rdfRepositoryClient = new RDFRepositoryClient(repoClientConfig);
       get = rdfRepositoryClient.httpClients[0].get;
       when(get).calledWith('/size').mockResolvedValue({data: 123});
     });

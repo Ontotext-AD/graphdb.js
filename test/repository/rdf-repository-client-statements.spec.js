@@ -29,15 +29,13 @@ describe('RDFRepositoryClient - statements', () => {
   const contentType = '';
   const readTimeout = 1000;
   const writeTimeout = 1000;
-  const retryInterval = 1000;
-  const retryCount = 1;
 
   describe('statements#get returning Quads', () => {
     beforeEach(() => {
       HttpClient.mockImplementation(() => httpClientStub());
 
       config = new RepositoryClientConfig(endpoints, headers, contentType,
-        readTimeout, writeTimeout, retryInterval, retryCount);
+        readTimeout, writeTimeout);
       repository = new RDFRepositoryClient(config);
     });
 
@@ -112,7 +110,7 @@ describe('RDFRepositoryClient - statements', () => {
       HttpClient.mockImplementation(() => httpClientStub());
 
       config = new RepositoryClientConfig(endpoints, headers, contentType,
-        readTimeout, writeTimeout, retryInterval, retryCount);
+        readTimeout, writeTimeout);
       repository = new RDFRepositoryClient(config);
     });
 

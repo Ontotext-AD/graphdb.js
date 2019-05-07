@@ -1,6 +1,6 @@
 const HttpClient = require('http/http-client');
 const RepositoryClientConfig = require('repository/repository-client-config');
-const RdfRepositoryClient = require('repository/rdf-repository-client');
+const RDFRepositoryClient = require('repository/rdf-repository-client');
 const RDFMimeType = require('http/rdf-mime-type');
 const AddStatementPayload = require('repository/add-statement-payload');
 
@@ -15,22 +15,21 @@ const {when} = require('jest-when');
 jest.mock('http/http-client');
 
 /*
- * Tests statements insertion via RdfRepositoryClient
+ * Tests statements insertion via RDFRepositoryClient
  */
-describe('RdfRepositoryClient - adding data', () => {
+describe('RDFRepositoryClient - adding data', () => {
 
   let repoClientConfig;
   let rdfRepositoryClient;
 
   beforeEach(() => {
-    // No timeout so it won't slow the test suite when testing rejections.
     repoClientConfig = new RepositoryClientConfig([
       'http://localhost:8080/repositories/test'
-    ], {}, '', 100, 200, 0, 0);
+    ], {}, '', 100, 200);
 
     HttpClient.mockImplementation(() => httpClientStub());
 
-    rdfRepositoryClient = new RdfRepositoryClient(repoClientConfig);
+    rdfRepositoryClient = new RDFRepositoryClient(repoClientConfig);
   });
 
   describe('add(payload)', () => {

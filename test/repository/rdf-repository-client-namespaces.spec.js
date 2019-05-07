@@ -1,6 +1,6 @@
 const HttpClient = require('http/http-client');
 const RepositoryClientConfig = require('repository/repository-client-config');
-const RdfRepositoryClient = require('repository/rdf-repository-client');
+const RDFRepositoryClient = require('repository/rdf-repository-client');
 const RDFMimeType = require('http/rdf-mime-type');
 const DataFactory = require('n3').DataFactory;
 const NamedNode = DataFactory.internal.NamedNode;
@@ -11,22 +11,21 @@ const namespaceData = require('./namespaces.data.json');
 jest.mock('http/http-client');
 
 /*
- * Tests the namespace management via RdfRepositoryClient: fetching, params etc.
+ * Tests the namespace management via RDFRepositoryClient: fetching, params etc.
  */
-describe('RdfRepositoryClient - Namespace management', () => {
+describe('RDFRepositoryClient - Namespace management', () => {
 
   let repoClientConfig;
   let rdfRepositoryClient;
 
   beforeEach(() => {
-    // No timeout so it won't slow the test suite when testing rejections.
     repoClientConfig = new RepositoryClientConfig([
       'http://localhost:8080/repositories/test'
-    ], {}, '', 100, 200, 0, 4);
+    ], {}, '', 100, 200);
 
     HttpClient.mockImplementation(() => stubHttpClient());
 
-    rdfRepositoryClient = new RdfRepositoryClient(repoClientConfig);
+    rdfRepositoryClient = new RDFRepositoryClient(repoClientConfig);
   });
 
   describe('getNamespaces()', () => {
