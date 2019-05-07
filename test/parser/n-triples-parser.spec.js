@@ -1,5 +1,5 @@
 const NTriplesParser = require('parser/n-triples-parser');
-const RdfContentType = require('http/rdf-content-type');
+const RDFMimeType = require('http/rdf-mime-type');
 
 describe('NTriplesParser', () => {
   test('should create instance of underlying parser and store it as a member', () => {
@@ -14,7 +14,7 @@ describe('NTriplesParser', () => {
   });
 
   test('should return supported type', () => {
-    expect(new NTriplesParser().getSupportedType()).toEqual(RdfContentType.N_TRIPLES);
+    expect(new NTriplesParser().getSupportedType()).toEqual(RDFMimeType.N_TRIPLES);
   });
 
   test('should invoke underlying parser', () => {

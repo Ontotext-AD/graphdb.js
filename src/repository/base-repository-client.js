@@ -3,7 +3,7 @@ const ConsoleLogger = require('logging/console-logger');
 const HttpClient = require('http/http-client');
 const RepositoryClientConfig = require('repository/repository-client-config');
 const Iterable = require('util/iterable');
-const RDFContentType = require('http/rdf-content-type');
+const RDFMimeType = require('http/rdf-mime-type');
 const TermConverter = require('model/term-converter');
 
 /**
@@ -137,7 +137,7 @@ class BaseRepositoryClient {
   /**
    * Parses provided content with registered parser if there is one. Otherwise
    * returns the content untouched. If <code>contentType</code> is provided it
-   * should be an instance of {@link RdfContentType} enum and is used as a key
+   * should be an instance of {@link RDFMimeType} enum and is used as a key
    * for selecting appropriate parser from the parsers registry.
    * Parsing is done synchronously!
    *
@@ -167,7 +167,7 @@ class BaseRepositoryClient {
       return this.execute((http) => http.post(PATH_STATEMENTS, payload, {
         timeout: this.repositoryClientConfig.writeTimeout,
         headers: {
-          'Content-Type': RDFContentType.TURTLE
+          'Content-Type': RDFMimeType.TURTLE
         }
       }));
     });

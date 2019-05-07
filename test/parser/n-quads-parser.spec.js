@@ -1,5 +1,5 @@
 const NQuadsParser = require('parser/n-quads-parser');
-const RdfContentType = require('http/rdf-content-type');
+const RDFMimeType = require('http/rdf-mime-type');
 
 describe('NQuadsParser', () => {
   test('should create instance of underlying parser and store it as a member', () => {
@@ -14,7 +14,7 @@ describe('NQuadsParser', () => {
   });
 
   test('should return supported type', () => {
-    expect(new NQuadsParser().getSupportedType()).toEqual(RdfContentType.N_QUADS);
+    expect(new NQuadsParser().getSupportedType()).toEqual(RDFMimeType.N_QUADS);
   });
 
   test('should invoke underlying parser', () => {

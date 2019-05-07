@@ -1,5 +1,5 @@
 const BaseRepositoryClient = require('../repository/base-repository-client');
-const RDFContentType = require('http/rdf-content-type');
+const RDFMimeType = require('http/rdf-mime-type');
 const DataFactory = require('n3').DataFactory;
 const NamedNode = DataFactory.internal.NamedNode;
 const Namespace = require('model/namespace');
@@ -26,7 +26,7 @@ class RDFRepositoryClient extends BaseRepositoryClient {
   getNamespaces() {
     return this.execute((http) => http.get('/namespaces', {
       headers: {
-        'Accept': RDFContentType.SPARQL_RESULTS_JSON
+        'Accept': RDFMimeType.SPARQL_RESULTS_JSON
       },
       timeout: this.repositoryClientConfig.readTimeout
     })).then((response) => {

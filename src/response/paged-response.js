@@ -11,7 +11,7 @@ export class PagedResponse {
    * @param {number} total
    * @param {number} offset
    * @param {number} limit
-   * @param {RDFContentType} responseType
+   * @param {RDFMimeType} responseType
    * @param {(string|sparql|ResponseIterator)} result
    */
   constructor(repository, total, offset, limit, responseType, result) {
