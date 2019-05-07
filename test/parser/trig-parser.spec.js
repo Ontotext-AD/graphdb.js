@@ -1,5 +1,5 @@
 const TriGParser = require('parser/trig-parser');
-const RdfContentType = require('http/rdf-content-type');
+const RDFMimeType = require('http/rdf-mime-type');
 
 describe('TriGParser', () => {
   test('should create instance of underlying parser and store it as a member', () => {
@@ -14,7 +14,7 @@ describe('TriGParser', () => {
   });
 
   test('should return supported type', () => {
-    expect(new TriGParser().getSupportedType()).toEqual(RdfContentType.TRIG);
+    expect(new TriGParser().getSupportedType()).toEqual(RDFMimeType.TRIG);
   });
 
   test('should invoke underlying parser', () => {

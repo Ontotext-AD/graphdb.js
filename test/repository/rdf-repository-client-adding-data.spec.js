@@ -1,7 +1,7 @@
 const HttpClient = require('http/http-client');
 const RepositoryClientConfig = require('repository/repository-client-config');
 const RdfRepositoryClient = require('repository/rdf-repository-client');
-const RDFContentType = require('http/rdf-content-type');
+const RDFMimeType = require('http/rdf-mime-type');
 
 const N3 = require('n3');
 const {DataFactory} = N3;
@@ -67,7 +67,7 @@ describe('RdfRepositoryClient - adding data', () => {
     expect(post).toHaveBeenCalledWith('/statements', expected, {
       timeout: 200,
       headers: {
-        'Content-Type': RDFContentType.TURTLE
+        'Content-Type': RDFMimeType.TURTLE
       }
     });
   }

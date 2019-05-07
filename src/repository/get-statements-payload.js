@@ -1,4 +1,4 @@
-const RDFContentType = require('http/rdf-content-type');
+const RDFMimeType = require('http/rdf-mime-type');
 
 /**
  * Payload object holding all request parameters applicable for the statements
@@ -18,7 +18,7 @@ class GetStatementsPayload {
    */
   constructor() {
     this.payload = {
-      responseType: RDFContentType.RDF_JSON
+      responseType: RDFMimeType.RDF_JSON
     };
   }
 
@@ -70,7 +70,7 @@ class GetStatementsPayload {
 
   /**
    * Sets responseType parameter.
-   * @param {RDFContentType} [responseType]
+   * @param {RDFMimeType} [responseType]
    * @return {GetStatementsPayload}
    */
   setResponseType(responseType) {

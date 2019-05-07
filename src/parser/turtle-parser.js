@@ -1,5 +1,5 @@
 const ContentTypeParser = require('parser/content-type-parser');
-const RdfContentType = require('http/rdf-content-type');
+const RDFMimeType = require('http/rdf-mime-type');
 const Parser = require('n3').Parser;
 
 /**
@@ -29,7 +29,7 @@ class TurtleParser extends ContentTypeParser {
    * @inheritDoc
    */
   getSupportedType() {
-    return RdfContentType.TURTLE;
+    return RDFMimeType.TURTLE;
   }
 }
 

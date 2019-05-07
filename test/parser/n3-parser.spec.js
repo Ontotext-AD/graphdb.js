@@ -1,5 +1,5 @@
 const N3Parser = require('parser/n3-parser');
-const RdfContentType = require('http/rdf-content-type');
+const RDFMimeType = require('http/rdf-mime-type');
 
 describe('N3Parser', () => {
   test('should create instance of underlying parser and store it as a member', () => {
@@ -14,7 +14,7 @@ describe('N3Parser', () => {
   });
 
   test('should return supported type', () => {
-    expect(new N3Parser().getSupportedType()).toEqual(RdfContentType.N3);
+    expect(new N3Parser().getSupportedType()).toEqual(RDFMimeType.N3);
   });
 
   test('should invoke underlying parser', () => {

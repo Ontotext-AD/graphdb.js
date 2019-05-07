@@ -2,7 +2,7 @@ const HttpClient = require('http/http-client');
 const RDFRepositoryClient = require('repository/rdf-repository-client');
 const RepositoryClientConfig = require('repository/repository-client-config');
 const GetStatementsPayload = require('repository/get-statements-payload');
-const RDFContentType = require('http/rdf-content-type');
+const RDFMimeType = require('http/rdf-mime-type');
 const TurtleParser = require('parser/turtle-parser');
 const NTriplesParser = require('parser/n-triples-parser');
 const NQuadsParser = require('parser/n-quads-parser');
@@ -64,45 +64,45 @@ describe('RDFRepositoryClient - statements', () => {
     test('should fetch statement in N-Triples format and return it converted to quads', () => {
       repository.registerParser(new NTriplesParser());
 
-      mockHttpGET(RDFContentType.N_TRIPLES);
+      mockHttpGET(RDFMimeType.N_TRIPLES);
 
-      const payload = buildPayload(RDFContentType.N_TRIPLES);
+      const payload = buildPayload(RDFMimeType.N_TRIPLES);
       return expect(repository.get(payload)).resolves.toEqual(expected);
     });
 
     test('should fetch statement in N3 format and return it converted to quads', () => {
       repository.registerParser(new N3Parser());
 
-      mockHttpGET(RDFContentType.N3);
+      mockHttpGET(RDFMimeType.N3);
 
-      const payload = buildPayload(RDFContentType.N3);
+      const payload = buildPayload(RDFMimeType.N3);
       return expect(repository.get(payload)).resolves.toEqual(expected);
     });
 
     test('should fetch statement in TriG format and return it converted to quads', () => {
       repository.registerParser(new TriGParser());
 
-      mockHttpGET(RDFContentType.TRIG);
+      mockHttpGET(RDFMimeType.TRIG);
 
-      const payload = buildPayload(RDFContentType.TRIG);
+      const payload = buildPayload(RDFMimeType.TRIG);
       return expect(repository.get(payload)).resolves.toEqual(expected);
     });
 
     test('should fetch statement in N-Quads format and return it converted to quads', () => {
       repository.registerParser(new NQuadsParser());
 
-      mockHttpGET(RDFContentType.N_QUADS);
+      mockHttpGET(RDFMimeType.N_QUADS);
 
-      const payload = buildPayload(RDFContentType.N_QUADS);
+      const payload = buildPayload(RDFMimeType.N_QUADS);
       return expect(repository.get(payload)).resolves.toEqual(expected);
     });
 
     test('should fetch statement in Turtle format and return it converted to quads', () => {
       repository.registerParser(new TurtleParser());
 
-      mockHttpGET(RDFContentType.TURTLE);
+      mockHttpGET(RDFMimeType.TURTLE);
 
-      const payload = buildPayload(RDFContentType.TURTLE);
+      const payload = buildPayload(RDFMimeType.TURTLE);
       return expect(repository.get(payload)).resolves.toEqual(expected);
     });
   });
@@ -129,7 +129,7 @@ describe('RDFRepositoryClient - statements', () => {
       });
 
       const payload = new GetStatementsPayload()
-        .setResponseType(RDFContentType.RDF_JSON)
+        .setResponseType(RDFMimeType.RDF_JSON)
         .setSubject('<http://eunis.eea.europa.eu/countries/AZ>')
         .setPredicate('<http://eunis.eea.europa.eu/rdf/schema.rdf#population>')
         .setObject('"7931000"^^http://www.w3.org/2001/XMLSchema#integer')
@@ -140,7 +140,7 @@ describe('RDFRepositoryClient - statements', () => {
       return repository.get(payload).then(() => {
         const httpGet = repository.httpClients[0].get;
         expect(httpGet).toHaveBeenCalledWith('/statements', {
-          headers: {'Accept': RDFContentType.RDF_JSON},
+          headers: {'Accept': RDFMimeType.RDF_JSON},
           params: {
             context: '<http://example.org/graph3>',
             infer: true,
@@ -161,7 +161,7 @@ describe('RDFRepositoryClient - statements', () => {
       const payload = new GetStatementsPayload()
         .setSubject('<http://eunis.eea.europa.eu/countries/AZ>')
         .setPredicate('<http://eunis.eea.europa.eu/rdf/schema.rdf#population>')
-        .setResponseType(RDFContentType.RDF_XML)
+        .setResponseType(RDFMimeType.RDF_XML)
         .get();
 
       const expectedPayload = {

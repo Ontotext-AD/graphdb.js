@@ -1,5 +1,5 @@
 const GetStatementsPayload = require('repository/get-statements-payload');
-const RDFContentType = require('http/rdf-content-type');
+const RDFMimeType = require('http/rdf-mime-type');
 
 describe('GetStatementsPayload', () => {
   test('should set responseType=application/rdf+json by default', () => {
@@ -8,7 +8,7 @@ describe('GetStatementsPayload', () => {
 
   test('should populate properties in the underlying payload', () => {
     let payload = new GetStatementsPayload()
-      .setResponseType(RDFContentType.RDF_XML)
+      .setResponseType(RDFMimeType.RDF_XML)
       .setSubject('<http://eunis.eea.europa.eu/countries/AZ>')
       .setPredicate('<http://eunis.eea.europa.eu/rdf/schema.rdf#population>')
       .setObject('"7931000"^^http://www.w3.org/2001/XMLSchema#integer')

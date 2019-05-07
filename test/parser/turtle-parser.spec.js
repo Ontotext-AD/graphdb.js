@@ -1,5 +1,5 @@
 const TurtleParser = require('parser/turtle-parser');
-const RdfContentType = require('http/rdf-content-type');
+const RDFMimeType = require('http/rdf-mime-type');
 
 describe('TurtleParser', () => {
   test('should create instance of underlying parser and store it as a member', () => {
@@ -14,7 +14,7 @@ describe('TurtleParser', () => {
   });
 
   test('should return supported type', () => {
-    expect(new TurtleParser().getSupportedType()).toEqual(RdfContentType.TURTLE);
+    expect(new TurtleParser().getSupportedType()).toEqual(RDFMimeType.TURTLE);
   });
 
   test('should invoke underlying parser', () => {
