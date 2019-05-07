@@ -1,4 +1,5 @@
 const axios = require('axios');
+const uuidv4 = require('uuid/v4');
 
 /**
  * Promise based HTTP client that delegates requests to Axios.
@@ -50,6 +51,7 @@ class HttpClient {
    * @return {Promise<any>} a promise resolving to the request's response
    */
   get(url, config = {}) {
+    this.addXRequestIdHeader(config);
     return this.axios.get(url, config);
   }
 
@@ -67,6 +69,7 @@ class HttpClient {
    * @return {Promise<any>} a promise resolving to the request's response
    */
   post(url, data, config = {}) {
+    this.addXRequestIdHeader(config);
     return this.axios.post(url, data, config);
   }
 
@@ -84,6 +87,7 @@ class HttpClient {
    * @return {Promise<any>} a promise resolving to the request's response
    */
   put(url, data, config = {}) {
+    this.addXRequestIdHeader(config);
     return this.axios.put(url, data, config);
   }
 
@@ -100,7 +104,21 @@ class HttpClient {
    * @return {Promise<any>} a promise resolving to the request's response
    */
   deleteResource(url, config = {}) {
+    this.addXRequestIdHeader(config);
     return this.axios.delete(url, config);
+  }
+
+  /**
+   * Sets the required x-request-id header.
+   *
+   * @private
+   * @param {Object} requestConfig
+   */
+  addXRequestIdHeader(requestConfig) {
+    if (!requestConfig.headers) {
+      requestConfig.headers = {};
+    }
+    requestConfig.headers['x-request-id'] = uuidv4();
   }
 }
 
