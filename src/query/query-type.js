@@ -3,9 +3,11 @@
  * @readonly
  * @enum {string}
  */
-export const QueryType = {
+const QueryType = {
   SELECT: 'SELECT',
   CONSTRUCT: 'CONSTRUCT',
   DESCRIBE: 'DESCRIBE',
   ASK: 'ASK'
 };
+
+module.exports = QueryType;
