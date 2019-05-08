@@ -194,6 +194,51 @@ class BaseRepositoryClient {
   }
 
   /**
+   * Saves the provided statement payload in the repository.
+   *
+   * The payload will be converted to a quad or a collection of quads in case
+   * there are multiple contexts.
+   *
+   * After the conversion, the produced quad(s) will be serialized to Turtle
+   * format and send to the repository as payload.
+   *
+   * See {@link #addQuads()}.
+   *
+   * @param {Object} payload params holding request parameters as returned
+   *                 by {@link AddStatementPayload#get()}
+   * @return {Promise} promise that will be resolved if the addition is
+   *                    successful or rejected in case of failure
+   */
+  add(payload) {
+    if (!payload) {
+      return Promise.reject(new Error('Cannot add statement without payload'));
+    }
+
+    const subject = payload.subject;
+    const predicate = payload.predicate;
+    const object = payload.object;
+    const context = payload.context;
+
+    if (BaseRepositoryClient.hasNullArguments(subject, predicate, object)) {
+      return Promise.reject(new Error('Cannot add statement with null ' +
+          'subject, predicate or object'));
+    }
+
+    let quads;
+    if (payload.language) {
+      quads = TermConverter.getQuadsWithLanguage(subject, predicate, object,
+          payload.language, context);
+    } else if (payload.dataType) {
+      quads = TermConverter.getQuadsWithDataType(subject, predicate, object,
+          payload.dataType, context);
+    } else {
+      quads = TermConverter.getQuads(subject, predicate, object, context);
+    }
+
+    return this.addQuads(quads);
+  }
+
+  /**
    * Serializes the provided quads to Turtle format and sends them to the
    * repository as payload.
    *
@@ -332,6 +377,17 @@ class BaseRepositoryClient {
       throw new Error('Cannot instantiate a repository without repository '
         + 'endpoint configuration! At least one endpoint must be provided.');
     }
+  }
+
+  /**
+   * Checks if at least one of the supplied arguments is undefined or null.
+   *
+   * @private
+   * @return {boolean} <code>true</code> if there is null argument or
+   *         <code>false</code> otherwise
+   */
+  static hasNullArguments(...args) {
+    return [...args].some((arg) => !arg);
   }
 }
 

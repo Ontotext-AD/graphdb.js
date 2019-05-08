@@ -1,0 +1,1 @@
+_:1 <http://domain/property/relation-1> _:2.

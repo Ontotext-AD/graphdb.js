@@ -2,6 +2,7 @@ const HttpClient = require('http/http-client');
 const RepositoryClientConfig = require('repository/repository-client-config');
 const RdfRepositoryClient = require('repository/rdf-repository-client');
 const RDFMimeType = require('http/rdf-mime-type');
+const AddStatementPayload = require('repository/add-statement-payload');
 
 const N3 = require('n3');
 const {DataFactory} = N3;
@@ -30,6 +31,102 @@ describe('RdfRepositoryClient - adding data', () => {
     HttpClient.mockImplementation(() => httpClientStub());
 
     rdfRepositoryClient = new RdfRepositoryClient(repoClientConfig);
+  });
+
+  describe('add(payload)', () => {
+    test('should properly convert triple payload to quad and send a request', () => {
+      const payload = new AddStatementPayload()
+        .setSubject(subj('resource-1'))
+        .setPredicate(pred('relation-1'))
+        .setObject(obj('uri-1'))
+        .get();
+
+      const expected = testUtils.loadFile('repository/data/add-statements-triple.txt').trim();
+      return rdfRepositoryClient.add(payload).then(() => verifySentPayload(expected));
+    });
+
+    test('should properly convert triple payload with blank nodes to quad and send a request', () => {
+      const payload = new AddStatementPayload()
+        .setSubject('_:1')
+        .setPredicate(pred('relation-1'))
+        .setObject('_:2')
+        .get();
+
+      const expected = testUtils.loadFile('repository/data/add-statements-triple-bnodes.txt').trim();
+      return rdfRepositoryClient.add(payload).then(() => verifySentPayload(expected));
+    });
+
+    test('should properly convert triple literal payload to quad and send a request', () => {
+      const payload = new AddStatementPayload()
+        .setSubject(subj('resource-1'))
+        .setPredicate(pred('relation-1'))
+        .setObject('Title')
+        .setLanguage('en')
+        .get();
+
+      const expected = testUtils.loadFile('repository/data/add-statements-literal.txt').trim();
+      return rdfRepositoryClient.add(payload).then(() => verifySentPayload(expected));
+    });
+
+    test('should properly convert triple literal payload with data type to quad and send a request', () => {
+      const payload = new AddStatementPayload()
+        .setSubject(subj('resource-1'))
+        .setPredicate(pred('relation-1'))
+        .setObject('true')
+        .setDataType('xsd:boolean')
+        .get();
+
+      const expected = testUtils.loadFile('repository/data/add-statements-literal-data-type.txt').trim();
+      return rdfRepositoryClient.add(payload).then(() => verifySentPayload(expected));
+    });
+
+    test('should properly convert triple payload with single context to quad and send a request', () => {
+      const payload = new AddStatementPayload()
+        .setSubject(subj('resource-1'))
+        .setPredicate(pred('relation-1'))
+        .setObject(obj('uri-1'))
+        .setContext(context('data-graph-1'))
+        .get();
+
+      const expected = testUtils.loadFile('repository/data/add-statements-context.txt').trim();
+      return rdfRepositoryClient.add(payload).then(() => verifySentPayload(expected));
+    });
+
+    test('should properly convert triple payload with multiple contexts to several quads and send a request', () => {
+      const payload = new AddStatementPayload()
+        .setSubject(subj('resource-1'))
+        .setPredicate(pred('relation-1'))
+        .setObject('Title')
+        .setLanguage('en')
+        .setContext([context('data-graph-1'), context('data-graph-2')])
+        .get();
+
+      const expected = testUtils.loadFile('repository/data/add-statements-contexts.txt').trim();
+      return rdfRepositoryClient.add(payload).then(() => verifySentPayload(expected));
+    });
+
+    test('should reject adding the payload if it is empty', () => {
+      const payload = new AddStatementPayload().get();
+      return expect(rdfRepositoryClient.add(payload)).rejects.toBeTruthy();
+    });
+
+    test('should reject adding the payload if it lacks required terms', () => {
+      const payload = new AddStatementPayload()
+        .setSubject(subj('resource-1'))
+        .setPredicate(pred('relation-1'))
+        .get();
+      return expect(rdfRepositoryClient.add(payload)).rejects.toBeTruthy();
+    });
+
+    test('should reject adding the payload when the server request is unsuccessful', () => {
+      rdfRepositoryClient.httpClients[0].post.mockRejectedValue({});
+      const payload = new AddStatementPayload()
+        .setSubject(subj('resource-1'))
+        .setPredicate(pred('relation-1'))
+        .setObject(obj('uri-1'))
+        .get();
+      return expect(rdfRepositoryClient.add(payload)).rejects.toBeTruthy();
+    });
   });
 
   describe('addQuads(quads)', () => {
@@ -62,7 +159,7 @@ describe('RdfRepositoryClient - adding data', () => {
   });
 
   function verifySentPayload(expected) {
-    let post = rdfRepositoryClient.httpClients[0].post;
+    const post = rdfRepositoryClient.httpClients[0].post;
     expect(post).toHaveBeenCalledTimes(1);
     expect(post).toHaveBeenCalledWith('/statements', expected, {
       timeout: 200,
