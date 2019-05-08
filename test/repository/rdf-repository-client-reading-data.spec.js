@@ -21,7 +21,7 @@ jest.mock('http/http-client');
 
 import data from './statements.data';
 
-describe('RDFRepositoryClient - statements', () => {
+describe('RDFRepositoryClient - reading statements', () => {
   let config;
   let repository;
   const endpoints = ['http://host/repositories/repo1'];

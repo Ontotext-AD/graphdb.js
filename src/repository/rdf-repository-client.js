@@ -138,6 +138,81 @@ class RDFRepositoryClient extends BaseRepositoryClient {
   }
 
   /**
+   * Executes a POST request against the <code>/statements</code> endpoint. The
+   * statements which have to be added are provided through a readable stream.
+   * This method is useful for library client who wants to upload a big data set
+   * into the repository.
+   *
+   * @param {ReadableStream} readStream
+   * @param {NamedNode|string} [context] optional context to restrict the
+   * operation.
+   * @param {string} [baseURI] optional uri against which any relative URIs
+   * found in the data would be resolved.
+   * @param {string} contentType is one of RDF mime type formats,
+   *                application/x-rdftransaction' for a transaction document or
+   *                application/x-www-form-urlencoded
+   * @return {Promise<void>}
+   */
+  upload(readStream, context, baseURI, contentType) {
+    const url = this.resolveUrl(context, baseURI);
+
+    return this.execute((http) => http.post(url, readStream,
+        http.getConfigBuilder()
+            .setTimeout(this.repositoryClientConfig.writeTimeout)
+            .addContentTypeHeader(contentType)
+            .setResponseType('stream')
+            .get()
+    ));
+  }
+
+  /**
+   * Executes a PUT request against the <code>/statements</code> endpoint. The
+   * statements which have to be updated are provided through a readable stream.
+   * This method is useful for overriding large set of statements that might be
+   * provided as a readable stream e.g. reading from file.
+   *
+   * @param {ReadableStream} readStream
+   * @param {NamedNode|string} context
+   * @param {string} [baseURI] optional uri against which any relative URIs
+   * found in the data would be resolved.
+   * @param {string} contentType
+   * @return {Promise<void>}
+   */
+  overwrite(readStream, context, baseURI, contentType) {
+    const url = this.resolveUrl(context, baseURI);
+
+    return this.execute((http) => http.put(url, readStream,
+        http.getConfigBuilder()
+            .setTimeout(this.repositoryClientConfig.writeTimeout)
+            .addContentTypeHeader(contentType)
+            .setResponseType('stream')
+            .get()
+    ));
+  }
+
+  /**
+   * Build an url for update operation encoding the context and baseURI if
+   * provided.
+   *
+   * @private
+   * @param {NamedNode|string} [context]
+   * @param {string} [baseURI]
+   * @return {string}
+   */
+  resolveUrl(context, baseURI) {
+    let url = '/statements';
+    const hasParams = context || baseURI;
+    if (hasParams) {
+      url += '?';
+    }
+    const params = [
+      context ? `context=${encodeURIComponent(context)}` : undefined,
+      baseURI ? `baseURI=${encodeURIComponent(baseURI)}` : undefined
+    ].filter((v) => v);
+    return url + params.join('&');
+  }
+
+  /**
    * Starts a transaction and produces a {@link TransactionalRepositoryClient}.
    *
    * The transactions ID is extracted from the <code>location</code> header and
