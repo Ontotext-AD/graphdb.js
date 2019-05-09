@@ -24,12 +24,12 @@ class RDFRepositoryClient extends BaseRepositoryClient {
    *                                {@link NamedNode} representing namespaces
    */
   getNamespaces() {
-    return this.execute((http) => http.get('/namespaces', {
-      headers: {
-        'Accept': RDFMimeType.SPARQL_RESULTS_JSON
-      },
-      timeout: this.repositoryClientConfig.readTimeout
-    })).then((response) => {
+    return this.execute((http) => http.get('/namespaces',
+        http.getConfigBuilder()
+            .setTimeout(this.repositoryClientConfig.readTimeout)
+            .addAcceptHeader(RDFMimeType.SPARQL_RESULTS_JSON)
+            .get()
+    )).then((response) => {
       return response.data.results.bindings.map((binding) => {
         const prefix = binding.prefix.value;
         const namespace = DataFactory.namedNode(binding.namespace.value);
@@ -56,9 +56,11 @@ class RDFRepositoryClient extends BaseRepositoryClient {
       return Promise.reject(new Error('Parameter prefix is required!'));
     }
 
-    return this.execute((http) => http.get(`/namespaces/${prefix}`, {
-      timeout: this.repositoryClientConfig.readTimeout
-    })).then((response) => {
+    return this.execute((http) => http.get(`/namespaces/${prefix}`,
+        http.getConfigBuilder()
+            .setTimeout(this.repositoryClientConfig.readTimeout)
+            .get()
+    )).then((response) => {
       return DataFactory.namedNode(response.data);
     });
   }
@@ -86,9 +88,11 @@ class RDFRepositoryClient extends BaseRepositoryClient {
       return Promise.reject(new Error('Parameter namespace is required!'));
     }
 
-    return this.execute((http) => http.put(`/namespaces/${prefix}`, payload, {
-      timeout: this.repositoryClientConfig.writeTimeout
-    }));
+    return this.execute((http) => http.put(`/namespaces/${prefix}`, payload,
+        http.getConfigBuilder()
+            .setTimeout(this.repositoryClientConfig.writeTimeout)
+            .get()
+    ));
   }
 
   /**
@@ -109,9 +113,11 @@ class RDFRepositoryClient extends BaseRepositoryClient {
       return Promise.reject(new Error('Parameter prefix is required!'));
     }
 
-    return this.execute((http) => http.deleteResource(`/namespaces/${prefix}`, {
-      timeout: this.repositoryClientConfig.writeTimeout
-    }));
+    return this.execute((http) => http.deleteResource(`/namespaces/${prefix}`,
+        http.getConfigBuilder()
+            .setTimeout(this.repositoryClientConfig.writeTimeout)
+            .get()
+    ));
   }
 
   /**
@@ -120,9 +126,11 @@ class RDFRepositoryClient extends BaseRepositoryClient {
    * @return {Promise} promise that will be resolved after successful deletion
    */
   deleteNamespaces() {
-    return this.execute((http) => http.deleteResource('/namespaces', {
-      timeout: this.repositoryClientConfig.writeTimeout
-    }));
+    return this.execute((http) => http.deleteResource('/namespaces',
+        http.getConfigBuilder()
+            .setTimeout(this.repositoryClientConfig.writeTimeout)
+            .get()
+    ));
   }
 }
 

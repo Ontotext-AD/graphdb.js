@@ -1,5 +1,6 @@
 const axios = require('axios');
 const HttpClient = require('http/http-client');
+const HttpClientConfig = require('http/http-client-config');
 
 jest.mock('axios');
 
@@ -112,6 +113,12 @@ describe('HttpClient', () => {
       return httpClient.deleteResource('/api/resources', requestConfig).then(() => {
         expect(axiosMock.delete.mock.calls[0][1].headers).toHaveProperty(X_REQUEST_ID_HEADER);
       });
+    });
+  });
+
+  describe('getConfigBuilder', () => {
+    test('should return instance of http client config', () => {
+      expect(httpClient.getConfigBuilder()).toBeInstanceOf(HttpClientConfig);
     });
   });
 });
