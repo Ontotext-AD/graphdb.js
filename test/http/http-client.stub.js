@@ -3,8 +3,9 @@ const HttpClientConfig = require('http/http-client-config');
 /**
  * Creates stub of HttpClient with default method spies.
  */
-function stub() {
+function stub(baseUrl) {
   return {
+    baseUrl,
     setDefaultHeaders: jest.fn().mockReturnThis(),
     get: jest.fn().mockResolvedValue({}),
     post: jest.fn().mockResolvedValue({}),

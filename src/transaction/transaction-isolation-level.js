@@ -3,7 +3,7 @@
  * @readonly
  * @enum {string}
  */
-export const TransactionIsolationLevel = {
+const TransactionIsolationLevel = {
   NONE: 'NONE',
   READ_UNCOMMITTED: 'READ_UNCOMMITTED',
   READ_COMMITTED: 'READ_COMMITTED',
@@ -11,3 +11,5 @@ export const TransactionIsolationLevel = {
   SNAPSHOT: 'SNAPSHOT',
   SERIALIZABLE: 'SERIALIZABLE'
 };
+
+module.exports = TransactionIsolationLevel;
