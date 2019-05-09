@@ -69,13 +69,8 @@ describe('RDFRepositoryClient - Namespace management', () => {
     });
 
     test('should not retrieve a namespace if not provided with prefix', () => {
-      return expect(rdfRepositoryClient.getNamespace('')).rejects.toThrow(Error);
-    });
-
-    test('should not perform a get request for namespace if not provided with prefix', () => {
-      return rdfRepositoryClient.getNamespace('').catch(() => {
-        return expect(rdfRepositoryClient.httpClients[0].get).toHaveBeenCalledTimes(0);
-      });
+      expect(() => rdfRepositoryClient.getNamespace('')).toThrow(Error);
+      expect(rdfRepositoryClient.httpClients[0].get).toHaveBeenCalledTimes(0);
     });
 
     test('should reject retrieving a namespace when the server request is unsuccessful', () => {
@@ -108,15 +103,13 @@ describe('RDFRepositoryClient - Namespace management', () => {
     });
 
     test('should not save a namespace if not provided with prefix', () => {
-      return expect(rdfRepositoryClient.saveNamespace('', 'http://new.namespace.com/schema#')).rejects.toThrow(Error);
+      expect(() => rdfRepositoryClient.saveNamespace('', 'http://new.namespace.com/schema#')).toThrow(Error);
     });
 
     test('should not save a namespace if not provided with namespace', () => {
-      return Promise.all([
         // namespace could be either string or named node -> check with empty and undefined
-        expect(rdfRepositoryClient.saveNamespace('new', '')).rejects.toThrow(Error),
-        expect(rdfRepositoryClient.saveNamespace('new', undefined)).rejects.toThrow(Error)
-      ]);
+        expect(() => rdfRepositoryClient.saveNamespace('new', '')).toThrow(Error);
+        expect(() => rdfRepositoryClient.saveNamespace('new', undefined)).toThrow(Error)
     });
 
     test('should reject saving a namespace when the server request is unsuccessful', () => {
@@ -137,7 +130,7 @@ describe('RDFRepositoryClient - Namespace management', () => {
     });
 
     test('should not delete a namespace if not provided with prefix', () => {
-      return expect(rdfRepositoryClient.deleteNamespace('')).rejects.toThrow(Error);
+      expect(() => rdfRepositoryClient.deleteNamespace('')).toThrow(Error);
     });
 
     test('should reject deleting a namespace when the server request is unsuccessful', () => {

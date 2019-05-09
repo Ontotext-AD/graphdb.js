@@ -106,7 +106,8 @@ describe('RDFRepositoryClient - adding data', () => {
 
     test('should reject adding the payload if it is empty', () => {
       const payload = new AddStatementPayload().get();
-      return expect(rdfRepositoryClient.add(payload)).rejects.toBeTruthy();
+      expect(() => rdfRepositoryClient.add(payload)).toThrow(Error);
+      verifyNoPayload();
     });
 
     test('should reject adding the payload if it lacks required terms', () => {
@@ -114,7 +115,8 @@ describe('RDFRepositoryClient - adding data', () => {
         .setSubject(subj('resource-1'))
         .setPredicate(pred('relation-1'))
         .get();
-      return expect(rdfRepositoryClient.add(payload)).rejects.toBeTruthy();
+      expect(() => rdfRepositoryClient.add(payload)).toThrow(Error);
+      verifyNoPayload();
     });
 
     test('should reject adding the payload when the server request is unsuccessful', () => {
@@ -166,6 +168,11 @@ describe('RDFRepositoryClient - adding data', () => {
         'Content-Type': RDFMimeType.TURTLE
       }
     });
+  }
+
+  function verifyNoPayload() {
+    const post = rdfRepositoryClient.httpClients[0].post;
+    expect(post).toHaveBeenCalledTimes(0);
   }
 
   // Utilities for building terms

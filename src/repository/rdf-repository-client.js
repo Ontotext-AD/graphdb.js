@@ -53,7 +53,7 @@ class RDFRepositoryClient extends BaseRepositoryClient {
    */
   getNamespace(prefix) {
     if (StringUtils.isBlank(prefix)) {
-      return Promise.reject(new Error('Parameter prefix is required!'));
+      throw new Error('Parameter prefix is required!');
     }
 
     return this.execute((http) => http.get(`/namespaces/${prefix}`,
@@ -69,7 +69,7 @@ class RDFRepositoryClient extends BaseRepositoryClient {
    * Creates or updates the namespace for the given prefix.
    *
    * If the provided prefix or namespace parameter is not a string or
-   * {@link NamedNode} then the method will reject with an error.
+   * {@link NamedNode} then the method will throw an error.
    *
    * @param {string} prefix prefix of the namespace to be created/updated
    * @param {string|NamedNode} namespace the namespace to be created/updated
@@ -78,14 +78,14 @@ class RDFRepositoryClient extends BaseRepositoryClient {
    */
   saveNamespace(prefix, namespace) {
     if (StringUtils.isBlank(prefix)) {
-      return Promise.reject(new Error('Parameter prefix is required!'));
+      throw new Error('Parameter prefix is required!');
     }
 
     let payload = namespace;
     if (namespace instanceof NamedNode) {
       payload = namespace.value;
     } else if (StringUtils.isBlank(namespace)) {
-      return Promise.reject(new Error('Parameter namespace is required!'));
+      throw new Error('Parameter namespace is required!');
     }
 
     return this.execute((http) => http.put(`/namespaces/${prefix}`, payload,
@@ -110,7 +110,7 @@ class RDFRepositoryClient extends BaseRepositoryClient {
    */
   deleteNamespace(prefix) {
     if (StringUtils.isBlank(prefix)) {
-      return Promise.reject(new Error('Parameter prefix is required!'));
+      throw new Error('Parameter prefix is required!');
     }
 
     return this.execute((http) => http.deleteResource(`/namespaces/${prefix}`,
