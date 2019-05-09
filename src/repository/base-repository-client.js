@@ -98,12 +98,10 @@ class BaseRepositoryClient {
    *                           statements in the repository
    */
   getSize(context) {
-    return this.execute((http) => http.get('/size', {
-      timeout: this.repositoryClientConfig.readTimeout,
-      params: {
-        context
-      }
-    })).then((response) => response.data);
+    return this.execute((http) => http.get('/size', http.getConfigBuilder()
+        .setTimeout(this.repositoryClientConfig.readTimeout)
+        .setParams({context})
+        .get())).then((response) => response.data);
   }
 
   /**
@@ -116,19 +114,17 @@ class BaseRepositoryClient {
    */
   get(params) {
     return this.execute((http) => {
-      return http.get(PATH_STATEMENTS, {
-        params: {
-          subj: params.subject,
-          pred: params.predicate,
-          obj: params.object,
-          context: params.context,
-          infer: params.inference
-        },
-        headers: {
-          'Accept': params.responseType
-        },
-        timeout: this.repositoryClientConfig.readTimeout
-      });
+      return http.get(PATH_STATEMENTS, http.getConfigBuilder()
+          .setParams({
+            subj: params.subject,
+            pred: params.predicate,
+            obj: params.object,
+            context: params.context,
+            infer: params.inference
+          })
+          .addAcceptHeader(params.responseType)
+          .setTimeout(this.repositoryClientConfig.readTimeout)
+          .get());
     }).then((response) => {
       return this.parse(response.data, params.responseType);
     });
@@ -148,29 +144,15 @@ class BaseRepositoryClient {
     return this.execute((http) => {
       return http.post('',
           payload.getParams(),
-          this.getQueryPostConfig(payload));
+          http.getConfigBuilder()
+              .setTimeout(this.repositoryClientConfig.readTimeout)
+              .setResponseType('stream')
+              .addAcceptHeader(payload.getResponseType())
+              .addContentTypeHeader(payload.getContentType())
+              .get());
     }).then((response) => {
       return response.data;
     });
-  }
-
-  /**
-   * Creates a configuration object for the http client which contains http
-   * headers, timeout and the responseType.
-   *
-   * @private
-   * @param {QueryPayload} payload
-   * @return {Object}
-   */
-  getQueryPostConfig(payload) {
-    return {
-      headers: {
-        'Accept': payload.getResponseType(),
-        'Content-Type': payload.getContentType()
-      },
-      timeout: this.repositoryClientConfig.readTimeout,
-      responseType: 'stream'
-    };
   }
 
   /**
@@ -221,7 +203,7 @@ class BaseRepositoryClient {
 
     if (BaseRepositoryClient.hasNullArguments(subject, predicate, object)) {
       return Promise.reject(new Error('Cannot add statement with null ' +
-          'subject, predicate or object'));
+        'subject, predicate or object'));
     }
 
     let quads;
@@ -248,12 +230,11 @@ class BaseRepositoryClient {
    */
   addQuads(quads) {
     return TermConverter.toTurtle(quads).then((payload) => {
-      return this.execute((http) => http.post(PATH_STATEMENTS, payload, {
-        timeout: this.repositoryClientConfig.writeTimeout,
-        headers: {
-          'Content-Type': RDFMimeType.TURTLE
-        }
-      }));
+      return this.execute((http) => http.post(PATH_STATEMENTS, payload,
+          http.getConfigBuilder()
+              .setTimeout(this.repositoryClientConfig.writeTimeout)
+              .addContentTypeHeader(RDFMimeType.TURTLE)
+              .get()));
     });
   }
 
@@ -273,15 +254,17 @@ class BaseRepositoryClient {
    *                         successful or rejected in case of failure
    */
   deleteStatements(subject, predicate, object, contexts) {
-    return this.execute((http) => http.deleteResource(PATH_STATEMENTS, {
-      timeout: this.repositoryClientConfig.writeTimeout,
-      params: {
-        subj: subject,
-        pred: predicate,
-        obj: object,
-        context: contexts
-      }
-    }));
+    return this.execute((http) => http.deleteResource(PATH_STATEMENTS,
+        http.getConfigBuilder()
+            .setTimeout(this.repositoryClientConfig.writeTimeout)
+            .setParams({
+              subj: subject,
+              pred: predicate,
+              obj: object,
+              context: contexts
+            })
+            .get()
+    ));
   }
 
   /**
@@ -291,9 +274,10 @@ class BaseRepositoryClient {
    *                   successful or rejected in case of failure
    */
   deleteAllStatements() {
-    return this.execute((http) => http.deleteResource(PATH_STATEMENTS, {
-      timeout: this.repositoryClientConfig.writeTimeout
-    }));
+    return this.execute((http) => http.deleteResource(PATH_STATEMENTS,
+        http.getConfigBuilder()
+            .setTimeout(this.repositoryClientConfig.writeTimeout)
+            .get()));
   }
 
   /**
@@ -330,7 +314,7 @@ class BaseRepositoryClient {
   retryExecution(httpClients, httpClientConsumer) {
     return httpClientConsumer(httpClients.next()).catch((error) => {
       if (BaseRepositoryClient.canRetryExecution(error)
-          && httpClients.hasNext()) {
+        && httpClients.hasNext()) {
         // Try the next endpoint client (if any)
         return this.retryExecution(httpClients, httpClientConsumer);
       }

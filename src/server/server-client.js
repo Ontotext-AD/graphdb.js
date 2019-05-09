@@ -26,9 +26,10 @@ class ServerClient {
    * @return {Promise} promise which resolves with an Array with repository ids.
    */
   getRepositoryIDs() {
-    return this.httpClient.get(SERVICE_URL, {
-      headers: {'Accept': RDFMimeType.SPARQL_RESULTS_JSON}
-    }).then((response) => {
+    return this.httpClient.get(SERVICE_URL, this.httpClient.getConfigBuilder()
+        .addAcceptHeader(RDFMimeType.SPARQL_RESULTS_JSON)
+        .get()
+    ).then((response) => {
       return response.data.results.bindings.map(({id}) => id.value);
     });
   }
