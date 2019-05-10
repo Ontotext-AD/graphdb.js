@@ -1,5 +1,3 @@
-const HttpClientConfig = require('http/http-client-config');
-
 /**
  * Creates stub of HttpClient with default method spies.
  */
@@ -12,8 +10,7 @@ function stub(baseUrl) {
     get: jest.fn().mockResolvedValue({}),
     post: jest.fn().mockResolvedValue({}),
     put: jest.fn().mockResolvedValue({}),
-    deleteResource: jest.fn().mockResolvedValue({}),
-    getConfigBuilder: () => new HttpClientConfig()
+    deleteResource: jest.fn().mockResolvedValue({})
   };
 }
 

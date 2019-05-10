@@ -35,7 +35,6 @@ describe('RDFRepositoryClient - Deleting statements', () => {
         let deleteResource = rdfRepositoryClient.httpClients[0].deleteResource;
         expect(deleteResource).toHaveBeenCalledTimes(1);
         expect(deleteResource).toHaveBeenCalledWith('/statements', {
-          timeout: 200,
           params: {
             subj, pred: undefined, obj: undefined, context: undefined
           }
@@ -48,7 +47,6 @@ describe('RDFRepositoryClient - Deleting statements', () => {
         let deleteResource = rdfRepositoryClient.httpClients[0].deleteResource;
         expect(deleteResource).toHaveBeenCalledTimes(1);
         expect(deleteResource).toHaveBeenCalledWith('/statements', {
-          timeout: 200,
           params: {
             subj, pred, obj, context: undefined
           }
@@ -62,7 +60,6 @@ describe('RDFRepositoryClient - Deleting statements', () => {
         let deleteResource = rdfRepositoryClient.httpClients[0].deleteResource;
         expect(deleteResource).toHaveBeenCalledTimes(1);
         expect(deleteResource).toHaveBeenCalledWith('/statements', {
-          timeout: 200,
           params: {
             subj, pred, obj, context: contexts
           }
@@ -75,7 +72,6 @@ describe('RDFRepositoryClient - Deleting statements', () => {
         let deleteResource = rdfRepositoryClient.httpClients[0].deleteResource;
         expect(deleteResource).toHaveBeenCalledTimes(1);
         expect(deleteResource).toHaveBeenCalledWith('/statements', {
-          timeout: 200,
           params: {
             subj: null, pred: null, obj: null, context
           }
@@ -94,9 +90,7 @@ describe('RDFRepositoryClient - Deleting statements', () => {
       return rdfRepositoryClient.deleteAllStatements().then(() => {
         let deleteResource = rdfRepositoryClient.httpClients[0].deleteResource;
         expect(deleteResource).toHaveBeenCalledTimes(1);
-        expect(deleteResource).toHaveBeenCalledWith('/statements', {
-          timeout: 200
-        });
+        expect(deleteResource).toHaveBeenCalledWith('/statements');
       });
     });
 

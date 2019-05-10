@@ -42,8 +42,7 @@ describe('RDFRepositoryClient - Namespace management', () => {
         let get = rdfRepositoryClient.httpClients[0].get;
         expect(get).toHaveBeenCalledTimes(1);
         expect(get).toHaveBeenCalledWith('/namespaces', {
-          headers: {'Accept': RDFMimeType.SPARQL_RESULTS_JSON},
-          timeout: 100
+          headers: {'Accept': RDFMimeType.SPARQL_RESULTS_JSON}
         });
       });
     });
@@ -62,9 +61,7 @@ describe('RDFRepositoryClient - Namespace management', () => {
 
         let get = rdfRepositoryClient.httpClients[0].get;
         expect(get).toHaveBeenCalledTimes(1);
-        expect(get).toHaveBeenCalledWith('/namespaces/rdfs', {
-          timeout: 100
-        });
+        expect(get).toHaveBeenCalledWith('/namespaces/rdfs');
       });
     });
 
@@ -85,9 +82,7 @@ describe('RDFRepositoryClient - Namespace management', () => {
       return rdfRepositoryClient.saveNamespace('new', namespace).then(() => {
         let put = rdfRepositoryClient.httpClients[0].put;
         expect(put).toHaveBeenCalledTimes(1);
-        expect(put).toHaveBeenCalledWith('/namespaces/new', namespace, {
-          timeout: 200
-        });
+        expect(put).toHaveBeenCalledWith('/namespaces/new', namespace);
       });
     });
 
@@ -96,9 +91,7 @@ describe('RDFRepositoryClient - Namespace management', () => {
       return rdfRepositoryClient.saveNamespace('new', namespaceTerm).then(() => {
         let put = rdfRepositoryClient.httpClients[0].put;
         expect(put).toHaveBeenCalledTimes(1);
-        expect(put).toHaveBeenCalledWith('/namespaces/new', namespaceTerm.value, {
-          timeout: 200
-        });
+        expect(put).toHaveBeenCalledWith('/namespaces/new', namespaceTerm.value);
       });
     });
 
@@ -123,9 +116,7 @@ describe('RDFRepositoryClient - Namespace management', () => {
       return rdfRepositoryClient.deleteNamespace('rdfs').then(() => {
         let deleteResource = rdfRepositoryClient.httpClients[0].deleteResource;
         expect(deleteResource).toHaveBeenCalledTimes(1);
-        expect(deleteResource).toHaveBeenCalledWith('/namespaces/rdfs', {
-          timeout: 200
-        });
+        expect(deleteResource).toHaveBeenCalledWith('/namespaces/rdfs');
       });
     });
 
@@ -144,9 +135,7 @@ describe('RDFRepositoryClient - Namespace management', () => {
       return rdfRepositoryClient.deleteNamespaces().then(() => {
         let deleteResource = rdfRepositoryClient.httpClients[0].deleteResource;
         expect(deleteResource).toHaveBeenCalledTimes(1);
-        expect(deleteResource).toHaveBeenCalledWith('/namespaces', {
-          timeout: 200
-        });
+        expect(deleteResource).toHaveBeenCalledWith('/namespaces');
       });
     });
 

@@ -163,7 +163,6 @@ describe('RDFRepositoryClient - adding data', () => {
     const post = rdfRepositoryClient.httpClients[0].post;
     expect(post).toHaveBeenCalledTimes(1);
     expect(post).toHaveBeenCalledWith('/statements', expected, {
-      timeout: 200,
       headers: {
         'Content-Type': RDFMimeType.TURTLE
       }

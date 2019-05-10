@@ -147,8 +147,7 @@ describe('RDFRepositoryClient - reading statements', () => {
             obj: '"7931000"^^http://www.w3.org/2001/XMLSchema#integer',
             pred: '<http://eunis.eea.europa.eu/rdf/schema.rdf#population>',
             subj: '<http://eunis.eea.europa.eu/countries/AZ>'
-          },
-          timeout: 1000
+          }
         });
       });
     });
@@ -238,7 +237,6 @@ describe('RDFRepositoryClient - reading statements', () => {
           headers: {
             'Accept': 'text/turtle'
           },
-          timeout: 1000,
           responseType: 'stream',
           params: {
             subj: '<http://eunis.eea.europa.eu/countries/AZ>',

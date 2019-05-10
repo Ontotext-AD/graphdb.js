@@ -54,7 +54,6 @@ describe('RdfRepositoryClient - streaming data', () => {
           headers: {
             'Content-Type': 'text/turtle'
           },
-          timeout: 1000,
           responseType: 'stream'
         });
       });
@@ -90,7 +89,6 @@ describe('RdfRepositoryClient - streaming data', () => {
           headers: {
             'Content-Type': 'text/turtle'
           },
-          timeout: 1000,
           responseType: 'stream'
         });
       });

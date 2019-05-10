@@ -1,6 +1,5 @@
 const axios = require('axios');
 const uuidv4 = require('uuid/v4');
-const HttpClientConfig = require('http/http-client-config');
 
 /**
  * Promise based HTTP client that delegates requests to Axios.
@@ -180,15 +179,6 @@ class HttpClient {
     if (!requestConfig.timeout) {
       requestConfig.timeout = this.writeTimeout;
     }
-  }
-
-  /**
-   * Creates an instance of the {@link HttpClientConfig}
-   *
-   * @return {HttpClientConfig}
-   */
-  getConfigBuilder() {
-    return new HttpClientConfig();
   }
 }
 

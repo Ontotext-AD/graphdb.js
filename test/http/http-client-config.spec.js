@@ -1,12 +1,12 @@
-const HttpClientConfig = require('http/http-client-config');
+const HttpRequestConfigBuilder = require('http/http-request-config-builder');
 
-describe('HttpClientConfig', () => {
+describe('HttpRequestConfigBuilder', () => {
   test('should init with an empty config', () => {
-    expect(new HttpClientConfig().get()).toEqual({});
+    expect(new HttpRequestConfigBuilder().get()).toEqual({});
   });
 
   test('should add a header in headers map', () => {
-    expect(new HttpClientConfig()
+    expect(new HttpRequestConfigBuilder()
       .addHeader('Accept', 'text/turtle')
       .get())
       .toEqual({
@@ -15,7 +15,7 @@ describe('HttpClientConfig', () => {
   });
 
   test('should set params provided as argument in the config', () => {
-    expect(new HttpClientConfig()
+    expect(new HttpRequestConfigBuilder()
       .setParams({
         subj: 'subj',
         pred: 'pred'
@@ -30,7 +30,7 @@ describe('HttpClientConfig', () => {
   });
 
   test('should add param in the params mapping', () => {
-    expect(new HttpClientConfig()
+    expect(new HttpRequestConfigBuilder()
       .addParam('subj', 'subj')
       .get())
       .toEqual({
@@ -41,7 +41,7 @@ describe('HttpClientConfig', () => {
   });
 
   test('should should set timeout configuration', () => {
-    expect(new HttpClientConfig()
+    expect(new HttpRequestConfigBuilder()
       .setTimeout(1000)
       .get())
       .toEqual({
@@ -50,7 +50,7 @@ describe('HttpClientConfig', () => {
   });
 
   test('should should set response type configuration', () => {
-    expect(new HttpClientConfig()
+    expect(new HttpRequestConfigBuilder()
       .setResponseType('stream')
       .get())
       .toEqual({
@@ -59,7 +59,7 @@ describe('HttpClientConfig', () => {
   });
 
   test('should add Accept header', () => {
-    expect(new HttpClientConfig()
+    expect(new HttpRequestConfigBuilder()
       .addAcceptHeader('text/turtle')
       .get())
       .toEqual({
@@ -68,7 +68,7 @@ describe('HttpClientConfig', () => {
   });
 
   test('should add Content-Type header', () => {
-    expect(new HttpClientConfig()
+    expect(new HttpRequestConfigBuilder()
       .addContentTypeHeader('text/turtle')
       .get())
       .toEqual({

@@ -75,8 +75,7 @@ describe('RDFRepositoryClient - query', () => {
             'Accept': 'application/sparql-results+json',
             'Content-Type': 'application/x-www-form-urlencoded'
           },
-          responseType: 'stream',
-          timeout: 1000
+          responseType: 'stream'
         });
     });
   });

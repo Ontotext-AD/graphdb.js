@@ -8,6 +8,7 @@ const TermConverter = require('model/term-converter');
 const RepositoryClientConfig = require('repository/repository-client-config');
 const TransactionalRepositoryClient =
   require('transaction/transactional-repository-client');
+const HttpRequestConfigBuilder = require('http/http-request-config-builder');
 
 /**
  * Defines the path segment for namespaces rest endpoint
@@ -49,30 +50,41 @@ class RDFRepositoryClient extends BaseRepositoryClient {
    *                           statements in the repository
    */
   getSize(context) {
-    return this.execute((http) => http.get('/size', http.getConfigBuilder()
-      .setTimeout(this.repositoryClientConfig.readTimeout)
+    const requestConfig = new HttpRequestConfigBuilder()
       .setParams({context})
-      .get())).then((response) => response.data);
+      .get();
+
+    return this.execute((http) => http.get('/size', requestConfig))
+      .then((response) => response.data);
   }
 
   /**
-   * Retrieves all present namespaces as a collection of {@link NamedNode}.
+   * Retrieves all present namespaces as a collection of {@link Namespace}.
    *
-   * @return {Promise<NamedNode[]>} promise resolving to a collection of
-   *                                {@link NamedNode} representing namespaces
+   * @return {Promise<Namespace[]>} promise resolving to a collection of
+   *                                {@link Namespace}
    */
   getNamespaces() {
-    return this.execute((http) => http.get(PATH_NAMESPACES,
-      http.getConfigBuilder()
-        .setTimeout(this.repositoryClientConfig.readTimeout)
-        .addAcceptHeader(RDFMimeType.SPARQL_RESULTS_JSON)
-        .get()
-    )).then((response) => {
-      return response.data.results.bindings.map((binding) => {
-        const prefix = binding.prefix.value;
-        const namespace = DataFactory.namedNode(binding.namespace.value);
-        return new Namespace(prefix, namespace);
-      });
+    const requestConfig = new HttpRequestConfigBuilder()
+      .addAcceptHeader(RDFMimeType.SPARQL_RESULTS_JSON)
+      .get();
+
+    return this.execute((http) => http.get(PATH_NAMESPACES, requestConfig))
+      .then((response) => this.mapNamespaceResponse(response.data));
+  }
+
+  /**
+   * Maps the response data from the namespaces request into {@link Namespace}.
+   *
+   * @private
+   * @param {object} responseData the data to map
+   * @return {Namespace[]} the mapped namespaces
+   */
+  mapNamespaceResponse(responseData) {
+    return responseData.results.bindings.map((binding) => {
+      const prefix = binding.prefix.value;
+      const namespace = DataFactory.namedNode(binding.namespace.value);
+      return new Namespace(prefix, namespace);
     });
   }
 
@@ -94,13 +106,8 @@ class RDFRepositoryClient extends BaseRepositoryClient {
       throw new Error('Parameter prefix is required!');
     }
 
-    return this.execute((http) => http.get(`${PATH_NAMESPACES}/${prefix}`,
-      http.getConfigBuilder()
-        .setTimeout(this.repositoryClientConfig.readTimeout)
-        .get()
-    )).then((response) => {
-      return DataFactory.namedNode(response.data);
-    });
+    return this.execute((http) => http.get(`${PATH_NAMESPACES}/${prefix}`))
+      .then((response) => DataFactory.namedNode(response.data));
   }
 
   /**
@@ -127,10 +134,7 @@ class RDFRepositoryClient extends BaseRepositoryClient {
     }
 
     return this.execute((http) => http.put(`${PATH_NAMESPACES}/${prefix}`,
-      payload, http.getConfigBuilder()
-        .setTimeout(this.repositoryClientConfig.writeTimeout)
-        .get()
-    ));
+      payload));
   }
 
   /**
@@ -152,11 +156,7 @@ class RDFRepositoryClient extends BaseRepositoryClient {
     }
 
     return this.execute((http) =>
-      http.deleteResource(`${PATH_NAMESPACES}/${prefix}`,
-        http.getConfigBuilder()
-          .setTimeout(this.repositoryClientConfig.writeTimeout)
-          .get()
-      ));
+      http.deleteResource(`${PATH_NAMESPACES}/${prefix}`));
   }
 
   /**
@@ -165,11 +165,7 @@ class RDFRepositoryClient extends BaseRepositoryClient {
    * @return {Promise} promise that will be resolved after successful deletion
    */
   deleteNamespaces() {
-    return this.execute((http) => http.deleteResource(PATH_NAMESPACES,
-      http.getConfigBuilder()
-        .setTimeout(this.repositoryClientConfig.writeTimeout)
-        .get()
-    ));
+    return this.execute((http) => http.deleteResource(PATH_NAMESPACES));
   }
 
   /**
@@ -181,21 +177,19 @@ class RDFRepositoryClient extends BaseRepositoryClient {
    *      to provided response type.
    */
   get(params) {
-    return this.execute((http) => {
-      return http.get(PATH_STATEMENTS, http.getConfigBuilder()
-        .setParams({
-          subj: params.subject,
-          pred: params.predicate,
-          obj: params.object,
-          context: params.context,
-          infer: params.inference
-        })
-        .addAcceptHeader(params.responseType)
-        .setTimeout(this.repositoryClientConfig.readTimeout)
-        .get());
-    }).then((response) => {
-      return this.parse(response.data, params.responseType);
-    });
+    const requestConfig = new HttpRequestConfigBuilder()
+      .setParams({
+        subj: params.subject,
+        pred: params.predicate,
+        obj: params.object,
+        context: params.context,
+        infer: params.inference
+      })
+      .addAcceptHeader(params.responseType)
+      .get();
+
+    return this.execute((http) => http.get(PATH_STATEMENTS, requestConfig))
+      .then((response) => this.parse(response.data, params.responseType));
   }
 
   /**
@@ -210,18 +204,14 @@ class RDFRepositoryClient extends BaseRepositoryClient {
    * soon as they are available.
    */
   query(payload) {
-    return this.execute((http) => {
-      return http.post('',
-        payload.getParams(),
-        http.getConfigBuilder()
-          .setTimeout(this.repositoryClientConfig.readTimeout)
-          .setResponseType('stream')
-          .addAcceptHeader(payload.getResponseType())
-          .addContentTypeHeader(payload.getContentType())
-          .get());
-    }).then((response) => {
-      return response.data;
-    });
+    const requestConfig = new HttpRequestConfigBuilder()
+      .setResponseType('stream')
+      .addAcceptHeader(payload.getResponseType())
+      .addContentTypeHeader(payload.getContentType())
+      .get();
+
+    return this.execute((http) => http.post('', payload.getParams(),
+      requestConfig)).then((response) => response.data);
   }
 
   /**
@@ -278,13 +268,28 @@ class RDFRepositoryClient extends BaseRepositoryClient {
    *                    successful or rejected in case of failure
    */
   addQuads(quads) {
-    return TermConverter.toTurtle(quads).then((payload) => {
-      return this.execute((http) => http.post(PATH_STATEMENTS, payload,
-        http.getConfigBuilder()
-          .setTimeout(this.repositoryClientConfig.writeTimeout)
-          .addContentTypeHeader(RDFMimeType.TURTLE)
-          .get()));
-    });
+    return TermConverter.toTurtle(quads).then((data) => this.addTurtle(data));
+  }
+
+  /**
+   * Inserts the statements in the provided Turtle formatted data.
+   *
+   * @private
+   * @param {string} data payload data in Turtle format
+   * @return {Promise} promise resolving after the data has been inserted
+   * successfully
+   */
+  addTurtle(data) {
+    if (StringUtils.isBlank(data)) {
+      throw new Error('Turtle data is required when adding statements');
+    }
+
+    const requestConfig = new HttpRequestConfigBuilder()
+      .addContentTypeHeader(RDFMimeType.TURTLE)
+      .get();
+
+    return this.execute((http) => http.post(PATH_STATEMENTS, data,
+      requestConfig));
   }
 
   /**
@@ -303,17 +308,17 @@ class RDFRepositoryClient extends BaseRepositoryClient {
    *                         successful or rejected in case of failure
    */
   deleteStatements(subject, predicate, object, contexts) {
+    const requestConfig = new HttpRequestConfigBuilder()
+      .setParams({
+        subj: subject,
+        pred: predicate,
+        obj: object,
+        context: contexts
+      })
+      .get();
+
     return this.execute((http) => http.deleteResource(PATH_STATEMENTS,
-      http.getConfigBuilder()
-        .setTimeout(this.repositoryClientConfig.writeTimeout)
-        .setParams({
-          subj: subject,
-          pred: predicate,
-          obj: object,
-          context: contexts
-        })
-        .get()
-    ));
+      requestConfig));
   }
 
   /**
@@ -323,10 +328,7 @@ class RDFRepositoryClient extends BaseRepositoryClient {
    *                   successful or rejected in case of failure
    */
   deleteAllStatements() {
-    return this.execute((http) => http.deleteResource(PATH_STATEMENTS,
-      http.getConfigBuilder()
-        .setTimeout(this.repositoryClientConfig.writeTimeout)
-        .get()));
+    return this.execute((http) => http.deleteResource(PATH_STATEMENTS));
   }
 
   /**
@@ -342,20 +344,20 @@ class RDFRepositoryClient extends BaseRepositoryClient {
    * response type as soon as they are available.
    */
   download(params) {
+    const requestConfig = new HttpRequestConfigBuilder()
+      .addAcceptHeader(params.responseType)
+      .setResponseType('stream')
+      .setParams({
+        subj: params.subject,
+        pred: params.predicate,
+        obj: params.object,
+        context: params.context,
+        infer: params.inference
+      })
+      .get();
+
     return this.execute((http) => {
-      return http.get('/statements', http.getConfigBuilder()
-        .addAcceptHeader(params.responseType)
-        .setResponseType('stream')
-        .setTimeout(this.repositoryClientConfig.readTimeout)
-        .setParams({
-          subj: params.subject,
-          pred: params.predicate,
-          obj: params.object,
-          context: params.context,
-          infer: params.inference
-        })
-        .get()
-      );
+      return http.get('/statements', requestConfig);
     }).then((response) => {
       return response.data;
     });
@@ -379,14 +381,12 @@ class RDFRepositoryClient extends BaseRepositoryClient {
    */
   upload(readStream, context, baseURI, contentType) {
     const url = this.resolveUrl(context, baseURI);
+    const requestConfig = new HttpRequestConfigBuilder()
+      .addContentTypeHeader(contentType)
+      .setResponseType('stream')
+      .get();
 
-    return this.execute((http) => http.post(url, readStream,
-      http.getConfigBuilder()
-        .setTimeout(this.repositoryClientConfig.writeTimeout)
-        .addContentTypeHeader(contentType)
-        .setResponseType('stream')
-        .get()
-    ));
+    return this.execute((http) => http.post(url, readStream, requestConfig));
   }
 
   /**
@@ -404,14 +404,12 @@ class RDFRepositoryClient extends BaseRepositoryClient {
    */
   overwrite(readStream, context, baseURI, contentType) {
     const url = this.resolveUrl(context, baseURI);
+    const requestConfig = new HttpRequestConfigBuilder()
+      .addContentTypeHeader(contentType)
+      .setResponseType('stream')
+      .get();
 
-    return this.execute((http) => http.put(url, readStream,
-      http.getConfigBuilder()
-        .setTimeout(this.repositoryClientConfig.writeTimeout)
-        .addContentTypeHeader(contentType)
-        .setResponseType('stream')
-        .get()
-    ));
+    return this.execute((http) => http.put(url, readStream, requestConfig));
   }
 
   /**
@@ -452,7 +450,6 @@ class RDFRepositoryClient extends BaseRepositoryClient {
    */
   beginTransaction(isolationLevel) {
     return this.execute((http) => http.post('/transactions', {
-      timeout: this.repositoryClientConfig.writeTimeout,
       params: {
         'isolation-level': isolationLevel
       }
