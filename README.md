@@ -11,17 +11,89 @@ npm install --save rdf4js
 ```
 
 ## Usage
+
+### ServerClient
+
+* Configure *ServerClient* and and fetch repository ids. 
 ```javascript
 const ServerClient = require('rdf4js/src/server/server-client');
 const ServerClientConfig = require('rdf4js/src/server/server-client-config');
+const RDFMimeType = require('rdf4js/src/http/rdf-mime-type');
 
 const serverConfig = new ServerClientConfig('http://rdf4j-compliant-server/', 0, {
-    'Accept': 'application/sparql-results+json'
+    'Accept': RDFMimeType.SPARQL_RESULTS_JSON
 });
 const server = new ServerClient(serverConfig);
 server.getRepositoryIDs().then(ids => {
     // work with ids
 }).catch(err => console.log(err));
+```
+
+### RDFRepositoryClient
+
+#### Configuration and instantiating RDFRepositoryClient
+
+* Instantiating repository client
+
+```javascript
+const readTimeout = 30000;
+const writeTimeout = 30000;
+const config = new RepositoryClientConfig(['http://GDB/repositories/my-repo'], {
+  'Accept': RDFMimeType.TURTLE
+}, '', readTimeout, writeTimeout);
+const repository = new RDFRepositoryClient(config);
+```
+
+* Obtaining repository client instance through a ServerClient
+```javascript
+const ServerClient = require('server/server-client');
+const ServerClientConfig = require('server/server-client-config');
+const RepositoryClientConfig = require('repository/repository-client-config')
+
+const config = new ServerClientConfig('http://GDB', 0, {});
+const server = new ServerClient(config);
+
+const readTimeout = 30000;
+const writeTimeout = 30000;
+const repositoryClientConfig = new RepositoryClientConfig(['http://GDB/repositories/my-repo'], {}, '', readTimeout, writeTimeout);
+return server.getRepository('automotive', repositoryClientConfig).then((rdfRepositoryClient) => {
+// rdfRepositoryClient is a configured instance of RDFRepositoryClient
+});
+```
+
+#### Uploading data in repository (POST) using ReadStream
+```javascript
+const contentType = RDFMimeType.TURTLE;
+const turtleFile = __dirname + '/statements.ttl';
+fs.readFile(turtleFile, (err, stream) => {
+    repository.upload(stream, null, null, contentType).catch((e) => console.log(e));
+});
+```
+
+#### Overwrite data in repository (PUT) using ReadStream
+```javascript
+const contentType = RDFMimeType.TURTLE;
+const file = __dirname + '/statements-overwrite.ttl';
+fs.readFile(file, (err, stream) => {
+    repository.overwrite(stream, null, null, contentType).catch((e) => console.log(e));
+});
+```
+
+#### Download data from repository by consuming a WritableStream
+```javascript
+const dest = __dirname + '/statements.ttl';
+const output = fs.createWriteStream(dest);
+const payload = new GetStatementsPayload()
+    .setResponseType(RDFMimeType.TURTLE)
+    .get();
+repository.download(payload).then((response) => {
+    response.on('data', (chunk) => {
+        output.write(new Buffer(chunk));
+    });
+    response.on('end', () => {
+        output.end();
+    });
+});
 ```
 
 ## Setup Development
