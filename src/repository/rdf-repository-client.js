@@ -10,6 +10,13 @@ const TransactionalRepositoryClient =
   require('transaction/transactional-repository-client');
 
 /**
+ * Defines the path segment for namespaces rest endpoint
+ *
+ * @type {string}
+ */
+const PATH_NAMESPACES = '/namespaces';
+
+/**
  * RDF repository client implementation realizing specific operations.
  * @class
  */
@@ -28,7 +35,7 @@ class RDFRepositoryClient extends BaseRepositoryClient {
    *                                {@link NamedNode} representing namespaces
    */
   getNamespaces() {
-    return this.execute((http) => http.get('/namespaces',
+    return this.execute((http) => http.get(PATH_NAMESPACES,
       http.getConfigBuilder()
         .setTimeout(this.repositoryClientConfig.readTimeout)
         .addAcceptHeader(RDFMimeType.SPARQL_RESULTS_JSON)
@@ -60,7 +67,7 @@ class RDFRepositoryClient extends BaseRepositoryClient {
       throw new Error('Parameter prefix is required!');
     }
 
-    return this.execute((http) => http.get(`/namespaces/${prefix}`,
+    return this.execute((http) => http.get(`${PATH_NAMESPACES}/${prefix}`,
       http.getConfigBuilder()
         .setTimeout(this.repositoryClientConfig.readTimeout)
         .get()
@@ -92,8 +99,8 @@ class RDFRepositoryClient extends BaseRepositoryClient {
       throw new Error('Parameter namespace is required!');
     }
 
-    return this.execute((http) => http.put(`/namespaces/${prefix}`, payload,
-      http.getConfigBuilder()
+    return this.execute((http) => http.put(`${PATH_NAMESPACES}/${prefix}`,
+      payload, http.getConfigBuilder()
         .setTimeout(this.repositoryClientConfig.writeTimeout)
         .get()
     ));
@@ -117,11 +124,12 @@ class RDFRepositoryClient extends BaseRepositoryClient {
       throw new Error('Parameter prefix is required!');
     }
 
-    return this.execute((http) => http.deleteResource(`/namespaces/${prefix}`,
-      http.getConfigBuilder()
-        .setTimeout(this.repositoryClientConfig.writeTimeout)
-        .get()
-    ));
+    return this.execute((http) =>
+      http.deleteResource(`${PATH_NAMESPACES}/${prefix}`,
+        http.getConfigBuilder()
+          .setTimeout(this.repositoryClientConfig.writeTimeout)
+          .get()
+      ));
   }
 
   /**
@@ -130,7 +138,7 @@ class RDFRepositoryClient extends BaseRepositoryClient {
    * @return {Promise} promise that will be resolved after successful deletion
    */
   deleteNamespaces() {
-    return this.execute((http) => http.deleteResource('/namespaces',
+    return this.execute((http) => http.deleteResource(PATH_NAMESPACES,
       http.getConfigBuilder()
         .setTimeout(this.repositoryClientConfig.writeTimeout)
         .get()
