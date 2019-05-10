@@ -293,9 +293,9 @@ class QueryPayload {
    */
   serialize(data) {
     return Object.entries(data)
-        .filter((x) => x[1] !== undefined)
-        .map((x) => `${encodeURIComponent(x[0])}=${encodeURIComponent(x[1])}`)
-        .join('&');
+      .filter((x) => x[1] !== undefined)
+      .map((x) => `${encodeURIComponent(x[0])}=${encodeURIComponent(x[1])}`)
+      .join('&');
   }
 
   // -----------------------------------------------------

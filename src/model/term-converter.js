@@ -90,7 +90,7 @@ class TermConverter {
 
     if (contextTerms && contextTerms.length) {
       return contextTerms.map((graph) => quad(subjectTerm, predicateTerm,
-          objectTerm, graph));
+        objectTerm, graph));
     }
     return [quad(subjectTerm, predicateTerm, objectTerm)];
   }
