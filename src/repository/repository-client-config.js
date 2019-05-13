@@ -5,9 +5,9 @@
  */
 class RepositoryClientConfig {
   /**
-   * @param {string[]} endpoints
-   * @param {Map<string, string>} headers
-   * @param {RDFMimeType} defaultRDFMimeType
+   * @param {string[]} endpoints is an array with repository endpoints
+   * @param {Object} headers is a key:value mapping of http headers and values
+   * @param {string} defaultRDFMimeType one of {@link RDFMimeType} values
    * @param {number} readTimeout
    * @param {number} writeTimeout
    */

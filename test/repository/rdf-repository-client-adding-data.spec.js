@@ -206,5 +206,4 @@ describe('RDFRepositoryClient - adding data', () => {
   function context(id) {
     return `http://domain/graph/${id}`;
   }
-
 });
