@@ -6,6 +6,8 @@ web browser environment.
 ## Installation
 Make sure you have Node.js and Node Package Manager ([npm](https://npmjs.org/)) installed before start 
 working with the library.
+
+
 ```
 npm install --save rdf4js
 ```
@@ -15,6 +17,8 @@ npm install --save rdf4js
 ### ServerClient
 
 * Configure *ServerClient* and and fetch repository ids. 
+
+
 ```javascript
 const ServerClient = require('rdf4js/src/server/server-client');
 const ServerClientConfig = require('rdf4js/src/server/server-client-config');
@@ -35,6 +39,7 @@ server.getRepositoryIDs().then(ids => {
 
 * Instantiating repository client
 
+
 ```javascript
 const readTimeout = 30000;
 const writeTimeout = 30000;
@@ -45,10 +50,12 @@ const repository = new RDFRepositoryClient(config);
 ```
 
 * Obtaining repository client instance through a ServerClient
+
+
 ```javascript
 const ServerClient = require('server/server-client');
 const ServerClientConfig = require('server/server-client-config');
-const RepositoryClientConfig = require('repository/repository-client-config')
+const RepositoryClientConfig = require('repository/repository-client-config');
 
 const config = new ServerClientConfig('http://GDB', 0, {});
 const server = new ServerClient(config);
@@ -62,6 +69,8 @@ return server.getRepository('automotive', repositoryClientConfig).then((rdfRepos
 ```
 
 #### Uploading data in repository (POST) using ReadStream
+
+
 ```javascript
 const contentType = RDFMimeType.TURTLE;
 const turtleFile = __dirname + '/statements.ttl';
@@ -71,6 +80,8 @@ fs.readFile(turtleFile, (err, stream) => {
 ```
 
 #### Overwrite data in repository (PUT) using ReadStream
+
+
 ```javascript
 const contentType = RDFMimeType.TURTLE;
 const file = __dirname + '/statements-overwrite.ttl';
@@ -80,6 +91,8 @@ fs.readFile(file, (err, stream) => {
 ```
 
 #### Download data from repository by consuming a WritableStream
+
+
 ```javascript
 const dest = __dirname + '/statements.ttl';
 const output = fs.createWriteStream(dest);
