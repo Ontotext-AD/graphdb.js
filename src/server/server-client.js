@@ -2,6 +2,7 @@ const HttpClient = require('http/http-client');
 const ConsoleLogger = require('logging/console-logger');
 const RDFRepositoryClient = require('repository/rdf-repository-client');
 const RepositoryClientConfig = require('repository/repository-client-config');
+const HttpRequestConfigBuilder = require('http/http-request-config-builder');
 const RDFMimeType = require('http/rdf-mime-type');
 
 const SERVICE_URL = '/repositories';
@@ -26,7 +27,7 @@ class ServerClient {
    * @return {Promise} promise which resolves with an Array with repository ids.
    */
   getRepositoryIDs() {
-    return this.httpClient.get(SERVICE_URL, this.httpClient.getConfigBuilder()
+    return this.httpClient.get(SERVICE_URL, new HttpRequestConfigBuilder()
       .addAcceptHeader(RDFMimeType.SPARQL_RESULTS_JSON)
       .get()
     ).then((response) => {

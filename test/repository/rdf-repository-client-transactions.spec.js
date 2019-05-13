@@ -82,7 +82,6 @@ describe('RDFRepositoryClient - transactions', () => {
     function verifyTransactionStart(isolation) {
       expect(post).toHaveBeenCalledTimes(1);
       expect(post).toHaveBeenCalledWith('/transactions', {
-        timeout: 200,
         params: {
           'isolation-level': isolation
         }
@@ -97,7 +96,6 @@ describe('RDFRepositoryClient - transactions', () => {
       }).then(() => {
         expect(transactionalClient.httpClients[0].put).toHaveBeenCalledTimes(1);
         expect(transactionalClient.httpClients[0].put).toHaveBeenCalledWith('', null, {
-          timeout: 200,
           params: {
             action: 'COMMIT'
           }
@@ -113,9 +111,7 @@ describe('RDFRepositoryClient - transactions', () => {
         return transactionalClient.rollback();
       }).then(() => {
         expect(transactionalClient.httpClients[0].deleteResource).toHaveBeenCalledTimes(1);
-        expect(transactionalClient.httpClients[0].deleteResource).toHaveBeenCalledWith('', null, {
-          timeout: 200
-        });
+        expect(transactionalClient.httpClients[0].deleteResource).toHaveBeenCalledWith('', null);
         expect(transactionalClient.isActive()).toEqual(false);
       });
     });
@@ -178,7 +174,6 @@ describe('RDFRepositoryClient - transactions', () => {
         expect(size).toEqual(123);
         expect(httpPut).toHaveBeenCalledTimes(1);
         expect(httpPut).toHaveBeenCalledWith('', null, {
-          timeout: 200,
           params: {
             action: 'SIZE',
             context: undefined
@@ -193,7 +188,6 @@ describe('RDFRepositoryClient - transactions', () => {
         expect(size).toEqual(123);
         expect(httpPut).toHaveBeenCalledTimes(1);
         expect(httpPut).toHaveBeenCalledWith('', null, {
-          timeout: 200,
           params: {
             action: 'SIZE',
             context: '<http://domain/context>'
@@ -224,8 +218,7 @@ describe('RDFRepositoryClient - transactions', () => {
             obj: '"7931000"^^http://www.w3.org/2001/XMLSchema#integer',
             pred: '<http://eunis.eea.europa.eu/rdf/schema.rdf#population>',
             subj: '<http://eunis.eea.europa.eu/countries/AZ>'
-          },
-          timeout: 200
+          }
         });
       });
     });
@@ -249,8 +242,7 @@ describe('RDFRepositoryClient - transactions', () => {
           },
           params: {
             action: 'ADD',
-          },
-          timeout: 200
+          }
         });
       });
     });
@@ -266,7 +258,7 @@ describe('RDFRepositoryClient - transactions', () => {
     });
 
     test('should add data', () => {
-      return transaction.addData(data).then(() => {
+      return transaction.addTurtle(data).then(() => {
         expect(httpPut).toHaveBeenCalledTimes(1);
         expect(httpPut).toHaveBeenCalledWith('', data, {
           headers: {
@@ -274,22 +266,21 @@ describe('RDFRepositoryClient - transactions', () => {
           },
           params: {
             action: 'ADD',
-          },
-          timeout: 200
+          }
         });
       });
     });
 
     test('should require data when adding', () => {
-      expect(() => transaction.addData()).toThrow();
-      expect(() => transaction.addData('')).toThrow();
-      expect(() => transaction.addData('  ')).toThrow();
+      expect(() => transaction.addTurtle()).toThrow();
+      expect(() => transaction.addTurtle('')).toThrow();
+      expect(() => transaction.addTurtle('  ')).toThrow();
       expect(httpPut).toHaveBeenCalledTimes(0);
     });
 
     test('should reject if the transaction cannot add data', () => {
       httpPut.mockRejectedValue('Error during add');
-      return expect(transaction.addData(data)).rejects.toEqual('Error during add');
+      return expect(transaction.addTurtle(data)).rejects.toEqual('Error during add');
     });
 
     test('should delete data', () => {
@@ -301,8 +292,7 @@ describe('RDFRepositoryClient - transactions', () => {
           },
           params: {
             action: 'DELETE',
-          },
-          timeout: 200
+          }
         });
       });
     });

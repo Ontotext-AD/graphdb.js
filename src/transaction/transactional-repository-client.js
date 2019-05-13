@@ -2,6 +2,7 @@ const BaseRepositoryClient = require('repository/base-repository-client');
 const RDFMimeType = require('http/rdf-mime-type');
 const TermConverter = require('model/term-converter');
 const StringUtils = require('util/string-utils');
+const HttpRequestConfigBuilder = require('http/http-request-config-builder');
 
 /**
  * Transactional RDF repository client implementation realizing transaction
@@ -47,15 +48,15 @@ class TransactionalRepositoryClient extends BaseRepositoryClient {
    * @return {Promise<number>} a promise resolving to the size of the repo
    */
   getSize(context) {
-    return this.execute((http) => http.put('', null, {
-      timeout: this.repositoryClientConfig.writeTimeout,
-      params: {
+    const requestConfig = new HttpRequestConfigBuilder()
+      .setParams({
         action: 'SIZE',
         context
-      }
-    })).then((response) => {
-      return response.data;
-    });
+      })
+      .get();
+
+    return this.execute((http) => http.put('', null, requestConfig))
+      .then((response) => response.data);
   }
 
   /**
@@ -69,22 +70,20 @@ class TransactionalRepositoryClient extends BaseRepositoryClient {
    *      to provided response type.
    */
   get(params) {
-    return this.execute((http) => http.put('', null, {
-      params: {
+    const requestConfig = new HttpRequestConfigBuilder()
+      .setParams({
         action: 'GET',
         subj: params.subject,
         pred: params.predicate,
         obj: params.object,
         context: params.context,
         infer: params.inference
-      },
-      headers: {
-        'Accept': params.responseType
-      },
-      timeout: this.repositoryClientConfig.writeTimeout
-    })).then((response) => {
-      return this.parse(response.data, params.responseType);
-    });
+      })
+      .addAcceptHeader(params.responseType)
+      .get();
+
+    return this.execute((http) => http.put('', null, requestConfig))
+      .then((response) => this.parse(response.data, params.responseType));
   }
 
   /**
@@ -96,17 +95,8 @@ class TransactionalRepositoryClient extends BaseRepositoryClient {
    * is successful or rejected in case of failure
    */
   addQuads(quads) {
-    return TermConverter.toTurtle(quads).then((payload) => {
-      return this.execute((http) => http.put('', payload, {
-        timeout: this.repositoryClientConfig.writeTimeout,
-        params: {
-          action: 'ADD'
-        },
-        headers: {
-          'Content-Type': RDFMimeType.TURTLE
-        }
-      }));
-    });
+    return TermConverter.toTurtle(quads)
+      .then((payload) => this.addTurtle(payload));
   }
 
   /**
@@ -116,20 +106,19 @@ class TransactionalRepositoryClient extends BaseRepositoryClient {
    * @return {Promise} promise resolving after the data has been inserted
    * successfully
    */
-  addData(data) {
+  addTurtle(data) {
     if (StringUtils.isBlank(data)) {
       throw new Error('Turtle data is required when adding statements');
     }
 
-    return this.execute((http) => http.put('', data, {
-      timeout: this.repositoryClientConfig.writeTimeout,
-      params: {
+    const requestConfig = new HttpRequestConfigBuilder()
+      .setParams({
         action: 'ADD'
-      },
-      headers: {
-        'Content-Type': RDFMimeType.TURTLE
-      }
-    }));
+      })
+      .addContentTypeHeader(RDFMimeType.TURTLE)
+      .get();
+
+    return this.execute((http) => http.put('', data, requestConfig));
   }
 
   /**
@@ -144,15 +133,14 @@ class TransactionalRepositoryClient extends BaseRepositoryClient {
       throw new Error('Turtle data is required when deleting statements');
     }
 
-    return this.execute((http) => http.put('', data, {
-      timeout: this.repositoryClientConfig.writeTimeout,
-      params: {
+    const requestConfig = new HttpRequestConfigBuilder()
+      .setParams({
         action: 'DELETE'
-      },
-      headers: {
-        'Content-Type': RDFMimeType.TURTLE
-      }
-    }));
+      })
+      .addContentTypeHeader(RDFMimeType.TURTLE)
+      .get();
+
+    return this.execute((http) => http.put('', data, requestConfig));
   }
 
   /**
@@ -164,14 +152,16 @@ class TransactionalRepositoryClient extends BaseRepositoryClient {
    * @return {Promise} that will be resolved after successful rollback
    */
   commit() {
-    return this.execute((http) => http.put('', null, {
-      timeout: this.repositoryClientConfig.writeTimeout,
-      params: {
+    const requestConfig = new HttpRequestConfigBuilder()
+      .setParams({
         action: 'COMMIT'
-      }
-    })).finally(() => {
-      this.active = false;
-    });
+      })
+      .get();
+
+    return this.execute((http) => http.put('', null, requestConfig))
+      .finally(() => {
+        this.active = false;
+      });
   }
 
   /**
@@ -182,9 +172,7 @@ class TransactionalRepositoryClient extends BaseRepositoryClient {
    * @return {Promise} that will be resolved after successful rollback
    */
   rollback() {
-    return this.execute((http) => http.deleteResource('', null, {
-      timeout: this.repositoryClientConfig.writeTimeout
-    })).finally(() => {
+    return this.execute((http) => http.deleteResource('', null)).finally(() => {
       this.active = false;
     });
   }

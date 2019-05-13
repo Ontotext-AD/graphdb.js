@@ -31,6 +31,8 @@ describe('RDFRepositoryClient', () => {
     expect(rdfRepositoryClient.httpClients).toBeDefined();
     expect(rdfRepositoryClient.httpClients.length).toEqual(1);
     expect(rdfRepositoryClient.httpClients[0].setDefaultHeaders).toHaveBeenCalledWith(defaultHeaders);
+    expect(rdfRepositoryClient.httpClients[0].setDefaultReadTimeout).toHaveBeenCalledWith(100);
+    expect(rdfRepositoryClient.httpClients[0].setDefaultWriteTimeout).toHaveBeenCalledWith(200);
   });
 
   test('should initialize with multiple endpoints from the client configuration', () => {
@@ -81,7 +83,6 @@ describe('RDFRepositoryClient', () => {
       return rdfRepositoryClient.getSize().then(() => {
         expect(get).toHaveBeenCalledTimes(1);
         expect(get).toHaveBeenCalledWith('/size', {
-          timeout: 100,
           params: {
             context: undefined
           }
@@ -93,7 +94,6 @@ describe('RDFRepositoryClient', () => {
       return rdfRepositoryClient.getSize(['context-1']).then(() => {
         expect(get).toHaveBeenCalledTimes(1);
         expect(get).toHaveBeenCalledWith('/size', {
-          timeout: 100,
           params: {
             context: ['context-1']
           }

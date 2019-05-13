@@ -1,8 +1,8 @@
 /**
- * Holds configuration applicable to the http client.
+ * Holds request configuration applicable to the http client.
  * @class
  */
-class HttpClientConfig {
+class HttpRequestConfigBuilder {
   /**
    * Constructor.
    */
@@ -15,7 +15,7 @@ class HttpClientConfig {
    *
    * @param {string} header type
    * @param {string} value the header value
-   * @return {HttpClientConfig}
+   * @return {HttpRequestConfigBuilder}
    */
   addHeader(header, value) {
     if (!this.config.headers) {
@@ -29,7 +29,7 @@ class HttpClientConfig {
    * Add a specific header of type <code>Accept</code> with the given value.
    *
    * @param {string} value
-   * @return {HttpClientConfig}
+   * @return {HttpRequestConfigBuilder}
    */
   addAcceptHeader(value) {
     return this.addHeader('Accept', value);
@@ -40,7 +40,7 @@ class HttpClientConfig {
    * value.
    *
    * @param {string} value
-   * @return {HttpClientConfig}
+   * @return {HttpRequestConfigBuilder}
    */
   addContentTypeHeader(value) {
     return this.addHeader('Content-Type', value);
@@ -50,7 +50,7 @@ class HttpClientConfig {
    * Set request parameters object.
    *
    * @param {Object} params
-   * @return {HttpClientConfig}
+   * @return {HttpRequestConfigBuilder}
    */
   setParams(params) {
     this.config.params = params;
@@ -62,7 +62,7 @@ class HttpClientConfig {
    *
    * @param {string} param
    * @param {any} value
-   * @return {HttpClientConfig}
+   * @return {HttpRequestConfigBuilder}
    */
   addParam(param, value) {
     if (!this.config.params) {
@@ -76,7 +76,7 @@ class HttpClientConfig {
    * Set timeout configuration.
    *
    * @param {number} timeout in ms
-   * @return {HttpClientConfig}
+   * @return {HttpRequestConfigBuilder}
    */
   setTimeout(timeout) {
     this.config.timeout = timeout;
@@ -87,7 +87,7 @@ class HttpClientConfig {
    * Set a responseType config.
    *
    * @param {string} responseType
-   * @return {HttpClientConfig}
+   * @return {HttpRequestConfigBuilder}
    */
   setResponseType(responseType) {
     this.config.responseType = responseType;
@@ -103,4 +103,4 @@ class HttpClientConfig {
   }
 }
 
-module.exports = HttpClientConfig;
+module.exports = HttpRequestConfigBuilder;
