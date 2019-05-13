@@ -27,8 +27,8 @@ class ServerClient {
    */
   getRepositoryIDs() {
     return this.httpClient.get(SERVICE_URL, this.httpClient.getConfigBuilder()
-        .addAcceptHeader(RDFMimeType.SPARQL_RESULTS_JSON)
-        .get()
+      .addAcceptHeader(RDFMimeType.SPARQL_RESULTS_JSON)
+      .get()
     ).then((response) => {
       return response.data.results.bindings.map(({id}) => id.value);
     });
@@ -63,14 +63,14 @@ class ServerClient {
     }
     if (!config || !(config instanceof RepositoryClientConfig)) {
       return Promise
-          .reject(new Error('RepositoryClientConfig is required parameter!'));
+        .reject(new Error('RepositoryClientConfig is required parameter!'));
     }
     return this.hasRepository(id).then((exists) => {
       if (exists) {
         return new RDFRepositoryClient(config);
       }
       return Promise
-          .reject(new Error(`Repository with id ${id} does not exists.`));
+        .reject(new Error(`Repository with id ${id} does not exists.`));
     });
   }
 

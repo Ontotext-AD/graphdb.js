@@ -5,6 +5,11 @@
     "no-debugger": "error",
     "comma-dangle": ["error", {
       "objects": "never"
+    }],
+    "indent": ["error", 2, {
+      "FunctionExpression": {
+        "parameters": 2
+      }
     }]
   },
   "settings": {

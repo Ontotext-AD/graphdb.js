@@ -72,9 +72,9 @@ class BaseRepositoryClient {
     // Constructs a http client for each endpoint
     this.httpClients = config.endpoints.map((endpoint) => {
       return new HttpClient(endpoint, config.readTimeout, config.writeTimeout)
-          .setDefaultHeaders(config.headers)
-          .setDefaultReadTimeout(config.readTimeout)
-          .setDefaultWriteTimeout(config.writeTimeout);
+        .setDefaultHeaders(config.headers)
+        .setDefaultReadTimeout(config.readTimeout)
+        .setDefaultWriteTimeout(config.writeTimeout);
     });
   }
 
@@ -102,9 +102,9 @@ class BaseRepositoryClient {
    */
   getSize(context) {
     return this.execute((http) => http.get('/size', http.getConfigBuilder()
-        .setTimeout(this.repositoryClientConfig.readTimeout)
-        .setParams({context})
-        .get())).then((response) => response.data);
+      .setTimeout(this.repositoryClientConfig.readTimeout)
+      .setParams({context})
+      .get())).then((response) => response.data);
   }
 
   /**
@@ -118,16 +118,16 @@ class BaseRepositoryClient {
   get(params) {
     return this.execute((http) => {
       return http.get(PATH_STATEMENTS, http.getConfigBuilder()
-          .setParams({
-            subj: params.subject,
-            pred: params.predicate,
-            obj: params.object,
-            context: params.context,
-            infer: params.inference
-          })
-          .addAcceptHeader(params.responseType)
-          .setTimeout(this.repositoryClientConfig.readTimeout)
-          .get());
+        .setParams({
+          subj: params.subject,
+          pred: params.predicate,
+          obj: params.object,
+          context: params.context,
+          infer: params.inference
+        })
+        .addAcceptHeader(params.responseType)
+        .setTimeout(this.repositoryClientConfig.readTimeout)
+        .get());
     }).then((response) => {
       return this.parse(response.data, params.responseType);
     });
@@ -147,13 +147,13 @@ class BaseRepositoryClient {
   query(payload) {
     return this.execute((http) => {
       return http.post('',
-          payload.getParams(),
-          http.getConfigBuilder()
-              .setTimeout(this.repositoryClientConfig.readTimeout)
-              .setResponseType('stream')
-              .addAcceptHeader(payload.getResponseType())
-              .addContentTypeHeader(payload.getContentType())
-              .get());
+        payload.getParams(),
+        http.getConfigBuilder()
+          .setTimeout(this.repositoryClientConfig.readTimeout)
+          .setResponseType('stream')
+          .addAcceptHeader(payload.getResponseType())
+          .addContentTypeHeader(payload.getContentType())
+          .get());
     }).then((response) => {
       return response.data;
     });
@@ -213,10 +213,10 @@ class BaseRepositoryClient {
     let quads;
     if (payload.language) {
       quads = TermConverter.getQuadsWithLanguage(subject, predicate, object,
-          payload.language, context);
+        payload.language, context);
     } else if (payload.dataType) {
       quads = TermConverter.getQuadsWithDataType(subject, predicate, object,
-          payload.dataType, context);
+        payload.dataType, context);
     } else {
       quads = TermConverter.getQuads(subject, predicate, object, context);
     }
@@ -235,10 +235,10 @@ class BaseRepositoryClient {
   addQuads(quads) {
     return TermConverter.toTurtle(quads).then((payload) => {
       return this.execute((http) => http.post(PATH_STATEMENTS, payload,
-          http.getConfigBuilder()
-              .setTimeout(this.repositoryClientConfig.writeTimeout)
-              .addContentTypeHeader(RDFMimeType.TURTLE)
-              .get()));
+        http.getConfigBuilder()
+          .setTimeout(this.repositoryClientConfig.writeTimeout)
+          .addContentTypeHeader(RDFMimeType.TURTLE)
+          .get()));
     });
   }
 
@@ -259,15 +259,15 @@ class BaseRepositoryClient {
    */
   deleteStatements(subject, predicate, object, contexts) {
     return this.execute((http) => http.deleteResource(PATH_STATEMENTS,
-        http.getConfigBuilder()
-            .setTimeout(this.repositoryClientConfig.writeTimeout)
-            .setParams({
-              subj: subject,
-              pred: predicate,
-              obj: object,
-              context: contexts
-            })
-            .get()
+      http.getConfigBuilder()
+        .setTimeout(this.repositoryClientConfig.writeTimeout)
+        .setParams({
+          subj: subject,
+          pred: predicate,
+          obj: object,
+          context: contexts
+        })
+        .get()
     ));
   }
 
@@ -279,9 +279,9 @@ class BaseRepositoryClient {
    */
   deleteAllStatements() {
     return this.execute((http) => http.deleteResource(PATH_STATEMENTS,
-        http.getConfigBuilder()
-            .setTimeout(this.repositoryClientConfig.writeTimeout)
-            .get()));
+      http.getConfigBuilder()
+        .setTimeout(this.repositoryClientConfig.writeTimeout)
+        .get()));
   }
 
   /**
