@@ -8,21 +8,27 @@ const HttpClientConfig = require('http/http-client-config');
  * The purpose of the delegating is to have an abstraction layer on top of the
  * used library.
  *
+ * By default all requests are without a timeout, e.g. execution time is not
+ * limited. To change that use {@link #setDefaultReadTimeout} and
+ * {@link #setDefaultWriteTimeout} or provide one in each request's
+ * configuration object.
+ *
  * @class
  * @author Mihail Radkov
  */
 class HttpClient {
   /**
    * Instantiates new HTTP client with the supplied base URL and default
-   * request timeout.
+   * request timeouts.
    *
    * @constructor
    * @param {string} baseURL base URL that will be prepend to all requests
-   * @param {number} [timeout=0] default timeout for all requests; if 0 or
-   *                             negative there will be no timeout;
+   * GET
    */
-  constructor(baseURL, timeout = 0) {
-    this.axios = axios.create({baseURL, timeout});
+  constructor(baseURL) {
+    this.axios = axios.create({baseURL});
+    this.readTimeout = 0;
+    this.writeTimeout = 0;
   }
 
   /**
@@ -40,6 +46,30 @@ class HttpClient {
   }
 
   /**
+   * Sets the default request read timeout. It will be used in case requests
+   * don't explicitly specify it in their request configurations.
+   *
+   * @param {number} readTimeout the default read timeout
+   * @return {HttpClient} the current client for method chaining
+   */
+  setDefaultReadTimeout(readTimeout) {
+    this.readTimeout = readTimeout;
+    return this;
+  }
+
+  /**
+   * Sets the default request write timeout. It will be used in case requests
+   * don't explicitly specify it in their request configurations.
+   *
+   * @param {number} writeTimeout the default write timeout
+   * @return {HttpClient} the current client for method chaining
+   */
+  setDefaultWriteTimeout(writeTimeout) {
+    this.writeTimeout = writeTimeout;
+    return this;
+  }
+
+  /**
    * Performs a GET request to the provided URL with the given request
    * configuration.
    *
@@ -53,6 +83,7 @@ class HttpClient {
    */
   get(url, config = {}) {
     this.addXRequestIdHeader(config);
+    this.addDefaultReadTimeout(config);
     return this.axios.get(url, config);
   }
 
@@ -71,6 +102,7 @@ class HttpClient {
    */
   post(url, data, config = {}) {
     this.addXRequestIdHeader(config);
+    this.addDefaultWriteTimeout(config);
     return this.axios.post(url, data, config);
   }
 
@@ -89,6 +121,7 @@ class HttpClient {
    */
   put(url, data, config = {}) {
     this.addXRequestIdHeader(config);
+    this.addDefaultWriteTimeout(config);
     return this.axios.put(url, data, config);
   }
 
@@ -106,6 +139,7 @@ class HttpClient {
    */
   deleteResource(url, config = {}) {
     this.addXRequestIdHeader(config);
+    this.addDefaultWriteTimeout(config);
     return this.axios.delete(url, config);
   }
 
@@ -120,6 +154,32 @@ class HttpClient {
       requestConfig.headers = {};
     }
     requestConfig.headers['x-request-id'] = uuidv4();
+  }
+
+  /**
+   * Adds a default read timeout if it is not explicitly specified in the
+   * request configuration object.
+   *
+   * @param {object} requestConfig request configuration object supplied to
+   * the http client for specific request
+   */
+  addDefaultReadTimeout(requestConfig) {
+    if (!requestConfig.timeout) {
+      requestConfig.timeout = this.readTimeout;
+    }
+  }
+
+  /**
+   * Adds a default write timeout if it is not explicitly specified in the
+   * request configuration object.
+   *
+   * @param {object} requestConfig request configuration object supplied to
+   * the http client for specific request
+   */
+  addDefaultWriteTimeout(requestConfig) {
+    if (!requestConfig.timeout) {
+      requestConfig.timeout = this.writeTimeout;
+    }
   }
 
   /**
