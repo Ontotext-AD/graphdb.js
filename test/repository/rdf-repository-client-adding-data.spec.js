@@ -1,6 +1,6 @@
 const HttpClient = require('http/http-client');
 const RepositoryClientConfig = require('repository/repository-client-config');
-const RdfRepositoryClient = require('repository/rdf-repository-client');
+const RDFRepositoryClient = require('repository/rdf-repository-client');
 const RDFMimeType = require('http/rdf-mime-type');
 const AddStatementPayload = require('repository/add-statement-payload');
 
@@ -15,22 +15,21 @@ const {when} = require('jest-when');
 jest.mock('http/http-client');
 
 /*
- * Tests statements insertion via RdfRepositoryClient
+ * Tests statements insertion via RDFRepositoryClient
  */
-describe('RdfRepositoryClient - adding data', () => {
+describe('RDFRepositoryClient - adding data', () => {
 
   let repoClientConfig;
   let rdfRepositoryClient;
 
   beforeEach(() => {
-    // No timeout so it won't slow the test suite when testing rejections.
     repoClientConfig = new RepositoryClientConfig([
       'http://localhost:8080/repositories/test'
-    ], {}, '', 100, 200, 0, 0);
+    ], {}, '', 100, 200);
 
     HttpClient.mockImplementation(() => httpClientStub());
 
-    rdfRepositoryClient = new RdfRepositoryClient(repoClientConfig);
+    rdfRepositoryClient = new RDFRepositoryClient(repoClientConfig);
   });
 
   describe('add(payload)', () => {
@@ -107,7 +106,8 @@ describe('RdfRepositoryClient - adding data', () => {
 
     test('should reject adding the payload if it is empty', () => {
       const payload = new AddStatementPayload().get();
-      return expect(rdfRepositoryClient.add(payload)).rejects.toBeTruthy();
+      expect(() => rdfRepositoryClient.add(payload)).toThrow(Error);
+      verifyNoPayload();
     });
 
     test('should reject adding the payload if it lacks required terms', () => {
@@ -115,7 +115,8 @@ describe('RdfRepositoryClient - adding data', () => {
         .setSubject(subj('resource-1'))
         .setPredicate(pred('relation-1'))
         .get();
-      return expect(rdfRepositoryClient.add(payload)).rejects.toBeTruthy();
+      expect(() => rdfRepositoryClient.add(payload)).toThrow(Error);
+      verifyNoPayload();
     });
 
     test('should reject adding the payload when the server request is unsuccessful', () => {
@@ -167,6 +168,11 @@ describe('RdfRepositoryClient - adding data', () => {
         'Content-Type': RDFMimeType.TURTLE
       }
     });
+  }
+
+  function verifyNoPayload() {
+    const post = rdfRepositoryClient.httpClients[0].post;
+    expect(post).toHaveBeenCalledTimes(0);
   }
 
   // Utilities for building terms

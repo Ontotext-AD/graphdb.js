@@ -193,7 +193,7 @@ class BaseRepositoryClient {
    */
   add(payload) {
     if (!payload) {
-      return Promise.reject(new Error('Cannot add statement without payload'));
+      throw new Error('Cannot add statement without payload');
     }
 
     const subject = payload.subject;
@@ -202,8 +202,8 @@ class BaseRepositoryClient {
     const context = payload.context;
 
     if (BaseRepositoryClient.hasNullArguments(subject, predicate, object)) {
-      return Promise.reject(new Error('Cannot add statement with null ' +
-        'subject, predicate or object'));
+      throw new Error('Cannot add statement with null ' +
+        'subject, predicate or object');
     }
 
     let quads;
