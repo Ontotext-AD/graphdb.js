@@ -140,8 +140,9 @@ class BaseRepositoryClient {
    *
    * @param {QueryPayload} payload is an object holding request parameters
    * required by the query POST endpoint.
-   * @return {Promise} stream that emits string or Quad depending on the
-   * provided response type as soon as they are available.
+   * @return {Promise} the client can subscribe to the stream events and consume
+   * the emitted strings or Quads depending on the provided response type as
+   * soon as they are available.
    */
   query(payload) {
     return this.execute((http) => {

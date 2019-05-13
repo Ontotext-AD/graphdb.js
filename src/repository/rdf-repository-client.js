@@ -138,6 +138,38 @@ class RDFRepositoryClient extends BaseRepositoryClient {
   }
 
   /**
+   * Fetch rdf data from statements endpoint using provided parameters.
+   *
+   * The request is configured so that expected response should be a readable
+   * stream.
+   *
+   * @param {Object} params is an object holding request parameters as returned
+   *                 by {@link GetStatementsPayload#get()}
+   * @return {Promise<WritableStream>} the client can subscribe to the readable
+   * stream events and consume the emitted strings depending on the provided
+   * response type as soon as they are available.
+   */
+  download(params) {
+    return this.execute((http) => {
+      return http.get('/statements', http.getConfigBuilder()
+          .addAcceptHeader(params.responseType)
+          .setResponseType('stream')
+          .setTimeout(this.repositoryClientConfig.readTimeout)
+          .setParams({
+            subj: params.subject,
+            pred: params.predicate,
+            obj: params.object,
+            context: params.context,
+            infer: params.inference
+          })
+          .get()
+      );
+    }).then((response) => {
+      return response.data;
+    });
+  }
+
+  /**
    * Executes a POST request against the <code>/statements</code> endpoint. The
    * statements which have to be added are provided through a readable stream.
    * This method is useful for library client who wants to upload a big data set

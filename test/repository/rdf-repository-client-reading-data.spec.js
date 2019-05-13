@@ -15,6 +15,8 @@ const literal = DataFactory.literal;
 const defaultGraph = DataFactory.defaultGraph;
 const quad = DataFactory.quad;
 
+const {ObjectReadableMock} = require('stream-mock');
+
 const httpClientStub = require('../http/http-client.stub');
 
 jest.mock('http/http-client');
@@ -182,5 +184,87 @@ describe('RDFRepositoryClient - reading statements', () => {
       const payload = new GetStatementsPayload().get();
       return expect(repository.get(payload)).resolves.toEqual(expected);
     });
+  });
+
+  describe('download', () => {
+    beforeEach(() => {
+      HttpClient.mockImplementation(() => httpClientStub());
+
+      config = new RepositoryClientConfig(endpoints, headers, contentType,
+        readTimeout, writeTimeout);
+      repository = new RDFRepositoryClient(config);
+    });
+
+    test('should fetch data and return readable stream to the client', (done) => {
+      const source = streamSource();
+      const stream = new ObjectReadableMock(source);
+      const expected = expectedStream();
+      const expectedIt = expected[Symbol.iterator]();
+
+      const payload = new GetStatementsPayload()
+        .setResponseType(RDFMimeType.TURTLE)
+        .setSubject('<http://eunis.eea.europa.eu/countries/AZ>')
+        .setPredicate('<http://eunis.eea.europa.eu/rdf/schema.rdf#population>')
+        .setObject('"7931000"^^http://www.w3.org/2001/XMLSchema#integer')
+        .setContext('<http://example.org/graph3>')
+        .get();
+
+      repository.httpClients[0].get.mockResolvedValue({
+        data: stream
+      });
+
+      return repository.download(payload).then((stream) => {
+        stream.on('data', (chunk) => {
+          expect(chunk).toEqual(expectedIt.next().value);
+        });
+        stream.on('end', done);
+      });
+    });
+
+    test('should make a GET request with proper arguments', () => {
+      const getMock = repository.httpClients[0].get;
+      const payload = new GetStatementsPayload()
+        .setResponseType(RDFMimeType.TURTLE)
+        .setSubject('<http://eunis.eea.europa.eu/countries/AZ>')
+        .setPredicate('<http://eunis.eea.europa.eu/rdf/schema.rdf#population>')
+        .setObject('"7931000"^^http://www.w3.org/2001/XMLSchema#integer')
+        .setContext('<http://example.org/graph3>')
+        .setInference(true)
+        .get();
+
+      return repository.download(payload).then(() => {
+        expect(getMock).toHaveBeenCalledTimes(1);
+        expect(getMock).toHaveBeenCalledWith('/statements', {
+          headers: {
+            'Accept': 'text/turtle'
+          },
+          timeout: 1000,
+          responseType: 'stream',
+          params: {
+            subj: '<http://eunis.eea.europa.eu/countries/AZ>',
+            pred: '<http://eunis.eea.europa.eu/rdf/schema.rdf#population>',
+            obj: '"7931000"^^http://www.w3.org/2001/XMLSchema#integer',
+            context: '<http://example.org/graph3>',
+            infer: true
+          }
+        });
+      });
+    });
+
+    function streamSource() {
+      return [
+        '<rdf:Description rdf:about="http://www.w3.org/1999/02/22-rdf-syntax-ns#type"><rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"/></rdf:Description>',
+        '<rdf:Description rdf:about="http://www.w3.org/2000/01/rdf-schema#subPropertyOf"><rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"/><rdf:type rdf:resource="http://www.w3.org/2002/07/owl#TransitiveProperty"/></rdf:Description>',
+        '<rdf:Description rdf:about="http://www.w3.org/2000/01/rdf-schema#domain"><rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"/></rdf:Description>'
+      ];
+    }
+
+    function expectedStream() {
+      return [
+        '<rdf:Description rdf:about="http://www.w3.org/1999/02/22-rdf-syntax-ns#type"><rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"/></rdf:Description>',
+        '<rdf:Description rdf:about="http://www.w3.org/2000/01/rdf-schema#subPropertyOf"><rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"/><rdf:type rdf:resource="http://www.w3.org/2002/07/owl#TransitiveProperty"/></rdf:Description>',
+        '<rdf:Description rdf:about="http://www.w3.org/2000/01/rdf-schema#domain"><rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"/></rdf:Description>'
+      ];
+    }
   });
 });

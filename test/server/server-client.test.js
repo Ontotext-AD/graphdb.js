@@ -15,7 +15,7 @@ describe('ServerClient', () => {
 
     server.httpClient.get = jest.fn();
     server.httpClient.get.mockImplementation(() => Promise.resolve({
-      data: data.repositories.GET,
+      data: data.repositories.GET
     }));
 
     server.httpClient.deleteResource = jest.fn();
@@ -34,7 +34,7 @@ describe('ServerClient', () => {
       expect(server.config).toEqual({
         endpoint: 'server/url',
         timeout: 0,
-        headers: {},
+        headers: {}
       });
     });
   });
@@ -44,7 +44,7 @@ describe('ServerClient', () => {
       return server.getRepositoryIDs().then(() => {
         expect(server.httpClient.get).toHaveBeenCalledTimes(1);
         expect(server.httpClient.get).toHaveBeenCalledWith('/repositories', {
-          headers: {'Accept': 'application/sparql-results+json'},
+          headers: {'Accept': 'application/sparql-results+json'}
         });
       });
     });
@@ -58,9 +58,9 @@ describe('ServerClient', () => {
       server.httpClient.get.mockImplementation(() => Promise.resolve({
         data: {
           results: {
-            bindings: [],
-          },
-        },
+            bindings: []
+          }
+        }
       }));
       return expect(server.getRepositoryIDs()).resolves.toEqual([]);
     });
@@ -104,17 +104,17 @@ describe('ServerClient', () => {
     });
 
     test('should reject with error if repository with provided id does not exists', () => {
-      const repositoryClientConfig = new RepositoryClientConfig(['endpoint'], {}, '', 3000, 3000, 5000, 3);
+      const repositoryClientConfig = new RepositoryClientConfig(['endpoint'], {}, '', 3000, 3000);
       return expect(server.getRepository('non_existing', repositoryClientConfig)).rejects.toEqual(Error('Repository with id non_existing does not exists.'));
     });
 
     test('should resolve with a RDFRepositoryClient instance if repository with provided id exists', () => {
-      const repositoryClientConfig = new RepositoryClientConfig(['endpoint'], {}, '', 3000, 3000, 5000, 3);
+      const repositoryClientConfig = new RepositoryClientConfig(['endpoint'], {}, '', 3000, 3000);
       const expected = new RDFRepositoryClient(repositoryClientConfig);
       return server.getRepository('automotive', repositoryClientConfig).then((actual) => {
         // Omit axios instances, they fail the deep equal check
-        actual.httpClients.forEach(client => delete client.axios);
-        expected.httpClients.forEach(client => delete client.axios);
+        actual.httpClients.forEach((client) => delete client.axios);
+        expected.httpClients.forEach((client) => delete client.axios);
         expect(actual).toEqual(expected);
       });
     });
