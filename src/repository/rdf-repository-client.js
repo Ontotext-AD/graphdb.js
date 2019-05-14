@@ -197,7 +197,7 @@ class RDFRepositoryClient extends BaseRepositoryClient {
    *
    * Only POST request with a valid QueryPayload is supported.
    *
-   * @param {QueryPayload} payload is an object holding request parameters
+   * @param {GetQueryPayload} payload is an object holding request parameters
    * required by the query POST endpoint.
    * @return {Promise} the client can subscribe to the stream events and consume
    * the emitted strings or Quads depending on the provided response type as
@@ -211,6 +211,34 @@ class RDFRepositoryClient extends BaseRepositoryClient {
       .get();
 
     return this.execute((http) => http.post('', payload.getParams(),
+      requestConfig)).then((response) => response.data);
+  }
+
+  /**
+   * Executes a request with a sparql query against <code>/statements</code>
+   * endpoint to update repository data.
+   *
+   * If <code>contentType</code> is set to
+   * <code>application/x-www-form-urlencoded</code> then query and request
+   * parameters from the payload are encoded as query string and sent as request
+   * body.
+   *
+   * If <code>contentType</code> is set to
+   * <code>application/sparql-update</code> then the query is sent unencoded as
+   * request body.
+   *
+   *
+   *
+   * @param {UpdateQueryPayload} payload
+   * @return {Promise<void>}
+   */
+  update(payload) {
+    const requestConfig = new HttpRequestConfigBuilder()
+      .addContentTypeHeader(payload.getContentType())
+      .get();
+
+    return this.execute((http) => http.post(PATH_STATEMENTS,
+      payload.getParams(),
       requestConfig)).then((response) => response.data);
   }
 

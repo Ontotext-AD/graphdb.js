@@ -96,6 +96,19 @@ repository.download(payload).then((response) => {
 });
 ```
 
+#### Executing a sparql update query
+```javascript
+const payload = new UpdateQueryPayload()
+  .setQuery('INSERT {?s ?p ?o} WHERE {?s ?p ?o}')
+  .setContentType(QueryContentType.X_WWW_FORM_URLENCODED)
+  .setInference(true)
+  .setTimeout(5);
+
+return repository.update(payload).then(() => {
+    // repository should have been updated at this point
+});
+```
+
 ## Setup Development
 ```
 npm install
