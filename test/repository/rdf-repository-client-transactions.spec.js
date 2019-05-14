@@ -3,14 +3,16 @@ const RDFRepositoryClient = require('repository/rdf-repository-client');
 const RepositoryClientConfig = require('repository/repository-client-config');
 const TransactionalRepositoryClient = require('transaction/transactional-repository-client');
 const TransactionIsolationLevel = require('transaction/transaction-isolation-level');
-
 const GetStatementsPayload = require('repository/get-statements-payload');
 const RDFMimeType = require('http/rdf-mime-type');
+const FileUtils = require('util/file-utils');
 
 const {namedNode, literal, quad} = require('n3').DataFactory;
 
 const httpClientStub = require('../http/http-client.stub');
 const {when} = require('jest-when');
+const testUtils = require('../utils');
+const path = require('path');
 
 jest.mock('http/http-client');
 
@@ -23,6 +25,9 @@ describe('RDFRepositoryClient - transactions', () => {
     'Accept': 'application/json'
   };
   const transactionUrl = 'http://localhost:8080/repositories/test/transactions/64a5937f-c112-d014-a044-f0123b93';
+
+  const context = '<urn:x-local:graph1>';
+  const baseURI = '<urn:x-local:graph2>';
 
   beforeEach(() => {
     repoClientConfig = new RepositoryClientConfig([
@@ -168,145 +173,270 @@ describe('RDFRepositoryClient - transactions', () => {
       });
     });
 
-    test('should retrieve the repository size', () => {
-      httpPut.mockResolvedValue({data: 123});
-      return transaction.getSize().then(size => {
-        expect(size).toEqual(123);
-        expect(httpPut).toHaveBeenCalledTimes(1);
-        expect(httpPut).toHaveBeenCalledWith('', null, {
-          params: {
-            action: 'SIZE',
-            context: undefined
-          }
+    describe('getSize()', () => {
+      test('should retrieve the repository size', () => {
+        httpPut.mockResolvedValue({data: 123});
+        return transaction.getSize().then(size => {
+          expect(size).toEqual(123);
+          expect(httpPut).toHaveBeenCalledTimes(1);
+          expect(httpPut).toHaveBeenCalledWith('', null, {
+            params: {
+              action: 'SIZE',
+              context: undefined
+            }
+          });
         });
       });
-    });
 
-    test('should retrieve the repository size in specific context', () => {
-      httpPut.mockResolvedValue({data: 123});
-      return transaction.getSize('<http://domain/context>').then(size => {
-        expect(size).toEqual(123);
-        expect(httpPut).toHaveBeenCalledTimes(1);
-        expect(httpPut).toHaveBeenCalledWith('', null, {
-          params: {
-            action: 'SIZE',
-            context: '<http://domain/context>'
-          }
+      test('should retrieve the repository size in specific context', () => {
+        httpPut.mockResolvedValue({data: 123});
+        return transaction.getSize('<http://domain/context>').then(size => {
+          expect(size).toEqual(123);
+          expect(httpPut).toHaveBeenCalledTimes(1);
+          expect(httpPut).toHaveBeenCalledWith('', null, {
+            params: {
+              action: 'SIZE',
+              context: '<http://domain/context>'
+            }
+          });
         });
       });
-    });
 
-    test('should reject if the transaction cannot retrieve the repository size', () => {
-      httpPut.mockRejectedValue('Error during size retrieve');
-      return expect(transaction.getSize()).rejects.toEqual('Error during size retrieve');
-    });
-
-    test('should retrieve statements', () => {
-      // TODO: This is not testing parsing...
-      httpPut.mockImplementation(() => {
-        return Promise.resolve({data: ''});
+      test('should reject if the transaction cannot retrieve the repository size', () => {
+        httpPut.mockRejectedValue('Error during size retrieve');
+        return expect(transaction.getSize()).rejects.toEqual('Error during size retrieve');
       });
+    });
 
-      return transaction.get(getStatementPayload()).then(() => {
-        expect(httpPut).toHaveBeenCalledTimes(1);
-        expect(httpPut).toHaveBeenCalledWith('', null, {
-          headers: {'Accept': RDFMimeType.RDF_JSON},
-          params: {
-            action: 'GET',
-            context: '<http://example.org/graph3>',
-            infer: true,
-            obj: '"7931000"^^http://www.w3.org/2001/XMLSchema#integer',
-            pred: '<http://eunis.eea.europa.eu/rdf/schema.rdf#population>',
-            subj: '<http://eunis.eea.europa.eu/countries/AZ>'
-          }
+    describe('get()', () => {
+      test('should retrieve statements', () => {
+        // TODO: This is not testing parsing...
+        httpPut.mockImplementation(() => {
+          return Promise.resolve({data: ''});
+        });
+
+        return transaction.get(getStatementPayload()).then(() => {
+          expect(httpPut).toHaveBeenCalledTimes(1);
+          expect(httpPut).toHaveBeenCalledWith('', null, {
+            headers: {'Accept': RDFMimeType.RDF_JSON},
+            params: {
+              action: 'GET',
+              context: '<http://example.org/graph3>',
+              infer: true,
+              obj: '"7931000"^^http://www.w3.org/2001/XMLSchema#integer',
+              pred: '<http://eunis.eea.europa.eu/rdf/schema.rdf#population>',
+              subj: '<http://eunis.eea.europa.eu/countries/AZ>'
+            }
+          });
         });
       });
-    });
 
-    test('should reject if the transaction cannot retrieve statements', () => {
-      httpPut.mockRejectedValue('Error during retrieve');
-      return expect(transaction.get(getStatementPayload())).rejects.toEqual('Error during retrieve');
-    });
-
-    test('should add quads', () => {
-      const q = quad(
-        namedNode('http://domain/resource/resource-1'),
-        namedNode('http://domain/property/relation-1'),
-        literal('Title', 'en'));
-
-      return transaction.addQuads([q]).then(() => {
-        expect(httpPut).toHaveBeenCalledTimes(1);
-        expect(httpPut).toHaveBeenCalledWith('', data, {
-          headers: {
-            'Content-Type': RDFMimeType.TURTLE
-          },
-          params: {
-            action: 'ADD',
-          }
-        });
+      test('should reject if the transaction cannot retrieve statements', () => {
+        httpPut.mockRejectedValue('Error during retrieve');
+        return expect(transaction.get(getStatementPayload())).rejects.toEqual('Error during retrieve');
       });
     });
 
-    test('should reject if the transaction cannot add quads', () => {
-      const q = quad(
-        namedNode('http://domain/resource/resource-1'),
-        namedNode('http://domain/property/relation-1'),
-        literal('Title', 'en'));
+    describe('addQuads()', () => {
+      test('should add quads', () => {
+        const q = quad(
+          namedNode('http://domain/resource/resource-1'),
+          namedNode('http://domain/property/relation-1'),
+          literal('Title', 'en'));
 
-      httpPut.mockRejectedValue('Error during quads add');
-      return expect(transaction.addQuads([q])).rejects.toEqual('Error during quads add');
-    });
-
-    test('should add data', () => {
-      return transaction.addTurtle(data).then(() => {
-        expect(httpPut).toHaveBeenCalledTimes(1);
-        expect(httpPut).toHaveBeenCalledWith('', data, {
-          headers: {
-            'Content-Type': RDFMimeType.TURTLE
-          },
-          params: {
-            action: 'ADD',
-          }
+        return transaction.addQuads([q]).then(() => {
+          expect(httpPut).toHaveBeenCalledTimes(1);
+          expect(httpPut).toHaveBeenCalledWith('', data, {
+            headers: {
+              'Content-Type': RDFMimeType.TURTLE
+            },
+            params: {
+              action: 'ADD',
+              context: undefined,
+              baseURI: undefined
+            }
+          });
         });
+      });
+
+      test('should support adding quads in given context and base URI for resolving', () => {
+        const q = quad(
+          namedNode('http://domain/resource/resource-1'),
+          namedNode('http://domain/property/relation-1'),
+          literal('Title', 'en'));
+
+        return transaction.addQuads([q], context, baseURI).then(() => {
+          expect(httpPut).toHaveBeenCalledTimes(1);
+          expect(httpPut).toHaveBeenCalledWith('', data, {
+            headers: {
+              'Content-Type': RDFMimeType.TURTLE
+            },
+            params: {
+              action: 'ADD',
+              context,
+              baseURI
+            }
+          });
+        });
+      });
+
+      test('should reject if the transaction cannot add quads', () => {
+        const q = quad(
+          namedNode('http://domain/resource/resource-1'),
+          namedNode('http://domain/property/relation-1'),
+          literal('Title', 'en'));
+
+        httpPut.mockRejectedValue('Error during quads add');
+        return expect(transaction.addQuads([q])).rejects.toEqual('Error during quads add');
       });
     });
 
-    test('should require data when adding', () => {
-      expect(() => transaction.addTurtle()).toThrow();
-      expect(() => transaction.addTurtle('')).toThrow();
-      expect(() => transaction.addTurtle('  ')).toThrow();
-      expect(httpPut).toHaveBeenCalledTimes(0);
-    });
-
-    test('should reject if the transaction cannot add data', () => {
-      httpPut.mockRejectedValue('Error during add');
-      return expect(transaction.addTurtle(data)).rejects.toEqual('Error during add');
-    });
-
-    test('should delete data', () => {
-      return transaction.deleteData(data).then(() => {
-        expect(httpPut).toHaveBeenCalledTimes(1);
-        expect(httpPut).toHaveBeenCalledWith('', data, {
-          headers: {
-            'Content-Type': RDFMimeType.TURTLE
-          },
-          params: {
-            action: 'DELETE',
-          }
+    describe('sendData()', () => {
+      test('should add data', () => {
+        return transaction.sendData(data).then(() => {
+          expect(httpPut).toHaveBeenCalledTimes(1);
+          expect(httpPut).toHaveBeenCalledWith('', data, {
+            headers: {
+              'Content-Type': RDFMimeType.TURTLE
+            },
+            params: {
+              action: 'ADD'
+            }
+          });
         });
+      });
+
+      test('should require data when adding', () => {
+        expect(() => transaction.sendData()).toThrow();
+        expect(() => transaction.sendData('')).toThrow();
+        expect(() => transaction.sendData('  ')).toThrow();
+        expect(httpPut).toHaveBeenCalledTimes(0);
+      });
+
+      test('should reject if the transaction cannot add data', () => {
+        httpPut.mockRejectedValue('Error during add');
+        return expect(transaction.sendData(data)).rejects.toEqual('Error during add');
       });
     });
 
-    test('should require data when deleting', () => {
-      expect(() => transaction.deleteData()).toThrow();
-      expect(() => transaction.deleteData('')).toThrow();
-      expect(() => transaction.deleteData('  ')).toThrow();
-      expect(httpPut).toHaveBeenCalledTimes(0);
+    describe('deleteData()', () => {
+      test('should delete data', () => {
+        return transaction.deleteData(data).then(() => {
+          expect(httpPut).toHaveBeenCalledTimes(1);
+          expect(httpPut).toHaveBeenCalledWith('', data, {
+            headers: {
+              'Content-Type': RDFMimeType.TURTLE
+            },
+            params: {
+              action: 'DELETE'
+            }
+          });
+        });
+      });
+
+      test('should require data when deleting', () => {
+        expect(() => transaction.deleteData()).toThrow();
+        expect(() => transaction.deleteData('')).toThrow();
+        expect(() => transaction.deleteData('  ')).toThrow();
+        expect(httpPut).toHaveBeenCalledTimes(0);
+      });
+
+      test('should reject if the transaction cannot delete data', () => {
+        httpPut.mockRejectedValue('Error during delete');
+        return expect(transaction.deleteData(data)).rejects.toEqual('Error during delete');
+      });
     });
 
-    test('should reject if the transaction cannot delete data', () => {
-      httpPut.mockRejectedValue('Error during delete');
-      return expect(transaction.deleteData(data)).rejects.toEqual('Error during delete');
+    describe('upload()', () => {
+      const testFilePath = path.resolve(__dirname, './data/add-statements-complex.txt');
+
+      test('should upload data stream in given context and base URI', () => {
+        const turtleStream = FileUtils.getReadStream(testFilePath);
+
+        return transaction.upload(turtleStream, context, baseURI, RDFMimeType.TRIG).then(() => {
+          expect(httpPut).toHaveBeenCalledTimes(1);
+
+          const httpPutCall = httpPut.mock.calls[0];
+
+          const url = httpPutCall[0];
+          expect(url).toEqual('');
+
+          const requestConfig = httpPutCall[2];
+          expect(requestConfig).toEqual({
+            headers: {
+              'Content-Type': RDFMimeType.TRIG
+            },
+            params: {
+              action: 'ADD',
+              context,
+              baseURI
+            },
+            responseType: 'stream'
+          });
+
+          const stream = httpPutCall[1];
+          return testUtils.readStream(stream)
+        }).then((streamData) => {
+          const turtleData = testUtils.loadFile(testFilePath).trim();
+          expect(streamData).toEqual(turtleData);
+        });
+      });
+
+      test('should reject if the server cannot consume the upload request', () => {
+        const error = new Error('cannot-upload');
+        httpPut.mockRejectedValue(error);
+
+        const promise = transaction.upload(FileUtils.getReadStream(testFilePath), context, null, RDFMimeType.TRIG);
+        return expect(promise).rejects.toEqual(error);
+      });
+    });
+
+    describe('addFile()', () => {
+      const testFilePath = path.resolve(__dirname, './data/add-statements-complex.txt');
+
+      test('should upload file with data as stream in given context and base URI', () => {
+        return transaction.addFile(testFilePath, context, baseURI, RDFMimeType.TRIG).then(() => {
+          expect(httpPut).toHaveBeenCalledTimes(1);
+
+          const httpPutCall = httpPut.mock.calls[0];
+
+          const url = httpPutCall[0];
+          expect(url).toEqual('');
+
+          const requestConfig = httpPutCall[2];
+          expect(requestConfig).toEqual({
+            headers: {
+              'Content-Type': RDFMimeType.TRIG
+            },
+            params: {
+              action: 'ADD',
+              context,
+              baseURI
+            },
+            responseType: 'stream'
+          });
+
+          const stream = httpPutCall[1];
+          return testUtils.readStream(stream)
+        }).then((streamData) => {
+          const turtleData = testUtils.loadFile(testFilePath).trim();
+          expect(streamData).toEqual(turtleData);
+        });
+      });
+
+      test('should reject if the server cannot consume the file upload request', () => {
+        const error = new Error('cannot-upload');
+        httpPut.mockRejectedValue(error);
+
+        const promise = transaction.addFile(testFilePath, context, null, RDFMimeType.TRIG);
+        return expect(promise).rejects.toEqual(error);
+      });
+
+      test('should disallow uploading missing files', () => {
+        expect(() => transaction.addFile(null, context, baseURI, RDFMimeType.TRIG)).toThrow(Error);
+        expect(() => transaction.addFile('', context, baseURI, RDFMimeType.TRIG)).toThrow(Error);
+        expect(() => transaction.addFile('missing-file-123', context, baseURI, RDFMimeType.TRIG)).toThrow(Error);
+      });
     });
 
     function getStatementPayload() {

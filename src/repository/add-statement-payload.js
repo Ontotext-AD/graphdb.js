@@ -32,6 +32,18 @@ class AddStatementPayload extends StatementPayload {
     this.payload.dataType = dataType;
     return this;
   }
+
+  /**
+   * Sets the base URI that is used for resolving any relative URIs in the
+   * current payload.
+   *
+   * @param {string} baseURI the base URI
+   * @return {AddStatementPayload} the payload for method chaining
+   */
+  setBaseURI(baseURI) {
+    this.payload.baseURI = baseURI;
+    return this;
+  }
 }
 
 module.exports = AddStatementPayload;

@@ -1,19 +1,27 @@
 const TermConverter = require('model/term-converter');
+
 const N3 = require('n3');
+const {DataFactory} = N3;
+const {NamedNode, Variable} = DataFactory.internal;
 
-jest.mock('n3');
-
-/*
- * Testing corner cases in TermConverter
- */
 describe('TermConverter', () => {
-  test('should reject adding quads if serialization fails', () => {
-    N3.Writer = () => {
-      return {
-        addQuads: jest.fn(),
-        end: (callback) => callback('error')
-      };
-    };
-    return expect(TermConverter.toTurtle([])).rejects.toEqual('error');
+  describe('getQuads()', () => {
+    test('should support variables', () => {
+      let quads = TermConverter.getQuads('subject', '?p', '?o');
+      expect(quads.length).toEqual(1);
+
+      let quad = quads[0];
+      let subjectTerm = quad.subject;
+      expect(subjectTerm).toBeInstanceOf(NamedNode);
+      expect(subjectTerm.value).toEqual('subject');
+
+      let predicateTerm = quad.predicate;
+      expect(predicateTerm).toBeInstanceOf(Variable);
+      expect(predicateTerm.value).toEqual('p');
+
+      let objectTerm = quad.object;
+      expect(objectTerm).toBeInstanceOf(Variable);
+      expect(objectTerm.value).toEqual('o');
+    });
   });
 });

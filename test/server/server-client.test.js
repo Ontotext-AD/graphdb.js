@@ -133,7 +133,7 @@ describe('ServerClient', () => {
     });
 
     test('should reject with error if repository id is not provided', () => {
-      return expect(server.hasRepository()).rejects.toEqual(Error('Repository id is required parameter!'));
+      return expect(server.deleteRepository()).rejects.toEqual(Error('Repository id is required parameter!'));
     });
 
     test('should reject with an error if request fails', () => {

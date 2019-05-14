@@ -96,14 +96,15 @@ class TermConverter {
   }
 
   /**
-   * Serializes the provided collection of quads to Turtle format.
+   * Serializes the provided collection of quads to Turtle format or Trig in
+   * case any of the quads have context.
    *
    * @public
    * @param {Quad[]} quads the collection of quads to serialize to Turtle
-   * @return {Promise<string>} a promise that will be resolved to Turtle text
-   *          or rejected if the quads cannot be serialized
+   * @return {Promise<string>} a promise that will be resolved to Turtle or Trig
+   * text or rejected if the quads cannot be serialized
    */
-  static toTurtle(quads) {
+  static toString(quads) {
     const writer = TermConverter.getWriter();
     writer.addQuads(quads);
     return new Promise((resolve, reject) => {
@@ -138,7 +139,7 @@ class TermConverter {
    */
   static toPredicate(value) {
     if (TermConverter.isVariable(value)) {
-      return variable(value);
+      return TermConverter.toVariable(value);
     }
     return namedNode(value);
   }
@@ -225,10 +226,20 @@ class TermConverter {
       return blankNode(value.substring(2));
     }
     if (TermConverter.isVariable(value)) {
-      // Trim leading ?
-      return variable(value.substring(1));
+      return TermConverter.toVariable(value);
     }
     return namedNode(value);
+  }
+
+  /**
+   * Returns a variable term from the provided value without leading ?
+   *
+   * @param {string} value the value to convert to variable
+   * @return {Variable} the produced variable
+   */
+  static toVariable(value) {
+    // Trim leading ?
+    return variable(value.substring(1));
   }
 
   /**
