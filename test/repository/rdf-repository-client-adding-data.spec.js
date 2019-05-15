@@ -104,6 +104,10 @@ describe('RDFRepositoryClient - adding data', () => {
       return rdfRepositoryClient.add(payload).then(() => verifySentPayload(expected));
     });
 
+    test('should throw error when a payload is not provided', () => {
+      expect(() => rdfRepositoryClient.add()).toThrow(Error('Cannot add statement without payload'));
+    });
+
     test('should reject adding the payload if it is empty', () => {
       const payload = new AddStatementPayload().get();
       expect(() => rdfRepositoryClient.add(payload)).toThrow(Error);
@@ -131,6 +135,12 @@ describe('RDFRepositoryClient - adding data', () => {
   });
 
   describe('addQuads(quads)', () => {
+    test('should throw error when no data is provided', () => {
+      const quads = [];
+      return expect(rdfRepositoryClient.addQuads(quads))
+        .rejects.toEqual(Error('Turtle data is required when adding statements'));
+    });
+
     test('should convert the quads to turtle and send a request', () => {
       const quads = [
         getQuad('resource-1', 'relation-1', 'uri-1'),

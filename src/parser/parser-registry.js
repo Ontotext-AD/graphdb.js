@@ -75,13 +75,12 @@ class ParserRegistry {
    * @param {ContentTypeParser} parser to be validated
    */
   static validateParser(parser) {
-    const supportedType = parser.getSupportedType();
-    if (!supportedType) {
-      throw new Error('Parser type is mandatory parameter!');
-    }
     if (!parser || !(parser instanceof ContentTypeParser)) {
       throw new Error('Parser is not provided or does not implement'
         + ' ContentTypeParser!');
+    }
+    if (!parser.getSupportedType()) {
+      throw new Error('Parser type is mandatory parameter!');
     }
   }
 }
