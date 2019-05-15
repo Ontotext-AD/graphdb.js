@@ -1,14 +1,36 @@
 const ContentTypeParser = require('parser/content-type-parser');
 
 /**
- * For testing purposes.
+ * An unsupported parser.
  */
-class SomeParser {
+class UnsupportedParser {
+}
+
+/**
+ * Parser which does not comply whith the API.
+ */
+class ParserWhichDoesNotImplementTheAPI extends ContentTypeParser {
   /**
-   * @return {string}
+   * @inheritDoc
+   */
+  parse(content) {
+    return null;
+  }
+}
+
+class ParserWhichDoesNotProvideSupportedType extends ContentTypeParser {
+  /**
+   * @inheritDoc
    */
   getSupportedType() {
-    return 'someparser';
+    return null;
+  }
+
+  /**
+   * @inheritDoc
+   */
+  parse(content) {
+    return null;
   }
 }
 
@@ -94,7 +116,9 @@ class ParserWithNoGetSupportedTypeMethod extends ContentTypeParser {
 }
 
 module.exports = {
-  SomeParser,
+  UnsupportedParser,
+  ParserWhichDoesNotImplementTheAPI,
+  ParserWhichDoesNotProvideSupportedType,
   RdfAsXmlParser,
   RdfAsJsonParser,
   AnotherRdfAsJsonParser,

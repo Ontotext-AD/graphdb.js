@@ -1,5 +1,7 @@
 const ParserRegistry = require('parser/parser-registry');
-const SomeParser = require('./parser-mocks').SomeParser;
+const UnsupportedParser = require('./parser-mocks').UnsupportedParser;
+const ParserWhichDoesNotImplementTheAPI = require('./parser-mocks').ParserWhichDoesNotImplementTheAPI;
+const ParserWhichDoesNotProvideSupportedType = require('./parser-mocks').ParserWhichDoesNotProvideSupportedType;
 const RdfAsXmlParser = require('./parser-mocks').RdfAsXmlParser;
 const RdfAsJsonParser = require('./parser-mocks').RdfAsJsonParser;
 const AnotherRdfAsJsonParser = require('./parser-mocks').AnotherRdfAsJsonParser;
@@ -20,7 +22,7 @@ describe('ParserRegistry', () => {
 
     test('should validate provided parsers and throw error when invalid parser is provided', () => {
       expect(() => {
-        new ParserRegistry([new RdfAsJsonParser(), new SomeParser()]);
+        new ParserRegistry([new RdfAsJsonParser(), new UnsupportedParser()]);
       }).toThrow(Error('Parser is not provided or does not implement ContentTypeParser!'));
     });
 
@@ -40,8 +42,14 @@ describe('ParserRegistry', () => {
       expect(() => registry.register()).toThrow(Error);
     });
 
-    test('should throw error when parser is not provided', () => {
-      expect(() => registry.register(new SomeParser())).toThrow(Error('Parser is not provided or does not implement ContentTypeParser!'));
+    test('should throw error when parser does not implement the API', () => {
+      expect(() => registry.register(new ParserWhichDoesNotImplementTheAPI()))
+        .toThrow(Error('Method #getSupportedType() must be implemented!'));
+    });
+
+    test('should throw error when parser does not provide what type it supports', () => {
+      expect(() => registry.register(new ParserWhichDoesNotProvideSupportedType()))
+        .toThrow(Error('Parser type is mandatory parameter!'));
     });
 
     test('should register new parser', () => {
