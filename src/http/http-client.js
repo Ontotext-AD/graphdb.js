@@ -1,5 +1,6 @@
 const axios = require('axios');
 const uuidv4 = require('uuid/v4');
+const qs = require('qs');
 
 /**
  * Promise based HTTP client that delegates requests to Axios.
@@ -25,7 +26,10 @@ class HttpClient {
    * GET
    */
   constructor(baseURL) {
-    this.axios = axios.create({baseURL});
+    this.axios = axios.create({
+      baseURL,
+      paramsSerializer: HttpClient.paramsSerializer
+    });
     this.readTimeout = 0;
     this.writeTimeout = 0;
   }
@@ -179,6 +183,24 @@ class HttpClient {
     if (!requestConfig.timeout) {
       requestConfig.timeout = this.writeTimeout;
     }
+  }
+
+  /**
+   * Serializes the provided parameters in a way that can be properly read by
+   * the RDF4J server.
+   *
+   * It ignores any null or undefined parameters and repeats array parameters.
+   *
+   * @private
+   * @static
+   * @param {object} params the parameters for serialization
+   * @return {string} the serialized parameters
+   */
+  static paramsSerializer(params) {
+    return qs.stringify(params, {
+      arrayFormat: 'repeat',
+      skipNulls: true
+    });
   }
 }
 

@@ -48,15 +48,32 @@ describe('RdfRepositoryClient - streaming data', () => {
       const postMock = rdfRepositoryClient.httpClients[0].post;
 
       return rdfRepositoryClient.upload({}, context, baseURI, contentType).then(() => {
-        expect(postMock).toHaveBeenCalledTimes(1);
-        expect(postMock).toHaveBeenCalledWith('/statements?context=%3Curn%3Ax-local%3Agraph1%3E&baseURI=%3Curn%3Ax-local%3Agraph1%3E', {}, {
-          headers: {
-            'Content-Type': 'text/turtle'
-          },
-          responseType: 'stream'
-        });
+        verifyUploadRequest(postMock);
       });
     });
+
+    test('should make a POST request with properly encoded context parameter', () => {
+      const postMock = rdfRepositoryClient.httpClients[0].post;
+
+      // Not encoded as N-Triple
+      return rdfRepositoryClient.upload({}, 'urn:x-local:graph1', baseURI, contentType).then(() => {
+        verifyUploadRequest(postMock);
+      });
+    });
+
+    function verifyUploadRequest(postMock) {
+      expect(postMock).toHaveBeenCalledTimes(1);
+      expect(postMock).toHaveBeenCalledWith('/statements', {}, {
+        headers: {
+          'Content-Type': 'text/turtle'
+        },
+        params: {
+          context,
+          baseURI
+        },
+        responseType: 'stream'
+      });
+    }
   });
 
   describe('overwrite', () => {
@@ -82,37 +99,32 @@ describe('RdfRepositoryClient - streaming data', () => {
       const putMock = rdfRepositoryClient.httpClients[0].put;
 
       return rdfRepositoryClient.overwrite({}, context, baseURI, contentType).then(() => {
-        expect(putMock).toHaveBeenCalledTimes(1);
-        expect(putMock).toHaveBeenCalledWith('/statements?context=%3Curn%3Ax-local%3Agraph1%3E&baseURI=%3Curn%3Ax-local%3Agraph1%3E', {}, {
-          headers: {
-            'Content-Type': 'text/turtle'
-          },
-          responseType: 'stream'
-        });
+        verifyOverwriteRequest(putMock);
       });
     });
-  });
 
-  describe('resolveUrl', () => {
-    test('should build url with context and baseURL', () => {
-      expect(rdfRepositoryClient.resolveUrl('ctx', 'baseuri')).toEqual('/statements?context=ctx&baseURI=baseuri');
+    test('should make a PUT request with properly encoded context parameter', () => {
+      const putMock = rdfRepositoryClient.httpClients[0].put;
+
+      // Not encoded as N-Triple
+      return rdfRepositoryClient.overwrite({}, 'urn:x-local:graph1', baseURI, contentType).then(() => {
+        verifyOverwriteRequest(putMock);
+      });
     });
 
-    test('should build url without context nor baseURI', () => {
-      expect(rdfRepositoryClient.resolveUrl()).toEqual('/statements');
-    });
-
-    test('should build url with context only', () => {
-      expect(rdfRepositoryClient.resolveUrl('ctx')).toEqual('/statements?context=ctx');
-    });
-
-    test('should build url with baseURI only', () => {
-      expect(rdfRepositoryClient.resolveUrl(null, 'baseuri')).toEqual('/statements?baseURI=baseuri');
-    });
-
-    test('should build url with context having null as string value', () => {
-      expect(rdfRepositoryClient.resolveUrl('null')).toEqual('/statements?context=null');
-    });
+    function verifyOverwriteRequest(putMock) {
+      expect(putMock).toHaveBeenCalledTimes(1);
+      expect(putMock).toHaveBeenCalledWith('/statements', {}, {
+        headers: {
+          'Content-Type': 'text/turtle'
+        },
+        params: {
+          context,
+          baseURI
+        },
+        responseType: 'stream'
+      });
+    }
   });
 
   function streamSource() {

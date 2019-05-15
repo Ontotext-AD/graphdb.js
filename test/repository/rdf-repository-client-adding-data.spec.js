@@ -117,6 +117,15 @@ describe('RDFRepositoryClient - adding data', () => {
       return rdfRepositoryClient.add(payload).then(() => verifyAddPayload(expected, undefined, 'http://base/uri'))
     });
 
+    test('should resolve to empty response (HTTP 204)', () => {
+      const payload = new AddStatementPayload()
+        .setSubject(subj('resource-1'))
+        .setPredicate(pred('relation-1'))
+        .setObject(obj('uri-1'))
+        .get();
+      return expect(rdfRepositoryClient.add(payload)).resolves.toEqual();
+    });
+
     test('should throw error when a payload is not provided', () => {
       expect(() => rdfRepositoryClient.add()).toThrow(Error('Cannot add statement without payload'));
     });
@@ -168,7 +177,14 @@ describe('RDFRepositoryClient - adding data', () => {
       const baseUri = 'http://base/uri';
 
       const expected = testUtils.loadFile('repository/data/add-statements-complex.txt').trim();
-      return rdfRepositoryClient.addQuads(quads, graph, baseUri).then(() => verifyAddPayload(expected, graph, baseUri));
+      const expectedGraph = '<' + graph + '>';
+      return rdfRepositoryClient.addQuads(quads, graph, baseUri)
+        .then(() => verifyAddPayload(expected, expectedGraph, baseUri));
+    });
+
+    test('should resolve to empty response (HTTP 204)', () => {
+      const quads = getQuadsDataSet();
+      return expect(rdfRepositoryClient.addQuads(quads)).resolves.toEqual();
     });
 
     test('should reject adding quads when the server request is unsuccessful', () => {
@@ -193,7 +209,14 @@ describe('RDFRepositoryClient - adding data', () => {
       const baseUri = 'http://base/uri';
 
       const expected = testUtils.loadFile('repository/data/add-statements-complex.txt').trim();
-      return rdfRepositoryClient.putQuads(quads, graph, baseUri).then(() => verifyPutPayload(expected, graph, baseUri));
+      const expectedGraph = '<' + graph + '>';
+      return rdfRepositoryClient.putQuads(quads, graph, baseUri)
+        .then(() => verifyPutPayload(expected, expectedGraph, baseUri));
+    });
+
+    test('should resolve to empty response (HTTP 204)', () => {
+      const quads = getQuadsDataSet();
+      return expect(rdfRepositoryClient.putQuads(quads)).resolves.toEqual();
     });
 
     test('should reject putting quads when the server request is unsuccessful', () => {

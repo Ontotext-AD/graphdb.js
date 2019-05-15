@@ -95,7 +95,7 @@ describe('RDFRepositoryClient', () => {
         expect(get).toHaveBeenCalledTimes(1);
         expect(get).toHaveBeenCalledWith('/size', {
           params: {
-            context: ['context-1']
+            context: ['<context-1>']
           }
         });
       });

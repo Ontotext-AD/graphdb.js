@@ -85,7 +85,7 @@ class BaseRepositoryClient {
    * for selecting appropriate parser from the parsers registry.
    * Parsing is done synchronously!
    *
-   * @private
+   * @protected
    * @param {string} content
    * @param {string} responseType
    * @return {(string|Term|Term[])}
@@ -109,14 +109,19 @@ class BaseRepositoryClient {
    * If all of the endpoints are unsuccessful then the execution will fail
    * with promise rejection.
    *
+   * By default, when the request is successful, it automatically resolves the
+   * response data object. To override it use the <code>responseMapper</code>
+   * parameter.
+   *
    * @protected
    * @param {Function} httpClientConsumer the consumer of supplied http client
    *                                      that performs the request execution
+   * @param {Function} [responseMapper] a mapper for the response object
    * @return {Promise<any>} a promise which resolves to http request response
    */
-  execute(httpClientConsumer) {
+  execute(httpClientConsumer, responseMapper) {
     const httpClients = new Iterable(this.httpClients);
-    return this.retryExecution(httpClients, httpClientConsumer);
+    return this.retryExecution(httpClients, httpClientConsumer, responseMapper);
   }
 
   /**
@@ -127,14 +132,21 @@ class BaseRepositoryClient {
    * @param {Iterable} httpClients iterable collection of http clients
    * @param {Function} httpClientConsumer the consumer of supplied http client
    *                                      that performs the request execution
+   * @param {Function} [responseMapper] a mapper for the response object
    * @return {Promise<any>} a promise which resolves to http request response
    */
-  retryExecution(httpClients, httpClientConsumer) {
-    return httpClientConsumer(httpClients.next()).catch((error) => {
+  retryExecution(httpClients, httpClientConsumer, responseMapper) {
+    return httpClientConsumer(httpClients.next()).then((response) => {
+      if (responseMapper) {
+        return responseMapper(response);
+      }
+      return response.data;
+    }).catch((error) => {
       if (BaseRepositoryClient.canRetryExecution(error)
         && httpClients.hasNext()) {
         // Try the next endpoint client (if any)
-        return this.retryExecution(httpClients, httpClientConsumer);
+        return this.retryExecution(httpClients, httpClientConsumer,
+          responseMapper);
       }
       // Not retriable
       return Promise.reject(error);
