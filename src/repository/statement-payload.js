@@ -19,7 +19,7 @@ class StatementPayload {
   }
 
   /**
-   * @param {(string|Term)} [subject]
+   * @param {string} [subject]
    * @return {StatementPayload}
    */
   setSubject(subject) {
@@ -28,7 +28,7 @@ class StatementPayload {
   }
 
   /**
-   * @param {(string|Term)} [predicate]
+   * @param {string} [predicate]
    * @return {StatementPayload}
    */
   setPredicate(predicate) {
@@ -37,7 +37,7 @@ class StatementPayload {
   }
 
   /**
-   * @param {(string|Term)} [object]
+   * @param {string} [object]
    * @return {StatementPayload}
    */
   setObject(object) {
@@ -46,7 +46,7 @@ class StatementPayload {
   }
 
   /**
-   * @param {(NamedNode[]|string[])} [context]
+   * @param {(string|string[])} [context]
    * @return {StatementPayload}
    */
   setContext(context) {

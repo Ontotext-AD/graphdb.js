@@ -4,6 +4,7 @@ const DataFactory = require('n3').DataFactory;
 const NamedNode = DataFactory.internal.NamedNode;
 const Namespace = require('model/namespace');
 const StringUtils = require('util/string-utils');
+const FileUtils = require('util/file-utils');
 const TermConverter = require('model/term-converter');
 const RepositoryClientConfig = require('repository/repository-client-config');
 const TransactionalRepositoryClient =
@@ -248,8 +249,8 @@ class RDFRepositoryClient extends BaseRepositoryClient {
    * The payload will be converted to a quad or a collection of quads in case
    * there are multiple contexts.
    *
-   * After the conversion, the produced quad(s) will be serialized to Turtle
-   * format and send to the repository as payload.
+   * After the conversion, the produced quad(s) will be serialized to Turtle or
+   * Trig format and send to the repository as payload.
    *
    * See {@link #addQuads()}.
    *
@@ -284,37 +285,80 @@ class RDFRepositoryClient extends BaseRepositoryClient {
       quads = TermConverter.getQuads(subject, predicate, object, context);
     }
 
-    return this.addQuads(quads);
+    // No context because it's in the payload and it is for single triple.
+    return this.addQuads(quads, undefined, payload.baseURI);
   }
 
   /**
    * Serializes the provided quads to Turtle format and sends them to the
    * repository as payload.
    *
-   * @param {Quad[]} quads collection of quads to be sent as Turtle text
+   * If any of the quads have a graph, then the text will be serialized to the
+   * Trig format which is an extended version of Turtle supporting contexts.
+   *
+   * @param {Quad[]} quads collection of quads to be sent as Turtle/Trig text
+   * @param {string|string[]} [context] restricts the insertion to the given
+   * context
+   * @param {string} [baseURI] used to resolve relative URIs in the data
    * @return {Promise} promise that will be resolved if the addition is
-   *                    successful or rejected in case of failure
+   * successful or rejected in case of failure
    */
-  addQuads(quads) {
-    return TermConverter.toTurtle(quads).then((data) => this.addTurtle(data));
+  addQuads(quads, context, baseURI) {
+    return TermConverter.toString(quads).then((data) => this.sendData(data,
+      context, baseURI, false));
   }
 
   /**
-   * Inserts the statements in the provided Turtle formatted data.
+   * Overwrites the repository's data by serializing the provided quads to
+   * Turtle format and sending them to the repository as payload.
+   *
+   * If any of the quads have a graph, then the text will be serialized to the
+   * Trig format which is an extended version of Turtle supporting contexts.
+   *
+   * The overwrite will be restricted if the context parameter is specified.
+   *
+   * @param {Quad[]} quads collection of quads to be sent as Turtle/Trig text
+   * @param {string|string[]} [context] restricts the insertion to the given
+   * context
+   * @param {string} [baseURI] used to resolve relative URIs in the data
+   * @return {Promise} promise that will be resolved if the overwrite is
+   * successful or rejected in case of failure
+   */
+  putQuads(quads, context, baseURI) {
+    return TermConverter.toString(quads).then((data) => this.sendData(data,
+      context, baseURI, true));
+  }
+
+  /**
+   * Inserts the statements in the provided Turtle or Trig formatted data.
    *
    * @private
-   * @param {string} data payload data in Turtle format
+   * @param {string} data payload data in Turtle or Trig format
+   * @param {string|string[]} [context] restricts the insertion to the given
+   * context
+   * @param {string} [baseURI] used to resolve relative URIs in the data
+   * @param {boolean} overwrite defines if the data should overwrite the repo
+   * data or not
    * @return {Promise} promise resolving after the data has been inserted
    * successfully
    */
-  addTurtle(data) {
+  sendData(data, context, baseURI, overwrite) {
     if (StringUtils.isBlank(data)) {
-      throw new Error('Turtle data is required when adding statements');
+      throw new Error('Turtle/trig data is required when adding statements');
     }
 
     const requestConfig = new HttpRequestConfigBuilder()
-      .addContentTypeHeader(RDFMimeType.TURTLE)
+      .addContentTypeHeader(RDFMimeType.TRIG)
+      .setParams({
+        baseURI,
+        context
+      })
       .get();
+
+    if (overwrite) {
+      return this.execute((http) => http.put(PATH_STATEMENTS, data,
+        requestConfig));
+    }
 
     return this.execute((http) => http.post(PATH_STATEMENTS, data,
       requestConfig));
@@ -405,7 +449,8 @@ class RDFRepositoryClient extends BaseRepositoryClient {
    * @param {string} contentType is one of RDF mime type formats,
    *                application/x-rdftransaction' for a transaction document or
    *                application/x-www-form-urlencoded
-   * @return {Promise<void>}
+   * @return {Promise<void>} a promise that will be resolved when the stream has
+   * been successfully consumed by the server
    */
   upload(readStream, context, baseURI, contentType) {
     const url = this.resolveUrl(context, baseURI);
@@ -428,7 +473,8 @@ class RDFRepositoryClient extends BaseRepositoryClient {
    * @param {string} [baseURI] optional uri against which any relative URIs
    * found in the data would be resolved.
    * @param {string} contentType
-   * @return {Promise<void>}
+   * @return {Promise<void>} a promise that will be resolved when the stream has
+   * been successfully consumed by the server
    */
   overwrite(readStream, context, baseURI, contentType) {
     const url = this.resolveUrl(context, baseURI);
@@ -438,6 +484,44 @@ class RDFRepositoryClient extends BaseRepositoryClient {
       .get();
 
     return this.execute((http) => http.put(url, readStream, requestConfig));
+  }
+
+  /**
+   * Uploads the file specified by the provided file path to the server.
+   *
+   * See {@link #upload}
+   *
+   * @param {string} filePath path to a file to be streamed to the server
+   * @param {string|string[]} [context] restricts the operation to the given
+   * context
+   * @param {string} [baseURI] used to resolve relative URIs in the data
+   * @param {string} contentType MIME type of the file's content
+   * @return {Promise<void>} a promise that will be resolved when the file has
+   * been successfully consumed by the server
+   */
+  addFile(filePath, context, baseURI, contentType) {
+    return this.upload(FileUtils.getReadStream(filePath), context, baseURI,
+      contentType);
+  }
+
+  /**
+   * Uploads the file specified by the provided file path to the server
+   * overwriting any data in the server's repository.
+   *
+   * The overwrite will be restricted if the context parameter is specified.
+   *
+   * See {@link #overwrite}
+   *
+   * @param {string} filePath path to a file to be streamed to the server
+   * @param {string} [context] restricts the operation to the given context
+   * @param {string} [baseURI] used to resolve relative URIs in the data
+   * @param {string} contentType MIME type of the file's content
+   * @return {Promise<void>} a promise that will be resolved when the file has
+   * been successfully consumed by the server
+   */
+  putFile(filePath, context, baseURI, contentType) {
+    return this.overwrite(FileUtils.getReadStream(filePath), context, baseURI,
+      contentType);
   }
 
   /**

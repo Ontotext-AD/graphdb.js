@@ -32,10 +32,12 @@ describe('HttpRequestConfigBuilder', () => {
   test('should add param in the params mapping', () => {
     expect(new HttpRequestConfigBuilder()
       .addParam('subj', 'subj')
+      .addParam('pred', 'pred')
       .get())
       .toEqual({
         params: {
-          subj: 'subj'
+          subj: 'subj',
+          pred: 'pred'
         }
       });
   });

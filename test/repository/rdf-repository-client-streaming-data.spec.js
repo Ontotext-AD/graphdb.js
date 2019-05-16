@@ -33,8 +33,7 @@ describe('RdfRepositoryClient - streaming data', () => {
     test('should upload rdf data provided as a stream', (done) => {
       const source = streamSource();
       const stream = new ObjectReadableMock(source);
-      const expected = expectedStream();
-      const expectedIt = expected[Symbol.iterator]();
+      const expectedIt = source[Symbol.iterator]();
 
       return rdfRepositoryClient.upload(stream, context, baseURI, contentType)
         .then(() => {
@@ -68,8 +67,7 @@ describe('RdfRepositoryClient - streaming data', () => {
     test('should overwrite statements using provided data as a stream', (done) => {
       const source = streamSource();
       const stream = new ObjectReadableMock(source);
-      const expected = expectedStream();
-      const expectedIt = expected[Symbol.iterator]();
+      const expectedIt = source[Symbol.iterator]();
 
       return rdfRepositoryClient.overwrite(stream, context, baseURI, contentType)
         .then(() => {
@@ -118,14 +116,6 @@ describe('RdfRepositoryClient - streaming data', () => {
   });
 
   function streamSource() {
-    return [
-      '<rdf:Description rdf:about="http://www.w3.org/1999/02/22-rdf-syntax-ns#type"><rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"/></rdf:Description>',
-      '<rdf:Description rdf:about="http://www.w3.org/2000/01/rdf-schema#subPropertyOf"><rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"/><rdf:type rdf:resource="http://www.w3.org/2002/07/owl#TransitiveProperty"/></rdf:Description>',
-      '<rdf:Description rdf:about="http://www.w3.org/2000/01/rdf-schema#domain"><rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"/></rdf:Description>'
-    ];
-  }
-
-  function expectedStream() {
     return [
       '<rdf:Description rdf:about="http://www.w3.org/1999/02/22-rdf-syntax-ns#type"><rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"/></rdf:Description>',
       '<rdf:Description rdf:about="http://www.w3.org/2000/01/rdf-schema#subPropertyOf"><rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"/><rdf:type rdf:resource="http://www.w3.org/2002/07/owl#TransitiveProperty"/></rdf:Description>',

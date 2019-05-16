@@ -41,7 +41,7 @@ describe('RDFRepositoryClient - adding data', () => {
         .get();
 
       const expected = testUtils.loadFile('repository/data/add-statements-triple.txt').trim();
-      return rdfRepositoryClient.add(payload).then(() => verifySentPayload(expected));
+      return rdfRepositoryClient.add(payload).then(() => verifyAddPayload(expected));
     });
 
     test('should properly convert triple payload with blank nodes to quad and send a request', () => {
@@ -52,7 +52,7 @@ describe('RDFRepositoryClient - adding data', () => {
         .get();
 
       const expected = testUtils.loadFile('repository/data/add-statements-triple-bnodes.txt').trim();
-      return rdfRepositoryClient.add(payload).then(() => verifySentPayload(expected));
+      return rdfRepositoryClient.add(payload).then(() => verifyAddPayload(expected));
     });
 
     test('should properly convert triple literal payload to quad and send a request', () => {
@@ -64,7 +64,7 @@ describe('RDFRepositoryClient - adding data', () => {
         .get();
 
       const expected = testUtils.loadFile('repository/data/add-statements-literal.txt').trim();
-      return rdfRepositoryClient.add(payload).then(() => verifySentPayload(expected));
+      return rdfRepositoryClient.add(payload).then(() => verifyAddPayload(expected));
     });
 
     test('should properly convert triple literal payload with data type to quad and send a request', () => {
@@ -76,7 +76,7 @@ describe('RDFRepositoryClient - adding data', () => {
         .get();
 
       const expected = testUtils.loadFile('repository/data/add-statements-literal-data-type.txt').trim();
-      return rdfRepositoryClient.add(payload).then(() => verifySentPayload(expected));
+      return rdfRepositoryClient.add(payload).then(() => verifyAddPayload(expected));
     });
 
     test('should properly convert triple payload with single context to quad and send a request', () => {
@@ -88,20 +88,33 @@ describe('RDFRepositoryClient - adding data', () => {
         .get();
 
       const expected = testUtils.loadFile('repository/data/add-statements-context.txt').trim();
-      return rdfRepositoryClient.add(payload).then(() => verifySentPayload(expected));
+      return rdfRepositoryClient.add(payload).then(() => verifyAddPayload(expected));
     });
 
     test('should properly convert triple payload with multiple contexts to several quads and send a request', () => {
+      const graphs = [context('data-graph-1'), context('data-graph-2')];
       const payload = new AddStatementPayload()
         .setSubject(subj('resource-1'))
         .setPredicate(pred('relation-1'))
         .setObject('Title')
         .setLanguage('en')
-        .setContext([context('data-graph-1'), context('data-graph-2')])
+        .setContext(graphs)
         .get();
 
       const expected = testUtils.loadFile('repository/data/add-statements-contexts.txt').trim();
-      return rdfRepositoryClient.add(payload).then(() => verifySentPayload(expected));
+      return rdfRepositoryClient.add(payload).then(() => verifyAddPayload(expected));
+    });
+
+    test('should allow to specify base URI for resolving of relative URIs', () => {
+      const payload = new AddStatementPayload()
+        .setBaseURI('http://base/uri')
+        .setSubject(subj('resource-1'))
+        .setPredicate(pred('relation-1'))
+        .setObject(obj('uri-1'))
+        .get();
+
+      const expected = testUtils.loadFile('repository/data/add-statements-triple.txt').trim();
+      return rdfRepositoryClient.add(payload).then(() => verifyAddPayload(expected, undefined, 'http://base/uri'))
     });
 
     test('should throw error when a payload is not provided', () => {
@@ -138,28 +151,24 @@ describe('RDFRepositoryClient - adding data', () => {
     test('should throw error when no data is provided', () => {
       const quads = [];
       return expect(rdfRepositoryClient.addQuads(quads))
-        .rejects.toEqual(Error('Turtle data is required when adding statements'));
+        .rejects.toEqual(Error('Turtle/trig data is required when adding statements'));
     });
 
     test('should convert the quads to turtle and send a request', () => {
-      const quads = [
-        getQuad('resource-1', 'relation-1', 'uri-1'),
-        getQuad('resource-1', 'relation-2', 'uri-2'),
-        getQuadLiteral('resource-1', 'boolean-property', 'true', namedNode('xsd:boolean')),
-        getQuadLiteral('resource-1', 'title', 'Title', 'en'),
-        getQuadLiteral('resource-1', 'title', 'Titel', 'de'),
-
-        getQuad('resource-2', 'relation-1', 'uri-2', 'data-graph-1'),
-        getQuad('resource-2', 'relation-2', 'uri-3', 'data-graph-1'),
-        getQuadLiteral('resource-2', 'title', 'Title', 'en', 'data-graph-2'),
-        getQuadLiteral('resource-2', 'title', 'Titel', 'de', 'data-graph-2'),
-
-        getQuad('resource-3', 'relation-1', 'uri-4', 'data-graph-1'),
-      ];
+      const quads = getQuadsDataSet();
 
       const expected = testUtils.loadFile('repository/data/add-statements-complex.txt').trim();
 
-      return rdfRepositoryClient.addQuads(quads).then(() => verifySentPayload(expected));
+      return rdfRepositoryClient.addQuads(quads).then(() => verifyAddPayload(expected));
+    });
+
+    test('should allow to specify base URI and context when adding quads', () => {
+      const quads = getQuadsDataSet();
+      const graph = context('data-graph-1');
+      const baseUri = 'http://base/uri';
+
+      const expected = testUtils.loadFile('repository/data/add-statements-complex.txt').trim();
+      return rdfRepositoryClient.addQuads(quads, graph, baseUri).then(() => verifyAddPayload(expected, graph, baseUri));
     });
 
     test('should reject adding quads when the server request is unsuccessful', () => {
@@ -169,12 +178,50 @@ describe('RDFRepositoryClient - adding data', () => {
     });
   });
 
-  function verifySentPayload(expected) {
+  describe('putQuads(quads)', () => {
+    test('should convert the quads to turtle and send an overwrite request', () => {
+      const quads = getQuadsDataSet();
+
+      const expected = testUtils.loadFile('repository/data/add-statements-complex.txt').trim();
+
+      return rdfRepositoryClient.putQuads(quads).then(() => verifyPutPayload(expected));
+    });
+
+    test('should allow to specify base URI and context when putting quads', () => {
+      const quads = getQuadsDataSet();
+      const graph = context('data-graph-1');
+      const baseUri = 'http://base/uri';
+
+      const expected = testUtils.loadFile('repository/data/add-statements-complex.txt').trim();
+      return rdfRepositoryClient.putQuads(quads, graph, baseUri).then(() => verifyPutPayload(expected, graph, baseUri));
+    });
+
+    test('should reject putting quads when the server request is unsuccessful', () => {
+      when(rdfRepositoryClient.httpClients[0].put).calledWith('/statements').mockRejectedValue('error-overwriting');
+      const quads = [getQuad('resource-1', 'relation-1', 'uri-1')];
+      return expect(rdfRepositoryClient.putQuads(quads)).rejects.toEqual('error-overwriting');
+    });
+  });
+
+  function verifyAddPayload(expected, context, baseURI) {
     const post = rdfRepositoryClient.httpClients[0].post;
-    expect(post).toHaveBeenCalledTimes(1);
-    expect(post).toHaveBeenCalledWith('/statements', expected, {
+    verifySentPayload(post, expected, context, baseURI);
+  }
+
+  function verifyPutPayload(expected, context, baseURI) {
+    const put = rdfRepositoryClient.httpClients[0].put;
+    verifySentPayload(put, expected, context, baseURI);
+  }
+
+  function verifySentPayload(method, expected, context, baseURI) {
+    expect(method).toHaveBeenCalledTimes(1);
+    expect(method).toHaveBeenCalledWith('/statements', expected, {
       headers: {
-        'Content-Type': RDFMimeType.TURTLE
+        'Content-Type': RDFMimeType.TRIG
+      },
+      params: {
+        context,
+        baseURI
       }
     });
   }
@@ -182,6 +229,23 @@ describe('RDFRepositoryClient - adding data', () => {
   function verifyNoPayload() {
     const post = rdfRepositoryClient.httpClients[0].post;
     expect(post).toHaveBeenCalledTimes(0);
+  }
+
+  function getQuadsDataSet() {
+    return [
+      getQuad('resource-1', 'relation-1', 'uri-1'),
+      getQuad('resource-1', 'relation-2', 'uri-2'),
+      getQuadLiteral('resource-1', 'boolean-property', 'true', namedNode('xsd:boolean')),
+      getQuadLiteral('resource-1', 'title', 'Title', 'en'),
+      getQuadLiteral('resource-1', 'title', 'Titel', 'de'),
+
+      getQuad('resource-2', 'relation-1', 'uri-2', 'data-graph-1'),
+      getQuad('resource-2', 'relation-2', 'uri-3', 'data-graph-1'),
+      getQuadLiteral('resource-2', 'title', 'Title', 'en', 'data-graph-2'),
+      getQuadLiteral('resource-2', 'title', 'Titel', 'de', 'data-graph-2'),
+
+      getQuad('resource-3', 'relation-1', 'uri-4', 'data-graph-1'),
+    ];
   }
 
   // Utilities for building terms
