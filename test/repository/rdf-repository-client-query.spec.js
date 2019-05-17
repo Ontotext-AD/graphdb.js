@@ -17,43 +17,89 @@ describe('RDFRepositoryClient - query', () => {
 
   beforeEach(() => {
     HttpClient.mockImplementation(() => httpClientStub());
-  });
-
-  test('should execute query and stream the result', (done) => {
     config = new RepositoryClientConfig(
       ['http://host/repositories/repo1'], {}, '', 1000, 1000);
-
     repository = new RDFRepositoryClient(config);
+  });
 
-    const source = streamSource();
-    const reader = new ObjectReadableMock(source);
-    const expected = expectedStream();
-    const expectedIt = expected[Symbol.iterator]();
+  describe('should execute query and stream the result', () => {
+    let source;
+    let reader;
+    let expected;
+    let expectedIt;
 
-    repository.httpClients[0].post.mockResolvedValue({
-      data: reader
+    beforeEach(() => {
+      source = streamSource();
+      reader = new ObjectReadableMock(source);
+      expected = expectedStream();
+      expectedIt = expected[Symbol.iterator]();
+      repository.httpClients[0].post.mockResolvedValue({
+        data: reader
+      });
     });
 
-    const payload = new GetQueryPayload()
-      .setQuery('select * where {?s ?p ?o}')
-      .setQueryType(QueryType.SELECT)
-      .setResponseType(RDFMimeType.SPARQL_RESULTS_JSON)
-      .setLimit(100);
+    test('from SELECT query', (done) => {
+      const payload = new GetQueryPayload()
+        .setQuery('select * where {?s ?p ?o}')
+        .setQueryType(QueryType.SELECT)
+        .setResponseType(RDFMimeType.SPARQL_RESULTS_JSON)
+        .setLimit(100);
 
-    return repository.query(payload).then((stream) => {
-      stream.on('data', (chunk) => {
-        expect(chunk).toEqual(expectedIt.next().value);
+      return repository.query(payload).then((stream) => {
+        stream.on('data', (chunk) => {
+          expect(chunk).toEqual(expectedIt.next().value);
+        });
+        stream.on('end', done);
       });
-      stream.on('end', done);
+    });
+
+    test('from DESCRIBE query', (done) => {
+      const payload = new GetQueryPayload()
+        .setQuery('PREFIX books: <http://www.example/book/> DESCRIBE books:book6')
+        .setQueryType(QueryType.DESCRIBE)
+        .setResponseType(RDFMimeType.RDF_XML)
+        .setLimit(100);
+
+      return repository.query(payload).then((stream) => {
+        stream.on('data', (chunk) => {
+          expect(chunk).toEqual(expectedIt.next().value);
+        });
+        stream.on('end', done);
+      });
+    });
+
+    test('from CONSTRUCT query', (done) => {
+      const payload = new GetQueryPayload()
+        .setQuery('PREFIX books: <http://www.example/book/> DESCRIBE books:book6')
+        .setQueryType(QueryType.CONSTRUCT)
+        .setResponseType(RDFMimeType.RDF_XML)
+        .setLimit(100);
+
+      return repository.query(payload).then((stream) => {
+        stream.on('data', (chunk) => {
+          expect(chunk).toEqual(expectedIt.next().value);
+        });
+        stream.on('end', done);
+      });
+    });
+
+    test('from ASK query', (done) => {
+      const payload = new GetQueryPayload()
+        .setQuery('PREFIX books: <http://www.example/book/> DESCRIBE books:book6')
+        .setQueryType(QueryType.ASK)
+        .setResponseType(RDFMimeType.BOOLEAN_RESULT)
+        .setLimit(100);
+
+      return repository.query(payload).then((stream) => {
+        stream.on('data', (chunk) => {
+          expect(chunk).toEqual(expectedIt.next().value);
+        });
+        stream.on('end', done);
+      });
     });
   });
 
   test('should make a POST request with proper parameters and headers', () => {
-    config = new RepositoryClientConfig(
-      ['http://host/repositories/repo1'], {}, '', 1000, 1000);
-
-    repository = new RDFRepositoryClient(config);
-
     const postMock = repository.httpClients[0].post;
 
     const payload = new GetQueryPayload()
@@ -77,6 +123,44 @@ describe('RDFRepositoryClient - query', () => {
           },
           responseType: 'stream'
         });
+    });
+  });
+
+  describe('on payload misconfiguration', () => {
+    test('should throw error if responseType is not properly configured for CONSTRUCT query', () => {
+      const payload = new GetQueryPayload()
+        .setQuery('select * where {?s ?p ?o}')
+        .setQueryType(QueryType.SELECT)
+        .setResponseType(RDFMimeType.RDF_XML);
+
+      return expect(repository.query(payload)).rejects.toBeTruthy();
+    });
+
+    test('should throw error if responseType is not properly configured for DESCRIBE query', () => {
+      const payload = new GetQueryPayload()
+        .setQuery('PREFIX books: <http://www.example/book/> DESCRIBE books:book6')
+        .setQueryType(QueryType.DESCRIBE)
+        .setResponseType(RDFMimeType.SPARQL_RESULTS_JSON);
+
+      return expect(repository.query(payload)).rejects.toBeTruthy();
+    });
+
+    test('should throw error if responseType is not properly configured for CONSTRUCT query', () => {
+      const payload = new GetQueryPayload()
+        .setQuery('construct {?s ?p ?o} where {?s ?p ?o}')
+        .setQueryType(QueryType.CONSTRUCT)
+        .setResponseType(RDFMimeType.SPARQL_RESULTS_JSON);
+
+      return expect(repository.query(payload)).rejects.toBeTruthy();
+    });
+
+    test('should throw error if responseType is not properly configured for ASK query', () => {
+      const payload = new GetQueryPayload()
+        .setQuery('ask {?s ?p ?o}')
+        .setQueryType(QueryType.ASK)
+        .setResponseType(RDFMimeType.BINARY_RDF);
+
+      return expect(repository.query(payload)).rejects.toBeTruthy();
     });
   });
 
