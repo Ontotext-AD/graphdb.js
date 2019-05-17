@@ -138,19 +138,38 @@ describe('RDFRepositoryClient - reading statements', () => {
         .get();
 
       return repository.get(payload).then(() => {
-        const httpGet = repository.httpClients[0].get;
-        expect(httpGet).toHaveBeenCalledWith('/statements', {
-          headers: {'Accept': RDFMimeType.RDF_JSON},
-          params: {
-            context: '<http://example.org/graph3>',
-            infer: true,
-            obj: '"7931000"^^http://www.w3.org/2001/XMLSchema#integer',
-            pred: '<http://eunis.eea.europa.eu/rdf/schema.rdf#population>',
-            subj: '<http://eunis.eea.europa.eu/countries/AZ>'
-          }
-        });
+        verifyGetRequest();
       });
     });
+
+    test('should convert the provided payload to N-Triple resources if not already encoded', () => {
+      const payload = new GetStatementsPayload()
+        .setResponseType(RDFMimeType.RDF_JSON)
+        .setSubject('http://eunis.eea.europa.eu/countries/AZ')
+        .setPredicate('http://eunis.eea.europa.eu/rdf/schema.rdf#population')
+        .setObject('"7931000"^^http://www.w3.org/2001/XMLSchema#integer')
+        .setContext('http://example.org/graph3')
+        .setInference(true)
+        .get();
+
+      return repository.get(payload).then(() => {
+        verifyGetRequest();
+      });
+    });
+
+    function verifyGetRequest() {
+      const httpGet = repository.httpClients[0].get;
+      expect(httpGet).toHaveBeenCalledWith('/statements', {
+        headers: {'Accept': RDFMimeType.RDF_JSON},
+        params: {
+          infer: true,
+          subj: '<http://eunis.eea.europa.eu/countries/AZ>',
+          pred: '<http://eunis.eea.europa.eu/rdf/schema.rdf#population>',
+          obj: '"7931000"^^http://www.w3.org/2001/XMLSchema#integer',
+          context: '<http://example.org/graph3>'
+        }
+      });
+    }
 
     test('should fetch and return single statement as plain string', () => {
       repository.httpClients[0].get.mockImplementation(() => Promise.resolve({
@@ -232,22 +251,42 @@ describe('RDFRepositoryClient - reading statements', () => {
         .get();
 
       return repository.download(payload).then(() => {
-        expect(getMock).toHaveBeenCalledTimes(1);
-        expect(getMock).toHaveBeenCalledWith('/statements', {
-          headers: {
-            'Accept': 'text/turtle'
-          },
-          responseType: 'stream',
-          params: {
-            subj: '<http://eunis.eea.europa.eu/countries/AZ>',
-            pred: '<http://eunis.eea.europa.eu/rdf/schema.rdf#population>',
-            obj: '"7931000"^^http://www.w3.org/2001/XMLSchema#integer',
-            context: '<http://example.org/graph3>',
-            infer: true
-          }
-        });
+        verifyDownloadRequest(getMock);
       });
     });
+
+    test('should convert the download request to N-Triple resources if not already encoded', () => {
+      const getMock = repository.httpClients[0].get;
+      const payload = new GetStatementsPayload()
+        .setResponseType(RDFMimeType.TURTLE)
+        .setSubject('http://eunis.eea.europa.eu/countries/AZ')
+        .setPredicate('http://eunis.eea.europa.eu/rdf/schema.rdf#population')
+        .setObject('"7931000"^^http://www.w3.org/2001/XMLSchema#integer')
+        .setContext('http://example.org/graph3')
+        .setInference(true)
+        .get();
+
+      return repository.download(payload).then(() => {
+        verifyDownloadRequest(getMock);
+      });
+    });
+
+    function verifyDownloadRequest(getMock) {
+      expect(getMock).toHaveBeenCalledTimes(1);
+      expect(getMock).toHaveBeenCalledWith('/statements', {
+        headers: {
+          'Accept': 'text/turtle'
+        },
+        responseType: 'stream',
+        params: {
+          subj: '<http://eunis.eea.europa.eu/countries/AZ>',
+          pred: '<http://eunis.eea.europa.eu/rdf/schema.rdf#population>',
+          obj: '"7931000"^^http://www.w3.org/2001/XMLSchema#integer',
+          context: '<http://example.org/graph3>',
+          infer: true
+        }
+      });
+    }
 
     function streamSource() {
       return [

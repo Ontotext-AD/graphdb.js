@@ -45,25 +45,27 @@ class TransactionalRepositoryClient extends BaseRepositoryClient {
    * Repository size is the amount of statements present.
    *
    * @param {string|string[]} [context] if provided, the size calculation will
-   * be restricted to this or these NTriple encoded resources
+   * be restricted. Will be encoded as N-Triple if it is not already one
    * @return {Promise<number>} a promise resolving to the size of the repo
    */
   getSize(context) {
     const requestConfig = new HttpRequestConfigBuilder()
       .setParams({
         action: 'SIZE',
-        context
+        context: TermConverter.toNTripleValues(context)
       })
       .get();
 
-    return this.execute((http) => http.put('', null, requestConfig))
-      .then((response) => response.data);
+    return this.execute((http) => http.put('', null, requestConfig));
   }
 
   /**
    * Fetch rdf data from statements endpoint using provided parameters.
    *
    * The fetched data depends on the transaction isolation level.
+   *
+   * Provided values will be automatically converted to N-Triples if they are
+   * not already encoded as such.
    *
    * @param {Object} params is an object holding request parameters as returned
    *                 by {@link GetStatementsPayload#get()}
@@ -74,17 +76,17 @@ class TransactionalRepositoryClient extends BaseRepositoryClient {
     const requestConfig = new HttpRequestConfigBuilder()
       .setParams({
         action: 'GET',
-        subj: params.subject,
-        pred: params.predicate,
-        obj: params.object,
-        context: params.context,
+        subj: TermConverter.toNTripleValue(params.subject),
+        pred: TermConverter.toNTripleValue(params.predicate),
+        obj: TermConverter.toNTripleValue(params.object),
+        context: TermConverter.toNTripleValues(params.context),
         infer: params.inference
       })
       .addAcceptHeader(params.responseType)
       .get();
 
     return this.execute((http) => http.put('', null, requestConfig))
-      .then((response) => this.parse(response.data, params.responseType));
+      .then((data) => this.parse(data, params.responseType));
   }
 
   /**
@@ -96,9 +98,9 @@ class TransactionalRepositoryClient extends BaseRepositoryClient {
    *
    * @param {Quad[]} quads collection of quads to be sent as Turtle text
    * @param {string|string[]} [context] restricts the insertion to the given
-   * context
+   * context. Will be encoded as N-Triple if it is not already one
    * @param {string} [baseURI] used to resolve relative URIs in the data
-   * @return {Promise} promise that will be resolved if the addition
+   * @return {Promise<void>} promise that will be resolved if the addition
    * is successful or rejected in case of failure
    */
   addQuads(quads, context, baseURI) {
@@ -111,9 +113,9 @@ class TransactionalRepositoryClient extends BaseRepositoryClient {
    *
    * @param {string} data payload data in Turtle or Trig format
    * @param {string|string[]} [context] restricts the insertion to the given
-   * context
+   * context. Will be encoded as N-Triple if it is not already one
    * @param {string} [baseURI] used to resolve relative URIs in the data
-   * @return {Promise} promise resolving after the data has been inserted
+   * @return {Promise<void>} promise resolving after the data has been inserted
    * successfully
    */
   sendData(data, context, baseURI) {
@@ -124,7 +126,7 @@ class TransactionalRepositoryClient extends BaseRepositoryClient {
     const requestConfig = new HttpRequestConfigBuilder()
       .setParams({
         action: 'ADD',
-        context,
+        context: TermConverter.toNTripleValues(context),
         baseURI
       })
       .addContentTypeHeader(RDFMimeType.TURTLE)
@@ -137,7 +139,7 @@ class TransactionalRepositoryClient extends BaseRepositoryClient {
    * Deletes the statements in the provided Turtle formatted data.
    *
    * @param {string} data payload data in Turtle format
-   * @return {Promise} promise resolving after the data has been deleted
+   * @return {Promise<void>} promise resolving after the data has been deleted
    * successfully
    */
   deleteData(data) {
@@ -163,7 +165,7 @@ class TransactionalRepositoryClient extends BaseRepositoryClient {
    *
    * @param {ReadableStream} readStream stream with the data to be uploaded
    * @param {NamedNode|string} [context] optional context to restrict the
-   * operation.
+   * operation. Will be encoded as N-Triple if it is not already one
    * @param {string} [baseURI] optional uri against which any relative URIs
    * found in the data would be resolved.
    * @param {string} contentType is one of RDF mime type formats,
@@ -178,8 +180,8 @@ class TransactionalRepositoryClient extends BaseRepositoryClient {
       .setResponseType('stream')
       .setParams({
         action: 'ADD',
-        baseURI,
-        context
+        context: TermConverter.toNTripleValues(context),
+        baseURI
       })
       .get();
 
@@ -193,7 +195,7 @@ class TransactionalRepositoryClient extends BaseRepositoryClient {
    *
    * @param {string} filePath path to a file to be streamed to the server
    * @param {string|string[]} [context] restricts the operation to the given
-   * context
+   * context. Will be encoded as N-Triple if it is not already one
    * @param {string} [baseURI] used to resolve relative URIs in the data
    * @param {string} contentType MIME type of the file's content
    * @return {Promise<void>} a promise that will be resolved when the file has
@@ -210,7 +212,7 @@ class TransactionalRepositoryClient extends BaseRepositoryClient {
    *
    * This effectively makes the transaction inactive.
    *
-   * @return {Promise} that will be resolved after successful rollback
+   * @return {Promise<void>} that will be resolved after successful commit
    */
   commit() {
     const requestConfig = new HttpRequestConfigBuilder()
@@ -230,7 +232,7 @@ class TransactionalRepositoryClient extends BaseRepositoryClient {
    *
    * This effectively makes the transaction inactive.
    *
-   * @return {Promise} that will be resolved after successful rollback
+   * @return {Promise<void>} that will be resolved after successful rollback
    */
   rollback() {
     return this.execute((http) => http.deleteResource('', null)).finally(() => {

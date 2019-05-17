@@ -51,7 +51,10 @@ describe('HttpClient', () => {
     expect(httpClient).not.toBeNull();
     expect(httpClient.axios).not.toBeNull();
     expect(axios.create).toHaveBeenCalledTimes(1);
-    expect(axios.create).toHaveBeenCalledWith({baseURL: '/base/url'});
+    expect(axios.create).toHaveBeenCalledWith({
+      baseURL: '/base/url',
+      paramsSerializer: expect.any(Function)
+    });
     expect(httpClient.readTimeout).toEqual(1000);
     expect(httpClient.writeTimeout).toEqual(2000);
   });
@@ -66,6 +69,16 @@ describe('HttpClient', () => {
     const headers = {'Accept': 'application/json'};
     httpClient.setDefaultHeaders(headers);
     expect(axiosMock.defaults.headers).toEqual(headers);
+  });
+
+  test('should properly serialize query parameters', () => {
+    const paramsSerializer = axios.create.mock.calls[0][0].paramsSerializer;
+    expect(paramsSerializer({
+      'param-1': 'a',
+      'param-2': ['b', 'c', 'd', 'null', undefined],
+      'param-3': undefined,
+      'param-4': null
+    })).toEqual('param-1=a&param-2=b&param-2=c&param-2=d&param-2=null');
   });
 
   describe('GET', () => {

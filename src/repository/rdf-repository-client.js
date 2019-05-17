@@ -46,17 +46,18 @@ class RDFRepositoryClient extends BaseRepositoryClient {
    * upon each of them.
    *
    * @param {string|string[]} [context] context or contexts to restrict the
-   *                            size calculation
+   * size calculation. Will be encoded as N-Triple if it is not already one
    * @return {Promise<number>} a promise resolving to the total number of
    *                           statements in the repository
    */
   getSize(context) {
     const requestConfig = new HttpRequestConfigBuilder()
-      .setParams({context})
+      .setParams({
+        context: TermConverter.toNTripleValues(context)
+      })
       .get();
 
-    return this.execute((http) => http.get('/size', requestConfig))
-      .then((response) => response.data);
+    return this.execute((http) => http.get('/size', requestConfig));
   }
 
   /**
@@ -71,7 +72,7 @@ class RDFRepositoryClient extends BaseRepositoryClient {
       .get();
 
     return this.execute((http) => http.get(PATH_NAMESPACES, requestConfig))
-      .then((response) => this.mapNamespaceResponse(response.data));
+      .then((data) => this.mapNamespaceResponse(data));
   }
 
   /**
@@ -108,7 +109,7 @@ class RDFRepositoryClient extends BaseRepositoryClient {
     }
 
     return this.execute((http) => http.get(`${PATH_NAMESPACES}/${prefix}`))
-      .then((response) => DataFactory.namedNode(response.data));
+      .then((data) => DataFactory.namedNode(data));
   }
 
   /**
@@ -119,7 +120,7 @@ class RDFRepositoryClient extends BaseRepositoryClient {
    *
    * @param {string} prefix prefix of the namespace to be created/updated
    * @param {string|NamedNode} namespace the namespace to be created/updated
-   * @return {Promise} promise that will be resolved if the create/update
+   * @return {Promise<void>} promise that will be resolved if the create/update
    *                   request is successful
    */
   saveNamespace(prefix, namespace) {
@@ -148,7 +149,7 @@ class RDFRepositoryClient extends BaseRepositoryClient {
    * result in an error from the server.
    *
    * @param {string} prefix prefix of the namespace to be deleted
-   * @return {Promise} promise that will be resolved if the deletion is
+   * @return {Promise<void>} promise that will be resolved if the deletion is
    *                   successful
    */
   deleteNamespace(prefix) {
@@ -163,7 +164,8 @@ class RDFRepositoryClient extends BaseRepositoryClient {
   /**
    * Deletes all namespace declarations in the repository.
    *
-   * @return {Promise} promise that will be resolved after successful deletion
+   * @return {Promise<void>} promise that will be resolved after
+   * successful deletion
    */
   deleteNamespaces() {
     return this.execute((http) => http.deleteResource(PATH_NAMESPACES));
@@ -171,6 +173,9 @@ class RDFRepositoryClient extends BaseRepositoryClient {
 
   /**
    * Fetch rdf data from statements endpoint using provided parameters.
+   *
+   * Provided values will be automatically converted to N-Triples if they are
+   * not already encoded as such.
    *
    * @param {Object} params is an object holding request parameters as returned
    *                 by {@link GetStatementsPayload#get()}
@@ -180,17 +185,17 @@ class RDFRepositoryClient extends BaseRepositoryClient {
   get(params) {
     const requestConfig = new HttpRequestConfigBuilder()
       .setParams({
-        subj: params.subject,
-        pred: params.predicate,
-        obj: params.object,
-        context: params.context,
+        subj: TermConverter.toNTripleValue(params.subject),
+        pred: TermConverter.toNTripleValue(params.predicate),
+        obj: TermConverter.toNTripleValue(params.object),
+        context: TermConverter.toNTripleValues(params.context),
         infer: params.inference
       })
       .addAcceptHeader(params.responseType)
       .get();
 
     return this.execute((http) => http.get(PATH_STATEMENTS, requestConfig))
-      .then((response) => this.parse(response.data, params.responseType));
+      .then((data) => this.parse(data, params.responseType));
   }
 
   /**
@@ -212,7 +217,7 @@ class RDFRepositoryClient extends BaseRepositoryClient {
       .get();
 
     return this.execute((http) => http.post('', payload.getParams(),
-      requestConfig)).then((response) => response.data);
+      requestConfig));
   }
 
   /**
@@ -228,10 +233,9 @@ class RDFRepositoryClient extends BaseRepositoryClient {
    * <code>application/sparql-update</code> then the query is sent unencoded as
    * request body.
    *
-   *
-   *
    * @param {UpdateQueryPayload} payload
-   * @return {Promise<void>}
+   * @return {Promise<void>} promise that will be resolved if the update is
+   * successful or rejected in case of failure
    */
   update(payload) {
     const requestConfig = new HttpRequestConfigBuilder()
@@ -239,8 +243,7 @@ class RDFRepositoryClient extends BaseRepositoryClient {
       .get();
 
     return this.execute((http) => http.post(PATH_STATEMENTS,
-      payload.getParams(),
-      requestConfig)).then((response) => response.data);
+      payload.getParams(), requestConfig));
   }
 
   /**
@@ -256,7 +259,7 @@ class RDFRepositoryClient extends BaseRepositoryClient {
    *
    * @param {Object} payload params holding request parameters as returned
    *                 by {@link AddStatementPayload#get()}
-   * @return {Promise} promise that will be resolved if the addition is
+   * @return {Promise<void>} promise that will be resolved if the addition is
    *                    successful or rejected in case of failure
    */
   add(payload) {
@@ -298,9 +301,9 @@ class RDFRepositoryClient extends BaseRepositoryClient {
    *
    * @param {Quad[]} quads collection of quads to be sent as Turtle/Trig text
    * @param {string|string[]} [context] restricts the insertion to the given
-   * context
+   * context. Will be encoded as N-Triple if it is not already one
    * @param {string} [baseURI] used to resolve relative URIs in the data
-   * @return {Promise} promise that will be resolved if the addition is
+   * @return {Promise<void>} promise that will be resolved if the addition is
    * successful or rejected in case of failure
    */
   addQuads(quads, context, baseURI) {
@@ -319,9 +322,9 @@ class RDFRepositoryClient extends BaseRepositoryClient {
    *
    * @param {Quad[]} quads collection of quads to be sent as Turtle/Trig text
    * @param {string|string[]} [context] restricts the insertion to the given
-   * context
+   * context. Will be encoded as N-Triple if it is not already one
    * @param {string} [baseURI] used to resolve relative URIs in the data
-   * @return {Promise} promise that will be resolved if the overwrite is
+   * @return {Promise<void>} promise that will be resolved if the overwrite is
    * successful or rejected in case of failure
    */
   putQuads(quads, context, baseURI) {
@@ -335,11 +338,11 @@ class RDFRepositoryClient extends BaseRepositoryClient {
    * @private
    * @param {string} data payload data in Turtle or Trig format
    * @param {string|string[]} [context] restricts the insertion to the given
-   * context
+   * context. Will be encoded as N-Triple if it is not already one
    * @param {string} [baseURI] used to resolve relative URIs in the data
    * @param {boolean} overwrite defines if the data should overwrite the repo
    * data or not
-   * @return {Promise} promise resolving after the data has been inserted
+   * @return {Promise<void>} promise resolving after the data has been inserted
    * successfully
    */
   sendData(data, context, baseURI, overwrite) {
@@ -351,7 +354,7 @@ class RDFRepositoryClient extends BaseRepositoryClient {
       .addContentTypeHeader(RDFMimeType.TRIG)
       .setParams({
         baseURI,
-        context
+        context: TermConverter.toNTripleValues(context)
       })
       .get();
 
@@ -372,20 +375,23 @@ class RDFRepositoryClient extends BaseRepositoryClient {
    * Providing context or contexts will restricts the operation to one or more
    * specific contexts in the repository.
    *
-   * @param {String} [subject] N-Triples encoded resource subject
-   * @param {String} [predicate] N-Triples encoded resource predicate
-   * @param {String} [object] N-Triples encoded resource object
-   * @param {String[]|String} [contexts] N-Triples encoded resource or resources
-   * @return {Promise} promise that will be resolved if the deletion is
+   * Provided values will be automatically converted to N-Triples if they are
+   * not already encoded as such.
+   *
+   * @param {String} [subject] resource subject
+   * @param {String} [predicate] resource predicate
+   * @param {String} [object] resource object
+   * @param {String[]|String} [contexts] resource or resources context
+   * @return {Promise<void>} promise that will be resolved if the deletion is
    *                         successful or rejected in case of failure
    */
   deleteStatements(subject, predicate, object, contexts) {
     const requestConfig = new HttpRequestConfigBuilder()
       .setParams({
-        subj: subject,
-        pred: predicate,
-        obj: object,
-        context: contexts
+        subj: TermConverter.toNTripleValue(subject),
+        pred: TermConverter.toNTripleValue(predicate),
+        obj: TermConverter.toNTripleValue(object),
+        context: TermConverter.toNTripleValues(contexts)
       })
       .get();
 
@@ -396,7 +402,7 @@ class RDFRepositoryClient extends BaseRepositoryClient {
   /**
    * Deletes all statements in the repository.
    *
-   * @return {Promise} promise that will be resolved if the deletion is
+   * @return {Promise<void>} promise that will be resolved if the deletion is
    *                   successful or rejected in case of failure
    */
   deleteAllStatements() {
@@ -409,6 +415,9 @@ class RDFRepositoryClient extends BaseRepositoryClient {
    * The request is configured so that expected response should be a readable
    * stream.
    *
+   * Provided request params will be automatically converted to N-Triples if
+   * they are not already encoded as such.
+   *
    * @param {Object} params is an object holding request parameters as returned
    *                 by {@link GetStatementsPayload#get()}
    * @return {Promise<WritableStream>} the client can subscribe to the readable
@@ -420,19 +429,15 @@ class RDFRepositoryClient extends BaseRepositoryClient {
       .addAcceptHeader(params.responseType)
       .setResponseType('stream')
       .setParams({
-        subj: params.subject,
-        pred: params.predicate,
-        obj: params.object,
-        context: params.context,
+        subj: TermConverter.toNTripleValue(params.subject),
+        pred: TermConverter.toNTripleValue(params.predicate),
+        obj: TermConverter.toNTripleValue(params.object),
+        context: TermConverter.toNTripleValues(params.context),
         infer: params.inference
       })
       .get();
 
-    return this.execute((http) => {
-      return http.get('/statements', requestConfig);
-    }).then((response) => {
-      return response.data;
-    });
+    return this.execute((http) => http.get('/statements', requestConfig));
   }
 
   /**
@@ -443,7 +448,7 @@ class RDFRepositoryClient extends BaseRepositoryClient {
    *
    * @param {ReadableStream} readStream
    * @param {NamedNode|string} [context] optional context to restrict the
-   * operation.
+   * operation. Will be encoded as N-Triple if it is not already one
    * @param {string} [baseURI] optional uri against which any relative URIs
    * found in the data would be resolved.
    * @param {string} contentType is one of RDF mime type formats,
@@ -453,13 +458,17 @@ class RDFRepositoryClient extends BaseRepositoryClient {
    * been successfully consumed by the server
    */
   upload(readStream, context, baseURI, contentType) {
-    const url = this.resolveUrl(context, baseURI);
     const requestConfig = new HttpRequestConfigBuilder()
       .addContentTypeHeader(contentType)
       .setResponseType('stream')
+      .setParams({
+        baseURI,
+        context: TermConverter.toNTripleValues(context)
+      })
       .get();
 
-    return this.execute((http) => http.post(url, readStream, requestConfig));
+    return this.execute((http) => http.post(PATH_STATEMENTS, readStream,
+      requestConfig));
   }
 
   /**
@@ -469,7 +478,8 @@ class RDFRepositoryClient extends BaseRepositoryClient {
    * provided as a readable stream e.g. reading from file.
    *
    * @param {ReadableStream} readStream
-   * @param {NamedNode|string} context
+   * @param {NamedNode|string} context restrict the operation. Will be encoded
+   * as N-Triple if it is not already one
    * @param {string} [baseURI] optional uri against which any relative URIs
    * found in the data would be resolved.
    * @param {string} contentType
@@ -477,13 +487,17 @@ class RDFRepositoryClient extends BaseRepositoryClient {
    * been successfully consumed by the server
    */
   overwrite(readStream, context, baseURI, contentType) {
-    const url = this.resolveUrl(context, baseURI);
     const requestConfig = new HttpRequestConfigBuilder()
       .addContentTypeHeader(contentType)
       .setResponseType('stream')
+      .setParams({
+        baseURI,
+        context: TermConverter.toNTripleValues(context)
+      })
       .get();
 
-    return this.execute((http) => http.put(url, readStream, requestConfig));
+    return this.execute((http) => http.put(PATH_STATEMENTS, readStream,
+      requestConfig));
   }
 
   /**
@@ -493,7 +507,7 @@ class RDFRepositoryClient extends BaseRepositoryClient {
    *
    * @param {string} filePath path to a file to be streamed to the server
    * @param {string|string[]} [context] restricts the operation to the given
-   * context
+   * context. Will be encoded as N-Triple if it is not already one
    * @param {string} [baseURI] used to resolve relative URIs in the data
    * @param {string} contentType MIME type of the file's content
    * @return {Promise<void>} a promise that will be resolved when the file has
@@ -513,7 +527,8 @@ class RDFRepositoryClient extends BaseRepositoryClient {
    * See {@link #overwrite}
    *
    * @param {string} filePath path to a file to be streamed to the server
-   * @param {string} [context] restricts the operation to the given context
+   * @param {string} [context] restricts the operation to the given context.
+   * Will be encoded as N-Triple if it is not already one
    * @param {string} [baseURI] used to resolve relative URIs in the data
    * @param {string} contentType MIME type of the file's content
    * @return {Promise<void>} a promise that will be resolved when the file has
@@ -522,28 +537,6 @@ class RDFRepositoryClient extends BaseRepositoryClient {
   putFile(filePath, context, baseURI, contentType) {
     return this.overwrite(FileUtils.getReadStream(filePath), context, baseURI,
       contentType);
-  }
-
-  /**
-   * Build an url for update operation encoding the context and baseURI if
-   * provided.
-   *
-   * @private
-   * @param {NamedNode|string} [context]
-   * @param {string} [baseURI]
-   * @return {string}
-   */
-  resolveUrl(context, baseURI) {
-    let url = '/statements';
-    const hasParams = context || baseURI;
-    if (hasParams) {
-      url += '?';
-    }
-    const params = [
-      context ? `context=${encodeURIComponent(context)}` : undefined,
-      baseURI ? `baseURI=${encodeURIComponent(baseURI)}` : undefined
-    ].filter((v) => v);
-    return url + params.join('&');
   }
 
   /**
@@ -561,11 +554,12 @@ class RDFRepositoryClient extends BaseRepositoryClient {
    * @return {Promise<TransactionalRepositoryClient>} transactional client
    */
   beginTransaction(isolationLevel) {
+    const responseMapper = (response) => response;
     return this.execute((http) => http.post('/transactions', {
       params: {
         'isolation-level': isolationLevel
       }
-    })).then((response) => {
+    }), responseMapper).then((response) => {
       const locationUrl = response.headers['location'];
       if (StringUtils.isBlank(locationUrl)) {
         return Promise.reject(new Error('Couldn\'t obtain transaction ID'));

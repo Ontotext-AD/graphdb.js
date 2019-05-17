@@ -1,6 +1,7 @@
 const N3 = require('n3');
 const {DataFactory} = N3;
 const {namedNode, literal, quad, blankNode, variable} = DataFactory;
+const StringUtils = require('util/string-utils');
 
 /**
  * Utility class for converting strings to terms, terms to quads and
@@ -77,6 +78,7 @@ class TermConverter {
    * The produced quads size depends on the supplied amount of context.
    *
    * @private
+   * @static
    * @param {string} subject the quad's subject
    * @param {string} predicate the quad's predicate
    * @param {Term} objectTerm the quads object already converted to a Term
@@ -100,6 +102,7 @@ class TermConverter {
    * case any of the quads have context.
    *
    * @public
+   * @static
    * @param {Quad[]} quads the collection of quads to serialize to Turtle
    * @return {Promise<string>} a promise that will be resolved to Turtle or Trig
    * text or rejected if the quads cannot be serialized
@@ -116,6 +119,60 @@ class TermConverter {
         }
       });
     });
+  }
+
+  /**
+   * Converts the provided value to N-Triple encoded value in case it is not
+   * already one or a literal value.
+   *
+   * For example:
+   * <ul>
+   *   <li><i>http://resource</i> encodes to <i><http://resource></i></li>
+   *   <li><i>"Literal title"@en</i> will not be encoded</li>
+   *   <li><i><http://resource></i> encodes to the same value</li>
+   * </ul>
+   *
+   * Empty or null values are ignored.
+   *
+   * @public
+   * @static
+   * @param {string} value the value for converting
+   * @return {string} the converted value to N-Triple
+   */
+  static toNTripleValue(value) {
+    if (StringUtils.isNotBlank(value)) {
+      if (value.startsWith('"')) {
+        // Do not convert literals
+        return value;
+      }
+      if (value.startsWith('<')) {
+        // Value is probably already encoded as N-Triple
+        return value;
+      }
+      return `<${value}>`;
+    }
+  }
+
+  /**
+   * Converts the provided values to N-Triple encoded values in case they are
+   * not already one or literal values.
+   *
+   * Empty or null values are ignored.
+   *
+   * @see {@link #toNTripleValue}
+
+   * @public
+   * @static
+   * @param {string|string[]} values the values for converting
+   * @return {string|string[]} the converted value or values to N-Triple
+   */
+  static toNTripleValues(values) {
+    if (values instanceof Array) {
+      return values
+        .filter((value) => StringUtils.isNotBlank(value))
+        .map((value) => TermConverter.toNTripleValue(value));
+    }
+    return TermConverter.toNTripleValue(values);
   }
 
   /**
@@ -234,6 +291,7 @@ class TermConverter {
   /**
    * Returns a variable term from the provided value without leading ?
    *
+   * @private
    * @param {string} value the value to convert to variable
    * @return {Variable} the produced variable
    */
@@ -247,6 +305,7 @@ class TermConverter {
    *
    * Blank nodes are such values that start with <code>_:</code> prefix
    *
+   * @private
    * @param {string} value the value to check
    * @return {boolean} <code>true</code> if the value is a blank node
    *                    or <code>false</code> otherwise
@@ -260,6 +319,7 @@ class TermConverter {
    *
    * Variables are such values that start with <code>?</code> prefix
    *
+   * @private
    * @param {string} value the value to check
    * @return {boolean} <code>true</code> if the value is a variable
    *                    or <code>false</code> otherwise

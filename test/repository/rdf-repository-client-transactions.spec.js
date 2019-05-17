@@ -289,6 +289,14 @@ describe('RDFRepositoryClient - transactions', () => {
         httpPut.mockRejectedValue('Error during quads add');
         return expect(transaction.addQuads([q])).rejects.toEqual('Error during quads add');
       });
+
+      test('should resolve to empty response (HTTP 204)', () => {
+        const q = quad(
+          namedNode('http://domain/resource/resource-1'),
+          namedNode('http://domain/property/relation-1'),
+          literal('Title', 'en'));
+        return expect(transaction.addQuads([q])).resolves.toEqual();
+      });
     });
 
     describe('sendData()', () => {
@@ -317,6 +325,10 @@ describe('RDFRepositoryClient - transactions', () => {
         httpPut.mockRejectedValue('Error during add');
         return expect(transaction.sendData(data)).rejects.toEqual('Error during add');
       });
+
+      test('should resolve to empty response (HTTP 204)', () => {
+        return expect(transaction.sendData(data)).resolves.toEqual();
+      });
     });
 
     describe('deleteData()', () => {
@@ -344,6 +356,10 @@ describe('RDFRepositoryClient - transactions', () => {
       test('should reject if the transaction cannot delete data', () => {
         httpPut.mockRejectedValue('Error during delete');
         return expect(transaction.deleteData(data)).rejects.toEqual('Error during delete');
+      });
+
+      test('should resolve to empty response (HTTP 204)', () => {
+        return expect(transaction.deleteData(data)).resolves.toEqual();
       });
     });
 
@@ -386,8 +402,14 @@ describe('RDFRepositoryClient - transactions', () => {
         const error = new Error('cannot-upload');
         httpPut.mockRejectedValue(error);
 
-        const promise = transaction.upload(FileUtils.getReadStream(testFilePath), context, null, RDFMimeType.TRIG);
+        const turtleStream = FileUtils.getReadStream(testFilePath);
+        const promise = transaction.upload(turtleStream, context, null, RDFMimeType.TRIG);
         return expect(promise).rejects.toEqual(error);
+      });
+
+      test('should resolve to empty response (HTTP 204)', () => {
+        const turtleStream = FileUtils.getReadStream(testFilePath);
+        return expect(transaction.upload(turtleStream, context, baseURI, RDFMimeType.TRIG)).resolves.toEqual();
       });
     });
 
@@ -436,6 +458,10 @@ describe('RDFRepositoryClient - transactions', () => {
         expect(() => transaction.addFile(null, context, baseURI, RDFMimeType.TRIG)).toThrow(Error);
         expect(() => transaction.addFile('', context, baseURI, RDFMimeType.TRIG)).toThrow(Error);
         expect(() => transaction.addFile('missing-file-123', context, baseURI, RDFMimeType.TRIG)).toThrow(Error);
+      });
+
+      test('should resolve to empty response (HTTP 204)', () => {
+        return expect(transaction.addFile(testFilePath, context, baseURI, RDFMimeType.TRIG)).resolves.toEqual();
       });
     });
 

@@ -62,4 +62,10 @@ describe('RDFRepositoryClient - update query', () => {
         });
     });
   });
+
+  test('should resolve to empty response (HTTP 204)', () => {
+    const payload = new UpdateQueryPayload()
+      .setQuery('INSERT {?s ?p ?o} WHERE {?s ?p ?o}');
+    return expect(repository.update(payload)).resolves.toEqual();
+  });
 });

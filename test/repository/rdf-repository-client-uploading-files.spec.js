@@ -46,12 +46,16 @@ describe('RdfRepositoryClient - uploading files', () => {
         const httpPostCall = httpPost.mock.calls[0];
 
         const url = httpPostCall[0];
-        expect(url).toEqual('/statements?context=%3Curn%3Ax-local%3Agraph1%3E&baseURI=%3Curn%3Ax-local%3Agraph1%3E');
+        expect(url).toEqual('/statements');
 
         const requestConfig = httpPostCall[2];
         expect(requestConfig).toEqual({
           headers: {
             'Content-Type': RDFMimeType.TRIG
+          },
+          params: {
+            baseURI,
+            context
           },
           responseType: 'stream'
         });
@@ -77,6 +81,10 @@ describe('RdfRepositoryClient - uploading files', () => {
       expect(() => rdfRepositoryClient.addFile('', context, baseURI, RDFMimeType.TRIG)).toThrow(Error);
       expect(() => rdfRepositoryClient.addFile('missing-file-123', context, baseURI, RDFMimeType.TRIG)).toThrow(Error);
     });
+
+    test('should resolve to empty response (HTTP 204)', () => {
+      return expect(rdfRepositoryClient.addFile(testFilePath, context, baseURI, RDFMimeType.TRIG)).resolves.toEqual();
+    });
   });
 
   describe('putFile(file)', () => {
@@ -93,12 +101,16 @@ describe('RdfRepositoryClient - uploading files', () => {
         const httpPutCall = httpPut.mock.calls[0];
 
         const url = httpPutCall[0];
-        expect(url).toEqual('/statements?context=%3Curn%3Ax-local%3Agraph1%3E&baseURI=%3Curn%3Ax-local%3Agraph1%3E');
+        expect(url).toEqual('/statements');
 
         const requestConfig = httpPutCall[2];
         expect(requestConfig).toEqual({
           headers: {
             'Content-Type': RDFMimeType.TRIG
+          },
+          params: {
+            baseURI,
+            context
           },
           responseType: 'stream'
         });
@@ -123,6 +135,10 @@ describe('RdfRepositoryClient - uploading files', () => {
       expect(() => rdfRepositoryClient.putFile(null, context, baseURI, RDFMimeType.TRIG)).toThrow(Error);
       expect(() => rdfRepositoryClient.putFile('', context, baseURI, RDFMimeType.TRIG)).toThrow(Error);
       expect(() => rdfRepositoryClient.putFile('missing-file-123', context, baseURI, RDFMimeType.TRIG)).toThrow(Error);
+    });
+
+    test('should resolve to empty response (HTTP 204)', () => {
+      return expect(rdfRepositoryClient.putFile(testFilePath, context, baseURI, RDFMimeType.TRIG)).resolves.toEqual();
     });
   });
 

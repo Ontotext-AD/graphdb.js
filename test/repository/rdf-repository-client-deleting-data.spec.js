@@ -73,7 +73,7 @@ describe('RDFRepositoryClient - Deleting statements', () => {
         expect(deleteResource).toHaveBeenCalledTimes(1);
         expect(deleteResource).toHaveBeenCalledWith('/statements', {
           params: {
-            subj: null, pred: null, obj: null, context
+            subj: undefined, pred: undefined, obj: undefined, context
           }
         });
       });
@@ -82,6 +82,26 @@ describe('RDFRepositoryClient - Deleting statements', () => {
     test('should reject deleting statements when the server request is unsuccessful', () => {
       when(rdfRepositoryClient.httpClients[0].deleteResource).calledWith('/statements').mockRejectedValue('error-deleting');
       return expect(rdfRepositoryClient.deleteStatements(subj)).rejects.toEqual('error-deleting');
+    });
+
+    test('should convert parameters to N-Triple encoded resources', () => {
+      return rdfRepositoryClient.deleteStatements(
+        'http://domain/resource/1',
+        'http://domain/property/1',
+        'http://domain/value/1',
+        'http://domain/graph/1').then(() => {
+        let deleteResource = rdfRepositoryClient.httpClients[0].deleteResource;
+        expect(deleteResource).toHaveBeenCalledTimes(1);
+        expect(deleteResource).toHaveBeenCalledWith('/statements', {
+          params: {
+            subj, pred, obj, context
+          }
+        });
+      });
+    });
+
+    test('should resolve to empty response (HTTP 204)', () => {
+      return expect(rdfRepositoryClient.deleteStatements(subj)).resolves.toEqual();
     });
   });
 
@@ -97,6 +117,10 @@ describe('RDFRepositoryClient - Deleting statements', () => {
     test('should reject deleting all statements when the server request is unsuccessful', () => {
       when(rdfRepositoryClient.httpClients[0].deleteResource).calledWith('/statements').mockRejectedValue('error-deleting-all');
       return expect(rdfRepositoryClient.deleteAllStatements()).rejects.toEqual('error-deleting-all');
+    });
+
+    test('should resolve to empty response (HTTP 204)', () => {
+      return expect(rdfRepositoryClient.deleteAllStatements()).resolves.toEqual();
     });
   });
 
