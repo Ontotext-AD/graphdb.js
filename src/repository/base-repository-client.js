@@ -117,11 +117,17 @@ class BaseRepositoryClient {
    * @param {Function} httpClientConsumer the consumer of supplied http client
    *                                      that performs the request execution
    * @param {Function} [responseMapper] a mapper for the response object
-   * @return {Promise<any>} a promise which resolves to http request response
+   * @return {Promise<any>} a promise which resolves to http request response or
+   * rejects with error if thrown during execution.
    */
   execute(httpClientConsumer, responseMapper) {
-    const httpClients = new Iterable(this.httpClients);
-    return this.retryExecution(httpClients, httpClientConsumer, responseMapper);
+    try {
+      const httpClients = new Iterable(this.httpClients);
+      return this.retryExecution(httpClients, httpClientConsumer,
+        responseMapper);
+    } catch (err) {
+      return Promise.reject(err);
+    }
   }
 
   /**

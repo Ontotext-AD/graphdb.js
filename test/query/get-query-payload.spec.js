@@ -160,7 +160,7 @@ describe('GetQueryPayload', () => {
 
     test('should throw error if responseType is not compatible with the DESCRIBE queryType', () => {
       const payload = new GetQueryPayload()
-        .setQuery('construct {?s ?p ?o} where {?s ?p ?o}')
+        .setQuery('PREFIX books: <http://www.example/book/>\n DESCRIBE books:book6')
         .setQueryType(QueryType.DESCRIBE)
         .setResponseType(RDFMimeType.SPARQL_RESULTS_JSON);
       expect(() => payload.getParams()).toThrowError();

@@ -27,4 +27,10 @@ describe('QueryPayload', () => {
       expect(() => payload.setContentType(123)).toThrow(Error);
     });
   });
+
+  describe('validateParams', () => {
+    test('should return false by default as the method should be implemented from successors', () => {
+      expect(new QueryPayload().validateParams()).toBeFalsy();
+    });
+  });
 });

@@ -11,19 +11,17 @@ jest.mock('http/http-client');
 describe('RDFRepositoryClient - update query', () => {
   let config;
   let repository;
+  let postMock;
 
   beforeEach(() => {
     HttpClient.mockImplementation(() => httpClientStub());
+    config = new RepositoryClientConfig(
+      ['http://host/repositories/repo1'], {}, '', 1000, 1000);
+    repository = new RDFRepositoryClient(config);
+    postMock = repository.httpClients[0].post;
   });
 
   test('should make a POST request with Content-Type/sparql-update header and unencoded sparql query as body', () => {
-    config = new RepositoryClientConfig(
-      ['http://host/repositories/repo1'], {}, '', 1000, 1000);
-
-    repository = new RDFRepositoryClient(config);
-
-    const postMock = repository.httpClients[0].post;
-
     const payload = new UpdateQueryPayload()
       .setQuery('INSERT {?s ?p ?o} WHERE {?s ?p ?o}');
 
@@ -39,13 +37,6 @@ describe('RDFRepositoryClient - update query', () => {
   });
 
   test('should make a POST request with Content-Type/x-www-form-urlencoded header and encoded query plus parameters as body', () => {
-    config = new RepositoryClientConfig(
-      ['http://host/repositories/repo1'], {}, '', 1000, 1000);
-
-    repository = new RDFRepositoryClient(config);
-
-    const postMock = repository.httpClients[0].post;
-
     const payload = new UpdateQueryPayload()
       .setQuery('INSERT {?s ?p ?o} WHERE {?s ?p ?o}')
       .setContentType(QueryContentType.X_WWW_FORM_URLENCODED)
@@ -60,6 +51,15 @@ describe('RDFRepositoryClient - update query', () => {
             'Content-Type': 'application/x-www-form-urlencoded'
           }
         });
+    });
+  });
+
+  describe('on payload misconfiguration', () => {
+    test('should throw error if the query is missing', () => {
+      const payload = new UpdateQueryPayload()
+        .setContentType(QueryContentType.X_WWW_FORM_URLENCODED);
+
+      return expect(repository.update(payload)).rejects.toEqual(Error('Parameter query is mandatory!'));
     });
   });
 
