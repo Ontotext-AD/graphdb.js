@@ -1,5 +1,5 @@
-const StatementPayload = require('repository/statement-payload');
-const RDFMimeType = require('http/rdf-mime-type');
+const StatementPayload = require('../repository/statement-payload');
+const RDFMimeType = require('../http/rdf-mime-type');
 
 /**
  * Payload object holding all request parameters applicable for the statements
@@ -12,6 +12,8 @@ const RDFMimeType = require('http/rdf-mime-type');
  * <code>application/rdf+json</code>.
  *
  * @class
+ * @author Mihail Radkov
+ * @author Svilen Velikov
  */
 class GetStatementsPayload extends StatementPayload {
   /**

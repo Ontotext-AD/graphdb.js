@@ -3,9 +3,12 @@
  * pages, defining pagination configuration and holding reference
  * to {@link BaseRepositoryClient} used internally for the fetch
  * operations.
+ *
  * @class
+ * @author Mihail Radkov
+ * @author Svilen Velikov
  */
-export class PagedResponse {
+class PagedResponse {
   /**
    * @param {BaseRepositoryClient} repository
    * @param {number} total
@@ -23,3 +26,5 @@ export class PagedResponse {
     this.result = result;
   }
 }
+
+module.exports = PagedResponse;

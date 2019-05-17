@@ -1,8 +1,8 @@
-const QueryPayload = require('query/query-payload');
-const QueryType = require('query/query-type');
-const QueryLanguage = require('query/query-language');
-const RDFMimeType = require('http/rdf-mime-type');
-const QueryContentType = require('http/query-content-type');
+const QueryPayload = require('../query/query-payload');
+const QueryType = require('../query/query-type');
+const QueryLanguage = require('../query/query-language');
+const RDFMimeType = require('../http/rdf-mime-type');
+const QueryContentType = require('../http/query-content-type');
 
 const SELECT_QUERY_RESULT_TYPES = [
   RDFMimeType.SPARQL_RESULTS_XML,
@@ -41,6 +41,8 @@ const QUERY_OPERATION_TYPES = [
  * <code>application/x-www-form-urlencoded</code> type is set.
  *
  * @class
+ * @author Mihail Radkov
+ * @author Svilen Velikov
  */
 class GetQueryPayload extends QueryPayload {
   /**

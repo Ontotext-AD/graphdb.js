@@ -1,7 +1,7 @@
 const N3 = require('n3');
 const {DataFactory} = N3;
 const {namedNode, literal, quad, blankNode, variable} = DataFactory;
-const StringUtils = require('util/string-utils');
+const StringUtils = require('../util/string-utils');
 
 /**
  * Utility class for converting strings to terms, terms to quads and
@@ -9,6 +9,7 @@ const StringUtils = require('util/string-utils');
  *
  * @class
  * @author Mihail Radkov
+ * @author Svilen Velikov
  */
 class TermConverter {
   /**

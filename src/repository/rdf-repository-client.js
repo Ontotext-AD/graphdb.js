@@ -1,15 +1,16 @@
 const BaseRepositoryClient = require('../repository/base-repository-client');
-const RDFMimeType = require('http/rdf-mime-type');
+const RDFMimeType = require('../http/rdf-mime-type');
+const Namespace = require('../model/namespace');
+const StringUtils = require('../util/string-utils');
+const FileUtils = require('../util/file-utils');
+const TermConverter = require('../model/term-converter');
+const RepositoryClientConfig =
+  require('../repository/repository-client-config');
+const TransactionalRepositoryClient =
+  require('../transaction/transactional-repository-client');
+const HttpRequestConfigBuilder = require('../http/http-request-config-builder');
 const DataFactory = require('n3').DataFactory;
 const NamedNode = DataFactory.internal.NamedNode;
-const Namespace = require('model/namespace');
-const StringUtils = require('util/string-utils');
-const FileUtils = require('util/file-utils');
-const TermConverter = require('model/term-converter');
-const RepositoryClientConfig = require('repository/repository-client-config');
-const TransactionalRepositoryClient =
-  require('transaction/transactional-repository-client');
-const HttpRequestConfigBuilder = require('http/http-request-config-builder');
 
 /**
  * Defines the path segment for namespaces rest endpoint
@@ -27,7 +28,10 @@ const PATH_STATEMENTS = '/statements';
 
 /**
  * RDF repository client implementation realizing specific operations.
+ *
  * @class
+ * @author Mihail Radkov
+ * @author Svilen Velikov
  */
 class RDFRepositoryClient extends BaseRepositoryClient {
   /**

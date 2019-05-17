@@ -1,7 +1,10 @@
 /**
  * Configuration wrapper used for initialization of {@link BaseRepositoryClient}
  * implementations.
+ *
  * @class
+ * @author Mihail Radkov
+ * @author Svilen Velikov
  */
 class RepositoryClientConfig {
   /**

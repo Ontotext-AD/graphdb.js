@@ -1,4 +1,4 @@
-const ContentTypeParser = require('./content-type-parser');
+const ContentTypeParser = require('../parser/content-type-parser');
 
 /**
  * Implementation of registry holding {@link ContentTypeParser} instances and
@@ -9,6 +9,8 @@ const ContentTypeParser = require('./content-type-parser');
  * thrown if there are invalid parsers.
  *
  * @class
+ * @author Mihail Radkov
+ * @author Svilen Velikov
  */
 class ParserRegistry {
   /**

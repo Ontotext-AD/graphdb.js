@@ -15,6 +15,7 @@ const qs = require('qs');
  *
  * @class
  * @author Mihail Radkov
+ * @author Svilen Velikov
  */
 class HttpClient {
   /**

@@ -1,8 +1,9 @@
-const ParserRegistry = require('parser/parser-registry');
-const ConsoleLogger = require('logging/console-logger');
-const HttpClient = require('http/http-client');
-const RepositoryClientConfig = require('repository/repository-client-config');
-const Iterable = require('util/iterable');
+const ParserRegistry = require('../parser/parser-registry');
+const ConsoleLogger = require('../logging/console-logger');
+const HttpClient = require('../http/http-client');
+const RepositoryClientConfig =
+  require('../repository/repository-client-config');
+const Iterable = require('../util/iterable');
 
 /**
  * Set of HTTP status codes for which requests could be re-attempted.
@@ -22,6 +23,8 @@ const RETRIABLE_STATUSES = [
  *
  * @abstract
  * @class
+ * @author Mihail Radkov
+ * @author Svilen Velikov
  */
 class BaseRepositoryClient {
   /**
