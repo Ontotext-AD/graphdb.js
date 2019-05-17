@@ -177,25 +177,25 @@ class RDFRepositoryClient extends BaseRepositoryClient {
    * Provided values will be automatically converted to N-Triples if they are
    * not already encoded as such.
    *
-   * @param {Object} params is an object holding request parameters as returned
-   *                 by {@link GetStatementsPayload#get()}
+   * @param {GetStatementsPayload} payload is an object holding the request
+   * parameters.
    * @return {Promise<string|Quad>} resolves with plain string or Quad according
    *      to provided response type.
    */
-  get(params) {
+  get(payload) {
     const requestConfig = new HttpRequestConfigBuilder()
       .setParams({
-        subj: TermConverter.toNTripleValue(params.subject),
-        pred: TermConverter.toNTripleValue(params.predicate),
-        obj: TermConverter.toNTripleValue(params.object),
-        context: TermConverter.toNTripleValues(params.context),
-        infer: params.inference
+        subj: TermConverter.toNTripleValue(payload.getSubject()),
+        pred: TermConverter.toNTripleValue(payload.getPredicate()),
+        obj: TermConverter.toNTripleValue(payload.getObject()),
+        context: TermConverter.toNTripleValues(payload.getContext()),
+        infer: payload.getInference()
       })
-      .addAcceptHeader(params.responseType)
+      .addAcceptHeader(payload.getResponseType())
       .get();
 
     return this.execute((http) => http.get(PATH_STATEMENTS, requestConfig))
-      .then((data) => this.parse(data, params.responseType));
+      .then((data) => this.parse(data, payload.getResponseType()));
   }
 
   /**

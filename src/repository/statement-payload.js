@@ -28,12 +28,26 @@ class StatementPayload {
   }
 
   /**
+   * @return {string} subject
+   */
+  getSubject() {
+    return this.payload.subject;
+  }
+
+  /**
    * @param {string} [predicate]
    * @return {StatementPayload}
    */
   setPredicate(predicate) {
     this.payload.predicate = predicate;
     return this;
+  }
+
+  /**
+   * @return {string} predicate
+   */
+  getPredicate() {
+    return this.payload.predicate;
   }
 
   /**
@@ -46,12 +60,26 @@ class StatementPayload {
   }
 
   /**
+   * @return {string} object
+   */
+  getObject() {
+    return this.payload.object;
+  }
+
+  /**
    * @param {(string|string[])} [context]
    * @return {StatementPayload}
    */
   setContext(context) {
     this.payload.context = context;
     return this;
+  }
+
+  /**
+   * @return {string} context
+   */
+  getContext() {
+    return this.payload.context;
   }
 
   /**

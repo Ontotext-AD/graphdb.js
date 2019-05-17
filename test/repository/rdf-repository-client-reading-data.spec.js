@@ -57,8 +57,7 @@ describe('RDFRepositoryClient - reading statements', () => {
       return new GetStatementsPayload()
         .setSubject('<http://eunis.eea.europa.eu/countries/AZ>')
         .setPredicate('<http://eunis.eea.europa.eu/rdf/schema.rdf#population>')
-        .setResponseType(type)
-        .get();
+        .setResponseType(type);
     }
 
     test('should fetch statement in N-Triples format and return it converted to quads', () => {
@@ -119,8 +118,7 @@ describe('RDFRepositoryClient - reading statements', () => {
     test('should reject with error if response fails', () => {
       repository.httpClients[0].get.mockImplementation(() => Promise.reject({response: 'Server error'}));
 
-      const payload = new GetStatementsPayload().get();
-      return expect(repository.get(payload)).rejects.toEqual({response: 'Server error'});
+      return expect(repository.get(new GetStatementsPayload())).rejects.toEqual({response: 'Server error'});
     });
 
     test('should populate http header and parameters according to provided data', () => {
@@ -134,8 +132,7 @@ describe('RDFRepositoryClient - reading statements', () => {
         .setPredicate('<http://eunis.eea.europa.eu/rdf/schema.rdf#population>')
         .setObject('"7931000"^^http://www.w3.org/2001/XMLSchema#integer')
         .setContext('<http://example.org/graph3>')
-        .setInference(true)
-        .get();
+        .setInference(true);
 
       return repository.get(payload).then(() => {
         verifyGetRequest();
@@ -149,8 +146,7 @@ describe('RDFRepositoryClient - reading statements', () => {
         .setPredicate('http://eunis.eea.europa.eu/rdf/schema.rdf#population')
         .setObject('"7931000"^^http://www.w3.org/2001/XMLSchema#integer')
         .setContext('http://example.org/graph3')
-        .setInference(true)
-        .get();
+        .setInference(true);
 
       return repository.get(payload).then(() => {
         verifyGetRequest();
@@ -179,15 +175,14 @@ describe('RDFRepositoryClient - reading statements', () => {
       const payload = new GetStatementsPayload()
         .setSubject('<http://eunis.eea.europa.eu/countries/AZ>')
         .setPredicate('<http://eunis.eea.europa.eu/rdf/schema.rdf#population>')
-        .setResponseType(RDFMimeType.RDF_XML)
-        .get();
+        .setResponseType(RDFMimeType.RDF_XML);
 
       const expectedPayload = {
         subject: '<http://eunis.eea.europa.eu/countries/AZ>',
         predicate: '<http://eunis.eea.europa.eu/rdf/schema.rdf#population>',
         responseType: 'application/rdf+xml'
       };
-      expect(payload).toEqual(expectedPayload);
+      expect(payload.get()).toEqual(expectedPayload);
 
       const expectedResponse = '<?xml version="1.0" encoding="UTF-8"?><rdf:RDF xmlns="http://eunis.eea.europa.eu/rdf/schema.rdf#"><rdf:Description rdf:about="http://eunis.eea.europa.eu/countries/AZ"><population rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">7931000</population></rdf:Description></rdf:RDF>';
       return expect(repository.get(payload)).resolves.toEqual(expectedResponse);
@@ -199,7 +194,7 @@ describe('RDFRepositoryClient - reading statements', () => {
       }));
       const expected = '<?xml version="1.0" encoding="UTF-8"?><rdf:RDF xmlns="http://eunis.eea.europa.eu/rdf/schema.rdf#"><rdf:Description rdf:about="http://www.w3.org/1999/02/22-rdf-syntax-ns#type"><rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"/></rdf:Description><rdf:Description rdf:about="http://www.w3.org/2000/01/rdf-schema#subPropertyOf"><rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"/><rdf:type rdf:resource="http://www.w3.org/2002/07/owl#TransitiveProperty"/></rdf:Description><rdf:Description rdf:about="http://www.w3.org/2000/01/rdf-schema#subClassOf"><rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"/><rdf:type rdf:resource="http://www.w3.org/2002/07/owl#TransitiveProperty"/></rdf:Description><rdf:Description rdf:about="http://www.w3.org/2000/01/rdf-schema#domain"><rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"/></rdf:Description></rdf:RDF>';
 
-      const payload = new GetStatementsPayload().get();
+      const payload = new GetStatementsPayload();
       return expect(repository.get(payload)).resolves.toEqual(expected);
     });
   });
