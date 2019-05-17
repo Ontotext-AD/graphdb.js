@@ -33,6 +33,13 @@ class GetStatementsPayload extends StatementPayload {
   }
 
   /**
+   * @return {boolean} inference
+   */
+  getInference() {
+    return this.payload.inference;
+  }
+
+  /**
    * Sets responseType parameter.
    * @param {RDFMimeType} [responseType]
    * @return {GetStatementsPayload}
@@ -40,6 +47,13 @@ class GetStatementsPayload extends StatementPayload {
   setResponseType(responseType) {
     this.payload.responseType = responseType;
     return this;
+  }
+
+  /**
+   * @return {string} responseType
+   */
+  getResponseType() {
+    return this.payload.responseType;
   }
 }
 
