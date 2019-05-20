@@ -33,9 +33,7 @@
     "node": ">=8.16.0"
   },
   "scripts": {
-    "build": "rimraf lib/ && cross-env NODE_ENV=production webpack --mode production && npm run doc && npm run tsd",
-    "build:dev": "rimraf lib/ && cross-env NODE_ENV=development webpack --mode development",
-    "watch": "rimraf lib/ && cross-env NODE_ENV=development webpack --mode development --watch",
+    "build": "node scripts/build.js && npm run doc && npm run tsd",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:report": "rimraf report/ && jest --config jest-report.config.js",
