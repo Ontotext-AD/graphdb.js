@@ -1,11 +1,11 @@
-# graphdb-javascript-driver (RDF4J.js)
+# graphdb-javascript-driver (RDF4JS)
 
 A GraphDB data access library written in JavaScript to be used in Node.js and/or 
 web browser environment.  
 
 ## Installation
-Make sure you have Node.js version 8 or greater and Node Package Manager ([npm](https://npmjs.org/)) installed before start 
-working with the library.
+Make sure you have Node.js version 8 or greater and Node Package Manager 
+([npm](https://npmjs.org/)) installed before start working with the library.
 ```
 npm install --save rdf4js
 ```
@@ -13,7 +13,10 @@ npm install --save rdf4js
 ## Usage
 
 ### ServerClient
-The `ServerClient` deals with operations on server level like obtaining a list with available repositories, concrete repository or deleting repositories. In order to work with the `ServerClient` it should be configured first.
+The `ServerClient` deals with operations on server level like obtaining a list 
+with available repositories, concrete repository or deleting repositories. In 
+order to work with the `ServerClient` it should be configured `ServerClientConfig`
+first.
 
 * Configure `ServerClient`
 
@@ -53,7 +56,9 @@ server.deleteReposiotry('repository-name').then(() => {
 }).catch(err => console.log(err));
 ```
 
-* Although a repository instance can be created using a constructor which can be seen in the examples below a client could obtain an instance of `RDFRepositoryClient` through the server client
+* Although a repository instance can be created using a constructor which can be
+seen in the examples below a client could obtain an instance of `RDFRepositoryClient` 
+through the server client
 
 ```javascript
 server.getReposiotry('repository-name').then(repository => {
@@ -77,6 +82,7 @@ const repository = new RDFRepositoryClient(config);
 ```
 
 * Obtaining repository client instance through a ServerClient
+
 ```javascript
 const ServerClient = require('server/server-client');
 const ServerClientConfig = require('server/server-client-config');
@@ -94,6 +100,7 @@ return server.getRepository('automotive', repositoryClientConfig).then((rdfRepos
 ```
 
 #### Uploading data in repository (POST) using ReadStream
+
 ```javascript
 const contentType = RDFMimeType.TURTLE;
 const turtleFile = __dirname + '/statements.ttl';
@@ -103,6 +110,7 @@ fs.readFile(turtleFile, (err, stream) => {
 ```
 
 #### Overwrite data in repository (PUT) using ReadStream
+
 ```javascript
 const contentType = RDFMimeType.TURTLE;
 const file = __dirname + '/statements-overwrite.ttl';
@@ -112,6 +120,7 @@ fs.readFile(file, (err, stream) => {
 ```
 
 #### Download data from repository by consuming a WritableStream
+
 ```javascript
 const dest = __dirname + '/statements.ttl';
 const output = fs.createWriteStream(dest);
@@ -129,6 +138,7 @@ repository.download(payload).then((response) => {
 ```
 
 #### Executing a sparql update query
+
 ```javascript
 const payload = new UpdateQueryPayload()
   .setQuery('INSERT {?s ?p ?o} WHERE {?s ?p ?o}')
@@ -142,14 +152,9 @@ return repository.update(payload).then(() => {
 ```
 
 ## Setup Development
+
 ```
 npm install
-```
-
-### Dev build
-
-```
-npm run build:dev
 ```
 
 ### Production build
@@ -164,17 +169,18 @@ npm run build
 npm run test
 ```
 
+or constantly watching for changes in source files and tests and re-execute the 
+test suite
+
+```
+npm run test:watch
+```
+
 ### Run lint
 The library uses Google [style](https://google.github.io/styleguide/jsguide.html) in conjunction with ESLint's recommended ruleset.
 ```
 npm run lint
 ```
-
-### Supported browsers
-
-| [<img src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/edge/edge_48x48.png" alt="IE / Edge" width="24px" height="24px" />](http://godban.github.io/browsers-support-badges/) <br/>IE / Edge | [<img src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/firefox/firefox_48x48.png" alt="Firefox" width="24px" height="24px" />](http://godban.github.io/browsers-support-badges/)<br/>Firefox | [<img src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/chrome/chrome_48x48.png" alt="Chrome" width="24px" height="24px" />](http://godban.github.io/browsers-support-badges/)<br/>Chrome | [<img src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/safari/safari_48x48.png" alt="Safari" width="24px" height="24px" />](http://godban.github.io/browsers-support-badges/)<br/>Safari | 
-| -------------- | --------------- | --------------- | --------------- |
-| IE 10/11, Edge | last 2 versions | last 2 versions | last 2 versions |
 
 ### Prerequisites
 Node > 8
