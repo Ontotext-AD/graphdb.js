@@ -4,7 +4,7 @@ A GraphDB data access library written in JavaScript to be used in Node.js and/or
 web browser environment.  
 
 ## Installation
-Make sure you have Node.js and Node Package Manager ([npm](https://npmjs.org/)) installed before start 
+Make sure you have Node.js version 8 or greater and Node Package Manager ([npm](https://npmjs.org/)) installed before start 
 working with the library.
 ```
 npm install --save rdf4js
@@ -13,21 +13,53 @@ npm install --save rdf4js
 ## Usage
 
 ### ServerClient
+The `ServerClient` deals with operations on server level like obtaining a list with available repositories, concrete repository or deleting repositories. In order to work with the `ServerClient` it should be configured first.
 
-* Configure *ServerClient* and and fetch repository ids. 
+* Configure `ServerClient`
+
 ```javascript
-const ServerClient = require('rdf4js/src/server/server-client');
-const ServerClientConfig = require('rdf4js/src/server/server-client-config');
-const RDFMimeType = require('rdf4js/src/http/rdf-mime-type');
+const {ServerClient, ServerClientConfig} = require('rdf4js').server;
+const {RDFMimeType} = require('rdf4js').http;
 
 const serverConfig = new ServerClientConfig('http://rdf4j-compliant-server/', 0, {
     'Accept': RDFMimeType.SPARQL_RESULTS_JSON
 });
 const server = new ServerClient(serverConfig);
+```
+
+*  Fetch repository ids
+
+```javascript
 server.getRepositoryIDs().then(ids => {
     // work with ids
 }).catch(err => console.log(err));
 ```
+
+* Check if repository with given name exists
+
+```javascript
+server.hasRepository('repository-name').then(exists => {
+    if (exists) {
+        // reposiotry exists -> delete it for example
+    }
+}).catch(err => console.log(err));
+```
+
+* Delete repository with given name
+
+```javascript
+server.deleteReposiotry('repository-name').then(() => {
+    // successfully deleted
+}).catch(err => console.log(err));
+```
+
+* Although a repository instance can be created using a constructor which can be seen in the examples below a client could obtain an instance of `RDFRepositoryClient` through the server client
+
+```javascript
+server.getReposiotry('repository-name').then(repository => {
+    // repository is a configured RDFRepositoryClient instance
+}).catch(err => console.log(err));
+``` 
 
 ### RDFRepositoryClient
 
