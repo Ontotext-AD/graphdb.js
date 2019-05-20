@@ -1,10 +1,14 @@
 /**
  * Holds request configuration applicable to the http client.
+ *
  * @class
+ *
+ * @author Mihail Radkov
+ * @author Svilen Velikov
  */
 class HttpRequestConfigBuilder {
   /**
-   * Constructor.
+   * Does default initialization of the configuration.
    */
   constructor() {
     this.config = {};

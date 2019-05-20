@@ -1,9 +1,9 @@
-const BaseRepositoryClient = require('repository/base-repository-client');
-const RDFMimeType = require('http/rdf-mime-type');
-const TermConverter = require('model/term-converter');
-const StringUtils = require('util/string-utils');
-const FileUtils = require('util/file-utils');
-const HttpRequestConfigBuilder = require('http/http-request-config-builder');
+const BaseRepositoryClient = require('../repository/base-repository-client');
+const RDFMimeType = require('../http/rdf-mime-type');
+const TermConverter = require('../model/term-converter');
+const StringUtils = require('../util/string-utils');
+const FileUtils = require('../util/file-utils');
+const HttpRequestConfigBuilder = require('../http/http-request-config-builder');
 
 /**
  * Transactional RDF repository client implementation realizing transaction
@@ -17,6 +17,8 @@ const HttpRequestConfigBuilder = require('http/http-request-config-builder');
  * invoked. After that each sequential request will result in an error.
  *
  * @class
+ * @author Mihail Radkov
+ * @author Svilen Velikov
  */
 class TransactionalRepositoryClient extends BaseRepositoryClient {
   /**

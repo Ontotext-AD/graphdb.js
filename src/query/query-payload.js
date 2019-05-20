@@ -1,4 +1,4 @@
-const QueryContentType = require('http/query-content-type');
+const QueryContentType = require('../http/query-content-type');
 
 /**
  * Base class from which all query payload classes derives. Successors must
@@ -6,6 +6,8 @@ const QueryContentType = require('http/query-content-type');
  *
  * @abstract
  * @class
+ * @author Mihail Radkov
+ * @author Svilen Velikov
  */
 class QueryPayload {
   /**

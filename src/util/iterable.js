@@ -6,6 +6,7 @@
  *
  * @class
  * @author Mihail Radkov
+ * @author Svilen Velikov
  */
 class Iterable {
   /**

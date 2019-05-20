@@ -1,10 +1,13 @@
-const ContentTypeParser = require('parser/content-type-parser');
-const RDFMimeType = require('http/rdf-mime-type');
+const ContentTypeParser = require('../parser/content-type-parser');
+const RDFMimeType = require('../http/rdf-mime-type');
 const Parser = require('n3').Parser;
 
 /**
  * Parse TriG data to triple/quads
+ *
  * @class
+ * @author Mihail Radkov
+ * @author Svilen Velikov
  */
 class TriGParser extends ContentTypeParser {
   /**

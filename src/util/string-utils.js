@@ -1,7 +1,9 @@
 /**
  * Class with utility methods related to strings.
  *
+ * @class
  * @author Mihail Radkov
+ * @author Svilen Velikov
  */
 class StringUtils {
   /**

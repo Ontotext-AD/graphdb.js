@@ -2,6 +2,7 @@
  * Class for containing a namespace and it's associated prefix.
  *
  * @author Mihail Radkov
+ * @author Svilen Velikov
  */
 class Namespace {
   /**

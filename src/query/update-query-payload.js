@@ -1,5 +1,5 @@
-const QueryPayload = require('query/query-payload');
-const QueryContentType = require('http/query-content-type');
+const QueryPayload = require('../query/query-payload');
+const QueryContentType = require('../http/query-content-type');
 
 const UPDATE_QUERY_OPERATION_TYPES = [
   QueryContentType.X_WWW_FORM_URLENCODED,
@@ -17,6 +17,8 @@ const UPDATE_QUERY_OPERATION_TYPES = [
  * <code>application/sparql-update</code> type is set.
  *
  * @class
+ * @author Mihail Radkov
+ * @author Svilen Velikov
  */
 class UpdateQueryPayload extends QueryPayload {
   /**

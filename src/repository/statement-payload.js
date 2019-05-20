@@ -9,6 +9,8 @@
  *
  * @class
  * @abstract
+ * @author Mihail Radkov
+ * @author Svilen Velikov
  */
 class StatementPayload {
   /**

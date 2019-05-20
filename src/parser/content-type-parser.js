@@ -2,6 +2,8 @@
  * Abstract class defining the API for content type parsers.
  *
  * @class
+ * @author Mihail Radkov
+ * @author Svilen Velikov
  */
 class ContentTypeParser {
   /**

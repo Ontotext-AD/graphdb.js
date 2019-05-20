@@ -1,10 +1,11 @@
-const StatementPayload = require('repository/statement-payload');
+const StatementPayload = require('../repository/statement-payload');
 
 /**
  * Object builder used for constructing a statement addition payload.
  *
  * @class
  * @author Mihail Radkov
+ * @author Svilen Velikov
  */
 class AddStatementPayload extends StatementPayload {
   /**

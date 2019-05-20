@@ -1,15 +1,19 @@
-const HttpClient = require('http/http-client');
-const ConsoleLogger = require('logging/console-logger');
-const RDFRepositoryClient = require('repository/rdf-repository-client');
-const RepositoryClientConfig = require('repository/repository-client-config');
-const HttpRequestConfigBuilder = require('http/http-request-config-builder');
-const RDFMimeType = require('http/rdf-mime-type');
+const HttpClient = require('../http/http-client');
+const ConsoleLogger = require('../logging/console-logger');
+const RDFRepositoryClient = require('../repository/rdf-repository-client');
+const RepositoryClientConfig =
+  require('../repository/repository-client-config');
+const HttpRequestConfigBuilder = require('../http/http-request-config-builder');
+const RDFMimeType = require('../http/rdf-mime-type');
 
 const SERVICE_URL = '/repositories';
 
 /**
  * Implementation of the RDF server operations.
+ *
  * @class
+ * @author Mihail Radkov
+ * @author Svilen Velikov
  */
 class ServerClient {
   /**

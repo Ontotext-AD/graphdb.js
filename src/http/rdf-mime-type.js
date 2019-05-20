@@ -1,7 +1,10 @@
 /**
  * Supported RDF mime types.
+ *
  * @readonly
  * @enum {string}
+ * @author Mihail Radkov
+ * @author Svilen Velikov
  */
 const RDFMimeType = {
 

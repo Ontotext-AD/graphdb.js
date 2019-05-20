@@ -1,8 +1,12 @@
 const fs = require('fs');
-const StringUtils = require('util/string-utils');
+const StringUtils = require('../util/string-utils');
 
 /**
  * Utilities related to working with files and the file system.
+ *
+ * @class
+ * @author Mihail Radkov
+ * @author Svilen Velikov
  */
 class FileUtils {
   /**
