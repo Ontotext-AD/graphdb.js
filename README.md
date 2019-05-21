@@ -6,6 +6,7 @@ web browser environment.
 ## Installation
 Make sure you have Node.js version 8 or greater and Node Package Manager 
 ([npm](https://npmjs.org/)) installed before start working with the library.
+
 ```
 npm install --save rdf4js
 ```
@@ -68,8 +69,6 @@ server.getReposiotry('repository-name').then(repository => {
 
 ### RDFRepositoryClient
 
-#### Configuration and instantiating RDFRepositoryClient
-
 * Instantiating repository client
 
 ```javascript
@@ -99,27 +98,26 @@ return server.getRepository('automotive', repositoryClientConfig).then((rdfRepos
 });
 ```
 
-#### Uploading data in repository (POST) using ReadStream
+#### Reading
+Statements could be fetched using the `RDFRepositoryClient.get`.
+
+* Reading statements
 
 ```javascript
-const contentType = RDFMimeType.TURTLE;
-const turtleFile = __dirname + '/statements.ttl';
-fs.readFile(turtleFile, (err, stream) => {
-    repository.upload(stream, null, null, contentType).catch((e) => console.log(e));
+const payload = new GetStatementsPayload()
+	.setResponseType(RDFMimeType.RDF_JSON)
+	.setSubject('<http://eunis.eea.europa.eu/countries/AZ>')
+	.setPredicate('<http://eunis.eea.europa.eu/rdf/schema.rdf#population>')
+	.setObject('"7931000"^^http://www.w3.org/2001/XMLSchema#integer')
+	.setContext('<http://example.org/graph3>')
+	.setInference(true);
+
+return repository.get(payload).then((data) => {
+	
 });
 ```
 
-#### Overwrite data in repository (PUT) using ReadStream
-
-```javascript
-const contentType = RDFMimeType.TURTLE;
-const file = __dirname + '/statements-overwrite.ttl';
-fs.readFile(file, (err, stream) => {
-    repository.overwrite(stream, null, null, contentType).catch((e) => console.log(e));
-});
-```
-
-#### Download data from repository by consuming a WritableStream
+* Downloading data from repository by consuming a WritableStream
 
 ```javascript
 const dest = __dirname + '/statements.ttl';
@@ -137,7 +135,78 @@ repository.download(payload).then((response) => {
 });
 ```
 
-#### Executing a sparql update query
+#### Response Parsers
+Response might be converted to respective format if a response parser is registered 
+for the configured in the payload `responseType`.
+
+The library provides a way parsers to be implemented and registered with given
+repository instance which in turn will use them to convert the response before
+returning it to the client.
+
+A parser could be implemented by extending the `ContentTypeParser` and implementing
+the `parse` and `getSupportedType` methods.
+
+```javascript
+class RdfAsJsonParser extends ContentTypeParser {
+  getSupportedType() {
+    return 'application/rdf+json';
+  }
+
+  parse(content) {
+    // parse and return the content
+    return parsedContent;
+  }
+}
+```
+
+The `getSupportedType` method must return one of the supported RDF and SPARQL
+MIME types this way defining that the parser is responsible for converting from
+that type. 
+
+Parsers should be registered in the repository before executing any request.
+
+```javascript
+// Import any of the predefined parsers
+const {NTriplesParser} = require('rdf4js').parser;
+// And register it in the repository
+repository.registerParser(new NTriplesParser());
+```
+
+Multiple parsers could be registered for different response types. Registering
+second parser for same type results in overriding the previously registerted 
+parser.
+
+The library provides parsers for some rdf formats using a thrid party library
+[N3](https://github.com/rdfjs/N3.js).
+* TurtleParser: `text/turtle`
+* N3parser: `text/rdf+n3`
+* NQuadsParser: `text/x-nquads`
+* NTriplesParser: `text/plain` (`N-Triples`)
+* TrigParser: `application/x-trig`
+
+#### Writing
+
+* Uploading data in repository (POST) using ReadStream
+
+```javascript
+const contentType = RDFMimeType.TURTLE;
+const turtleFile = __dirname + '/statements.ttl';
+fs.readFile(turtleFile, (err, stream) => {
+    repository.upload(stream, null, null, contentType).catch((e) => console.log(e));
+});
+```
+
+* Overwriting data in repository (PUT) using ReadStream
+
+```javascript
+const contentType = RDFMimeType.TURTLE;
+const file = __dirname + '/statements-overwrite.ttl';
+fs.readFile(file, (err, stream) => {
+    repository.overwrite(stream, null, null, contentType).catch((e) => console.log(e));
+});
+```
+
+* Executing a sparql update query
 
 ```javascript
 const payload = new UpdateQueryPayload()
@@ -151,19 +220,43 @@ return repository.update(payload).then(() => {
 });
 ```
 
-## Setup Development
+#### Deleting
+* Delete statement from given context
+
+```javascript
+repository.deleteStatements(subj, pred, obj, contexts).then(() => {
+
+});
+```
+
+### Transactions
+Repository operations can be executed in transaction. In order to work with transactions
+the `TransactionalRepositoryClient` must be used.
+
+`TODO`
+#### Reading
+#### Writing
+#### Deleting
+
+### Namespaces
+`TODO`
+
+## Development
+
+### Setup Environment
+
+* Checkout or clone the project.
+* Make sure prerequisites are covered: node js and npm must be present and versions
+should be supported.
+* Enter the project directory and execute
 
 ```
 npm install
 ```
 
-### Production build
-
-```
-npm run build
-```
-
 ### Run tests
+After any change the tests should be run and check if any existing functionality
+is not broken in result.
 
 ```
 npm run test
@@ -176,14 +269,45 @@ test suite
 npm run test:watch
 ```
 
+The best and preferred way a new feature or changes to be introduced is a test
+case to be written first and then the change to be implemented following the TDD
+approach.
+
 ### Run lint
-The library uses Google [style](https://google.github.io/styleguide/jsguide.html) in conjunction with ESLint's recommended ruleset.
+The library uses Google [style](https://google.github.io/styleguide/jsguide.html) 
+in conjunction with ESLint's recommended ruleset.
+
 ```
 npm run lint
 ```
 
+### Production build
+The library is written in ES2016. During the build process source files `src/`
+are transpiled to ES2015 and copied to `lib/` directory.
+
+A typescript definition file `types.d.ts` is generated in the `lib/` as well.
+
+Documentation is generated in `docs/` from the JSDoc annotations in the source
+code.
+
+```
+npm run build
+```
+
+### Testing the packaging
+Library is managed by NPM package manager. During publishing npm consults the 
+`.gitignore`, `.npmignore` and `package.json#files` property in order to decide 
+which resources should be published. If any change in the project structure, 
+`.gitignore` or `.npmignore` is made, then publishing must be verified in order
+to be guaranteed that needed sources will be properly published.
+The packaging could be verified using the `npm package` command which generates 
+a `*.tgz` archive in the project root. The archive should contain only the needed
+resources.
+Furture the archive could be used as a source for `npm install` where the path
+pointing the archive is provided.
+
 ### Prerequisites
-Node > 8
+Node >= 8.16
 
 ### License
 [LICENSE](LICENSE)
