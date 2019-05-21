@@ -237,7 +237,7 @@ class TransactionalRepositoryClient extends BaseRepositoryClient {
    * @return {Promise<void>} that will be resolved after successful rollback
    */
   rollback() {
-    return this.execute((http) => http.deleteResource('', null)).finally(() => {
+    return this.execute((http) => http.deleteResource('')).finally(() => {
       this.active = false;
     });
   }
