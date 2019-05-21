@@ -116,7 +116,7 @@ describe('RDFRepositoryClient - transactions', () => {
         return transactionalClient.rollback();
       }).then(() => {
         expect(transactionalClient.httpClients[0].deleteResource).toHaveBeenCalledTimes(1);
-        expect(transactionalClient.httpClients[0].deleteResource).toHaveBeenCalledWith('', null);
+        expect(transactionalClient.httpClients[0].deleteResource).toHaveBeenCalledWith('');
         expect(transactionalClient.isActive()).toEqual(false);
       });
     });
