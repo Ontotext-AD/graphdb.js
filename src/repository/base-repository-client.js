@@ -65,7 +65,7 @@ class BaseRepositoryClient {
     const config = this.repositoryClientConfig;
     // Constructs a http client for each endpoint
     this.httpClients = config.endpoints.map((endpoint) => {
-      return new HttpClient(endpoint, config.readTimeout, config.writeTimeout)
+      return new HttpClient(endpoint)
         .setDefaultHeaders(config.headers)
         .setDefaultReadTimeout(config.readTimeout)
         .setDefaultWriteTimeout(config.writeTimeout);

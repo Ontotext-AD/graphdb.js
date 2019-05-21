@@ -95,7 +95,7 @@ class ServerClient {
    * Initializes the http client.
    */
   initHttpClient() {
-    this.httpClient = new HttpClient(this.config.endpoint, this.config.timeout);
+    this.httpClient = new HttpClient(this.config.endpoint);
   }
 
   /**
