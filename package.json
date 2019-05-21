@@ -1,9 +1,37 @@
 {
   "name": "rdf4js",
   "version": "1.0.0",
-  "description": "rdf4js lib",
-  "main": "lib/rdf4js.js",
-  "module": "src/index.js",
+  "description": "Javascript client library supporting the RDF4J REST API.",
+  "author": "",
+  "contributors": [],
+  "homepage": "",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "",
+    "url": ""
+  },
+  "bugs": {
+    "url": ""
+  },
+  "keywords": [
+    "rdf4j",
+    "rdfjs",
+    "graphdb",
+    "javascript",
+    "rdf4j api",
+    "rest"
+  ],
+  "main": "lib/index.js",
+  "module": "lib/index.js",
+  "typings": "lib/index.d.ts",
+  "files": [
+    "lib/",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=8.16.0"
+  },
   "scripts": {
     "build": "rimraf lib/ && cross-env NODE_ENV=production webpack --mode production && npm run doc && npm run tsd",
     "build:dev": "rimraf lib/ && cross-env NODE_ENV=development webpack --mode development",
@@ -21,8 +49,6 @@
       "pre-push": "npm run lint"
     }
   },
-  "author": "",
-  "license": "ISC",
   "devDependencies": {
     "@babel/core": "^7.4.3",
     "@babel/preset-env": "^7.4.3",
