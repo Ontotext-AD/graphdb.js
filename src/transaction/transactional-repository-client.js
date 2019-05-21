@@ -224,8 +224,11 @@ class TransactionalRepositoryClient extends BaseRepositoryClient {
       .get();
 
     return this.execute((http) => http.put('', null, requestConfig))
-      .finally(() => {
+      .then(() => {
         this.active = false;
+      }).catch((err) => {
+        this.active = false;
+        return Promise.reject(err);
       });
   }
 
@@ -237,8 +240,11 @@ class TransactionalRepositoryClient extends BaseRepositoryClient {
    * @return {Promise<void>} that will be resolved after successful rollback
    */
   rollback() {
-    return this.execute((http) => http.deleteResource('')).finally(() => {
+    return this.execute((http) => http.deleteResource('')).then(() => {
       this.active = false;
+    }).catch((err) => {
+      this.active = false;
+      return Promise.reject(err);
     });
   }
 
