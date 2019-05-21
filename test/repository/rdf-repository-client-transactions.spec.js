@@ -139,12 +139,60 @@ describe('RDFRepositoryClient - transactions', () => {
       });
     });
 
+    test('should reject if the transactional client cannot commit in case of server error', () => {
+      const err = new Error('cannot commit');
+      let transactionalClient;
+      return rdfRepositoryClient.beginTransaction().then(client => {
+        transactionalClient = client;
+        transactionalClient.httpClients[0].put.mockRejectedValue(err);
+        return expect(transactionalClient.commit()).rejects.toEqual(err);
+      });
+    });
+
+    test('should disallow using inactive transaction after commit failure', () => {
+      const err = new Error('cannot commit');
+      let transactionalClient;
+      return rdfRepositoryClient.beginTransaction().then(client => {
+        transactionalClient = client;
+        transactionalClient.httpClients[0].put.mockRejectedValue(err);
+        return transactionalClient.commit();
+      }).catch(() => {
+        expect(() => transactionalClient.getSize()).toThrow();
+        expect(() => transactionalClient.commit()).toThrow();
+        expect(() => transactionalClient.rollback()).toThrow();
+      });
+    });
+
     test('should disallow using inactive transaction after rollback', () => {
       let transactionalClient;
       return rdfRepositoryClient.beginTransaction().then(client => {
         transactionalClient = client;
         return transactionalClient.rollback();
       }).then(() => {
+        expect(() => transactionalClient.getSize()).toThrow();
+        expect(() => transactionalClient.commit()).toThrow();
+        expect(() => transactionalClient.rollback()).toThrow();
+      });
+    });
+
+    test('should reject if the transactional client cannot rollback in case of server error', () => {
+      const err = new Error('cannot rollback');
+      let transactionalClient;
+      return rdfRepositoryClient.beginTransaction().then(client => {
+        transactionalClient = client;
+        transactionalClient.httpClients[0].deleteResource.mockRejectedValue(err);
+        return expect(transactionalClient.rollback()).rejects.toEqual(err);
+      });
+    });
+
+    test('should disallow using inactive transaction after rollback failure', () => {
+      const err = new Error('cannot rollback');
+      let transactionalClient;
+      return rdfRepositoryClient.beginTransaction().then(client => {
+        transactionalClient = client;
+        transactionalClient.httpClients[0].deleteResource.mockRejectedValue(err);
+        return transactionalClient.rollback();
+      }).catch(() => {
         expect(() => transactionalClient.getSize()).toThrow();
         expect(() => transactionalClient.commit()).toThrow();
         expect(() => transactionalClient.rollback()).toThrow();
