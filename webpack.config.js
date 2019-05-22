@@ -7,7 +7,7 @@ const DIST_PATH = path.resolve(__dirname, 'lib');
 
 const config = {
   entry: {
-    main: './src/index.js',
+    main: './index.js',
   },
   node: {
     process: false

@@ -2,6 +2,7 @@ node_modules
 lib
 npm-debug.log
 *.iml
+*.tgz
 .DS_Store
 .DS_Store?
 .docs
