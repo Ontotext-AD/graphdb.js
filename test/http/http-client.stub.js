@@ -10,7 +10,8 @@ function stub(baseUrl) {
     get: jest.fn().mockResolvedValue({}),
     post: jest.fn().mockResolvedValue({}),
     put: jest.fn().mockResolvedValue({}),
-    deleteResource: jest.fn().mockResolvedValue({})
+    deleteResource: jest.fn().mockResolvedValue({}),
+    getBaseURL: () => baseUrl
   };
 }
 

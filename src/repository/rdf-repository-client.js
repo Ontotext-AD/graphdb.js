@@ -1,4 +1,5 @@
 const BaseRepositoryClient = require('../repository/base-repository-client');
+const ConsoleLogger = require('../logging/console-logger');
 const RDFMimeType = require('../http/rdf-mime-type');
 const Namespace = require('../model/namespace');
 const StringUtils = require('../util/string-utils');
@@ -42,6 +43,15 @@ class RDFRepositoryClient extends BaseRepositoryClient {
   }
 
   /**
+   * @inheritDoc
+   */
+  getLogger() {
+    return new ConsoleLogger({
+      name: 'RDFRepositoryClient'
+    });
+  }
+
+  /**
    * Retrieves the size of the repository.
    *
    * Effectively returns how much statements are in the repository.
@@ -61,7 +71,12 @@ class RDFRepositoryClient extends BaseRepositoryClient {
       })
       .get();
 
-    return this.execute((http) => http.get('/size', requestConfig));
+    return this.execute((http) => http.get('/size', requestConfig))
+      .then((response) => {
+        this.logger.debug(this.getLogPayload(response, {context}),
+          'Fetched size');
+        return response.getData();
+      });
   }
 
   /**
@@ -76,7 +91,10 @@ class RDFRepositoryClient extends BaseRepositoryClient {
       .get();
 
     return this.execute((http) => http.get(PATH_NAMESPACES, requestConfig))
-      .then((data) => this.mapNamespaceResponse(data));
+      .then((response) => {
+        this.logger.debug(this.getLogPayload(response), 'Fetched namespaces');
+        return this.mapNamespaceResponse(response.getData());
+      });
   }
 
   /**
@@ -113,7 +131,11 @@ class RDFRepositoryClient extends BaseRepositoryClient {
     }
 
     return this.execute((http) => http.get(`${PATH_NAMESPACES}/${prefix}`))
-      .then((data) => DataFactory.namedNode(data));
+      .then((response) => {
+        this.logger.debug(this.getLogPayload(response, {prefix}),
+          'Fetched namespace');
+        return DataFactory.namedNode(response.getData());
+      });
   }
 
   /**
@@ -140,7 +162,10 @@ class RDFRepositoryClient extends BaseRepositoryClient {
     }
 
     return this.execute((http) => http.put(`${PATH_NAMESPACES}/${prefix}`,
-      payload));
+      payload)).then((response) => {
+      this.logger.debug(this.getLogPayload(response, {prefix, namespace}),
+        'Saved namespace');
+    });
   }
 
   /**
@@ -162,7 +187,10 @@ class RDFRepositoryClient extends BaseRepositoryClient {
     }
 
     return this.execute((http) =>
-      http.deleteResource(`${PATH_NAMESPACES}/${prefix}`));
+      http.deleteResource(`${PATH_NAMESPACES}/${prefix}`)).then((response) => {
+      this.logger.debug(this.getLogPayload(response, {prefix}),
+        'Deleted namespace');
+    });
   }
 
   /**
@@ -172,7 +200,11 @@ class RDFRepositoryClient extends BaseRepositoryClient {
    * successful deletion
    */
   deleteNamespaces() {
-    return this.execute((http) => http.deleteResource(PATH_NAMESPACES));
+    return this.execute((http) => http.deleteResource(PATH_NAMESPACES))
+      .then((response) => {
+        this.logger.debug(this.getLogPayload(response),
+          'Deleted all namespaces');
+      });
   }
 
   /**
@@ -199,7 +231,15 @@ class RDFRepositoryClient extends BaseRepositoryClient {
       .get();
 
     return this.execute((http) => http.get(PATH_STATEMENTS, requestConfig))
-      .then((data) => this.parse(data, payload.getResponseType()));
+      .then((response) => {
+        this.logger.debug(this.getLogPayload(response, {
+          subject: payload.getSubject(),
+          predicate: payload.getPredicate(),
+          object: payload.getObject(),
+          context: payload.getContext()
+        }), 'Fetched data');
+        return this.parse(response.getData(), payload.getResponseType());
+      });
   }
 
   /**
@@ -221,7 +261,13 @@ class RDFRepositoryClient extends BaseRepositoryClient {
       .get();
 
     return this.execute((http) => http.post('', payload.getParams(),
-      requestConfig));
+      requestConfig)).then((response) => {
+      this.logger.debug(this.getLogPayload(response, {
+        query: payload.getQuery(),
+        queryType: payload.getQueryType()
+      }), 'Queried data');
+      return response.getData();
+    });
   }
 
   /**
@@ -247,7 +293,10 @@ class RDFRepositoryClient extends BaseRepositoryClient {
       .get();
 
     return this.execute((http) => http.post(PATH_STATEMENTS,
-      payload.getParams(), requestConfig));
+      payload.getParams(), requestConfig)).then((response) => {
+      this.logger.debug(this.getLogPayload(response,
+        {query: payload.getQuery()}), 'Performed update');
+    });
   }
 
   /**
@@ -312,7 +361,10 @@ class RDFRepositoryClient extends BaseRepositoryClient {
    */
   addQuads(quads, context, baseURI) {
     return TermConverter.toString(quads).then((data) => this.sendData(data,
-      context, baseURI, false));
+      context, baseURI, false)).then((response) => {
+      this.logger.debug(this.getLogPayload(response, {quads, context, baseURI}),
+        'Inserted statements');
+    });
   }
 
   /**
@@ -332,8 +384,15 @@ class RDFRepositoryClient extends BaseRepositoryClient {
    * successful or rejected in case of failure
    */
   putQuads(quads, context, baseURI) {
-    return TermConverter.toString(quads).then((data) => this.sendData(data,
-      context, baseURI, true));
+    return TermConverter.toString(quads)
+      .then((data) => this.sendData(data, context, baseURI, true))
+      .then((response) => {
+        this.logger.debug(this.getLogPayload(response, {
+          quads,
+          context,
+          baseURI
+        }), 'Overwritten statements');
+      });
   }
 
   /**
@@ -346,8 +405,8 @@ class RDFRepositoryClient extends BaseRepositoryClient {
    * @param {string} [baseURI] used to resolve relative URIs in the data
    * @param {boolean} overwrite defines if the data should overwrite the repo
    * data or not
-   * @return {Promise<void>} promise resolving after the data has been inserted
-   * successfully
+   * @return {Promise<HttpResponse|Error>} promise resolving after the data has
+   * been inserted successfully or an error if not
    */
   sendData(data, context, baseURI, overwrite) {
     if (StringUtils.isBlank(data)) {
@@ -400,7 +459,14 @@ class RDFRepositoryClient extends BaseRepositoryClient {
       .get();
 
     return this.execute((http) => http.deleteResource(PATH_STATEMENTS,
-      requestConfig));
+      requestConfig)).then((response) => {
+      this.logger.debug(this.getLogPayload(response, {
+        subject,
+        predicate,
+        object,
+        contexts
+      }), 'Deleted statements');
+    });
   }
 
   /**
@@ -410,7 +476,11 @@ class RDFRepositoryClient extends BaseRepositoryClient {
    *                   successful or rejected in case of failure
    */
   deleteAllStatements() {
-    return this.execute((http) => http.deleteResource(PATH_STATEMENTS));
+    return this.execute((http) => http.deleteResource(PATH_STATEMENTS))
+      .then((response) => {
+        this.logger.debug(this.getLogPayload(response),
+          'Deleted all statements');
+      });
   }
 
   /**
@@ -441,7 +511,12 @@ class RDFRepositoryClient extends BaseRepositoryClient {
       })
       .get();
 
-    return this.execute((http) => http.get('/statements', requestConfig));
+    return this.execute((http) => http.get('/statements', requestConfig))
+      .then((response) => {
+        this.logger.debug(this.getLogPayload(response, {params}),
+          'Downloaded data');
+        return response.getData();
+      });
   }
 
   /**
@@ -462,6 +537,114 @@ class RDFRepositoryClient extends BaseRepositoryClient {
    * been successfully consumed by the server
    */
   upload(readStream, context, baseURI, contentType) {
+    return this.uploadData(readStream, context, baseURI, contentType)
+      .then((response) => {
+        this.logger.debug(this.getLogPayload(response, {
+          context,
+          baseURI,
+          contentType
+        }), 'Uploaded data stream');
+      });
+  }
+
+  /**
+   * Executes a PUT request against the <code>/statements</code> endpoint. The
+   * statements which have to be updated are provided through a readable stream.
+   * This method is useful for overriding large set of statements that might be
+   * provided as a readable stream e.g. reading from file.
+   *
+   * @param {ReadableStream} readStream
+   * @param {NamedNode|string} context restrict the operation. Will be encoded
+   * as N-Triple if it is not already one
+   * @param {string} [baseURI] optional uri against which any relative URIs
+   * found in the data would be resolved.
+   * @param {string} contentType
+   * @return {Promise<void>} a promise that will be resolved when the stream has
+   * been successfully consumed by the server
+   */
+  overwrite(readStream, context, baseURI, contentType) {
+    return this.overwriteData(readStream, context, baseURI, contentType)
+      .then((response) => {
+        this.logger.debug(this.getLogPayload(response, {
+          context,
+          baseURI,
+          contentType
+        }), 'Overwritten data stream');
+      });
+  }
+
+  /**
+   * Uploads the file specified by the provided file path to the server.
+   *
+   * See {@link #upload}
+   *
+   * @param {string} filePath path to a file to be streamed to the server
+   * @param {string|string[]} [context] restricts the operation to the given
+   * context. Will be encoded as N-Triple if it is not already one
+   * @param {string} [baseURI] used to resolve relative URIs in the data
+   * @param {string} contentType MIME type of the file's content
+   * @return {Promise<void>} a promise that will be resolved when the file has
+   * been successfully consumed by the server
+   */
+  addFile(filePath, context, baseURI, contentType) {
+    return this.uploadData(FileUtils.getReadStream(filePath), context, baseURI,
+      contentType).then((response) => {
+      this.logger.debug(this.getLogPayload(response, {
+        filePath,
+        context,
+        baseURI,
+        contentType
+      }), 'Uploaded file');
+    });
+  }
+
+  /**
+   * Uploads the file specified by the provided file path to the server
+   * overwriting any data in the server's repository.
+   *
+   * The overwrite will be restricted if the context parameter is specified.
+   *
+   * See {@link #overwrite}
+   *
+   * @param {string} filePath path to a file to be streamed to the server
+   * @param {string} [context] restricts the operation to the given context.
+   * Will be encoded as N-Triple if it is not already one
+   * @param {string} [baseURI] used to resolve relative URIs in the data
+   * @param {string} contentType MIME type of the file's content
+   * @return {Promise<void>} a promise that will be resolved when the file has
+   * been successfully consumed by the server
+   */
+  putFile(filePath, context, baseURI, contentType) {
+    return this.overwriteData(FileUtils.getReadStream(filePath), context,
+      baseURI, contentType).then((response) => {
+      this.logger.debug(this.getLogPayload(response, {
+        filePath,
+        context,
+        baseURI,
+        contentType
+      }), 'Overwritten data from file');
+    });
+  }
+
+  /**
+   * Executes a POST request against the <code>/statements</code> endpoint. The
+   * statements which have to be added are provided through a readable stream.
+   * This method is useful for library client who wants to upload a big data set
+   * into the repository.
+   *
+   * @private
+   * @param {ReadableStream} readStream
+   * @param {NamedNode|string} [context] optional context to restrict the
+   * operation. Will be encoded as N-Triple if it is not already one
+   * @param {string} [baseURI] optional uri against which any relative URIs
+   * found in the data would be resolved.
+   * @param {string} contentType is one of RDF mime type formats,
+   *                application/x-rdftransaction' for a transaction document or
+   *                application/x-www-form-urlencoded
+   * @return {Promise<HttpResponse|Error>} a promise that will be resolved when
+   * the stream has been successfully consumed by the server
+   */
+  uploadData(readStream, context, baseURI, contentType) {
     const requestConfig = new HttpRequestConfigBuilder()
       .addContentTypeHeader(contentType)
       .setResponseType('stream')
@@ -487,10 +670,10 @@ class RDFRepositoryClient extends BaseRepositoryClient {
    * @param {string} [baseURI] optional uri against which any relative URIs
    * found in the data would be resolved.
    * @param {string} contentType
-   * @return {Promise<void>} a promise that will be resolved when the stream has
-   * been successfully consumed by the server
+   * @return {Promise<HttpResponse|Error>} a promise that will be resolved when
+   * the stream has been successfully consumed by the server
    */
-  overwrite(readStream, context, baseURI, contentType) {
+  overwriteData(readStream, context, baseURI, contentType) {
     const requestConfig = new HttpRequestConfigBuilder()
       .addContentTypeHeader(contentType)
       .setResponseType('stream')
@@ -502,45 +685,6 @@ class RDFRepositoryClient extends BaseRepositoryClient {
 
     return this.execute((http) => http.put(PATH_STATEMENTS, readStream,
       requestConfig));
-  }
-
-  /**
-   * Uploads the file specified by the provided file path to the server.
-   *
-   * See {@link #upload}
-   *
-   * @param {string} filePath path to a file to be streamed to the server
-   * @param {string|string[]} [context] restricts the operation to the given
-   * context. Will be encoded as N-Triple if it is not already one
-   * @param {string} [baseURI] used to resolve relative URIs in the data
-   * @param {string} contentType MIME type of the file's content
-   * @return {Promise<void>} a promise that will be resolved when the file has
-   * been successfully consumed by the server
-   */
-  addFile(filePath, context, baseURI, contentType) {
-    return this.upload(FileUtils.getReadStream(filePath), context, baseURI,
-      contentType);
-  }
-
-  /**
-   * Uploads the file specified by the provided file path to the server
-   * overwriting any data in the server's repository.
-   *
-   * The overwrite will be restricted if the context parameter is specified.
-   *
-   * See {@link #overwrite}
-   *
-   * @param {string} filePath path to a file to be streamed to the server
-   * @param {string} [context] restricts the operation to the given context.
-   * Will be encoded as N-Triple if it is not already one
-   * @param {string} [baseURI] used to resolve relative URIs in the data
-   * @param {string} contentType MIME type of the file's content
-   * @return {Promise<void>} a promise that will be resolved when the file has
-   * been successfully consumed by the server
-   */
-  putFile(filePath, context, baseURI, contentType) {
-    return this.overwrite(FileUtils.getReadStream(filePath), context, baseURI,
-      contentType);
   }
 
   /**
@@ -558,18 +702,24 @@ class RDFRepositoryClient extends BaseRepositoryClient {
    * @return {Promise<TransactionalRepositoryClient>} transactional client
    */
   beginTransaction(isolationLevel) {
-    const responseMapper = (response) => response;
     return this.execute((http) => http.post('/transactions', {
       params: {
         'isolation-level': isolationLevel
       }
-    }), responseMapper).then((response) => {
-      const locationUrl = response.headers['location'];
+    })).then((response) => {
+      const locationUrl = response.getHeaders()['location'];
       if (StringUtils.isBlank(locationUrl)) {
+        this.logger.error(this.getLogPayload(response, {isolationLevel}),
+          'Cannot obtain transaction ID');
         return Promise.reject(new Error('Couldn\'t obtain transaction ID'));
       }
+
       const config = this.getTransactionalClientConfig(locationUrl);
-      return new TransactionalRepositoryClient(config);
+      const transactionClient = new TransactionalRepositoryClient(config);
+
+      this.logger.debug(this.getLogPayload(response, {isolationLevel}),
+        'Started transaction');
+      return transactionClient;
     });
   }
 

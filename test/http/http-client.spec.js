@@ -24,14 +24,16 @@ describe('HttpClient', () => {
 
     // Stub axios.create to return a mock of axios
     axiosMock = jest.genMockFromModule('axios');
-    axios.create.mockReturnValue(axiosMock);
+    axios.create.mockImplementation((defaults) => {
+      axiosMock.defaults = defaults;
+      return axiosMock;
+    });
 
     // Stub methods to return promises
     axiosMock.get.mockResolvedValue();
     axiosMock.post.mockResolvedValue();
     axiosMock.put.mockResolvedValue();
     axiosMock.delete.mockResolvedValue();
-    axiosMock.defaults = {};
 
     requestConfig = {
       params: {
@@ -79,6 +81,10 @@ describe('HttpClient', () => {
       'param-3': undefined,
       'param-4': null
     })).toEqual('param-1=a&param-2=b&param-2=c&param-2=d&param-2=null');
+  });
+
+  test('should expose its base URL', () => {
+    expect(httpClient.getBaseURL()).toEqual('/base/url');
   });
 
   describe('GET', () => {

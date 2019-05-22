@@ -31,10 +31,14 @@ class ServerClient {
    * @return {Promise} promise which resolves with an Array with repository ids.
    */
   getRepositoryIDs() {
-    return this.httpClient.get(SERVICE_URL, new HttpRequestConfigBuilder()
+    const requestConfig = new HttpRequestConfigBuilder()
       .addAcceptHeader(RDFMimeType.SPARQL_RESULTS_JSON)
-      .get()
-    ).then((response) => {
+      .get();
+
+    let elapsedTime = Date.now();
+    return this.httpClient.get(SERVICE_URL, requestConfig).then((response) => {
+      elapsedTime = Date.now() - elapsedTime;
+      this.logger.debug({elapsedTime}, 'Retrieved repository IDs');
       return response.data.results.bindings.map(({id}) => id.value);
     });
   }
@@ -46,7 +50,7 @@ class ServerClient {
    */
   hasRepository(id) {
     if (!id) {
-      return Promise.reject(new Error('Repository id is required parameter!'));
+      throw new Error('Repository id is required parameter!');
     }
     return this.getRepositoryIDs().then((repositoryIds) => {
       return repositoryIds.indexOf(id) !== -1;
@@ -64,16 +68,16 @@ class ServerClient {
    */
   getRepository(id, config) {
     if (!id) {
-      return Promise.reject(new Error('Repository id is required parameter!'));
+      throw new Error('Repository id is required parameter!');
     }
     if (!config || !(config instanceof RepositoryClientConfig)) {
-      return Promise
-        .reject(new Error('RepositoryClientConfig is required parameter!'));
+      throw new Error('RepositoryClientConfig is required parameter!');
     }
     return this.hasRepository(id).then((exists) => {
       if (exists) {
         return new RDFRepositoryClient(config);
       }
+      this.logger.error({repoId: id}, 'Repository does not exist');
       return Promise
         .reject(new Error(`Repository with id ${id} does not exists.`));
     });
@@ -86,9 +90,15 @@ class ServerClient {
    */
   deleteRepository(id) {
     if (!id) {
-      return Promise.reject(new Error('Repository id is required parameter!'));
+      throw new Error('Repository id is required parameter!');
     }
-    return this.httpClient.deleteResource(`${SERVICE_URL}/${id}`);
+
+    let elapsedTime = Date.now();
+    return this.httpClient.deleteResource(`${SERVICE_URL}/${id}`)
+      .then(() => {
+        elapsedTime = Date.now() - elapsedTime;
+        this.logger.info({repoId: id, elapsedTime}, 'Deleted repository');
+      });
   }
 
   /**
@@ -102,7 +112,10 @@ class ServerClient {
    * Initializes the logger.
    */
   initLogger() {
-    this.logger = new ConsoleLogger();
+    this.logger = new ConsoleLogger({
+      name: 'ServerClient',
+      serverURL: this.config.endpoint
+    });
   }
 }
 

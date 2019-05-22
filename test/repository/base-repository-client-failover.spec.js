@@ -123,23 +123,6 @@ describe('BaseRepositoryClient', () => {
         expect(httpClient3.get).toHaveBeenCalledTimes(0);
       });
     });
-
-    test('should propagate response mapper between retries', () => {
-      let httpClient1 = repositoryClient.httpClients[0];
-      stubHttpClientWithoutResponse(httpClient1);
-
-      let httpClient2 = repositoryClient.httpClients[1];
-      stubHttpClientWithoutResponse(httpClient2);
-
-      // Should manage to get response from the 3rd endpoint
-      let httpClient3 = repositoryClient.httpClients[2];
-      stubHttpClient(httpClient3, 200);
-
-      let responseMapper = response => response.status;
-      return repositoryClient.execute((client) => client.get('url'), responseMapper).then((status) => {
-        expect(status).toEqual(200);
-      });
-    });
   });
 
   function stubHttpClient(client, status) {

@@ -4,6 +4,7 @@ const HttpClient = require('../http/http-client');
 const RepositoryClientConfig =
   require('../repository/repository-client-config');
 const Iterable = require('../util/iterable');
+const HttpResponse = require('../http/http-response');
 
 /**
  * Set of HTTP status codes for which requests could be re-attempted.
@@ -54,7 +55,16 @@ class BaseRepositoryClient {
    * @private
    */
   initLogger() {
-    this.logger = new ConsoleLogger();
+    this.logger = this.getLogger();
+  }
+
+  /**
+   * Gets a logger instance.
+   *
+   * @return {Logger} the logger instance
+   */
+  getLogger() {
+    return new ConsoleLogger();
   }
 
   /**
@@ -98,7 +108,13 @@ class BaseRepositoryClient {
       return content;
     }
     const parser = this.parserRegistry.get(responseType);
-    return parser.parse(content);
+
+    const startTime = Date.now();
+    const parsed = parser.parse(content);
+    const elapsedTime = Date.now() - startTime;
+
+    this.logger.debug({elapsedTime, responseType}, 'Parsed content');
+    return parsed;
   }
 
   /**
@@ -112,22 +128,21 @@ class BaseRepositoryClient {
    * If all of the endpoints are unsuccessful then the execution will fail
    * with promise rejection.
    *
-   * By default, when the request is successful, it automatically resolves the
-   * response data object. To override it use the <code>responseMapper</code>
-   * parameter.
-   *
    * @protected
    * @param {Function} httpClientConsumer the consumer of supplied http client
    *                                      that performs the request execution
-   * @param {Function} [responseMapper] a mapper for the response object
-   * @return {Promise<any>} a promise which resolves to http request response or
-   * rejects with error if thrown during execution.
+   * @return {Promise<HttpResponse|Error>} a promise which resolves to response
+   * wrapper or rejects with error if thrown during execution.
    */
-  execute(httpClientConsumer, responseMapper) {
+  execute(httpClientConsumer) {
     try {
+      const startTime = Date.now();
       const httpClients = new Iterable(this.httpClients);
-      return this.retryExecution(httpClients, httpClientConsumer,
-        responseMapper);
+      return this.retryExecution(httpClients, httpClientConsumer)
+        .then((executionResponse) => {
+          executionResponse.setElapsedTime(Date.now() - startTime);
+          return executionResponse;
+        });
     } catch (err) {
       return Promise.reject(err);
     }
@@ -141,25 +156,56 @@ class BaseRepositoryClient {
    * @param {Iterable} httpClients iterable collection of http clients
    * @param {Function} httpClientConsumer the consumer of supplied http client
    *                                      that performs the request execution
-   * @param {Function} [responseMapper] a mapper for the response object
-   * @return {Promise<any>} a promise which resolves to http request response
+   * @return {Promise<HttpResponse|Error>} a promise which resolves to response
+   * wrapper or rejects with error if thrown during execution.
    */
-  retryExecution(httpClients, httpClientConsumer, responseMapper) {
-    return httpClientConsumer(httpClients.next()).then((response) => {
-      if (responseMapper) {
-        return responseMapper(response);
-      }
-      return response.data;
+  retryExecution(httpClients, httpClientConsumer) {
+    const httpClient = httpClients.next();
+    return httpClientConsumer(httpClient).then((response) => {
+      return new HttpResponse(response, httpClient);
     }).catch((error) => {
-      if (BaseRepositoryClient.canRetryExecution(error)
-        && httpClients.hasNext()) {
-        // Try the next endpoint client (if any)
-        return this.retryExecution(httpClients, httpClientConsumer,
-          responseMapper);
+      const canRetry = BaseRepositoryClient.canRetryExecution(error);
+      const hasNext = httpClients.hasNext();
+
+      const loggerPayload = {repositoryUrl: httpClient.getBaseURL()};
+
+      // Try the next repo http client (if any)
+      if (canRetry && hasNext) {
+        this.logger.warn(loggerPayload, 'Retrying execution');
+        return this.retryExecution(httpClients, httpClientConsumer);
       }
+
+      if (!canRetry) {
+        this.logger.error(loggerPayload, 'Cannot retry execution');
+      } else {
+        this.logger.error(loggerPayload, 'No more retries');
+      }
+
       // Not retriable
       return Promise.reject(error);
     });
+  }
+
+  /**
+   * Creates an object from the provided HTTP response that is suitable for
+   * structured logging.
+   *
+   * Any additional key-value entries from <code>params</code> will be assigned
+   * in the created payload object.
+   *
+   * @protected
+   * @param {HttpResponse} response the HTTP response.
+   * Used to get the execution time and the base URL
+   * @param {object} [params] additional parameters to be appended
+   * @return {object} the constructed payload object for logging
+   */
+  getLogPayload(response, params = {}) {
+    const payload = {
+      elapsedTime: response.getElapsedTime(),
+      repositoryUrl: response.getBaseURL()
+    };
+    Object.assign(payload, params);
+    return payload;
   }
 
   /**

@@ -77,4 +77,13 @@ describe('HttpRequestConfigBuilder', () => {
         headers: {'Content-Type': 'text/turtle'}
       });
   });
+
+  test('should skip empty header values', () => {
+    expect(new HttpRequestConfigBuilder()
+      .addContentTypeHeader('')
+      .addAcceptHeader()
+      .addHeader('custom', null)
+      .get())
+      .toEqual({});
+  });
 });

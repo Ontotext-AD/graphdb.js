@@ -81,7 +81,7 @@ describe('ServerClient', () => {
     });
 
     test('should reject with error if repository id is not provided', () => {
-      return expect(server.hasRepository()).rejects.toEqual(Error('Repository id is required parameter!'));
+      expect(() => server.hasRepository()).toThrow(Error('Repository id is required parameter!'));
     });
 
     test('should reject with error if request fails', () => {
@@ -92,15 +92,15 @@ describe('ServerClient', () => {
 
   describe('getRepository', () => {
     test('should reject with error if repository id is not provided', () => {
-      return expect(server.getRepository()).rejects.toEqual(Error('Repository id is required parameter!'));
+      expect(() => server.getRepository()).toThrow(Error('Repository id is required parameter!'));
     });
 
     test('should reject with error if repository config is not provided', () => {
-      return expect(server.getRepository('automotive')).rejects.toEqual(Error('RepositoryClientConfig is required parameter!'));
+      expect(() => server.getRepository('automotive')).toThrow(Error('RepositoryClientConfig is required parameter!'));
     });
 
     test('should reject with error if repository config is not of desired type', () => {
-      return expect(server.getRepository('automotive', {})).rejects.toEqual(Error('RepositoryClientConfig is required parameter!'));
+      expect(() => server.getRepository('automotive', {})).toThrow(Error('RepositoryClientConfig is required parameter!'));
     });
 
     test('should reject with error if repository with provided id does not exists', () => {
@@ -129,11 +129,11 @@ describe('ServerClient', () => {
     });
 
     test('should delete repository', () => {
-      return expect(server.deleteRepository('automotive')).resolves.toBeTruthy();
+      return expect(server.deleteRepository('automotive')).resolves.toEqual();
     });
 
     test('should reject with error if repository id is not provided', () => {
-      return expect(server.deleteRepository()).rejects.toEqual(Error('Repository id is required parameter!'));
+      expect(() => server.deleteRepository()).toThrow(Error('Repository id is required parameter!'));
     });
 
     test('should reject with an error if request fails', () => {

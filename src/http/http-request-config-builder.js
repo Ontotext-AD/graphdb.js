@@ -1,3 +1,5 @@
+const StringUtils = require('../util/string-utils');
+
 /**
  * Holds request configuration applicable to the http client.
  *
@@ -15,13 +17,16 @@ class HttpRequestConfigBuilder {
   }
 
   /**
-   * Add a new http header entry.
+   * Add a new http header entry. Blank values are skipped.
    *
    * @param {string} header type
    * @param {string} value the header value
    * @return {HttpRequestConfigBuilder}
    */
   addHeader(header, value) {
+    if (StringUtils.isBlank(value)) {
+      return this;
+    }
     if (!this.config.headers) {
       this.config.headers = {};
     }
