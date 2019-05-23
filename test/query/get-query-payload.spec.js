@@ -40,15 +40,15 @@ describe('GetQueryPayload', () => {
 
   describe('setLimit', () => {
     test('should throw error when limit is not a positive number', () => {
-      expect(() => new GetQueryPayload().setLimit('123')).toThrow(`Limit must be a positive number!`);
-      expect(() => new GetQueryPayload().setLimit(-123)).toThrow(`Limit must be a positive number!`);
+      expect(() => new GetQueryPayload().setLimit('123')).toThrow(`Limit must be a non negative number!`);
+      expect(() => new GetQueryPayload().setLimit(-123)).toThrow(`Limit must be a non negative number!`);
     });
   });
 
   describe('setOffset', () => {
     test('should throw error when offset is not a positive number', () => {
-      expect(() => new GetQueryPayload().setOffset('123')).toThrow(`Offset must be a positive number!`);
-      expect(() => new GetQueryPayload().setOffset(-123)).toThrow(`Offset must be a positive number!`);
+      expect(() => new GetQueryPayload().setOffset('123')).toThrow(`Offset must be a non negative number!`);
+      expect(() => new GetQueryPayload().setOffset(-123)).toThrow(`Offset must be a non negative number!`);
     });
   });
 

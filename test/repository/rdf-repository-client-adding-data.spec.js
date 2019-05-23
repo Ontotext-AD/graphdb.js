@@ -133,8 +133,9 @@ describe('RDFRepositoryClient - adding data', () => {
         .setObject(obj('uri-1'))
         .setContext(context('data-graph-1'));
 
+      const expectedGraph = encodedContext('data-graph-1');
       const expected = testUtils.loadFile('repository/data/add-statements-context.txt').trim();
-      return rdfRepositoryClient.add(payload).then(() => verifyAddPayload(expected));
+      return rdfRepositoryClient.add(payload).then(() => verifyAddPayload(expected, expectedGraph));
     });
 
     test('should properly convert triple payload with multiple contexts to several quads and send a request', () => {
@@ -146,8 +147,9 @@ describe('RDFRepositoryClient - adding data', () => {
         .setLanguage('en')
         .setContext(graphs);
 
+      const expectedGraphs = [encodedContext('data-graph-1'), encodedContext('data-graph-2')];
       const expected = testUtils.loadFile('repository/data/add-statements-contexts.txt').trim();
-      return rdfRepositoryClient.add(payload).then(() => verifyAddPayload(expected));
+      return rdfRepositoryClient.add(payload).then(() => verifyAddPayload(expected, expectedGraphs));
     });
 
     test('should allow to specify base URI for resolving of relative URIs', () => {
@@ -174,7 +176,7 @@ describe('RDFRepositoryClient - adding data', () => {
     });
 
     test('should reject adding the payload if it is empty', () => {
-      const payload = new AddStatementPayload().get();
+      const payload = new AddStatementPayload();
       expect(() => rdfRepositoryClient.add(payload)).toThrow(Error);
       verifyNoPayload();
     });
@@ -342,5 +344,9 @@ describe('RDFRepositoryClient - adding data', () => {
 
   function context(id) {
     return `http://domain/graph/${id}`;
+  }
+
+  function encodedContext(id) {
+    return '<' + context(id) + '>';
   }
 });
