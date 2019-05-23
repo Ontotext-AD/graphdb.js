@@ -202,23 +202,24 @@ class TransactionalRepositoryClient extends BaseRepositoryClient {
    * into the repository during a transaction
    *
    * @param {ReadableStream} readStream stream with the data to be uploaded
+   * @param {string} contentType is one of RDF mime type formats,
+   *                application/x-rdftransaction' for a transaction document or
+   *                application/x-www-form-urlencoded
    * @param {NamedNode|string} [context] optional context to restrict the
    * operation. Will be encoded as N-Triple if it is not already one
    * @param {string} [baseURI] optional uri against which any relative URIs
    * found in the data would be resolved.
-   * @param {string} contentType is one of RDF mime type formats,
-   *                application/x-rdftransaction' for a transaction document or
-   *                application/x-www-form-urlencoded
+   *
    * @return {Promise<void>} a promise that will be resolved when the stream has
    * been successfully consumed by the server
    */
-  upload(readStream, context, baseURI, contentType) {
-    return this.uploadData(readStream, context, baseURI, contentType)
+  upload(readStream, contentType, context, baseURI) {
+    return this.uploadData(readStream, contentType, context, baseURI)
       .then((response) => {
         this.logger.debug(this.getLogPayload(response, {
+          contentType,
           context,
-          baseURI,
-          contentType
+          baseURI
         }), 'Uploaded data stream');
       });
   }
@@ -229,21 +230,22 @@ class TransactionalRepositoryClient extends BaseRepositoryClient {
    * See {@link #upload}
    *
    * @param {string} filePath path to a file to be streamed to the server
+   * @param {string} contentType MIME type of the file's content
    * @param {string|string[]} [context] restricts the operation to the given
    * context. Will be encoded as N-Triple if it is not already one
    * @param {string} [baseURI] used to resolve relative URIs in the data
-   * @param {string} contentType MIME type of the file's content
+   *
    * @return {Promise<void>} a promise that will be resolved when the file has
    * been successfully consumed by the server
    */
-  addFile(filePath, context, baseURI, contentType) {
-    return this.uploadData(FileUtils.getReadStream(filePath), context, baseURI,
-      contentType).then((response) => {
+  addFile(filePath, contentType, context, baseURI) {
+    return this.uploadData(FileUtils.getReadStream(filePath), contentType,
+      context, baseURI).then((response) => {
       this.logger.debug(this.getLogPayload(response, {
         filePath,
+        contentType,
         context,
-        baseURI,
-        contentType
+        baseURI
       }), 'Uploaded file');
     });
   }
@@ -255,17 +257,17 @@ class TransactionalRepositoryClient extends BaseRepositoryClient {
    * into the repository during a transaction
    *
    * @param {ReadableStream} readStream stream with the data to be uploaded
+   * @param {string} contentType is one of RDF mime type formats,
+   *                application/x-rdftransaction' for a transaction document or
+   *                application/x-www-form-urlencoded
    * @param {NamedNode|string} [context] optional context to restrict the
    * operation. Will be encoded as N-Triple if it is not already one
    * @param {string} [baseURI] optional uri against which any relative URIs
    * found in the data would be resolved.
-   * @param {string} contentType is one of RDF mime type formats,
-   *                application/x-rdftransaction' for a transaction document or
-   *                application/x-www-form-urlencoded
    * @return {Promise<HttpResponse|Error>} a promise that will be resolved when
    * the stream has been successfully consumed by the server
    */
-  uploadData(readStream, context, baseURI, contentType) {
+  uploadData(readStream, contentType, context, baseURI) {
     const requestConfig = new HttpRequestConfigBuilder()
       .addContentTypeHeader(contentType)
       .setResponseType('stream')

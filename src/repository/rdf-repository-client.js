@@ -496,6 +496,7 @@ class RDFRepositoryClient extends BaseRepositoryClient {
    *
    * @param {Object} params is an object holding request parameters as returned
    *                 by {@link GetStatementsPayload#get()}
+   *
    * @return {Promise<WritableStream>} the client can subscribe to the readable
    * stream events and consume the emitted strings depending on the provided
    * response type as soon as they are available.
@@ -528,23 +529,24 @@ class RDFRepositoryClient extends BaseRepositoryClient {
    * into the repository.
    *
    * @param {ReadableStream} readStream
+   * @param {string} contentType is one of RDF mime type formats,
+   *                application/x-rdftransaction' for a transaction document or
+   *                application/x-www-form-urlencoded
    * @param {NamedNode|string} [context] optional context to restrict the
    * operation. Will be encoded as N-Triple if it is not already one
    * @param {string} [baseURI] optional uri against which any relative URIs
    * found in the data would be resolved.
-   * @param {string} contentType is one of RDF mime type formats,
-   *                application/x-rdftransaction' for a transaction document or
-   *                application/x-www-form-urlencoded
+   *
    * @return {Promise<void>} a promise that will be resolved when the stream has
    * been successfully consumed by the server
    */
-  upload(readStream, context, baseURI, contentType) {
-    return this.uploadData(readStream, context, baseURI, contentType)
+  upload(readStream, contentType, context, baseURI) {
+    return this.uploadData(readStream, contentType, context, baseURI)
       .then((response) => {
         this.logger.debug(this.getLogPayload(response, {
+          contentType,
           context,
-          baseURI,
-          contentType
+          baseURI
         }), 'Uploaded data stream');
       });
   }
@@ -556,21 +558,22 @@ class RDFRepositoryClient extends BaseRepositoryClient {
    * provided as a readable stream e.g. reading from file.
    *
    * @param {ReadableStream} readStream
+   * @param {string} contentType
    * @param {NamedNode|string} context restrict the operation. Will be encoded
    * as N-Triple if it is not already one
    * @param {string} [baseURI] optional uri against which any relative URIs
    * found in the data would be resolved.
-   * @param {string} contentType
+   *
    * @return {Promise<void>} a promise that will be resolved when the stream has
    * been successfully consumed by the server
    */
-  overwrite(readStream, context, baseURI, contentType) {
-    return this.overwriteData(readStream, context, baseURI, contentType)
+  overwrite(readStream, contentType, context, baseURI) {
+    return this.overwriteData(readStream, contentType, context, baseURI)
       .then((response) => {
         this.logger.debug(this.getLogPayload(response, {
+          contentType,
           context,
-          baseURI,
-          contentType
+          baseURI
         }), 'Overwritten data stream');
       });
   }
@@ -581,21 +584,22 @@ class RDFRepositoryClient extends BaseRepositoryClient {
    * See {@link #upload}
    *
    * @param {string} filePath path to a file to be streamed to the server
+   * @param {string} contentType MIME type of the file's content
    * @param {string|string[]} [context] restricts the operation to the given
    * context. Will be encoded as N-Triple if it is not already one
    * @param {string} [baseURI] used to resolve relative URIs in the data
-   * @param {string} contentType MIME type of the file's content
+   *
    * @return {Promise<void>} a promise that will be resolved when the file has
    * been successfully consumed by the server
    */
-  addFile(filePath, context, baseURI, contentType) {
-    return this.uploadData(FileUtils.getReadStream(filePath), context, baseURI,
-      contentType).then((response) => {
+  addFile(filePath, contentType, context, baseURI) {
+    return this.uploadData(FileUtils.getReadStream(filePath), contentType,
+      context, baseURI).then((response) => {
       this.logger.debug(this.getLogPayload(response, {
         filePath,
+        contentType,
         context,
-        baseURI,
-        contentType
+        baseURI
       }), 'Uploaded file');
     });
   }
@@ -609,21 +613,22 @@ class RDFRepositoryClient extends BaseRepositoryClient {
    * See {@link #overwrite}
    *
    * @param {string} filePath path to a file to be streamed to the server
+   * @param {string} contentType MIME type of the file's content
    * @param {string} [context] restricts the operation to the given context.
    * Will be encoded as N-Triple if it is not already one
    * @param {string} [baseURI] used to resolve relative URIs in the data
-   * @param {string} contentType MIME type of the file's content
+   *
    * @return {Promise<void>} a promise that will be resolved when the file has
    * been successfully consumed by the server
    */
-  putFile(filePath, context, baseURI, contentType) {
-    return this.overwriteData(FileUtils.getReadStream(filePath), context,
-      baseURI, contentType).then((response) => {
+  putFile(filePath, contentType, context, baseURI) {
+    return this.overwriteData(FileUtils.getReadStream(filePath), contentType,
+      context, baseURI).then((response) => {
       this.logger.debug(this.getLogPayload(response, {
         filePath,
+        contentType,
         context,
-        baseURI,
-        contentType
+        baseURI
       }), 'Overwritten data from file');
     });
   }
@@ -636,17 +641,17 @@ class RDFRepositoryClient extends BaseRepositoryClient {
    *
    * @private
    * @param {ReadableStream} readStream
+   * @param {string} contentType is one of RDF mime type formats,
+   *                application/x-rdftransaction' for a transaction document or
+   *                application/x-www-form-urlencoded
    * @param {NamedNode|string} [context] optional context to restrict the
    * operation. Will be encoded as N-Triple if it is not already one
    * @param {string} [baseURI] optional uri against which any relative URIs
    * found in the data would be resolved.
-   * @param {string} contentType is one of RDF mime type formats,
-   *                application/x-rdftransaction' for a transaction document or
-   *                application/x-www-form-urlencoded
    * @return {Promise<HttpResponse|Error>} a promise that will be resolved when
    * the stream has been successfully consumed by the server
    */
-  uploadData(readStream, context, baseURI, contentType) {
+  uploadData(readStream, contentType, context, baseURI) {
     const requestConfig = new HttpRequestConfigBuilder()
       .addContentTypeHeader(contentType)
       .setResponseType('stream')
@@ -667,15 +672,15 @@ class RDFRepositoryClient extends BaseRepositoryClient {
    * provided as a readable stream e.g. reading from file.
    *
    * @param {ReadableStream} readStream
+   * @param {string} contentType
    * @param {NamedNode|string} context restrict the operation. Will be encoded
    * as N-Triple if it is not already one
    * @param {string} [baseURI] optional uri against which any relative URIs
    * found in the data would be resolved.
-   * @param {string} contentType
    * @return {Promise<HttpResponse|Error>} a promise that will be resolved when
    * the stream has been successfully consumed by the server
    */
-  overwriteData(readStream, context, baseURI, contentType) {
+  overwriteData(readStream, contentType, context, baseURI) {
     const requestConfig = new HttpRequestConfigBuilder()
       .addContentTypeHeader(contentType)
       .setResponseType('stream')
