@@ -51,6 +51,7 @@ module.exports = {
 
   model: {
     Namespace: require('./model/namespace'),
-    TermConverter: require('./model/term-converter')
+    TermConverter: require('./model/term-converter'),
+    Types: require('./model/types')
   }
 };

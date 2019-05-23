@@ -1,1 +1,0 @@
-<http://domain/resource/resource-1> <http://domain/property/relation-1> "true"^^<xsd:boolean>.
