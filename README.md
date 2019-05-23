@@ -11,6 +11,139 @@ Make sure you have Node.js version 8 or greater and Node Package Manager
 npm install --save rdf4js
 ```
 
+## Development
+
+### Setup Environment
+
+* Checkout or clone the project.
+* Make sure prerequisites are covered: node js and npm must be present and versions
+should be supported.
+* Enter the project directory and execute
+
+```
+npm install
+```
+
+### Running Tests
+After any change the tests should be run and check if any existing functionality
+is not broken in result.
+
+```
+npm run test
+```
+
+or constantly watching for changes in source files and tests and re-execute the 
+test suite
+
+```
+npm run test:watch
+```
+
+The best and preferred way a new feature or changes to be introduced is a test
+case to be written first and then the change to be implemented following the TDD
+approach.
+
+### Checking the codestyle
+The library uses Google [style](https://google.github.io/styleguide/jsguide.html) 
+in conjunction with ESLint's recommended ruleset.
+
+```
+npm run lint
+```
+
+### Production build
+The library is written in ES2016. During the build process source files `src/`
+are transpiled to ES2015 and copied to `lib/` directory.
+
+A typescript definition file `types.d.ts` is generated in the `lib/` as well.
+
+Documentation is generated in `docs/` from the JSDoc annotations in the source
+code.
+
+```
+npm run build
+```
+
+### Testing the packaging
+Library is managed by NPM package manager. During publishing npm consults the 
+`.gitignore`, `.npmignore` and `package.json#files` property in order to decide 
+which resources should be published. If any change in the project structure, 
+`.gitignore` or `.npmignore` is made, then publishing must be verified in order
+to be guaranteed that needed sources will be properly published.
+The packaging could be verified using the `npm package` command which generates 
+a `*.tgz` archive in the project root. The archive should contain only the needed
+resources.
+Furture the archive could be used as a source for `npm install` where the path
+pointing the archive is provided.
+
+### Prerequisites
+Node >= 8.16
+
+## Development
+
+### Setup Environment
+
+* Checkout or clone the project.
+* Make sure prerequisites are covered: node js and npm must be present and versions
+should be supported.
+* Enter the project directory and execute
+
+```
+npm install
+```
+
+### Run tests
+After any change the tests should be run and check if any existing functionality
+is not broken in result.
+
+```
+npm run test
+```
+
+or constantly watching for changes in source files and tests and re-execute the 
+test suite
+
+```
+npm run test:watch
+```
+
+The best and preferred way a new feature or changes to be introduced is a test
+case to be written first and then the change to be implemented following the TDD
+approach.
+
+### Run lint
+The library uses Google [style](https://google.github.io/styleguide/jsguide.html) 
+in conjunction with ESLint's recommended ruleset.
+
+```
+npm run lint
+```
+
+### Production build
+The library is written in ES2016. During the build process source files `src/`
+are transpiled to ES2015 and copied to `lib/` directory.
+
+A typescript definition file `types.d.ts` is generated in the `lib/` as well.
+
+Documentation is generated in `docs/` from the JSDoc annotations in the source
+code.
+
+```
+npm run build
+```
+
+### Testing the packaging
+Library is managed by NPM package manager. During publishing npm consults the 
+`.gitignore`, `.npmignore` and `package.json#files` property in order to decide 
+which resources should be published. If any change in the project structure, 
+`.gitignore` or `.npmignore` is made, then publishing must be verified in order
+to be guaranteed that needed sources will be properly published.
+The packaging could be verified using the `npm package` command which generates 
+a `*.tgz` archive in the project root. The archive should contain only the needed
+resources.
+Furture the archive could be used as a source for `npm install` where the path
+pointing the archive is provided.
+
 ## Usage
 
 ### ServerClient
@@ -240,74 +373,6 @@ the `TransactionalRepositoryClient` must be used.
 
 ### Namespaces
 `TODO`
-
-## Development
-
-### Setup Environment
-
-* Checkout or clone the project.
-* Make sure prerequisites are covered: node js and npm must be present and versions
-should be supported.
-* Enter the project directory and execute
-
-```
-npm install
-```
-
-### Run tests
-After any change the tests should be run and check if any existing functionality
-is not broken in result.
-
-```
-npm run test
-```
-
-or constantly watching for changes in source files and tests and re-execute the 
-test suite
-
-```
-npm run test:watch
-```
-
-The best and preferred way a new feature or changes to be introduced is a test
-case to be written first and then the change to be implemented following the TDD
-approach.
-
-### Run lint
-The library uses Google [style](https://google.github.io/styleguide/jsguide.html) 
-in conjunction with ESLint's recommended ruleset.
-
-```
-npm run lint
-```
-
-### Production build
-The library is written in ES2016. During the build process source files `src/`
-are transpiled to ES2015 and copied to `lib/` directory.
-
-A typescript definition file `types.d.ts` is generated in the `lib/` as well.
-
-Documentation is generated in `docs/` from the JSDoc annotations in the source
-code.
-
-```
-npm run build
-```
-
-### Testing the packaging
-Library is managed by NPM package manager. During publishing npm consults the 
-`.gitignore`, `.npmignore` and `package.json#files` property in order to decide 
-which resources should be published. If any change in the project structure, 
-`.gitignore` or `.npmignore` is made, then publishing must be verified in order
-to be guaranteed that needed sources will be properly published.
-The packaging could be verified using the `npm package` command which generates 
-a `*.tgz` archive in the project root. The archive should contain only the needed
-resources.
-Furture the archive could be used as a source for `npm install` where the path
-pointing the archive is provided.
-
-### Prerequisites
-Node >= 8.16
 
 ### License
 [LICENSE](LICENSE)
