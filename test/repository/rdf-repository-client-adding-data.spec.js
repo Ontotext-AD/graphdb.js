@@ -38,8 +38,7 @@ describe('RDFRepositoryClient - adding data', () => {
       const payload = new AddStatementPayload()
         .setSubject(subj('resource-1'))
         .setPredicate(pred('relation-1'))
-        .setObject(obj('uri-1'))
-        .get();
+        .setObject(obj('uri-1'));
 
       const expected = testUtils.loadFile('repository/data/add-statements-triple.txt').trim();
       return rdfRepositoryClient.add(payload).then(() => verifyAddPayload(expected));
@@ -49,8 +48,7 @@ describe('RDFRepositoryClient - adding data', () => {
       const payload = new AddStatementPayload()
         .setSubject('_:1')
         .setPredicate(pred('relation-1'))
-        .setObject('_:2')
-        .get();
+        .setObject('_:2');
 
       const expected = testUtils.loadFile('repository/data/add-statements-triple-bnodes.txt').trim();
       return rdfRepositoryClient.add(payload).then(() => verifyAddPayload(expected));
@@ -61,8 +59,7 @@ describe('RDFRepositoryClient - adding data', () => {
         .setSubject(subj('resource-1'))
         .setPredicate(pred('relation-1'))
         .setObject('Title')
-        .setLanguage('en')
-        .get();
+        .setLanguage('en');
 
       const expected = testUtils.loadFile('repository/data/add-statements-literal-language.txt').trim();
       return rdfRepositoryClient.add(payload).then(() => verifyAddPayload(expected));
@@ -73,8 +70,7 @@ describe('RDFRepositoryClient - adding data', () => {
         .setSubject(subj('resource-1'))
         .setPredicate(pred('property-boolean'))
         .setObject('true')
-        .setDataType('xsd:boolean')
-        .get();
+        .setDataType('xsd:boolean');
 
       const expected = testUtils.loadFile('repository/data/add-statements-literal-boolean.txt').trim();
       return rdfRepositoryClient.add(payload).then(() => verifyAddPayload(expected));
@@ -84,8 +80,7 @@ describe('RDFRepositoryClient - adding data', () => {
       const payload = new AddStatementPayload()
         .setSubject(subj('resource-1'))
         .setPredicate(pred('property-string'))
-        .setObjectLiteral('Some value')
-        .get();
+        .setObjectLiteral('Some value');
 
       const expected = testUtils.loadFile('repository/data/add-statements-literal.txt').trim();
       return rdfRepositoryClient.add(payload).then(() => verifyAddPayload(expected));
@@ -95,8 +90,7 @@ describe('RDFRepositoryClient - adding data', () => {
       const payload = new AddStatementPayload()
         .setSubject(subj('resource-1'))
         .setPredicate(pred('relation-1'))
-        .setObjectLiteral('Title', XSD.STRING, 'en')
-        .get();
+        .setObjectLiteral('Title', XSD.STRING, 'en');
 
       const expected = testUtils.loadFile('repository/data/add-statements-literal-language.txt').trim();
       return rdfRepositoryClient.add(payload).then(() => verifyAddPayload(expected));
@@ -106,8 +100,7 @@ describe('RDFRepositoryClient - adding data', () => {
       const payload = new AddStatementPayload()
         .setSubject(subj('resource-1'))
         .setPredicate(pred('property-int'))
-        .setObjectLiteral(4)
-        .get();
+        .setObjectLiteral(4);
 
       const expected = testUtils.loadFile('repository/data/add-statements-literal-integer.txt').trim();
       return rdfRepositoryClient.add(payload).then(() => verifyAddPayload(expected));
@@ -117,8 +110,7 @@ describe('RDFRepositoryClient - adding data', () => {
       const payload = new AddStatementPayload()
         .setSubject(subj('resource-1'))
         .setPredicate(pred('property-float'))
-        .setObjectLiteral(3.1415)
-        .get();
+        .setObjectLiteral(3.1415);
 
       const expected = testUtils.loadFile('repository/data/add-statements-literal-decimal.txt').trim();
       return rdfRepositoryClient.add(payload).then(() => verifyAddPayload(expected));
@@ -128,8 +120,7 @@ describe('RDFRepositoryClient - adding data', () => {
       const payload = new AddStatementPayload()
         .setSubject(subj('resource-1'))
         .setPredicate(pred('property-boolean'))
-        .setObjectLiteral(true)
-        .get();
+        .setObjectLiteral(true);
 
       const expected = testUtils.loadFile('repository/data/add-statements-literal-boolean.txt').trim();
       return rdfRepositoryClient.add(payload).then(() => verifyAddPayload(expected));
@@ -140,8 +131,7 @@ describe('RDFRepositoryClient - adding data', () => {
         .setSubject(subj('resource-1'))
         .setPredicate(pred('relation-1'))
         .setObject(obj('uri-1'))
-        .setContext(context('data-graph-1'))
-        .get();
+        .setContext(context('data-graph-1'));
 
       const expected = testUtils.loadFile('repository/data/add-statements-context.txt').trim();
       return rdfRepositoryClient.add(payload).then(() => verifyAddPayload(expected));
@@ -154,8 +144,7 @@ describe('RDFRepositoryClient - adding data', () => {
         .setPredicate(pred('relation-1'))
         .setObject('Title')
         .setLanguage('en')
-        .setContext(graphs)
-        .get();
+        .setContext(graphs);
 
       const expected = testUtils.loadFile('repository/data/add-statements-contexts.txt').trim();
       return rdfRepositoryClient.add(payload).then(() => verifyAddPayload(expected));
@@ -166,8 +155,7 @@ describe('RDFRepositoryClient - adding data', () => {
         .setBaseURI('http://base/uri')
         .setSubject(subj('resource-1'))
         .setPredicate(pred('relation-1'))
-        .setObject(obj('uri-1'))
-        .get();
+        .setObject(obj('uri-1'));
 
       const expected = testUtils.loadFile('repository/data/add-statements-triple.txt').trim();
       return rdfRepositoryClient.add(payload).then(() => verifyAddPayload(expected, undefined, 'http://base/uri'))
@@ -177,8 +165,7 @@ describe('RDFRepositoryClient - adding data', () => {
       const payload = new AddStatementPayload()
         .setSubject(subj('resource-1'))
         .setPredicate(pred('relation-1'))
-        .setObject(obj('uri-1'))
-        .get();
+        .setObject(obj('uri-1'));
       return expect(rdfRepositoryClient.add(payload)).resolves.toEqual();
     });
 
@@ -195,8 +182,7 @@ describe('RDFRepositoryClient - adding data', () => {
     test('should reject adding the payload if it lacks required terms', () => {
       const payload = new AddStatementPayload()
         .setSubject(subj('resource-1'))
-        .setPredicate(pred('relation-1'))
-        .get();
+        .setPredicate(pred('relation-1'));
       expect(() => rdfRepositoryClient.add(payload)).toThrow(Error);
       verifyNoPayload();
     });
@@ -206,8 +192,7 @@ describe('RDFRepositoryClient - adding data', () => {
       const payload = new AddStatementPayload()
         .setSubject(subj('resource-1'))
         .setPredicate(pred('relation-1'))
-        .setObject(obj('uri-1'))
-        .get();
+        .setObject(obj('uri-1'));
       return expect(rdfRepositoryClient.add(payload)).rejects.toBeTruthy();
     });
   });

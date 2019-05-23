@@ -17,6 +17,7 @@ describe('AddStatementPayload', () => {
     expect(payload.getLanguage()).toBeUndefined();
     expect(payload.getDataType()).toBeUndefined();
     expect(payload.getBaseURI()).toEqual('http://domain/base');
+    expect(payload.isLiteral()).toEqual(false);
   });
 
   test('should properly create a payload with literal having a language', () => {
@@ -33,6 +34,7 @@ describe('AddStatementPayload', () => {
     expect(payload.getLanguage()).toEqual('en');
     expect(payload.getDataType()).toBeUndefined();
     expect(payload.getBaseURI()).toBeUndefined();
+    expect(payload.isLiteral()).toEqual(true);
   });
 
   test('should properly create a payload with literal having a data type', () => {
@@ -48,6 +50,7 @@ describe('AddStatementPayload', () => {
     expect(payload.getLanguage()).toBeUndefined();
     expect(payload.getDataType()).toEqual(XSD.INTEGER);
     expect(payload.getBaseURI()).toBeUndefined();
+    expect(payload.isLiteral()).toEqual(true);
   });
 
   describe('setObjectLiteral()', () => {

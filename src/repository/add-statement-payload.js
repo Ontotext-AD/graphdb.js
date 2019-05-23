@@ -70,7 +70,7 @@ class AddStatementPayload extends StatementPayload {
    *
    * To set a language the data type must be xsd:string.
    *
-   * @param {string} value the statements object value
+   * @param {*} value the statements object value
    * @param {string} [type] the statements object data type
    * @param {string} [language] the statements object language
    * @return {AddStatementPayload} the payload for method chaining
@@ -108,6 +108,17 @@ class AddStatementPayload extends StatementPayload {
     }
     // Default
     return XSD.STRING;
+  }
+
+  /**
+   * Returns if this statement payload is for a literal. A literal have
+   * data type and/or language.
+   *
+   * @return {boolean} <code>true</code> if it is a literal payload or
+   * <code>false</code> otherwise
+   */
+  isLiteral() {
+    return !!(this.payload.language || this.payload.dataType);
   }
 
   /**

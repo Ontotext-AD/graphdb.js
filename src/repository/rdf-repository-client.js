@@ -310,8 +310,7 @@ class RDFRepositoryClient extends BaseRepositoryClient {
    *
    * See {@link #addQuads()}.
    *
-   * @param {Object} payload params holding request parameters as returned
-   *                 by {@link AddStatementPayload#get()}
+   * @param {AddStatementPayload} payload holding request parameters
    * @return {Promise<void>} promise that will be resolved if the addition is
    *                    successful or rejected in case of failure
    */
@@ -320,10 +319,10 @@ class RDFRepositoryClient extends BaseRepositoryClient {
       throw new Error('Cannot add statement without payload');
     }
 
-    const subject = payload.subject;
-    const predicate = payload.predicate;
-    const object = payload.object;
-    const context = payload.context;
+    const subject = payload.getSubject();
+    const predicate = payload.getPredicate();
+    const object = payload.getObject();
+    const context = payload.getContext();
 
     if (RDFRepositoryClient.hasNullArguments(subject, predicate, object)) {
       throw new Error('Cannot add statement with null ' +
@@ -331,18 +330,15 @@ class RDFRepositoryClient extends BaseRepositoryClient {
     }
 
     let quads;
-    if (payload.language) {
-      quads = TermConverter.getQuadsWithLanguage(subject, predicate, object,
-        payload.language, context);
-    } else if (payload.dataType) {
-      quads = TermConverter.getQuadsWithDataType(subject, predicate, object,
-        payload.dataType, context);
+    if (payload.isLiteral()) {
+      quads = TermConverter.getLiteralQuads(subject, predicate, object, context,
+        payload.getDataType(), payload.getLanguage());
     } else {
       quads = TermConverter.getQuads(subject, predicate, object, context);
     }
 
     // No context because it's in the payload and it is for single triple.
-    return this.addQuads(quads, undefined, payload.baseURI);
+    return this.addQuads(quads, undefined, payload.getBaseURI());
   }
 
   /**
