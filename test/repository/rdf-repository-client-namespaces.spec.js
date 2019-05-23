@@ -6,7 +6,7 @@ const DataFactory = require('n3').DataFactory;
 const NamedNode = DataFactory.internal.NamedNode;
 const Namespace = require('model/namespace');
 const httpClientStub = require('../http/http-client.stub');
-const namespaceData = require('./namespaces.data.json');
+const namespaceData = require('./data/namespaces.json');
 
 jest.mock('http/http-client');
 
