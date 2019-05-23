@@ -17,6 +17,7 @@ class FileUtils {
    *
    * @param {string} filePath path to the file to be read
    * @return {ReadableStream} stream with the file data
+   * @throws {Error} if the file path is not provided or no file exists for it
    */
   static getReadStream(filePath) {
     if (StringUtils.isBlank(filePath)) {
