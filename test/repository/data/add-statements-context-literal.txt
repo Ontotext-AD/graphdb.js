@@ -1,0 +1,3 @@
+<http://domain/graph/data-graph-1> {
+<http://domain/resource/resource-1> <http://domain/property/property-1> "Title"@en
+}

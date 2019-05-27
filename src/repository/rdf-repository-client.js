@@ -4,6 +4,7 @@ const RDFMimeType = require('../http/rdf-mime-type');
 const Namespace = require('../model/namespace');
 const StringUtils = require('../util/string-utils');
 const FileUtils = require('../util/file-utils');
+const CommonUtils = require('../util/common-utils');
 const TermConverter = require('../model/term-converter');
 const RepositoryClientConfig =
   require('../repository/repository-client-config');
@@ -329,7 +330,7 @@ class RDFRepositoryClient extends BaseRepositoryClient {
     const object = payload.getObject();
     const context = payload.getContext();
 
-    if (RDFRepositoryClient.hasNullArguments(subject, predicate, object)) {
+    if (CommonUtils.hasNullArguments(subject, predicate, object)) {
       throw new Error('Cannot add statement with null ' +
         'subject, predicate or object');
     }
@@ -342,8 +343,7 @@ class RDFRepositoryClient extends BaseRepositoryClient {
       quads = TermConverter.getQuads(subject, predicate, object, context);
     }
 
-    // No context because it's in the payload and it is for single triple.
-    return this.addQuads(quads, undefined, payload.getBaseURI());
+    return this.addQuads(quads, payload.getContext(), payload.getBaseURI());
   }
 
   /**
@@ -741,17 +741,6 @@ class RDFRepositoryClient extends BaseRepositoryClient {
     const config = this.repositoryClientConfig;
     return new RepositoryClientConfig([locationUrl], config.headers,
       config.defaultRDFMimeType, config.readTimeout, config.writeTimeout);
-  }
-
-  /**
-   * Checks if at least one of the supplied arguments is undefined or null.
-   *
-   * @private
-   * @return {boolean} <code>true</code> if there is null argument or
-   *         <code>false</code> otherwise
-   */
-  static hasNullArguments(...args) {
-    return [...args].some((arg) => !arg);
   }
 }
 

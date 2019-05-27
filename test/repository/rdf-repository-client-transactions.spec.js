@@ -6,6 +6,7 @@ const TransactionIsolationLevel = require('transaction/transaction-isolation-lev
 const GetStatementsPayload = require('repository/get-statements-payload');
 const RDFMimeType = require('http/rdf-mime-type');
 const FileUtils = require('util/file-utils');
+const AddStatementPayload = require('repository/add-statement-payload');
 
 const {namedNode, literal, quad} = require('n3').DataFactory;
 
@@ -285,6 +286,65 @@ describe('RDFRepositoryClient - transactions', () => {
       });
     });
 
+    describe('add()', () => {
+      let payload = new AddStatementPayload()
+        .setSubject('http://domain/resource/resource-1')
+        .setPredicate('http://domain/property/relation-1')
+        .setObject('http://domain/value/uri-1')
+        .setContext('http://domain/graph/data-graph-1')
+        .setBaseURI(baseURI);
+
+      test('should convert the payload to proper Turtle and send it to the server', () => {
+        const expectedData = testUtils.loadFile('repository/data/add-statements-context.txt').trim();
+        return transaction.add(payload).then(() => {
+          expectInsertedData(expectedData, '<http://domain/graph/data-graph-1>', baseURI);
+        });
+      });
+
+      test('should convert the literal payload to proper Turtle and send it to the server', () => {
+        payload = new AddStatementPayload()
+          .setSubject('http://domain/resource/resource-1')
+          .setPredicate('http://domain/property/property-1')
+          .setObject('Title')
+          .setLanguage('en')
+          .setContext('http://domain/graph/data-graph-1')
+          .setBaseURI(baseURI);
+
+        const expectedData = testUtils.loadFile('repository/data/add-statements-context-literal.txt').trim();
+        return transaction.add(payload).then(() => {
+          expectInsertedData(expectedData, '<http://domain/graph/data-graph-1>', baseURI);
+        });
+      });
+
+      test('should throw error when a payload is not provided', () => {
+        expect(() => transaction.add()).toThrow(Error('Cannot add statement without payload'));
+        expectNoInsertedData();
+      });
+
+      test('should reject adding the payload if it is empty', () => {
+        const payload = new AddStatementPayload();
+        expect(() => transaction.add(payload)).toThrow(Error);
+        expectNoInsertedData();
+      });
+
+      test('should reject adding the payload if it lacks required terms', () => {
+        const payload = new AddStatementPayload()
+          .setSubject('http://domain/resource/resource-1')
+          .setPredicate('http://domain/property/property-1');
+        expect(() => transaction.add(payload)).toThrow(Error);
+        expectNoInsertedData();
+      });
+
+      test('should reject if the transaction cannot insert statements', () => {
+        httpPut.mockRejectedValue('Error during add');
+        return expect(transaction.add(payload)).rejects.toEqual('Error during add');
+      });
+
+      test('should resolve to empty response (HTTP 204)', () => {
+        return expect(transaction.add(payload)).resolves.toEqual();
+      });
+    });
+
     describe('addQuads()', () => {
       test('should add quads', () => {
         const q = quad(
@@ -293,17 +353,7 @@ describe('RDFRepositoryClient - transactions', () => {
           literal('Title', 'en'));
 
         return transaction.addQuads([q]).then(() => {
-          expect(httpPut).toHaveBeenCalledTimes(1);
-          expect(httpPut).toHaveBeenCalledWith('', data, {
-            headers: {
-              'Content-Type': RDFMimeType.TURTLE
-            },
-            params: {
-              action: 'ADD',
-              context: undefined,
-              baseURI: undefined
-            }
-          });
+          expectInsertedData(data, undefined, undefined);
         });
       });
 
@@ -314,17 +364,7 @@ describe('RDFRepositoryClient - transactions', () => {
           literal('Title', 'en'));
 
         return transaction.addQuads([q], context, baseURI).then(() => {
-          expect(httpPut).toHaveBeenCalledTimes(1);
-          expect(httpPut).toHaveBeenCalledWith('', data, {
-            headers: {
-              'Content-Type': RDFMimeType.TURTLE
-            },
-            params: {
-              action: 'ADD',
-              context,
-              baseURI
-            }
-          });
+          expectInsertedData(data, context, baseURI);
         });
       });
 
@@ -350,15 +390,7 @@ describe('RDFRepositoryClient - transactions', () => {
     describe('sendData()', () => {
       test('should add data', () => {
         return transaction.sendData(data).then(() => {
-          expect(httpPut).toHaveBeenCalledTimes(1);
-          expect(httpPut).toHaveBeenCalledWith('', data, {
-            headers: {
-              'Content-Type': RDFMimeType.TURTLE
-            },
-            params: {
-              action: 'ADD'
-            }
-          });
+          expectInsertedData(data, undefined, undefined);
         });
       });
 
@@ -379,13 +411,31 @@ describe('RDFRepositoryClient - transactions', () => {
       });
     });
 
+    function expectInsertedData(expectedData, expectedContext, expectedBaseURI) {
+      expect(httpPut).toHaveBeenCalledTimes(1);
+      expect(httpPut).toHaveBeenCalledWith('', expectedData, {
+        headers: {
+          'Content-Type': RDFMimeType.TRIG
+        },
+        params: {
+          action: 'ADD',
+          context: expectedContext,
+          baseURI: expectedBaseURI
+        }
+      });
+    }
+
+    function expectNoInsertedData() {
+      expect(httpPut).toHaveBeenCalledTimes(0);
+    }
+
     describe('deleteData()', () => {
       test('should delete data', () => {
         return transaction.deleteData(data).then(() => {
           expect(httpPut).toHaveBeenCalledTimes(1);
           expect(httpPut).toHaveBeenCalledWith('', data, {
             headers: {
-              'Content-Type': RDFMimeType.TURTLE
+              'Content-Type': RDFMimeType.TRIG
             },
             params: {
               action: 'DELETE'

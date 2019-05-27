@@ -4,6 +4,7 @@ const RDFMimeType = require('../http/rdf-mime-type');
 const TermConverter = require('../model/term-converter');
 const StringUtils = require('../util/string-utils');
 const FileUtils = require('../util/file-utils');
+const CommonUtils = require('../util/common-utils');
 const HttpRequestConfigBuilder = require('../http/http-request-config-builder');
 
 /**
@@ -116,6 +117,50 @@ class TransactionalRepositoryClient extends BaseRepositoryClient {
   }
 
   /**
+   * Saves the provided statement payload in the repository.
+   *
+   * The payload will be converted to a quad or a collection of quads in case
+   * there are multiple contexts.
+   *
+   * After the conversion, the produced quad(s) will be serialized to Turtle or
+   * Trig format and send to the repository as payload.
+   *
+   * See {@link #addQuads()}.
+   *
+   * @param {AddStatementPayload} payload holding request parameters
+   *
+   * @return {Promise<void>} promise that will be resolved if the addition is
+   * successful or rejected in case of failure
+   * @throws {Error} if the payload is not provided or the payload has null
+   * subject, predicate and/or object
+   */
+  add(payload) {
+    if (!payload) {
+      throw new Error('Cannot add statement without payload');
+    }
+
+    const subject = payload.getSubject();
+    const predicate = payload.getPredicate();
+    const object = payload.getObject();
+    const context = payload.getContext();
+
+    if (CommonUtils.hasNullArguments(subject, predicate, object)) {
+      throw new Error('Cannot add statement with null ' +
+        'subject, predicate or object');
+    }
+
+    let quads;
+    if (payload.isLiteral()) {
+      quads = TermConverter.getLiteralQuads(subject, predicate, object, context,
+        payload.getDataType(), payload.getLanguage());
+    } else {
+      quads = TermConverter.getQuads(subject, predicate, object, context);
+    }
+
+    return this.addQuads(quads, payload.getContext(), payload.getBaseURI());
+  }
+
+  /**
    * Serializes the provided quads to Turtle format and sends them to the
    * repository as payload.
    *
@@ -156,7 +201,7 @@ class TransactionalRepositoryClient extends BaseRepositoryClient {
         context: TermConverter.toNTripleValues(context),
         baseURI
       })
-      .addContentTypeHeader(RDFMimeType.TURTLE)
+      .addContentTypeHeader(RDFMimeType.TRIG)
       .get();
 
     return this.execute((http) => http.put('', data, requestConfig))
@@ -170,9 +215,9 @@ class TransactionalRepositoryClient extends BaseRepositoryClient {
   }
 
   /**
-   * Deletes the statements in the provided Turtle formatted data.
+   * Deletes the statements in the provided Turtle or Trig formatted data.
    *
-   * @param {string} data payload data in Turtle format
+   * @param {string} data payload data in Turtle or Trig format
    * @return {Promise<void>} promise resolving after the data has been deleted
    * successfully
    * @throws {Error} if no data is provided for deleting
@@ -186,7 +231,7 @@ class TransactionalRepositoryClient extends BaseRepositoryClient {
       .setParams({
         action: 'DELETE'
       })
-      .addContentTypeHeader(RDFMimeType.TURTLE)
+      .addContentTypeHeader(RDFMimeType.TRIG)
       .get();
 
     return this.execute((http) => http.put('', data, requestConfig))
