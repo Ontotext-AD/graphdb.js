@@ -270,7 +270,9 @@ class RDFRepositoryClient extends BaseRepositoryClient {
         query: payload.getQuery(),
         queryType: payload.getQueryType()
       }), 'Queried data');
-      return this.parse(response.getData(), payload.getResponseType());
+      return this.parse(response.getData(), payload.getResponseType(), {
+        queryType: payload.getQueryType()
+      });
     });
   }
 

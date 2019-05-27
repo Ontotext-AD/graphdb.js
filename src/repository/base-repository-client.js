@@ -101,16 +101,17 @@ class BaseRepositoryClient {
    * @protected
    * @param {string} content
    * @param {string} responseType
+   * @param {Object} [parserConfig] optional parser configuration
    * @return {(string|Term|Term[])}
    */
-  parse(content, responseType) {
+  parse(content, responseType, parserConfig = {}) {
     if (!this.parserRegistry.get(responseType)) {
       return content;
     }
     const parser = this.parserRegistry.get(responseType);
 
     const startTime = Date.now();
-    const parsed = parser.parse(content);
+    const parsed = parser.parse(content, parserConfig);
     const elapsedTime = Date.now() - startTime;
 
     this.logger.debug({elapsedTime, responseType}, 'Parsed content');

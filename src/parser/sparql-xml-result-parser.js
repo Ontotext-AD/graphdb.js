@@ -1,5 +1,6 @@
 const ContentTypeParser = require('../parser/content-type-parser');
 const RDFMimeType = require('../http/rdf-mime-type');
+const QueryType = require('../query/query-type');
 const DataFactory = require('n3').DataFactory;
 import {SparqlXmlParser} from 'sparqlxml-parse';
 
@@ -40,12 +41,17 @@ class SparqlXmlResultParser extends ContentTypeParser {
    * stream.on('error', (error) => console.log(error));
    * </code>
    *
-   * @abstract
-   * @param {ReadableStream} stream with the text which has to be parsed to
-   * given format.
-   * @return {ReadableStream} a stream with the converted content.
+   * @param {NodeJS.ReadableStream} stream with the text which has to be parsed
+   * to given format.
+   * @param {Object} [config] optional parser configuration.
+   * @return {NodeJS.ReadableStream|Promise<boolean>} a stream with the
+   * converted content for SELECT and DESCRIBE queries and a Promise which
+   * resolves to boolean value for ASK queries.
    */
-  parse(stream) {
+  parse(stream, config) {
+    if (config.queryType === QueryType.ASK) {
+      return this.parser.parseXmlBooleanStream(stream);
+    }
     return this.parser.parseXmlResultsStream(stream);
   }
 

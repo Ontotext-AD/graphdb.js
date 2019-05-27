@@ -131,6 +131,25 @@ describe('RDFRepositoryClient - query', () => {
       });
     });
 
+    test('xml boolean result', (done) => {
+      repository.httpClients[0].post.mockResolvedValue({
+        data: true
+      });
+
+      const payload = new GetQueryPayload()
+        .setQuery('ask {?s ?p ?o}')
+        .setQueryType(QueryType.ASK)
+        .setResponseType(RDFMimeType.BOOLEAN_RESULT)
+        .setLimit(100);
+
+      repository.registerParser(new SparqlXmlResultParser());
+
+      return repository.query(payload).then((data) => {
+        expect(data).toEqual(true);
+        done();
+      });
+    });
+
     test('json result', (done) => {
       const source = [data.select.json];
       const reader = new ObjectReadableMock(source);
@@ -155,6 +174,26 @@ describe('RDFRepositoryClient - query', () => {
         stream.on('end', done);
       });
     });
+
+    test('json boolean result', (done) => {
+      repository.httpClients[0].post.mockResolvedValue({
+        data: false
+      });
+
+      const payload = new GetQueryPayload()
+        .setQuery('ask {?s ?p ?o}')
+        .setQueryType(QueryType.ASK)
+        .setResponseType(RDFMimeType.BOOLEAN_RESULT)
+        .setLimit(100);
+
+      repository.registerParser(new SparqlJsonResultParser());
+
+      return repository.query(payload).then((data) => {
+        expect(data).toEqual(false);
+        done();
+      });
+    });
+
   });
 
   test('should make a POST request with proper parameters and headers', () => {

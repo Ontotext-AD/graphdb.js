@@ -24,7 +24,7 @@ class TurtleParser extends ContentTypeParser {
   /**
    * @inheritDoc
    */
-  parse(content) {
+  parse(content, config) {
     return this.parser.parse(content);
   }
 

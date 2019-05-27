@@ -27,9 +27,10 @@ class ContentTypeParser {
    *
    * @abstract
    * @param {string} content which has to be parsed to given format.
+   * @param {Object} [config] optional parser configuration.
    * @return {Term} the converted content.
    */
-  parse(content) {
+  parse(content, config) {
     throw new Error('Method #parse(content) must be implemented!');
   }
 
