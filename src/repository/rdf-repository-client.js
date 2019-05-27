@@ -494,30 +494,33 @@ class RDFRepositoryClient extends BaseRepositoryClient {
    * Provided request params will be automatically converted to N-Triples if
    * they are not already encoded as such.
    *
-   * @param {Object} params is an object holding request parameters as returned
-   *                 by {@link GetStatementsPayload#get()}
+   * @param {GetStatementsPayload} payload is an object holding request params
    *
    * @return {Promise<WritableStream>} the client can subscribe to the readable
    * stream events and consume the emitted strings depending on the provided
    * response type as soon as they are available.
    */
-  download(params) {
+  download(payload) {
     const requestConfig = new HttpRequestConfigBuilder()
-      .addAcceptHeader(params.responseType)
+      .addAcceptHeader(payload.getResponseType())
       .setResponseType('stream')
       .setParams({
-        subj: TermConverter.toNTripleValue(params.subject),
-        pred: TermConverter.toNTripleValue(params.predicate),
-        obj: TermConverter.toNTripleValue(params.object),
-        context: TermConverter.toNTripleValues(params.context),
-        infer: params.inference
+        subj: TermConverter.toNTripleValue(payload.getSubject()),
+        pred: TermConverter.toNTripleValue(payload.getPredicate()),
+        obj: TermConverter.toNTripleValue(payload.getObject()),
+        context: TermConverter.toNTripleValues(payload.getContext()),
+        infer: payload.getInference()
       })
       .get();
 
     return this.execute((http) => http.get('/statements', requestConfig))
       .then((response) => {
-        this.logger.debug(this.getLogPayload(response, {params}),
-          'Downloaded data');
+        this.logger.debug(this.getLogPayload(response, {
+          subject: payload.getSubject(),
+          predicate: payload.getPredicate(),
+          object: payload.getObject(),
+          context: payload.getContext()
+        }), 'Downloaded data');
         return response.getData();
       });
   }
