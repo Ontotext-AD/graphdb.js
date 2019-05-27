@@ -190,7 +190,7 @@ class GetQueryPayload extends QueryPayload {
     if (this.getQueryType() === QueryType.DESCRIBE) {
       const isValidType = this.isDescribeQueryResultType(responseType);
       if (!isValidType) {
-        throw new Error(`Invalid responseType=${responseType} for CONSTRUCT 
+        throw new Error(`Invalid responseType=${responseType} for DESCRIBE 
         query! Must be one of ${RDF_FORMATS}`);
       }
     }
