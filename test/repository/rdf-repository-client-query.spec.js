@@ -7,6 +7,7 @@ const QueryType = require('query/query-type');
 const RDFMimeType = require('http/rdf-mime-type');
 const {ObjectReadableMock} = require('stream-mock');
 const SparqlJsonResultParser = require('parser/sparql-json-result-parser');
+const SparqlXmlResultParser = require('parser/sparql-xml-result-parser');
 const DataFactory = require('n3').DataFactory;
 const namedNode = DataFactory.namedNode;
 
@@ -104,23 +105,41 @@ describe('RDFRepositoryClient - query', () => {
     });
   });
 
-  describe('should execute query and stream parsed to objects result', () => {
-    let source;
-    let reader;
-    let expected;
-    let expectedIt;
-
-    beforeEach(() => {
-      source = [data.select.json];
-      reader = new ObjectReadableMock(source);
-      expected = expectedParsedStream();
-      expectedIt = expected[Symbol.iterator]();
+  describe('should execute query and stream parsed to objects', () => {
+    test('xml result', (done) => {
+      const source = [data.select.xml];
+      const reader = new ObjectReadableMock(source);
+      const expected = expectedParsedStream();
+      const expectedIt = expected[Symbol.iterator]();
       repository.httpClients[0].post.mockResolvedValue({
         data: reader
       });
+
+      const payload = new GetQueryPayload()
+        .setQuery('select * where {?s ?p ?o}')
+        .setQueryType(QueryType.SELECT)
+        .setResponseType(RDFMimeType.SPARQL_RESULTS_XML)
+        .setLimit(100);
+
+      repository.registerParser(new SparqlXmlResultParser());
+
+      return repository.query(payload).then((stream) => {
+        stream.on('data', (bindings) => {
+          expect(bindings).toEqual(expectedIt.next().value);
+        });
+        stream.on('end', done);
+      });
     });
 
-    test('from SELECT query with parser', (done) => {
+    test('json result', (done) => {
+      const source = [data.select.json];
+      const reader = new ObjectReadableMock(source);
+      const expected = expectedParsedStream();
+      const expectedIt = expected[Symbol.iterator]();
+      repository.httpClients[0].post.mockResolvedValue({
+        data: reader
+      });
+
       const payload = new GetQueryPayload()
         .setQuery('select * where {?s ?p ?o}')
         .setQueryType(QueryType.SELECT)
