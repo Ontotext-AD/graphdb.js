@@ -124,6 +124,7 @@ class RDFRepositoryClient extends BaseRepositoryClient {
    *
    * @param {string} prefix prefix of the namespace to be retrieved
    * @return {Promise<NamedNode>} promise resolving to {@link NamedNode}
+   * @throws {Error} if the prefix parameter is not supplied
    */
   getNamespace(prefix) {
     if (StringUtils.isBlank(prefix)) {
@@ -147,7 +148,8 @@ class RDFRepositoryClient extends BaseRepositoryClient {
    * @param {string} prefix prefix of the namespace to be created/updated
    * @param {string|NamedNode} namespace the namespace to be created/updated
    * @return {Promise<void>} promise that will be resolved if the create/update
-   *                   request is successful
+   * request is successful
+   * @throws {Error} if the prefix or namespace parameter are not provided
    */
   saveNamespace(prefix, namespace) {
     if (StringUtils.isBlank(prefix)) {
@@ -179,7 +181,8 @@ class RDFRepositoryClient extends BaseRepositoryClient {
    *
    * @param {string} prefix prefix of the namespace to be deleted
    * @return {Promise<void>} promise that will be resolved if the deletion is
-   *                   successful
+   * successful
+   * @throws {Error} if the prefix parameter is not provided
    */
   deleteNamespace(prefix) {
     if (StringUtils.isBlank(prefix)) {
@@ -312,7 +315,9 @@ class RDFRepositoryClient extends BaseRepositoryClient {
    *
    * @param {AddStatementPayload} payload holding request parameters
    * @return {Promise<void>} promise that will be resolved if the addition is
-   *                    successful or rejected in case of failure
+   * successful or rejected in case of failure
+   * @throws {Error} if the payload is not provided or the payload has null
+   * subject, predicate and/or object
    */
   add(payload) {
     if (!payload) {
@@ -403,6 +408,7 @@ class RDFRepositoryClient extends BaseRepositoryClient {
    * data or not
    * @return {Promise<HttpResponse|Error>} promise resolving after the data has
    * been inserted successfully or an error if not
+   * @throws {Error} if no data is provided for saving
    */
   sendData(data, context, baseURI, overwrite) {
     if (StringUtils.isBlank(data)) {

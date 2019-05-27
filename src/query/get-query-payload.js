@@ -56,6 +56,7 @@ class GetQueryPayload extends QueryPayload {
   /**
    * @param {string} query The query as string to be evaluated.
    * @return {UpdateQueryPayload}
+   * @throws {Error} if the query is not a string
    */
   setQuery(query) {
     if (typeof query !== 'string') {
@@ -76,6 +77,7 @@ class GetQueryPayload extends QueryPayload {
   /**
    * @param {string} [queryLn] the query language that is used for the query.
    * @return {GetQueryPayload}
+   * @throws {Error} if the query language is not one of {@link QueryLanguage}
    */
   setQueryLn(queryLn) {
     const supportedLanguages = Object.values(QueryLanguage);
@@ -97,6 +99,7 @@ class GetQueryPayload extends QueryPayload {
    *                 of the actual query.
    * @param {string} [value] A variable's binding value. See the binding comment
    * @return {GetQueryPayload}
+   * @throws {Error} if the binding or the value is not a string
    */
   addBinding(binding, value) {
     if (typeof binding !== 'string' || typeof value !== 'string') {
@@ -111,6 +114,7 @@ class GetQueryPayload extends QueryPayload {
    * @param {boolean} [distinct] Specifies if only distinct query solutions
    *                  should be returned.
    * @return {GetQueryPayload}
+   * @throws {Error} if the parameter is not a boolean
    */
   setDistinct(distinct) {
     if (typeof distinct !== 'boolean') {
@@ -125,10 +129,11 @@ class GetQueryPayload extends QueryPayload {
    * @param {number} limit specifies the maximum number of query solutions to
    *                 return.
    * @return {GetQueryPayload}
+   * @throws {Error} if the limit is not a non negative number
    */
   setLimit(limit) {
     if (typeof limit !== 'number' || limit < 0) {
-      throw new Error('Limit must be a positive number!');
+      throw new Error('Limit must be a non negative number!');
     }
 
     this.payload.limit = limit;
@@ -138,10 +143,11 @@ class GetQueryPayload extends QueryPayload {
   /**
    * @param {number} [offset] Specifies the number of query solutions to skip.
    * @return {GetQueryPayload}
+   * @throws {Error} if the offset is not a non negative number
    */
   setOffset(offset) {
     if (typeof offset !== 'number' || offset < 0) {
-      throw new Error('Offset must be a positive number!');
+      throw new Error('Offset must be a non negative number!');
     }
 
     this.payload.offset = offset;
@@ -150,6 +156,7 @@ class GetQueryPayload extends QueryPayload {
 
   /**
    * @inheritDoc
+   * @throws {Error} if the validation does not pass
    */
   validateParams() {
     if (!this.payload.query) {
@@ -246,6 +253,7 @@ class GetQueryPayload extends QueryPayload {
    *
    * @param {string} responseType
    * @return {GetQueryPayload}
+   * @throws {Error} if the response type is not one of {@link RDFMimeType}
    */
   setResponseType(responseType) {
     const supportedTypes = Object.values(RDFMimeType);
@@ -271,6 +279,7 @@ class GetQueryPayload extends QueryPayload {
    *
    * @param {QueryType} queryType
    * @return {GetQueryPayload}
+   * @throws {Error} if the query type is not one of {@link QueryType}
    */
   setQueryType(queryType) {
     const supportedTypes = Object.values(QueryType);

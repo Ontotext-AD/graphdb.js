@@ -90,6 +90,8 @@ class ParserRegistry {
   /**
    * @private
    * @param {ContentTypeParser} parser to be validated
+   * @throws {Error} if the provided parser is not implementing
+   * {@link ContentTypeParser} or has not supported type
    */
   static validateParser(parser) {
     if (!parser || !(parser instanceof ContentTypeParser)) {

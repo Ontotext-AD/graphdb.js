@@ -234,6 +234,8 @@ class BaseRepositoryClient {
    *
    * @private
    * @param {RepositoryClientConfig} repositoryClientConfig the config to check
+   * @throws {Error} if the configuration is not an instance of
+   * {@link RepositoryClientConfig} or there are no configured endpoints
    */
   static validateConfig(repositoryClientConfig) {
     if (!(repositoryClientConfig instanceof RepositoryClientConfig)) {

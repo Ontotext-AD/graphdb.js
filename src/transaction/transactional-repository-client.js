@@ -42,6 +42,7 @@ class TransactionalRepositoryClient extends BaseRepositoryClient {
   /**
    * @inheritDoc
    * @override
+   * @throws {Error} if the transaction has been committed or rollbacked
    */
   execute(httpClientConsumer) {
     if (!this.active) {
@@ -142,6 +143,7 @@ class TransactionalRepositoryClient extends BaseRepositoryClient {
    * @param {string} [baseURI] used to resolve relative URIs in the data
    * @return {Promise<void>} promise resolving after the data has been inserted
    * successfully
+   * @throws {Error} if no data is provided for saving
    */
   sendData(data, context, baseURI) {
     if (StringUtils.isBlank(data)) {
@@ -173,6 +175,7 @@ class TransactionalRepositoryClient extends BaseRepositoryClient {
    * @param {string} data payload data in Turtle format
    * @return {Promise<void>} promise resolving after the data has been deleted
    * successfully
+   * @throws {Error} if no data is provided for deleting
    */
   deleteData(data) {
     if (StringUtils.isBlank(data)) {

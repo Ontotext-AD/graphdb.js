@@ -40,6 +40,7 @@ class Iterable {
    * the function will blow with an error.
    *
    * @return {Object} the next iterated object from the collection
+   * @throws {Error} if there are no more elements to be iterated
    */
   next() {
     if (!this.hasNext()) {
