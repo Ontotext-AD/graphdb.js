@@ -167,7 +167,11 @@ return server.getRepository('automotive', repositoryClientConfig).then((rdfRepos
 ```
 
 #### Reading
-Statements could be fetched using the `RDFRepositoryClient.get`.
+Statements could be fetched using the `RDFRepositoryClient.get`, `RDFRepositoryClient.query`, 
+`RDFRepositoryClient.download`. 
+
+Every reading method can get the response parsed to data objects according to 
+[RDFJS](http://rdf.js.org/data-model-spec/) data model specification (see [Response Parsers](#Response Parsers)).
 
 * Reading statements
 
@@ -202,55 +206,6 @@ repository.download(payload).then((response) => {
     });
 });
 ```
-
-#### Response Parsers
-Response might be converted to respective format if a response parser is registered 
-for the configured in the payload `responseType`.
-
-The library provides a way parsers to be implemented and registered with given
-repository instance which in turn will use them to convert the response before
-returning it to the client.
-
-A parser could be implemented by extending the `ContentTypeParser` and implementing
-the `parse` and `getSupportedType` methods.
-
-```javascript
-class RdfAsJsonParser extends ContentTypeParser {
-  getSupportedType() {
-    return 'application/rdf+json';
-  }
-
-  parse(content) {
-    // parse and return the content
-    return parsedContent;
-  }
-}
-```
-
-The `getSupportedType` method must return one of the supported RDF and SPARQL
-MIME types this way defining that the parser is responsible for converting from
-that type. 
-
-Parsers should be registered in the repository before executing any request.
-
-```javascript
-// Import any of the predefined parsers
-const {NTriplesParser} = require('rdf4js').parser;
-// And register it in the repository
-repository.registerParser(new NTriplesParser());
-```
-
-Multiple parsers could be registered for different response types. Registering
-second parser for same type results in overriding the previously registerted 
-parser.
-
-The library provides parsers for some rdf formats using a thrid party library
-[N3](https://github.com/rdfjs/N3.js).
-* TurtleParser: `text/turtle`
-* N3parser: `text/rdf+n3`
-* NQuadsParser: `text/x-nquads`
-* NTriplesParser: `text/plain` (`N-Triples`)
-* TrigParser: `application/x-trig`
 
 #### Writing
 
@@ -308,6 +263,65 @@ the `TransactionalRepositoryClient` must be used.
 
 ### Namespaces
 `TODO`
+
+### Response Parsers
+Read responses of different content types might be parsed to data objects with
+parsers registered in the repository instance.
+
+The library provides a way parsers to be implemented and registered with given
+repository instance which in turn will use them to parse the response before
+returning it to the client.
+
+#### Implementing a custom parser
+A parser could be implemented by extending the `ContentTypeParser` and implementing
+the `parse` and `getSupportedType` methods.
+
+```javascript
+class RdfAsJsonParser extends ContentTypeParser {
+  getSupportedType() {
+    return 'application/rdf+json';
+  }
+
+  parse(content) {
+    // parse and return the content
+    return parsedContent;
+  }
+}
+```
+
+The `getSupportedType` method must return one of the supported RDF and SPARQL
+MIME types this way defining that the parser is responsible for converting from
+that type. 
+
+#### Register parser in the repository
+Parsers should be registered in the repository before executing any request.
+
+```javascript
+// Import any of the predefined parsers
+const {NTriplesParser} = require('rdf4js').parser;
+// And register it in the repository
+repository.registerParser(new NTriplesParser());
+```
+
+Multiple parsers could be registered for different response types. 
+
+`Registering a second parser for same content type results in overriding the previously registerted parser!`
+
+#### Predefined parsers
+The library provides parsers for rdf formats using the [N3](https://github.com/rdfjs/N3.js) library:
+* TurtleParser: `text/turtle`
+* N3parser: `text/rdf+n3`
+* NQuadsParser: `text/x-nquads`
+* NTriplesParser: `text/plain` (`N-Triples`)
+* TrigParser: `application/x-trig`
+
+For SELECT query results in `json` and `xml` formats as well as boolean results 
+from ASK queries following parsers are wrapped and exposed: 
+[sparqlxml-parse](https://github.com/rubensworks/sparqlxml-parse.js) and 
+[sparqljson-parse](https://github.com/rubensworks/sparqljson-parse.js)
+* SparqlXmlResultParser: `application/sparql-results+xml`, `text/boolean`
+* SparqlJsonResultParser: `application/sparql-results+json`, `text/boolean`
+
 
 ### License
 [LICENSE](LICENSE)
