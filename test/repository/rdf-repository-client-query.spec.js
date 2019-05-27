@@ -6,8 +6,13 @@ const QueryLanguage = require('query/query-language');
 const QueryType = require('query/query-type');
 const RDFMimeType = require('http/rdf-mime-type');
 const {ObjectReadableMock} = require('stream-mock');
+const SparqlJsonResultParser = require('parser/sparql-json-result-parser');
+const DataFactory = require('n3').DataFactory;
+const namedNode = DataFactory.namedNode;
 
 const httpClientStub = require('../http/http-client.stub');
+
+import data from './data/sparql-query-result';
 
 jest.mock('http/http-client');
 
@@ -99,6 +104,40 @@ describe('RDFRepositoryClient - query', () => {
     });
   });
 
+  describe('should execute query and stream parsed to objects result', () => {
+    let source;
+    let reader;
+    let expected;
+    let expectedIt;
+
+    beforeEach(() => {
+      source = [data.select.json];
+      reader = new ObjectReadableMock(source);
+      expected = expectedParsedStream();
+      expectedIt = expected[Symbol.iterator]();
+      repository.httpClients[0].post.mockResolvedValue({
+        data: reader
+      });
+    });
+
+    test('from SELECT query with parser', (done) => {
+      const payload = new GetQueryPayload()
+        .setQuery('select * where {?s ?p ?o}')
+        .setQueryType(QueryType.SELECT)
+        .setResponseType(RDFMimeType.SPARQL_RESULTS_JSON)
+        .setLimit(100);
+
+      repository.registerParser(new SparqlJsonResultParser());
+
+      return repository.query(payload).then((stream) => {
+        stream.on('data', (bindings) => {
+          expect(bindings).toEqual(expectedIt.next().value);
+        });
+        stream.on('end', done);
+      });
+    });
+  });
+
   test('should make a POST request with proper parameters and headers', () => {
     const postMock = repository.httpClients[0].post;
 
@@ -177,6 +216,31 @@ describe('RDFRepositoryClient - query', () => {
       '<rdf:Description rdf:about="http://www.w3.org/1999/02/22-rdf-syntax-ns#type"><rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"/></rdf:Description>',
       '<rdf:Description rdf:about="http://www.w3.org/2000/01/rdf-schema#subPropertyOf"><rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"/><rdf:type rdf:resource="http://www.w3.org/2002/07/owl#TransitiveProperty"/></rdf:Description>',
       '<rdf:Description rdf:about="http://www.w3.org/2000/01/rdf-schema#domain"><rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"/></rdf:Description>'
+    ];
+  }
+
+  function expectedParsedStream() {
+    return [
+      {
+        p: namedNode('http://www.w3.org/1999/02/22-rdf-syntax-ns#type'),
+        s: namedNode('http://www.w3.org/1999/02/22-rdf-syntax-ns#type'),
+        o: namedNode('http://www.w3.org/1999/02/22-rdf-syntax-ns#Property')
+      },
+      {
+        p: namedNode('http://www.w3.org/1999/02/22-rdf-syntax-ns#type'),
+        s: namedNode('http://www.w3.org/2000/01/rdf-schema#subPropertyOf'),
+        o: namedNode('http://www.w3.org/1999/02/22-rdf-syntax-ns#Property')
+      },
+      {
+        p: namedNode('http://www.w3.org/1999/02/22-rdf-syntax-ns#type'),
+        s: namedNode('http://www.w3.org/2000/01/rdf-schema#subPropertyOf'),
+        o: namedNode('http://www.w3.org/2002/07/owl#TransitiveProperty')
+      },
+      {
+        p: namedNode('http://www.w3.org/1999/02/22-rdf-syntax-ns#type'),
+        s: namedNode('http://www.w3.org/2000/01/rdf-schema#subClassOf'),
+        o: namedNode('http://www.w3.org/1999/02/22-rdf-syntax-ns#Property')
+      }
     ];
   }
 });
