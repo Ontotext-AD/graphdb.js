@@ -1,6 +1,7 @@
 const axios = require('axios');
 const uuidv4 = require('uuid/v4');
 const qs = require('qs');
+const ConsoleLogger = require('../logging/console-logger');
 
 /**
  * Promise based HTTP client that delegates requests to Axios.
@@ -33,6 +34,21 @@ class HttpClient {
     });
     this.readTimeout = 0;
     this.writeTimeout = 0;
+    this.initLogger(baseURL);
+  }
+
+  /**
+   * Instantiates a logger for this http client instance.
+   *
+   * @private
+   * @param {string} baseURL the URL for this client that will be
+   * logged for each request
+   */
+  initLogger(baseURL) {
+    this.logger = new ConsoleLogger({
+      name: 'HttpClient',
+      baseURL
+    });
   }
 
   /**
@@ -88,6 +104,7 @@ class HttpClient {
   get(url, config = {}) {
     this.addXRequestIdHeader(config);
     this.addDefaultReadTimeout(config);
+    this.logger.trace({url, config}, 'Executing GET request');
     return this.axios.get(url, config);
   }
 
@@ -107,6 +124,7 @@ class HttpClient {
   post(url, data, config = {}) {
     this.addXRequestIdHeader(config);
     this.addDefaultWriteTimeout(config);
+    this.logger.trace({url, config, data}, 'Executing POST request');
     return this.axios.post(url, data, config);
   }
 
@@ -126,6 +144,7 @@ class HttpClient {
   put(url, data, config = {}) {
     this.addXRequestIdHeader(config);
     this.addDefaultWriteTimeout(config);
+    this.logger.trace({url, config, data}, 'Executing PUT request');
     return this.axios.put(url, data, config);
   }
 
@@ -144,6 +163,7 @@ class HttpClient {
   deleteResource(url, config = {}) {
     this.addXRequestIdHeader(config);
     this.addDefaultWriteTimeout(config);
+    this.logger.trace({url, config}, 'Executing DELETE request');
     return this.axios.delete(url, config);
   }
 
@@ -184,6 +204,15 @@ class HttpClient {
     if (!requestConfig.timeout) {
       requestConfig.timeout = this.writeTimeout;
     }
+  }
+
+  /**
+   * Returns the base URL which this http client uses to send requests.
+   *
+   * @return {string} the base URL for each request
+   */
+  getBaseURL() {
+    return this.axios.defaults.baseURL;
   }
 
   /**

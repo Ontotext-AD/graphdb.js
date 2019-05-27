@@ -520,8 +520,7 @@ describe('RDFRepositoryClient - transactions', () => {
         .setPredicate('<http://eunis.eea.europa.eu/rdf/schema.rdf#population>')
         .setObject('"7931000"^^http://www.w3.org/2001/XMLSchema#integer')
         .setContext('<http://example.org/graph3>')
-        .setInference(true)
-        .get();
+        .setInference(true);
     }
   });
 

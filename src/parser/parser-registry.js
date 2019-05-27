@@ -1,4 +1,5 @@
 const ContentTypeParser = require('../parser/content-type-parser');
+const ConsoleLogger = require('../logging/console-logger');
 
 /**
  * Implementation of registry holding {@link ContentTypeParser} instances and
@@ -19,8 +20,18 @@ class ParserRegistry {
    */
   constructor(parsers = []) {
     this.parsers = {};
+    this.initLogger();
     this.validateParsers(parsers);
     this.init(parsers);
+  }
+
+  /**
+   * Initializes a console logger.
+   */
+  initLogger() {
+    this.logger = new ConsoleLogger({
+      name: 'ParserRegistry'
+    });
   }
 
   /**
@@ -34,7 +45,11 @@ class ParserRegistry {
   register(parser) {
     ParserRegistry.validateParser(parser);
 
-    // TODO: log a warning about overriding existing parser!
+    const supportedType = parser.getSupportedType();
+    if (this.parsers[supportedType]) {
+      this.logger.warn({parserType: supportedType},
+        'Overriding registered parser');
+    }
 
     this.parsers[parser.getSupportedType()] = parser;
   }

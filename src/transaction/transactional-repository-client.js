@@ -1,4 +1,5 @@
 const BaseRepositoryClient = require('../repository/base-repository-client');
+const ConsoleLogger = require('../logging/console-logger');
 const RDFMimeType = require('../http/rdf-mime-type');
 const TermConverter = require('../model/term-converter');
 const StringUtils = require('../util/string-utils');
@@ -31,6 +32,15 @@ class TransactionalRepositoryClient extends BaseRepositoryClient {
 
   /**
    * @inheritDoc
+   */
+  getLogger() {
+    return new ConsoleLogger({
+      name: 'TransactionalRepositoryClient'
+    });
+  }
+
+  /**
+   * @inheritDoc
    * @override
    */
   execute(httpClientConsumer) {
@@ -58,7 +68,12 @@ class TransactionalRepositoryClient extends BaseRepositoryClient {
       })
       .get();
 
-    return this.execute((http) => http.put('', null, requestConfig));
+    return this.execute((http) => http.put('', null, requestConfig))
+      .then((response) => {
+        this.logger.debug(this.getLogPayload(response, {context}),
+          'Fetched size');
+        return response.getData();
+      });
   }
 
   /**
@@ -69,26 +84,34 @@ class TransactionalRepositoryClient extends BaseRepositoryClient {
    * Provided values will be automatically converted to N-Triples if they are
    * not already encoded as such.
    *
-   * @param {Object} params is an object holding request parameters as returned
-   *                 by {@link GetStatementsPayload#get()}
+   * @param {GetStatementsPayload} payload is an object holding the request
+   * parameters.
    * @return {Promise<string|Quad>} resolves with plain string or Quad according
    *      to provided response type.
    */
-  get(params) {
+  get(payload) {
     const requestConfig = new HttpRequestConfigBuilder()
       .setParams({
         action: 'GET',
-        subj: TermConverter.toNTripleValue(params.subject),
-        pred: TermConverter.toNTripleValue(params.predicate),
-        obj: TermConverter.toNTripleValue(params.object),
-        context: TermConverter.toNTripleValues(params.context),
-        infer: params.inference
+        subj: TermConverter.toNTripleValue(payload.getSubject()),
+        pred: TermConverter.toNTripleValue(payload.getPredicate()),
+        obj: TermConverter.toNTripleValue(payload.getObject()),
+        context: TermConverter.toNTripleValues(payload.getContext()),
+        infer: payload.getInference()
       })
-      .addAcceptHeader(params.responseType)
+      .addAcceptHeader(payload.getResponseType())
       .get();
 
     return this.execute((http) => http.put('', null, requestConfig))
-      .then((data) => this.parse(data, params.responseType));
+      .then((response) => {
+        this.logger.debug(this.getLogPayload(response, {
+          subject: payload.getSubject(),
+          predicate: payload.getPredicate(),
+          object: payload.getObject(),
+          context: payload.getContext()
+        }), 'Fetched data');
+        return this.parse(response.getData(), payload.getResponseType());
+      });
   }
 
   /**
@@ -134,7 +157,14 @@ class TransactionalRepositoryClient extends BaseRepositoryClient {
       .addContentTypeHeader(RDFMimeType.TURTLE)
       .get();
 
-    return this.execute((http) => http.put('', data, requestConfig));
+    return this.execute((http) => http.put('', data, requestConfig))
+      .then((response) => {
+        this.logger.debug(this.getLogPayload(response, {
+          data,
+          context,
+          baseURI
+        }), 'Inserted statements');
+      });
   }
 
   /**
@@ -156,7 +186,10 @@ class TransactionalRepositoryClient extends BaseRepositoryClient {
       .addContentTypeHeader(RDFMimeType.TURTLE)
       .get();
 
-    return this.execute((http) => http.put('', data, requestConfig));
+    return this.execute((http) => http.put('', data, requestConfig))
+      .then((response) => {
+        this.logger.debug(this.getLogPayload(response, {data}), 'Deleted data');
+      });
   }
 
   /**
@@ -177,17 +210,14 @@ class TransactionalRepositoryClient extends BaseRepositoryClient {
    * been successfully consumed by the server
    */
   upload(readStream, context, baseURI, contentType) {
-    const requestConfig = new HttpRequestConfigBuilder()
-      .addContentTypeHeader(contentType)
-      .setResponseType('stream')
-      .setParams({
-        action: 'ADD',
-        context: TermConverter.toNTripleValues(context),
-        baseURI
-      })
-      .get();
-
-    return this.execute((http) => http.put('', readStream, requestConfig));
+    return this.uploadData(readStream, context, baseURI, contentType)
+      .then((response) => {
+        this.logger.debug(this.getLogPayload(response, {
+          context,
+          baseURI,
+          contentType
+        }), 'Uploaded data stream');
+      });
   }
 
   /**
@@ -204,8 +234,46 @@ class TransactionalRepositoryClient extends BaseRepositoryClient {
    * been successfully consumed by the server
    */
   addFile(filePath, context, baseURI, contentType) {
-    return this.upload(FileUtils.getReadStream(filePath), context, baseURI,
-      contentType);
+    return this.uploadData(FileUtils.getReadStream(filePath), context, baseURI,
+      contentType).then((response) => {
+      this.logger.debug(this.getLogPayload(response, {
+        filePath,
+        context,
+        baseURI,
+        contentType
+      }), 'Uploaded file');
+    });
+  }
+
+  /**
+   * Streams data to the repository from the provided readable stream.
+   *
+   * This method is useful for library client who wants to upload a big data set
+   * into the repository during a transaction
+   *
+   * @param {ReadableStream} readStream stream with the data to be uploaded
+   * @param {NamedNode|string} [context] optional context to restrict the
+   * operation. Will be encoded as N-Triple if it is not already one
+   * @param {string} [baseURI] optional uri against which any relative URIs
+   * found in the data would be resolved.
+   * @param {string} contentType is one of RDF mime type formats,
+   *                application/x-rdftransaction' for a transaction document or
+   *                application/x-www-form-urlencoded
+   * @return {Promise<HttpResponse|Error>} a promise that will be resolved when
+   * the stream has been successfully consumed by the server
+   */
+  uploadData(readStream, context, baseURI, contentType) {
+    const requestConfig = new HttpRequestConfigBuilder()
+      .addContentTypeHeader(contentType)
+      .setResponseType('stream')
+      .setParams({
+        action: 'ADD',
+        context: TermConverter.toNTripleValues(context),
+        baseURI
+      })
+      .get();
+
+    return this.execute((http) => http.put('', readStream, requestConfig));
   }
 
   /**
@@ -224,8 +292,9 @@ class TransactionalRepositoryClient extends BaseRepositoryClient {
       .get();
 
     return this.execute((http) => http.put('', null, requestConfig))
-      .then(() => {
+      .then((response) => {
         this.active = false;
+        this.logger.debug(this.getLogPayload(response), 'Transaction commit');
       }).catch((err) => {
         this.active = false;
         return Promise.reject(err);
@@ -240,8 +309,9 @@ class TransactionalRepositoryClient extends BaseRepositoryClient {
    * @return {Promise<void>} that will be resolved after successful rollback
    */
   rollback() {
-    return this.execute((http) => http.deleteResource('')).then(() => {
+    return this.execute((http) => http.deleteResource('')).then((response) => {
       this.active = false;
+      this.logger.debug(this.getLogPayload(response), 'Transaction rollback');
     }).catch((err) => {
       this.active = false;
       return Promise.reject(err);
