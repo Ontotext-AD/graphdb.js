@@ -1,0 +1,1 @@
+<http://domain/resource/resource-1> <http://domain/property/property-float> "3.1415"^^<xsd:decimal>.

@@ -33,7 +33,7 @@ class TermConverter {
   /**
    * Convert the supplied params to a collection of quads.
    *
-   * The quads object term will be a literal with a language.
+   * The quads object term will be a literal with a data type or a language.
    *
    * The produced quads size depends on the supplied amount of context.
    *
@@ -42,33 +42,18 @@ class TermConverter {
    * @param {string} subject the quad's subject
    * @param {string} predicate the quad's predicate
    * @param {string} object the quad's object
+   * @param {(string|string[])} [contexts] the quad's context
+   * @param {string} type the quad's data type
    * @param {string} language the quad's literal language
-   * @param {(string|string[])} [contexts] the quad's context
    * @return {Quad[]} a collection of quads constructed from the provided params
    */
-  static getQuadsWithLanguage(subject, predicate, object, language, contexts) {
-    const objectTerm = TermConverter.toObjectWithLanguage(object, language);
-    return TermConverter.toQuads(subject, predicate, objectTerm, contexts);
-  }
-
-  /**
-   * Convert the supplied params to a collection of quads.
-   *
-   * The quads object term will be a literal with a data type.
-   *
-   * The produced quads size depends on the supplied amount of context.
-   *
-   * @public
-   * @static
-   * @param {string} subject the quad's subject
-   * @param {string} predicate the quad's predicate
-   * @param {string} object the quad's object
-   * @param {string} dataType the quad's literal data type
-   * @param {(string|string[])} [contexts] the quad's context
-   * @return {Quad[]} a collection of quads constructed from the provided params
-   */
-  static getQuadsWithDataType(subject, predicate, object, dataType, contexts) {
-    const objectTerm = TermConverter.toObjectWithDataType(object, dataType);
+  static getLiteralQuads(subject, predicate, object, contexts, type, language) {
+    let objectTerm;
+    if (language) {
+      objectTerm = TermConverter.toObjectWithLanguage(object, language);
+    } else {
+      objectTerm = TermConverter.toObjectWithDataType(object, type);
+    }
     return TermConverter.toQuads(subject, predicate, objectTerm, contexts);
   }
 

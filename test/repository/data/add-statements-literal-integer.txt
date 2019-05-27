@@ -1,0 +1,1 @@
+<http://domain/resource/resource-1> <http://domain/property/property-int> "4"^^<xsd:integer>.
