@@ -79,38 +79,6 @@ npm run build
 ### Prerequisites
 Node >= 8.16
 
-## Development
-
-### Setup Environment
-
-* Checkout or clone the project.
-* Make sure prerequisites are covered: node js and npm must be present and versions
-should be supported.
-* Enter the project directory and execute
-
-```
-npm install
-```
-
-### Run tests
-After any change the tests should be run and check if any existing functionality
-is not broken in result.
-
-```
-npm run test
-```
-
-or constantly watching for changes in source files and tests and re-execute the 
-test suite
-
-```
-npm run test:watch
-```
-
-The best and preferred way a new feature or changes to be introduced is a test
-case to be written first and then the change to be implemented following the TDD
-approach.
-
 ## Usage
 
 ### ServerClient
