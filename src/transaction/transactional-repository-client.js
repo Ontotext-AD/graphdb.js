@@ -117,6 +117,60 @@ class TransactionalRepositoryClient extends BaseRepositoryClient {
   }
 
   /**
+   * Executes request to query a repository.
+   *
+   * @param {GetQueryPayload} payload is an object holding request parameters
+   *
+   * @return {Promise} the client can subscribe to the stream events and consume
+   * the emitted strings or Quads depending on the provided response type as
+   * soon as they are available.
+   */
+  query(payload) {
+    const requestConfig = new HttpRequestConfigBuilder()
+      .setResponseType('stream')
+      .addAcceptHeader(payload.getResponseType())
+      .addContentTypeHeader(payload.getContentType())
+      .setParams({
+        action: 'QUERY'
+      })
+      .get();
+
+    return this.execute((http) => http.put('', payload.getParams(),
+      requestConfig)).then((response) => {
+      this.logger.debug(this.getLogPayload(response, {
+        query: payload.getQuery(),
+        queryType: payload.getQueryType()
+      }), 'Queried data');
+
+      return this.parse(response.getData(), payload.getResponseType(), {
+        queryType: payload.getQueryType()
+      });
+    });
+  }
+
+  /**
+   * Executes a request with a SPARQL query to update repository data.
+   *
+   * @param {UpdateQueryPayload} payload request object containing the query
+   * @return {Promise<void>} promise that will be resolved if the update is
+   * successful or rejected in case of failure
+   */
+  update(payload) {
+    const requestConfig = new HttpRequestConfigBuilder()
+      .addContentTypeHeader(payload.getContentType())
+      .setParams({
+        action: 'UPDATE'
+      })
+      .get();
+
+    return this.execute((http) => http.put('', payload.getParams(),
+      requestConfig)).then((response) => {
+      this.logger.debug(this.getLogPayload(response,
+        {query: payload.getQuery()}), 'Performed update');
+    });
+  }
+
+  /**
    * Saves the provided statement payload in the repository.
    *
    * The payload will be converted to a quad or a collection of quads in case
@@ -237,6 +291,47 @@ class TransactionalRepositoryClient extends BaseRepositoryClient {
     return this.execute((http) => http.put('', data, requestConfig))
       .then((response) => {
         this.logger.debug(this.getLogPayload(response, {data}), 'Deleted data');
+      });
+  }
+
+  /**
+   * Fetch rdf data from statements endpoint using provided parameters.
+   *
+   * The request is configured so that expected response should be a readable
+   * stream.
+   *
+   * Provided request params will be automatically converted to N-Triples if
+   * they are not already encoded as such.
+   *
+   * @param {GetStatementsPayload} payload is an object holding request params
+   *
+   * @return {Promise<WritableStream>} the client can subscribe to the readable
+   * stream events and consume the emitted strings depending on the provided
+   * response type as soon as they are available.
+   */
+  download(payload) {
+    const requestConfig = new HttpRequestConfigBuilder()
+      .addAcceptHeader(payload.getResponseType())
+      .setResponseType('stream')
+      .setParams({
+        action: 'GET',
+        subj: TermConverter.toNTripleValue(payload.getSubject()),
+        pred: TermConverter.toNTripleValue(payload.getPredicate()),
+        obj: TermConverter.toNTripleValue(payload.getObject()),
+        context: TermConverter.toNTripleValues(payload.getContext()),
+        infer: payload.getInference()
+      })
+      .get();
+
+    return this.execute((http) => http.put('', null, requestConfig))
+      .then((response) => {
+        this.logger.debug(this.getLogPayload(response, {
+          subject: payload.getSubject(),
+          predicate: payload.getPredicate(),
+          object: payload.getObject(),
+          context: payload.getContext()
+        }), 'Downloaded data');
+        return response.getData();
       });
   }
 

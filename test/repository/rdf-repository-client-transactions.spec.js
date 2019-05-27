@@ -7,6 +7,10 @@ const GetStatementsPayload = require('repository/get-statements-payload');
 const RDFMimeType = require('http/rdf-mime-type');
 const FileUtils = require('util/file-utils');
 const AddStatementPayload = require('repository/add-statement-payload');
+const GetQueryPayload = require('query/get-query-payload');
+const QueryType = require('query/query-type');
+const UpdateQueryPayload = require('query/update-query-payload');
+const QueryContentType = require('http/query-content-type');
 
 const {namedNode, literal, quad} = require('n3').DataFactory;
 
@@ -29,6 +33,8 @@ describe('RDFRepositoryClient - transactions', () => {
 
   const context = '<urn:x-local:graph1>';
   const baseURI = '<urn:x-local:graph2>';
+
+  const testFilePath = path.resolve(__dirname, './data/add-statements-complex.txt');
 
   beforeEach(() => {
     repoClientConfig = new RepositoryClientConfig([
@@ -259,11 +265,14 @@ describe('RDFRepositoryClient - transactions', () => {
 
     describe('get()', () => {
       test('should retrieve statements', () => {
-        // TODO: This is not testing parsing...
-        httpPut.mockImplementation(() => {
-          return Promise.resolve({data: ''});
+        const data = testUtils.loadFile(testFilePath).trim();
+        httpPut.mockResolvedValue({data});
+        return transaction.get(getStatementPayload()).then((result) => {
+          expect(result).toEqual(data);
         });
+      });
 
+      test('should properly request to retrieve statements', () => {
         return transaction.get(getStatementPayload()).then(() => {
           expect(httpPut).toHaveBeenCalledTimes(1);
           expect(httpPut).toHaveBeenCalledWith('', null, {
@@ -283,6 +292,75 @@ describe('RDFRepositoryClient - transactions', () => {
       test('should reject if the transaction cannot retrieve statements', () => {
         httpPut.mockRejectedValue('Error during retrieve');
         return expect(transaction.get(getStatementPayload())).rejects.toEqual('Error during retrieve');
+      });
+    });
+
+    describe('query()', () => {
+      const payload = new GetQueryPayload()
+        .setQuery('ask {?s ?p ?o}')
+        .setQueryType(QueryType.ASK)
+        .setResponseType(RDFMimeType.BOOLEAN_RESULT)
+        .setContentType(QueryContentType.SPARQL_QUERY)
+        .setTimeout(5);
+
+      test('should query data', () => {
+        httpPut.mockResolvedValue({data: true});
+        return transaction.query(payload).then((response) => {
+          expect(response).toEqual(true);
+        });
+      });
+
+      test('should properly perform query request', () => {
+        httpPut.mockResolvedValue({data: true});
+        return transaction.query(payload).then(() => {
+          expect(httpPut).toHaveBeenCalledTimes(1);
+          expect(httpPut).toHaveBeenCalledWith('', 'ask {?s ?p ?o}', {
+            params: {
+              action: 'QUERY'
+            },
+            headers: {
+              'Accept': 'text/boolean',
+              'Content-Type': QueryContentType.SPARQL_QUERY
+            },
+            responseType: 'stream'
+          });
+        });
+      });
+
+      test('should reject if the transaction cannot perform a query request', () => {
+        const err = new Error('Cannot query');
+        httpPut.mockRejectedValue(err);
+        return expect(transaction.query(payload)).rejects.toEqual(err);
+      });
+    });
+
+    describe('update()', () => {
+      const updatePayload = new UpdateQueryPayload()
+        .setContentType(QueryContentType.SPARQL_UPDATE)
+        .setQuery('INSERT {?s ?p ?o} WHERE {?s ?p ?o}');
+
+      test('should perform update with proper request', () => {
+        return transaction.update(updatePayload).then(() => {
+          expect(httpPut).toHaveBeenCalledTimes(1);
+          expect(httpPut).toHaveBeenCalledWith('', 'INSERT {?s ?p ?o} WHERE {?s ?p ?o}', {
+            params: {
+              action: 'UPDATE'
+            },
+            headers: {
+              'Content-Type': QueryContentType.SPARQL_UPDATE
+            }
+          });
+        });
+      });
+
+      test('should reject if the transaction cannot perform an update request', () => {
+        const err = new Error('Cannot update');
+        httpPut.mockRejectedValue(err);
+        return expect(transaction.update(updatePayload)).rejects.toEqual(err);
+      });
+
+      test('should resolve to empty response (HTTP 204)', () => {
+        return expect(transaction.update(updatePayload)).resolves.toEqual();
       });
     });
 
@@ -461,9 +539,48 @@ describe('RDFRepositoryClient - transactions', () => {
       });
     });
 
-    describe('upload()', () => {
-      const testFilePath = path.resolve(__dirname, './data/add-statements-complex.txt');
+    describe('download()', () => {
+      test('should download data', () => {
+        httpPut.mockResolvedValue({
+          data: FileUtils.getReadStream(testFilePath)
+        });
+        return transaction.download(getStatementPayload()).then((dataStream) => {
+          return testUtils.readStream(dataStream);
+        }).then((data) => {
+          const turtleData = testUtils.loadFile(testFilePath).trim();
+          expect(data).toEqual(turtleData);
+        });
+      });
 
+      test('should properly request to download data', () => {
+        httpPut.mockResolvedValue({
+          data: FileUtils.getReadStream(testFilePath)
+        });
+        return transaction.download(getStatementPayload()).then(() => {
+          expect(httpPut).toHaveBeenCalledTimes(1);
+          expect(httpPut).toHaveBeenCalledWith('', null, {
+            headers: {'Accept': RDFMimeType.RDF_JSON},
+            params: {
+              action: 'GET',
+              context: '<http://example.org/graph3>',
+              infer: true,
+              obj: '"7931000"^^http://www.w3.org/2001/XMLSchema#integer',
+              pred: '<http://eunis.eea.europa.eu/rdf/schema.rdf#population>',
+              subj: '<http://eunis.eea.europa.eu/countries/AZ>'
+            },
+            responseType: 'stream'
+          });
+        });
+      });
+
+      test('should reject if the transaction cannot download data', () => {
+        const err = new Error('Cannot download data');
+        httpPut.mockRejectedValue(err);
+        return expect(transaction.download(getStatementPayload())).rejects.toEqual(err);
+      });
+    });
+
+    describe('upload()', () => {
       test('should upload data stream in given context and base URI', () => {
         const turtleStream = FileUtils.getReadStream(testFilePath);
 
@@ -489,7 +606,7 @@ describe('RDFRepositoryClient - transactions', () => {
           });
 
           const stream = httpPutCall[1];
-          return testUtils.readStream(stream)
+          return testUtils.readStream(stream);
         }).then((streamData) => {
           const turtleData = testUtils.loadFile(testFilePath).trim();
           expect(streamData).toEqual(turtleData);

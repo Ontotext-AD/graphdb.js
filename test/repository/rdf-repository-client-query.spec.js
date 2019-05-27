@@ -91,7 +91,7 @@ describe('RDFRepositoryClient - query', () => {
 
     test('from ASK query', (done) => {
       const payload = new GetQueryPayload()
-        .setQuery('PREFIX books: <http://www.example/book/> DESCRIBE books:book6')
+        .setQuery('ask {?s ?p ?o}')
         .setQueryType(QueryType.ASK)
         .setResponseType(RDFMimeType.BOOLEAN_RESULT)
         .setLimit(100);
