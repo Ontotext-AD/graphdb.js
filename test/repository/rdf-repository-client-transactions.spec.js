@@ -417,7 +417,7 @@ describe('RDFRepositoryClient - transactions', () => {
       test('should upload data stream in given context and base URI', () => {
         const turtleStream = FileUtils.getReadStream(testFilePath);
 
-        return transaction.upload(turtleStream, context, baseURI, RDFMimeType.TRIG).then(() => {
+        return transaction.upload(turtleStream, RDFMimeType.TRIG, context, baseURI).then(() => {
           expect(httpPut).toHaveBeenCalledTimes(1);
 
           const httpPutCall = httpPut.mock.calls[0];
@@ -451,13 +451,13 @@ describe('RDFRepositoryClient - transactions', () => {
         httpPut.mockRejectedValue(error);
 
         const turtleStream = FileUtils.getReadStream(testFilePath);
-        const promise = transaction.upload(turtleStream, context, null, RDFMimeType.TRIG);
+        const promise = transaction.upload(turtleStream, RDFMimeType.TRIG, context, null);
         return expect(promise).rejects.toEqual(error);
       });
 
       test('should resolve to empty response (HTTP 204)', () => {
         const turtleStream = FileUtils.getReadStream(testFilePath);
-        return expect(transaction.upload(turtleStream, context, baseURI, RDFMimeType.TRIG)).resolves.toEqual();
+        return expect(transaction.upload(turtleStream, RDFMimeType.TRIG, context, baseURI)).resolves.toEqual();
       });
     });
 
@@ -465,7 +465,7 @@ describe('RDFRepositoryClient - transactions', () => {
       const testFilePath = path.resolve(__dirname, './data/add-statements-complex.txt');
 
       test('should upload file with data as stream in given context and base URI', () => {
-        return transaction.addFile(testFilePath, context, baseURI, RDFMimeType.TRIG).then(() => {
+        return transaction.addFile(testFilePath, RDFMimeType.TRIG, context, baseURI).then(() => {
           expect(httpPut).toHaveBeenCalledTimes(1);
 
           const httpPutCall = httpPut.mock.calls[0];
@@ -498,18 +498,18 @@ describe('RDFRepositoryClient - transactions', () => {
         const error = new Error('cannot-upload');
         httpPut.mockRejectedValue(error);
 
-        const promise = transaction.addFile(testFilePath, context, null, RDFMimeType.TRIG);
+        const promise = transaction.addFile(testFilePath, RDFMimeType.TRIG, context, null);
         return expect(promise).rejects.toEqual(error);
       });
 
       test('should disallow uploading missing files', () => {
-        expect(() => transaction.addFile(null, context, baseURI, RDFMimeType.TRIG)).toThrow(Error);
-        expect(() => transaction.addFile('', context, baseURI, RDFMimeType.TRIG)).toThrow(Error);
-        expect(() => transaction.addFile('missing-file-123', context, baseURI, RDFMimeType.TRIG)).toThrow(Error);
+        expect(() => transaction.addFile(null, RDFMimeType.TRIG, context, baseURI)).toThrow(Error);
+        expect(() => transaction.addFile('', RDFMimeType.TRIG, context, baseURI)).toThrow(Error);
+        expect(() => transaction.addFile('missing-file-123', RDFMimeType.TRIG, context, baseURI)).toThrow(Error);
       });
 
       test('should resolve to empty response (HTTP 204)', () => {
-        return expect(transaction.addFile(testFilePath, context, baseURI, RDFMimeType.TRIG)).resolves.toEqual();
+        return expect(transaction.addFile(testFilePath, RDFMimeType.TRIG, context, baseURI)).resolves.toEqual();
       });
     });
 

@@ -40,7 +40,7 @@ describe('RdfRepositoryClient - uploading files', () => {
     });
 
     test('should open a readable stream of the file and send it to the server', () => {
-      return rdfRepositoryClient.addFile(testFilePath, context, baseURI, RDFMimeType.TRIG).then(() => {
+      return rdfRepositoryClient.addFile(testFilePath, RDFMimeType.TRIG, context, baseURI).then(() => {
         expect(httpPost).toHaveBeenCalledTimes(1);
 
         const httpPostCall = httpPost.mock.calls[0];
@@ -72,18 +72,18 @@ describe('RdfRepositoryClient - uploading files', () => {
       const error = new Error('cannot-upload-file');
       when(httpPost).calledWith(expect.stringContaining('/statements')).mockRejectedValue(error);
 
-      const promise = rdfRepositoryClient.addFile(testFilePath, context, baseURI, RDFMimeType.TRIG);
+      const promise = rdfRepositoryClient.addFile(testFilePath, RDFMimeType.TRIG, context, baseURI);
       return expect(promise).rejects.toEqual(error);
     });
 
     test('should disallow uploading missing files', () => {
-      expect(() => rdfRepositoryClient.addFile(null, context, baseURI, RDFMimeType.TRIG)).toThrow(Error);
-      expect(() => rdfRepositoryClient.addFile('', context, baseURI, RDFMimeType.TRIG)).toThrow(Error);
-      expect(() => rdfRepositoryClient.addFile('missing-file-123', context, baseURI, RDFMimeType.TRIG)).toThrow(Error);
+      expect(() => rdfRepositoryClient.addFile(null, RDFMimeType.TRIG, context, baseURI)).toThrow(Error);
+      expect(() => rdfRepositoryClient.addFile('', RDFMimeType.TRIG, context, baseURI)).toThrow(Error);
+      expect(() => rdfRepositoryClient.addFile('missing-file-123', RDFMimeType.TRIG, context, baseURI)).toThrow(Error);
     });
 
     test('should resolve to empty response (HTTP 204)', () => {
-      return expect(rdfRepositoryClient.addFile(testFilePath, context, baseURI, RDFMimeType.TRIG)).resolves.toEqual();
+      return expect(rdfRepositoryClient.addFile(testFilePath, RDFMimeType.TRIG, context, baseURI)).resolves.toEqual();
     });
   });
 
@@ -95,7 +95,7 @@ describe('RdfRepositoryClient - uploading files', () => {
     });
 
     test('should open a readable stream of the file and send it to the server to overwrite the data', () => {
-      return rdfRepositoryClient.putFile(testFilePath, context, baseURI, RDFMimeType.TRIG).then(() => {
+      return rdfRepositoryClient.putFile(testFilePath, RDFMimeType.TRIG, context, baseURI).then(() => {
         expect(httpPut).toHaveBeenCalledTimes(1);
 
         const httpPutCall = httpPut.mock.calls[0];
@@ -127,18 +127,18 @@ describe('RdfRepositoryClient - uploading files', () => {
       const error = new Error('cannot-upload-file');
       when(httpPut).calledWith(expect.stringContaining('/statements')).mockRejectedValue(error);
 
-      const promise = rdfRepositoryClient.putFile(testFilePath, context, baseURI, RDFMimeType.TRIG);
+      const promise = rdfRepositoryClient.putFile(testFilePath, RDFMimeType.TRIG, context, baseURI);
       return expect(promise).rejects.toEqual(error);
     });
 
     test('should disallow overwriting with missing files', () => {
-      expect(() => rdfRepositoryClient.putFile(null, context, baseURI, RDFMimeType.TRIG)).toThrow(Error);
-      expect(() => rdfRepositoryClient.putFile('', context, baseURI, RDFMimeType.TRIG)).toThrow(Error);
-      expect(() => rdfRepositoryClient.putFile('missing-file-123', context, baseURI, RDFMimeType.TRIG)).toThrow(Error);
+      expect(() => rdfRepositoryClient.putFile(null, RDFMimeType.TRIG, context, baseURI)).toThrow(Error);
+      expect(() => rdfRepositoryClient.putFile('', RDFMimeType.TRIG, context, baseURI)).toThrow(Error);
+      expect(() => rdfRepositoryClient.putFile('missing-file-123', RDFMimeType.TRIG, context, baseURI)).toThrow(Error);
     });
 
     test('should resolve to empty response (HTTP 204)', () => {
-      return expect(rdfRepositoryClient.putFile(testFilePath, context, baseURI, RDFMimeType.TRIG)).resolves.toEqual();
+      return expect(rdfRepositoryClient.putFile(testFilePath, RDFMimeType.TRIG, context, baseURI)).resolves.toEqual();
     });
   });
 

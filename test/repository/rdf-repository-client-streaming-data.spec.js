@@ -35,7 +35,7 @@ describe('RdfRepositoryClient - streaming data', () => {
       const stream = new ObjectReadableMock(source);
       const expectedIt = source[Symbol.iterator]();
 
-      return rdfRepositoryClient.upload(stream, context, baseURI, contentType)
+      return rdfRepositoryClient.upload(stream, contentType, context, baseURI)
         .then(() => {
           stream.on('data', (chunk) => {
             expect(chunk).toEqual(expectedIt.next().value);
@@ -47,7 +47,7 @@ describe('RdfRepositoryClient - streaming data', () => {
     test('should make a POST request with proper parameters and headers', () => {
       const postMock = rdfRepositoryClient.httpClients[0].post;
 
-      return rdfRepositoryClient.upload({}, context, baseURI, contentType).then(() => {
+      return rdfRepositoryClient.upload({}, contentType, context, baseURI).then(() => {
         verifyUploadRequest(postMock);
       });
     });
@@ -56,7 +56,7 @@ describe('RdfRepositoryClient - streaming data', () => {
       const postMock = rdfRepositoryClient.httpClients[0].post;
 
       // Not encoded as N-Triple
-      return rdfRepositoryClient.upload({}, 'urn:x-local:graph1', baseURI, contentType).then(() => {
+      return rdfRepositoryClient.upload({}, contentType, 'urn:x-local:graph1', baseURI).then(() => {
         verifyUploadRequest(postMock);
       });
     });
@@ -86,7 +86,7 @@ describe('RdfRepositoryClient - streaming data', () => {
       const stream = new ObjectReadableMock(source);
       const expectedIt = source[Symbol.iterator]();
 
-      return rdfRepositoryClient.overwrite(stream, context, baseURI, contentType)
+      return rdfRepositoryClient.overwrite(stream, contentType, context, baseURI)
         .then(() => {
           stream.on('data', (chunk) => {
             expect(chunk).toEqual(expectedIt.next().value);
@@ -98,7 +98,7 @@ describe('RdfRepositoryClient - streaming data', () => {
     test('should make a PUT request with proper parameters and headers', () => {
       const putMock = rdfRepositoryClient.httpClients[0].put;
 
-      return rdfRepositoryClient.overwrite({}, context, baseURI, contentType).then(() => {
+      return rdfRepositoryClient.overwrite({}, contentType, context, baseURI).then(() => {
         verifyOverwriteRequest(putMock);
       });
     });
@@ -107,7 +107,7 @@ describe('RdfRepositoryClient - streaming data', () => {
       const putMock = rdfRepositoryClient.httpClients[0].put;
 
       // Not encoded as N-Triple
-      return rdfRepositoryClient.overwrite({}, 'urn:x-local:graph1', baseURI, contentType).then(() => {
+      return rdfRepositoryClient.overwrite({}, contentType, 'urn:x-local:graph1', baseURI).then(() => {
         verifyOverwriteRequest(putMock);
       });
     });
