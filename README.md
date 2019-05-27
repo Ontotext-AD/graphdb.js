@@ -171,7 +171,7 @@ Statements could be fetched using the `RDFRepositoryClient.get`, `RDFRepositoryC
 `RDFRepositoryClient.download`. 
 
 Every reading method can get the response parsed to data objects according to 
-[RDFJS](http://rdf.js.org/data-model-spec/) data model specification (see [Response Parsers](#response_parsers)).
+[RDFJS](http://rdf.js.org/data-model-spec/) data model specification (see [Response Parsers](#response-parsers)).
 
 * Reading statements
 
