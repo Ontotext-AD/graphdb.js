@@ -21,7 +21,7 @@ const httpClientStub = require('../http/http-client.stub');
 
 jest.mock('http/http-client');
 
-import data from './statements.data';
+import data from './data/read-statements';
 
 describe('RDFRepositoryClient - reading statements', () => {
   let config;

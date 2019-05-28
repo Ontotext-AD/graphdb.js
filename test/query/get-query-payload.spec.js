@@ -170,7 +170,7 @@ describe('GetQueryPayload', () => {
       const payload = new GetQueryPayload()
         .setQuery('ask {?s ?p ?o}')
         .setQueryType(QueryType.ASK)
-        .setResponseType(RDFMimeType.SPARQL_RESULTS_JSON);
+        .setResponseType(RDFMimeType.BINARY_RDF_RESULTS_TABLE);
       expect(() => payload.getParams()).toThrowError();
     });
   });
