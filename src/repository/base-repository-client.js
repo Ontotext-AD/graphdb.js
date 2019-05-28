@@ -85,7 +85,7 @@ class BaseRepositoryClient {
   /**
    * Register provided parser in the internal parser registry.
    *
-   * @param {ContentTypeParser} parser implementation wrapper.
+   * @param {ContentParser} parser implementation wrapper.
    */
   registerParser(parser) {
     this.parserRegistry.register(parser);

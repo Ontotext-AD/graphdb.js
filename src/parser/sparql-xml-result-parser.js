@@ -1,4 +1,4 @@
-const ContentTypeParser = require('../parser/content-type-parser');
+const ContentParser = require('../parser/content-parser');
 const RDFMimeType = require('../http/rdf-mime-type');
 const QueryType = require('../query/query-type');
 const DataFactory = require('n3').DataFactory;
@@ -17,7 +17,7 @@ import {SparqlXmlParser} from 'sparqlxml-parse';
  * @author Mihail Radkov
  * @author Svilen Velikov
  */
-class SparqlXmlResultParser extends ContentTypeParser {
+class SparqlXmlResultParser extends ContentParser {
   /**
    * @inheritDoc
    */

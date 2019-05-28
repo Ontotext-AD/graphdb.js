@@ -36,7 +36,7 @@ module.exports = {
 
   parser: {
     ParserRegistry: require('./parser/parser-registry'),
-    ContentTypeParser: require('./parser/content-type-parser'),
+    ContentParser: require('./parser/content-parser'),
     N3Parser: require('./parser/n3-parser'),
     NQuadsParser: require('./parser/n-quads-parser'),
     NTriplesParser: require('./parser/n-triples-parser'),

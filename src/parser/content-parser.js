@@ -5,7 +5,7 @@
  * @author Mihail Radkov
  * @author Svilen Velikov
  */
-class ContentTypeParser {
+class ContentParser {
   /**
    * @param {boolean} isDefault if the implementation is configured as default.
    */
@@ -44,4 +44,4 @@ class ContentTypeParser {
   }
 }
 
-module.exports = ContentTypeParser;
+module.exports = ContentParser;
