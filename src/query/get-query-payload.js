@@ -11,6 +11,12 @@ const SELECT_QUERY_RESULT_TYPES = [
   RDFMimeType.BOOLEAN_RESULT
 ];
 
+const ASK_QUERY_RESULT_TYPES = [
+  RDFMimeType.SPARQL_RESULTS_XML,
+  RDFMimeType.SPARQL_RESULTS_JSON,
+  RDFMimeType.BOOLEAN_RESULT
+];
+
 const RDF_FORMATS = [
   RDFMimeType.RDF_XML,
   RDFMimeType.N_TRIPLES,
@@ -28,6 +34,13 @@ const QUERY_OPERATION_TYPES = [
   QueryContentType.X_WWW_FORM_URLENCODED,
   QueryContentType.SPARQL_QUERY
 ];
+
+const QUERY_TO_RESPONSE_TYPE_FORMATS_MAPPING = {
+  SELECT: SELECT_QUERY_RESULT_TYPES,
+  DESCRIBE: RDF_FORMATS,
+  CONSTRUCT: RDF_FORMATS,
+  ASK: ASK_QUERY_RESULT_TYPES
+};
 
 /**
  * Payload object holding common request parameters applicable for the query
@@ -171,76 +184,28 @@ class GetQueryPayload extends QueryPayload {
 
     const responseType = this.getResponseType();
 
-    if (this.getQueryType() === QueryType.SELECT) {
-      const isValidType = this.isSelectQueryResultType(responseType);
-      if (!isValidType) {
-        throw new Error(`Invalid responseType=${responseType} for SELECT query!
-         Must be one of ${SELECT_QUERY_RESULT_TYPES}`);
-      }
-    }
+    const allowedFormats =
+      QUERY_TO_RESPONSE_TYPE_FORMATS_MAPPING[this.getQueryType()];
 
-    if (this.getQueryType() === QueryType.CONSTRUCT) {
-      const isValidType = this.isConstructQueryResultType(responseType);
-      if (!isValidType) {
-        throw new Error(`Invalid responseType=${responseType} for CONSTRUCT 
-        query! Must be one of ${RDF_FORMATS}`);
-      }
-    }
-
-    if (this.getQueryType() === QueryType.DESCRIBE) {
-      const isValidType = this.isDescribeQueryResultType(responseType);
-      if (!isValidType) {
-        throw new Error(`Invalid responseType=${responseType} for DESCRIBE 
-        query! Must be one of ${RDF_FORMATS}`);
-      }
-    }
-
-    if (this.getQueryType() === QueryType.ASK) {
-      if (responseType !== RDFMimeType.BOOLEAN_RESULT) {
-        throw new Error(`Invalid responseType=${responseType} for ASK query! 
-        Must be of ${RDFMimeType.BOOLEAN_RESULT}`);
-      }
+    if (!this.isResponseTypeSupported(responseType, allowedFormats)) {
+      throw new Error(`Invalid responseType=${responseType} 
+      for ${this.getQueryType()} query! Must be one of ${allowedFormats}`);
     }
 
     return true;
   }
 
   /**
-   * Verifies that responseType is one of the expected types for CONSTRUCT
-   * query.
+   * Verifies that responseType is one of the expected types.
    *
    * @private
    * @param {string} responseType
+   * @param {Array<string>} formats
    * @return {boolean} true if responseType is one of the expected types and
    * false otherwise.
    */
-  isConstructQueryResultType(responseType) {
-    return RDF_FORMATS.indexOf(responseType) !== -1;
-  }
-
-  /**
-   * Verifies that responseType is one of the expected types for DESCRIBE query.
-   *
-   * @private
-   * @param {string} responseType
-   * @return {boolean} true if responseType is one of the expected types and
-   * false otherwise.
-   */
-  isDescribeQueryResultType(responseType) {
-    return RDF_FORMATS.indexOf(responseType) !== -1;
-  }
-
-  /**
-   * Verifies that responseType is one of the expected types for SELECT query.
-   *
-   * @private
-   * @param {string} responseType
-   * @return {boolean} true if responseType is one of the expected types and
-   * false otherwise.
-   */
-  isSelectQueryResultType(responseType) {
-    return SELECT_QUERY_RESULT_TYPES.indexOf(responseType)
-      !== -1;
+  isResponseTypeSupported(responseType, formats) {
+    return formats.indexOf(responseType) !== -1;
   }
 
   // -----------------------------------------------------

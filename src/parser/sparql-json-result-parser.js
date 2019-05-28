@@ -45,8 +45,8 @@ class SparqlJsonResultParser extends ContentTypeParser {
    * to given format.
    * @param {Object} [config] optional parser configuration.
    * @return {NodeJS.ReadableStream|Promise<boolean>} a stream with the
-   * converted content for SELECT and DESCRIBE queries and a Promise which
-   * resolves to boolean value for ASK queries.
+   * converted content for SELECT queries and a Promise which resolves to
+   * boolean value for ASK queries.
    */
   parse(stream, config) {
     if (config.queryType === QueryType.ASK) {
