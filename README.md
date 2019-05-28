@@ -1,6 +1,6 @@
 # graphdb-javascript-driver (GRAPHDBJS)
 
-A GraphDB data access library written in JavaScript to be used in Node.js.  
+A GraphDB and RDF4J data access library written in JavaScript to be used in Node.js.  
 
 ## Installation
 Make sure you have Node.js version 8 or greater and Node Package Manager 
