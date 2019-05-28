@@ -1,4 +1,4 @@
-const ContentTypeParser = require('parser/content-type-parser');
+const ContentParser = require('parser/content-parser');
 
 /**
  * An unsupported parser.
@@ -9,7 +9,7 @@ class UnsupportedParser {
 /**
  * Parser which does not comply whith the API.
  */
-class ParserWhichDoesNotImplementTheAPI extends ContentTypeParser {
+class ParserWhichDoesNotImplementTheAPI extends ContentParser {
   /**
    * @inheritDoc
    */
@@ -18,7 +18,7 @@ class ParserWhichDoesNotImplementTheAPI extends ContentTypeParser {
   }
 }
 
-class ParserWhichDoesNotProvideSupportedType extends ContentTypeParser {
+class ParserWhichDoesNotProvideSupportedType extends ContentParser {
   /**
    * @inheritDoc
    */
@@ -37,7 +37,7 @@ class ParserWhichDoesNotProvideSupportedType extends ContentTypeParser {
 /**
  * For testing purposes.
  */
-class RdfAsXmlParser extends ContentTypeParser {
+class RdfAsXmlParser extends ContentParser {
   /**
    * @inheritDoc
    */
@@ -56,7 +56,7 @@ class RdfAsXmlParser extends ContentTypeParser {
 /**
  * For testing purposes.
  */
-class RdfAsJsonParser extends ContentTypeParser {
+class RdfAsJsonParser extends ContentParser {
   /**
    * @inheritDoc
    */
@@ -75,7 +75,7 @@ class RdfAsJsonParser extends ContentTypeParser {
 /**
  * For testing purposes.
  */
-class AnotherRdfAsJsonParser extends ContentTypeParser {
+class AnotherRdfAsJsonParser extends ContentParser {
   /**
    * @inheritDoc
    */
@@ -94,7 +94,7 @@ class AnotherRdfAsJsonParser extends ContentTypeParser {
 /**
  * For testing purposes.
  */
-class ParserWithNoParseMethod extends ContentTypeParser {
+class ParserWithNoParseMethod extends ContentParser {
   /**
    * @inheritDoc
    */
@@ -106,7 +106,7 @@ class ParserWithNoParseMethod extends ContentTypeParser {
 /**
  * For testing purposes.
  */
-class ParserWithNoGetSupportedTypeMethod extends ContentTypeParser {
+class ParserWithNoGetSupportedTypeMethod extends ContentParser {
   /**
    * @inheritDoc
    */

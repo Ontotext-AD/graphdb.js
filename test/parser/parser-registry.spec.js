@@ -23,7 +23,7 @@ describe('ParserRegistry', () => {
     test('should validate provided parsers and throw error when invalid parser is provided', () => {
       expect(() => {
         new ParserRegistry([new RdfAsJsonParser(), new UnsupportedParser()]);
-      }).toThrow(Error('Parser is not provided or does not implement ContentTypeParser!'));
+      }).toThrow(Error('Parser is not provided or does not implement ContentParser!'));
     });
 
     test('should populate provided parsers', () => {

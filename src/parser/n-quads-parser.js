@@ -1,4 +1,4 @@
-const ContentTypeParser = require('../parser/content-type-parser');
+const ContentParser = require('../parser/content-parser');
 const RDFMimeType = require('../http/rdf-mime-type');
 const Parser = require('n3').Parser;
 
@@ -9,7 +9,7 @@ const Parser = require('n3').Parser;
  * @author Mihail Radkov
  * @author Svilen Velikov
  */
-class NQuadsParser extends ContentTypeParser {
+class NQuadsParser extends ContentParser {
   /**
    * @inheritDoc
    */
