@@ -1,7 +1,7 @@
 {
-  "name": "rdf4js",
+  "name": "graphdbjs",
   "version": "1.0.0",
-  "description": "Javascript client library supporting the RDF4J REST API.",
+  "description": "Javascript client library supporting GraphDB and RDF4J REST API.",
   "author": "",
   "contributors": [],
   "homepage": "",
