@@ -1,4 +1,4 @@
-# graphdb-javascript-driver (RDF4JS)
+# graphdb-javascript-driver (GRAPHDBJS)
 
 A GraphDB data access library written in JavaScript to be used in Node.js and/or 
 web browser environment.  
@@ -8,7 +8,7 @@ Make sure you have Node.js version 8 or greater and Node Package Manager
 ([npm](https://npmjs.org/)) installed before start working with the library.
 
 ```
-npm install --save rdf4js
+npm install --save graphdbjs
 ```
 
 ## Development
@@ -90,8 +90,8 @@ first.
 * Configure `ServerClient`
 
 ```javascript
-const {ServerClient, ServerClientConfig} = require('rdf4js').server;
-const {RDFMimeType} = require('rdf4js').http;
+const {ServerClient, ServerClientConfig} = require('graphdbjs').server;
+const {RDFMimeType} = require('graphdbjs').http;
 
 const serverConfig = new ServerClientConfig('http://rdf4j-compliant-server/', 0, {
     'Accept': RDFMimeType.SPARQL_RESULTS_JSON
@@ -336,7 +336,7 @@ Parsers should be registered in the repository before executing any request.
 
 ```javascript
 // Import any of the predefined parsers
-const {NTriplesParser} = require('rdf4js').parser;
+const {NTriplesParser} = require('graphdbjs').parser;
 // And register it in the repository
 repository.registerParser(new NTriplesParser());
 ```
