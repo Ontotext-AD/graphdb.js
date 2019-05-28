@@ -311,11 +311,11 @@ repository instance which in turn will use them to parse the response before
 returning it to the client.
 
 #### Implementing a custom parser
-A parser could be implemented by extending the `ContentTypeParser` and implementing
+A parser could be implemented by extending the `ContentParser` and implementing
 the `parse` and `getSupportedType` methods.
 
 ```javascript
-class RdfAsJsonParser extends ContentTypeParser {
+class RdfAsJsonParser extends ContentParser {
   getSupportedType() {
     return 'application/rdf+json';
   }
