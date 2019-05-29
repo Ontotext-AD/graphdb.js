@@ -6,8 +6,10 @@ A GraphDB and RDF4J data access library written in JavaScript to be used in Node
 Make sure you have Node.js version 8 or greater and Node Package Manager 
 ([npm](https://npmjs.org/)) installed before start working with the library.
 
+Currently the library is not published in NPM registry, but it still can be installed directly from this GitHub repository.
+
 ```
-npm install --save graphdbjs
+npm install --save Ontotext-AD/graphdb.js
 ```
 
 ## Development
