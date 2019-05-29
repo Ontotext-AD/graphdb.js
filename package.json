@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Javascript client library supporting GraphDB and RDF4J REST API.",
   "author": {
-    "name": "Ontotext AD",
+    "name": "Sirma AI JSC, trading as Ontotext",
     "url": "https://www.ontotext.com/"
   },
   "contributors": [
