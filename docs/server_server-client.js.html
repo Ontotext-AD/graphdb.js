@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: server/server-client.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: server/server-client.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>const HttpClient = require('../http/http-client');
+const ConsoleLogger = require('../logging/console-logger');
+const RDFRepositoryClient = require('../repository/rdf-repository-client');
+const RepositoryClientConfig =
+  require('../repository/repository-client-config');
+const HttpRequestConfigBuilder = require('../http/http-request-config-builder');
+const RDFMimeType = require('../http/rdf-mime-type');
+
+const SERVICE_URL = '/repositories';
+
+/**
+ * Implementation of the RDF server operations.
+ *
+ * @class
+ * @author Mihail Radkov
+ * @author Svilen Velikov
+ */
+class ServerClient {
+  /**
+   * @param {ServerClientConfig} config for the server client.
+   **/
+  constructor(config) {
+    this.config = config;
+
+    this.initHttpClient();
+    this.initLogger();
+  }
+
+  /**
+   * Get an array of repository ids available in the server.
+   * @return {Promise} promise which resolves with an Array with repository ids.
+   */
+  getRepositoryIDs() {
+    const requestConfig = new HttpRequestConfigBuilder()
+      .addAcceptHeader(RDFMimeType.SPARQL_RESULTS_JSON)
+      .get();
+
+    let elapsedTime = Date.now();
+    return this.httpClient.get(SERVICE_URL, requestConfig).then((response) => {
+      elapsedTime = Date.now() - elapsedTime;
+      this.logger.debug({elapsedTime}, 'Retrieved repository IDs');
+      return response.data.results.bindings.map(({id}) => id.value);
+    });
+  }
+
+  /**
+   * Check if repository with the provided id exists.
+   * @param {string} id of the repository which should be checked.
+   * @return {Promise&lt;boolean>} promise which resolves with boolean value.
+   */
+  hasRepository(id) {
+    if (!id) {
+      throw new Error('Repository id is required parameter!');
+    }
+    return this.getRepositoryIDs().then((repositoryIds) => {
+      return repositoryIds.indexOf(id) !== -1;
+    });
+  }
+
+  /**
+   * Creates a repository client instance with the provided id and
+   * configuration.
+   * @param {string} id of the repository
+   * @param {RepositoryClientConfig} config for the overridable repository
+   *    configuration.
+   * @return {Promise&lt;RDFRepositoryClient>} promise which resolves with
+   *    new RDFRepositoryClient instance.
+   */
+  getRepository(id, config) {
+    if (!id) {
+      throw new Error('Repository id is required parameter!');
+    }
+    if (!config || !(config instanceof RepositoryClientConfig)) {
+      throw new Error('RepositoryClientConfig is required parameter!');
+    }
+    return this.hasRepository(id).then((exists) => {
+      if (exists) {
+        return new RDFRepositoryClient(config);
+      }
+      this.logger.error({repoId: id}, 'Repository does not exist');
+      return Promise
+        .reject(new Error(`Repository with id ${id} does not exists.`));
+    });
+  }
+
+  /**
+   * Delete repository with the provided id.
+   * @param {string} id of the repository which should be deleted.
+   * @return {Promise&lt;any>} promise which resolves with the delete result.
+   */
+  deleteRepository(id) {
+    if (!id) {
+      throw new Error('Repository id is required parameter!');
+    }
+
+    let elapsedTime = Date.now();
+    return this.httpClient.deleteResource(`${SERVICE_URL}/${id}`)
+      .then(() => {
+        elapsedTime = Date.now() - elapsedTime;
+        this.logger.info({repoId: id, elapsedTime}, 'Deleted repository');
+      });
+  }
+
+  /**
+   * Initializes the http client.
+   */
+  initHttpClient() {
+    this.httpClient = new HttpClient(this.config.endpoint);
+  }
+
+  /**
+   * Initializes the logger.
+   */
+  initLogger() {
+    this.logger = new ConsoleLogger({
+      name: 'ServerClient',
+      serverURL: this.config.endpoint
+    });
+  }
+}
+
+module.exports = ServerClient;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="AddStatementPayload.html">AddStatementPayload</a></li><li><a href="BaseRepositoryClient.html">BaseRepositoryClient</a></li><li><a href="CommonUtils.html">CommonUtils</a></li><li><a href="ConsoleLogger.html">ConsoleLogger</a></li><li><a href="ContentParser.html">ContentParser</a></li><li><a href="FileUtils.html">FileUtils</a></li><li><a href="GetQueryPayload.html">GetQueryPayload</a></li><li><a href="GetStatementsPayload.html">GetStatementsPayload</a></li><li><a href="HttpClient.html">HttpClient</a></li><li><a href="HttpRequestConfigBuilder.html">HttpRequestConfigBuilder</a></li><li><a href="HttpResponse.html">HttpResponse</a></li><li><a href="Iterable.html">Iterable</a></li><li><a href="N3Parser.html">N3Parser</a></li><li><a href="Namespace.html">Namespace</a></li><li><a href="NQuadsParser.html">NQuadsParser</a></li><li><a href="NTriplesParser.html">NTriplesParser</a></li><li><a href="PagedResponse.html">PagedResponse</a></li><li><a href="ParserRegistry.html">ParserRegistry</a></li><li><a href="QueryPayload.html">QueryPayload</a></li><li><a href="RDFRepositoryClient.html">RDFRepositoryClient</a></li><li><a href="RepositoryClientConfig.html">RepositoryClientConfig</a></li><li><a href="ResponseIterator.html">ResponseIterator</a></li><li><a href="ServerClient.html">ServerClient</a></li><li><a href="ServerClientConfig.html">ServerClientConfig</a></li><li><a href="SparqlJsonResultParser.html">SparqlJsonResultParser</a></li><li><a href="SparqlXmlResultParser.html">SparqlXmlResultParser</a></li><li><a href="StatementPayload.html">StatementPayload</a></li><li><a href="StringUtils.html">StringUtils</a></li><li><a href="TermConverter.html">TermConverter</a></li><li><a href="TransactionalRepositoryClient.html">TransactionalRepositoryClient</a></li><li><a href="TriGParser.html">TriGParser</a></li><li><a href="TurtleParser.html">TurtleParser</a></li><li><a href="UpdateQueryPayload.html">UpdateQueryPayload</a></li></ul><h3>Interfaces</h3><ul><li><a href="Logger.html">Logger</a></li></ul><h3>Global</h3><ul><li><a href="global.html#PATH_NAMESPACES">PATH_NAMESPACES</a></li><li><a href="global.html#PATH_STATEMENTS">PATH_STATEMENTS</a></li><li><a href="global.html#QueryContentType">QueryContentType</a></li><li><a href="global.html#QueryLanguage">QueryLanguage</a></li><li><a href="global.html#QueryType">QueryType</a></li><li><a href="global.html#RDFMimeType">RDFMimeType</a></li><li><a href="global.html#RETRIABLE_STATUSES">RETRIABLE_STATUSES</a></li><li><a href="global.html#TransactionIsolationLevel">TransactionIsolationLevel</a></li><li><a href="global.html#XSD">XSD</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Wed May 29 2019 09:19:32 GMT+0300 (Eastern European Summer Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
