@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: repository/base-repository-client.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: repository/base-repository-client.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>const ParserRegistry = require('../parser/parser-registry');
+const ConsoleLogger = require('../logging/console-logger');
+const HttpClient = require('../http/http-client');
+const RepositoryClientConfig =
+  require('../repository/repository-client-config');
+const Iterable = require('../util/iterable');
+const HttpResponse = require('../http/http-response');
+
+/**
+ * Set of HTTP status codes for which requests could be re-attempted.
+ *
+ * @type {number[]}
+ */
+const RETRIABLE_STATUSES = [
+  503 // Server busy
+];
+
+/**
+ * Implementation of the RDF repository operations.
+ *
+ * The repository will construct a list of HTTP clients for each supplied
+ * repository endpoint in the configuration. These clients will be used as
+ * fallback strategy.
+ *
+ * @abstract
+ * @class
+ * @author Mihail Radkov
+ * @author Svilen Velikov
+ */
+class BaseRepositoryClient {
+  /**
+   * Constructs a repository client with the provided configuration.
+   *
+   * @param {RepositoryClientConfig} repositoryClientConfig
+   */
+  constructor(repositoryClientConfig) {
+    BaseRepositoryClient.validateConfig(repositoryClientConfig);
+    this.repositoryClientConfig = repositoryClientConfig;
+
+    this.initParsers();
+    this.initLogger();
+    this.initHttpClients();
+  }
+
+  /**
+   * Initializes the parser registry with default supported parsers.
+   * @private
+   */
+  initParsers() {
+    this.parserRegistry = new ParserRegistry();
+  }
+
+  /**
+   * Initializes a logger instance.
+   * @private
+   */
+  initLogger() {
+    this.logger = this.getLogger();
+  }
+
+  /**
+   * Gets a logger instance.
+   *
+   * @return {Logger} the logger instance
+   */
+  getLogger() {
+    return new ConsoleLogger();
+  }
+
+  /**
+   * Initializes http clients depending on the provided endpoints.
+   * @private
+   */
+  initHttpClients() {
+    const config = this.repositoryClientConfig;
+    // Constructs a http client for each endpoint
+    this.httpClients = config.endpoints.map((endpoint) => {
+      return new HttpClient(endpoint)
+        .setDefaultHeaders(config.headers)
+        .setDefaultReadTimeout(config.readTimeout)
+        .setDefaultWriteTimeout(config.writeTimeout);
+    });
+  }
+
+  /**
+   * Register provided parser in the internal parser registry.
+   *
+   * @param {ContentParser} parser implementation wrapper.
+   */
+  registerParser(parser) {
+    this.parserRegistry.register(parser);
+  }
+
+  /**
+   * Parses provided content with registered parser if there is one. Otherwise
+   * returns the content untouched. If &lt;code>contentType&lt;/code> is provided it
+   * should be an instance of {@link RDFMimeType} enum and is used as a key
+   * for selecting appropriate parser from the parsers registry.
+   * Parsing is done synchronously!
+   *
+   * @protected
+   * @param {string} content
+   * @param {string} responseType
+   * @param {Object} [parserConfig] optional parser configuration
+   * @return {(string|Term|Term[])}
+   */
+  parse(content, responseType, parserConfig = {}) {
+    if (!this.parserRegistry.get(responseType)) {
+      return content;
+    }
+    const parser = this.parserRegistry.get(responseType);
+
+    const startTime = Date.now();
+    const parsed = parser.parse(content, parserConfig);
+    const elapsedTime = Date.now() - startTime;
+
+    this.logger.debug({elapsedTime, responseType}, 'Parsed content');
+    return parsed;
+  }
+
+  /**
+   * Executor for http requests. It supplies the provided HTTP client consumer
+   * with a HTTP client for executing requests.
+   *
+   * If the request was unsuccessful it will be retried with another endpoint
+   * HTTP client in case the request's status is one of
+   * {@link RETRIABLE_STATUSES} or if the host is currently unreachable.
+   *
+   * If all of the endpoints are unsuccessful then the execution will fail
+   * with promise rejection.
+   *
+   * @protected
+   * @param {Function} httpClientConsumer the consumer of supplied http client
+   *                                      that performs the request execution
+   * @return {Promise&lt;HttpResponse|Error>} a promise which resolves to response
+   * wrapper or rejects with error if thrown during execution.
+   */
+  execute(httpClientConsumer) {
+    try {
+      const startTime = Date.now();
+      const httpClients = new Iterable(this.httpClients);
+      return this.retryExecution(httpClients, httpClientConsumer)
+        .then((executionResponse) => {
+          executionResponse.setElapsedTime(Date.now() - startTime);
+          return executionResponse;
+        });
+    } catch (err) {
+      return Promise.reject(err);
+    }
+  }
+
+  /**
+   * Retries HTTP request execution until successful or until no more clients
+   * are left if the status is allowed for retry.
+   *
+   * @private
+   * @param {Iterable} httpClients iterable collection of http clients
+   * @param {Function} httpClientConsumer the consumer of supplied http client
+   *                                      that performs the request execution
+   * @return {Promise&lt;HttpResponse|Error>} a promise which resolves to response
+   * wrapper or rejects with error if thrown during execution.
+   */
+  retryExecution(httpClients, httpClientConsumer) {
+    const httpClient = httpClients.next();
+    return httpClientConsumer(httpClient).then((response) => {
+      return new HttpResponse(response, httpClient);
+    }).catch((error) => {
+      const canRetry = BaseRepositoryClient.canRetryExecution(error);
+      const hasNext = httpClients.hasNext();
+
+      const loggerPayload = {repositoryUrl: httpClient.getBaseURL()};
+
+      // Try the next repo http client (if any)
+      if (canRetry &amp;&amp; hasNext) {
+        this.logger.warn(loggerPayload, 'Retrying execution');
+        return this.retryExecution(httpClients, httpClientConsumer);
+      }
+
+      if (!canRetry) {
+        this.logger.error(loggerPayload, 'Cannot retry execution');
+      } else {
+        this.logger.error(loggerPayload, 'No more retries');
+      }
+
+      // Not retriable
+      return Promise.reject(error);
+    });
+  }
+
+  /**
+   * Creates an object from the provided HTTP response that is suitable for
+   * structured logging.
+   *
+   * Any additional key-value entries from &lt;code>params&lt;/code> will be assigned
+   * in the created payload object.
+   *
+   * @protected
+   * @param {HttpResponse} response the HTTP response.
+   * Used to get the execution time and the base URL
+   * @param {object} [params] additional parameters to be appended
+   * @return {object} the constructed payload object for logging
+   */
+  getLogPayload(response, params = {}) {
+    const payload = {
+      elapsedTime: response.getElapsedTime(),
+      repositoryUrl: response.getBaseURL()
+    };
+    Object.assign(payload, params);
+    return payload;
+  }
+
+  /**
+   * Checks if the request that produced the provided error can be re-attempted.
+   *
+   * @private
+   * @param {Object} error the error to check
+   * @return {boolean} &lt;code>true&lt;/code> if it can be attempted again or
+   *                    &lt;code>false&lt;/code> otherwise
+   */
+  static canRetryExecution(error) {
+    // Not an error from the HTTP client, do not retry
+    if (!error || !error.request) {
+      return false;
+    }
+    // The current client couldn't get a response from the server, try again
+    if (!error.response) {
+      return true;
+    }
+    const status = error.response.status;
+    return RETRIABLE_STATUSES.indexOf(status) > -1;
+  }
+
+  /**
+   * Validates the provided repository client configuration.
+   *
+   * @private
+   * @param {RepositoryClientConfig} repositoryClientConfig the config to check
+   * @throws {Error} if the configuration is not an instance of
+   * {@link RepositoryClientConfig} or there are no configured endpoints
+   */
+  static validateConfig(repositoryClientConfig) {
+    if (!(repositoryClientConfig instanceof RepositoryClientConfig)) {
+      throw new Error('Cannot instantiate repository with unsupported config '
+        + 'type!');
+    }
+
+    const endpoints = repositoryClientConfig.endpoints;
+    if (!endpoints || !endpoints.length) {
+      throw new Error('Cannot instantiate a repository without repository '
+        + 'endpoint configuration! At least one endpoint must be provided.');
+    }
+  }
+}
+
+module.exports = BaseRepositoryClient;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="AddStatementPayload.html">AddStatementPayload</a></li><li><a href="BaseRepositoryClient.html">BaseRepositoryClient</a></li><li><a href="CommonUtils.html">CommonUtils</a></li><li><a href="ConsoleLogger.html">ConsoleLogger</a></li><li><a href="ContentParser.html">ContentParser</a></li><li><a href="FileUtils.html">FileUtils</a></li><li><a href="GetQueryPayload.html">GetQueryPayload</a></li><li><a href="GetStatementsPayload.html">GetStatementsPayload</a></li><li><a href="HttpClient.html">HttpClient</a></li><li><a href="HttpRequestConfigBuilder.html">HttpRequestConfigBuilder</a></li><li><a href="HttpResponse.html">HttpResponse</a></li><li><a href="Iterable.html">Iterable</a></li><li><a href="N3Parser.html">N3Parser</a></li><li><a href="Namespace.html">Namespace</a></li><li><a href="NQuadsParser.html">NQuadsParser</a></li><li><a href="NTriplesParser.html">NTriplesParser</a></li><li><a href="PagedResponse.html">PagedResponse</a></li><li><a href="ParserRegistry.html">ParserRegistry</a></li><li><a href="QueryPayload.html">QueryPayload</a></li><li><a href="RDFRepositoryClient.html">RDFRepositoryClient</a></li><li><a href="RepositoryClientConfig.html">RepositoryClientConfig</a></li><li><a href="ResponseIterator.html">ResponseIterator</a></li><li><a href="ServerClient.html">ServerClient</a></li><li><a href="ServerClientConfig.html">ServerClientConfig</a></li><li><a href="SparqlJsonResultParser.html">SparqlJsonResultParser</a></li><li><a href="SparqlXmlResultParser.html">SparqlXmlResultParser</a></li><li><a href="StatementPayload.html">StatementPayload</a></li><li><a href="StringUtils.html">StringUtils</a></li><li><a href="TermConverter.html">TermConverter</a></li><li><a href="TransactionalRepositoryClient.html">TransactionalRepositoryClient</a></li><li><a href="TriGParser.html">TriGParser</a></li><li><a href="TurtleParser.html">TurtleParser</a></li><li><a href="UpdateQueryPayload.html">UpdateQueryPayload</a></li></ul><h3>Interfaces</h3><ul><li><a href="Logger.html">Logger</a></li></ul><h3>Global</h3><ul><li><a href="global.html#PATH_NAMESPACES">PATH_NAMESPACES</a></li><li><a href="global.html#PATH_STATEMENTS">PATH_STATEMENTS</a></li><li><a href="global.html#QueryContentType">QueryContentType</a></li><li><a href="global.html#QueryLanguage">QueryLanguage</a></li><li><a href="global.html#QueryType">QueryType</a></li><li><a href="global.html#RDFMimeType">RDFMimeType</a></li><li><a href="global.html#RETRIABLE_STATUSES">RETRIABLE_STATUSES</a></li><li><a href="global.html#TransactionIsolationLevel">TransactionIsolationLevel</a></li><li><a href="global.html#XSD">XSD</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Wed May 29 2019 09:19:32 GMT+0300 (Eastern European Summer Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
