@@ -2,16 +2,32 @@
   "name": "graphdbjs",
   "version": "1.0.0",
   "description": "Javascript client library supporting GraphDB and RDF4J REST API.",
-  "author": "",
-  "contributors": [],
-  "homepage": "",
+  "author": {
+    "name": "Ontotext AD",
+    "url": "https://www.ontotext.com/"
+  },
+  "contributors": [
+    {
+      "name": "Desislava Hristova",
+      "email": "desislava.hristova@ontotext.com"
+    },
+    {
+      "name": "Mihail Radkov",
+      "email": "mihail.radkov@ontotext.com"
+    },
+    {
+      "name": "Svilen Velikov",
+      "email": "svilen.velikov@ontotext.com"
+    }
+  ],
+  "homepage": "https://github.com/Ontotext-AD/graphdb.js",
   "license": "Apache-2.0",
   "repository": {
-    "type": "",
-    "url": ""
+    "type": "git",
+    "url": "https://github.com/Ontotext-AD/graphdb.js"
   },
   "bugs": {
-    "url": ""
+    "url": "https://github.com/Ontotext-AD/graphdb.js/issues"
   },
   "keywords": [
     "rdf4j",
@@ -33,7 +49,9 @@
     "node": ">=8.16.0"
   },
   "scripts": {
-    "build": "node scripts/build.js && npm run doc && npm run tsd",
+    "build": "node scripts/build.js",
+    "postbuild": "npm run doc && npm run tsd",
+    "prepare": "npm run build",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:report": "rimraf report/ && jest --config jest-report.config.js",
