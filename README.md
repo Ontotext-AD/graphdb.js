@@ -1,4 +1,4 @@
-# graphdb-javascript-driver (GRAPHDBJS)
+# graphdb.js
 
 [![Build Status](https://travis-ci.com/Ontotext-AD/graphdb.js.svg?branch=master)](https://travis-ci.com/Ontotext-AD/graphdb.js)
 
