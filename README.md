@@ -1,5 +1,7 @@
 # graphdb-javascript-driver (GRAPHDBJS)
 
+[![Build Status](https://travis-ci.com/Ontotext-AD/graphdb.js.svg?branch=master)](https://travis-ci.com/Ontotext-AD/graphdb.js)
+
 A GraphDB and RDF4J data access library written in JavaScript to be used in Node.js.  
 
 ## Installation
