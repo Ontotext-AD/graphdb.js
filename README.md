@@ -115,7 +115,7 @@ server.getRepositoryIDs().then(ids => {
 ```javascript
 server.hasRepository('repository-name').then(exists => {
     if (exists) {
-        // reposiotry exists -> delete it for example
+        // repository exists -> delete it for example
     }
 }).catch(err => console.log(err));
 ```
@@ -123,7 +123,7 @@ server.hasRepository('repository-name').then(exists => {
 * Delete repository with given name
 
 ```javascript
-server.deleteReposiotry('repository-name').then(() => {
+server.deleteRepository('repository-name').then(() => {
     // successfully deleted
 }).catch(err => console.log(err));
 ```
@@ -133,7 +133,7 @@ seen in the examples below a client could obtain an instance of `RDFRepositoryCl
 through the server client
 
 ```javascript
-server.getReposiotry('repository-name').then(repository => {
+server.getRepository('repository-name').then(repository => {
     // repository is a configured RDFRepositoryClient instance
 }).catch(err => console.log(err));
 ``` 
