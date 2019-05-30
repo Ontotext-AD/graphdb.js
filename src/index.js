@@ -41,7 +41,9 @@ module.exports = {
     NQuadsParser: require('./parser/n-quads-parser'),
     NTriplesParser: require('./parser/n-triples-parser'),
     TriGParser: require('./parser/trig-parser'),
-    TurtleParser: require('./parser/turtle-parser')
+    TurtleParser: require('./parser/turtle-parser'),
+    SparqlJsonResultParser: require('./parser/sparql-json-result-parser'),
+    SparqlXmlResultParser: require('./parser/sparql-xml-result-parser')
   },
 
   logger: {
