@@ -236,6 +236,7 @@ class TransactionalRepositoryClient extends BaseRepositoryClient {
   /**
    * Inserts the statements in the provided Turtle or Trig formatted data.
    *
+   * @private
    * @param {string} data payload data in Turtle or Trig format
    * @param {string|string[]} [context] restricts the insertion to the given
    * context. Will be encoded as N-Triple if it is not already one
@@ -396,6 +397,7 @@ class TransactionalRepositoryClient extends BaseRepositoryClient {
    * This method is useful for library client who wants to upload a big data set
    * into the repository during a transaction
    *
+   * @private
    * @param {ReadableStream} readStream stream with the data to be uploaded
    * @param {string} contentType is one of RDF mime type formats,
    *                application/x-rdftransaction' for a transaction document or

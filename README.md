@@ -293,16 +293,116 @@ repository.deleteStatements(subj, pred, obj, contexts).then(() => {
 ```
 
 ### Transactions
-Repository operations can be executed in transaction. In order to work with transactions
-the `TransactionalRepositoryClient` must be used.
+Repository operations can be executed in transaction. In order to work with 
+transactions the `TransactionalRepositoryClient` is used.
 
-`TODO`
-#### Reading
-#### Writing
+#### Starting a transaction
+
+`RDFRepositoryClient` can initiate a transaction via `beginTransaction()` which 
+produces an instance of `TransactionalRepositoryClient`. 
+
+Each started transaction allows to be committed or rolled back by using 
+respectively `commit()` and `rollback()`
+
+The following is a short use example of a transaction:
+```javascript
+const turtlePath = __dirname + '/statements.ttl';
+
+let transactionClient;
+return repository.beginTransaction().then((transaction) => {
+  transactionClient = transaction;
+  return transactionClient.addFile(turtlePath);
+}).then(() => {
+  // File upload was successful, commit the changes
+  return transactionClient.commit();
+}).catch((e) => {
+  console.log(e);
+  if (transactionClient) {
+    // Couldn't upload the file, abort the transaction
+    return transactionClient.rollback();
+  }
+  return Promise.reject(e);
+});
+```
+
+For specific isolation level use `TransactionIsolationLevel` 
+```javascript
+return repository.beginTransaction(TransactionIsolationLevel.READ_UNCOMMITTED);
+```
+
+The default isolation level is specific for each store implementation. 
+
+**Important:** After commit or rollback, a transaction cannot be reused, any 
+attempts will result in an error. If you are not sure what is the state of the 
+transaction, you can use `transaction.isActive()`
+
+#### Working with a transaction
+
+Almost all of the transaction methods for reading & modifying data have the same 
+syntax and parameters as those in `RDFRepositoryClient`.
+
+##### Reading
+
+`TransactionalRepositoryClient` supports the following methods for reading data, 
+including any changes that are not yet committed: 
+
+* `getSize()`
+* `get()`
+* `download()`
+* `query()`
+
+##### Writing
+
+* `add()`
+* `addQuads()`
+* `upload()`
+* `addFile()`
+
 #### Deleting
+Deleting data during a transaction is different than the one in 
+`RDFRepositoryClient`, it expects RDF data document instead of statements 
+filter parameters.
+
+Currently it supports only Turtle or TriG formatted RDF data:
+```javascript
+const turtlePath = __dirname + '/statements.ttl';
+const turtleData = fs.readFileSync(turtlePath, 'utf8');
+return transaction.deleteData(turtleData);
+```
 
 ### Namespaces
-`TODO`
+
+* Retrieving all available namespace declarations. The resolved value is an 
+array of `Namespace` instances.
+```javascript
+return repository.getNamespaces().then((namespaces) => {
+  namespaces.forEach((namespace) => {
+    console.log(namespace.getPrefix() + ' -> ' + namespace.getNamespace());
+   });
+})
+```
+
+* Retrieving specific namespace declaration
+```javascript
+return repository.getNamespace('rdf').then((namespace) => {
+  console.log(namespace);
+})
+```
+
+* Setting the namespace declaration. This can act as create or update:
+```javascript
+return repository.saveNamespace('rdf', 'http://www.w3.org/1999/02/22-rdf-syntax-ns#');
+```
+
+* Deleting specific namespace declaration
+```javascript
+return repository.deleteNamespace('rdf');
+```
+
+* Deleting all namespaces declarations
+```javascript
+return repository.deleteNamespaces();
+```
 
 ### Response Parsers
 Read responses of different content types might be parsed to data objects with
