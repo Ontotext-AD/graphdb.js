@@ -154,9 +154,8 @@ const repository = new RDFRepositoryClient(config);
 * Obtaining repository client instance through a ServerClient
 
 ```javascript
-const ServerClient = require('server/server-client');
-const ServerClientConfig = require('server/server-client-config');
-const RepositoryClientConfig = require('repository/repository-client-config')
+const {ServerClient, ServerClientConfig} = require('graphdbjs').server;
+const {RepositoryClientConfig} = require('graphdbjs').repository;
 
 const config = new ServerClientConfig('http://GDB', 0, {});
 const server = new ServerClient(config);
