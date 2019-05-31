@@ -13,9 +13,17 @@ branches:
 
 cache: npm
 
+#addons:
+#  sonarcloud:
+#    organization: "sonarcloud_organization_key" # the key of the org you chose at step #3
+#    token:
+#      secure: "*********" # encrypted value of your token
+
 script:
   - npm run lint:test
   - npm run test:report
+  - npm run build
+#  - sonar-scanner
 
 # TODO: Notifications on failure ?
 
