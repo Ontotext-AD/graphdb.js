@@ -49,8 +49,8 @@
     "node": ">=8.16.0"
   },
   "scripts": {
-    "build": "echo "Building..." && node scripts/build.js && echo "Docs..." && npm run doc && echo "TSD..." && npm run tsd",
-    "prepare": "echo "Prepare..." && npm run build",
+    "build": "echo 'Building...' && node scripts/build.js && echo 'Docs...' && npm run doc && echo 'TSD...' && npm run tsd",
+    "prepare": "echo 'Prepare...' && npm run build",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:report": "rimraf report/ && jest --config jest-report.config.js",
