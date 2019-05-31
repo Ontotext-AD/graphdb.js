@@ -7,11 +7,6 @@ module.exports = {
     RDFMimeType: require('./http/rdf-mime-type')
   },
 
-  server: {
-    ServerClient: require('./server/server-client'),
-    ServerClientConfig: require('./server/server-client-config')
-  },
-
   repository: {
     RepositoryClientConfig: require('./repository/repository-client-config'),
     BaseRepositoryClient: require('./repository/base-repository-client'),
@@ -19,6 +14,11 @@ module.exports = {
     StatementPayload: require('./repository/statement-payload'),
     AddStatementPayload: require('./repository/add-statement-payload'),
     GetStatementsPayload: require('./repository/get-statements-payload')
+  },
+
+  server: {
+    ServerClient: require('./server/server-client'),
+    ServerClientConfig: require('./server/server-client-config')
   },
 
   transaction: {
