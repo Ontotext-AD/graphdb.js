@@ -16,6 +16,7 @@ cache: npm
 script:
   - npm run lint:test
   - npm run test:report
+  - npm run test:coveralls
 
 # TODO: Notifications on failure ?
 

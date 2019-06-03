@@ -14,7 +14,7 @@ module.exports = Object.assign({
 
   coverageReporters: ['text', 'lcov'],
 
-  reporters: ['default', ['jest-junit', {outputDirectory: REPORT_DIR}]],
+  reporters: ['default'],
 
   coveragePathIgnorePatterns: [...defaults.coveragePathIgnorePatterns, 'test/']
 
