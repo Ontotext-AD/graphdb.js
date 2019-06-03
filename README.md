@@ -93,8 +93,8 @@ first.
 * Configure `ServerClient`
 
 ```javascript
-const {ServerClient, ServerClientConfig} = require('graphdbjs').server;
-const {RDFMimeType} = require('graphdbjs').http;
+const {ServerClient, ServerClientConfig} = require('graphdb').server;
+const {RDFMimeType} = require('graphdb').http;
 
 const serverConfig = new ServerClientConfig('http://rdf4j-compliant-server/', 0, {
     'Accept': RDFMimeType.SPARQL_RESULTS_JSON
@@ -154,8 +154,8 @@ const repository = new RDFRepositoryClient(config);
 * Obtaining repository client instance through a ServerClient
 
 ```javascript
-const {ServerClient, ServerClientConfig} = require('graphdbjs').server;
-const {RepositoryClientConfig} = require('graphdbjs').repository;
+const {ServerClient, ServerClientConfig} = require('graphdb').server;
+const {RepositoryClientConfig} = require('graphdb').repository;
 
 const config = new ServerClientConfig('http://GDB', 0, {});
 const server = new ServerClient(config);
@@ -438,7 +438,7 @@ Parsers should be registered in the repository before executing any request.
 
 ```javascript
 // Import any of the predefined parsers
-const {NTriplesParser} = require('graphdbjs').parser;
+const {NTriplesParser} = require('graphdb').parser;
 // And register it in the repository
 repository.registerParser(new NTriplesParser());
 ```
