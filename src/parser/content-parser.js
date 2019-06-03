@@ -7,18 +7,28 @@
  */
 class ContentParser {
   /**
-   * @param {boolean} isDefault if the implementation is configured as default.
+   * @param {Object} config is an object containing the parser configuration.
    */
-  constructor(isDefault) {
-    this.default = isDefault !== undefined ? isDefault : false;
+  constructor(config) {
+    this.configureParser(config);
   }
 
   /**
-   * @return {boolean} <code>true</code> if current implementation is set as
-   * default and <code>false</code> otherwise.
+   * Configure the parser instance.
+   *
+   * @private
+   * @param {Object} config
    */
-  isDefault() {
-    return this.default;
+  configureParser(config = {}) {
+    this.config = config;
+  }
+
+  /**
+   * @return {Object} config is the passed during the initialization parser
+   * config object.
+   */
+  getConfig() {
+    return this.config;
   }
 
   /**

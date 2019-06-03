@@ -6,11 +6,12 @@ describe('TriGParser', () => {
     expect(new TriGParser().parser).toBeDefined();
   });
 
-  test('should set isDefault if provided to constructor', () => {
+  test('should store provided with the constructor configuration', () => {
     let parserInstance = new TriGParser();
-    expect(parserInstance.isDefault()).toBeFalsy();
-    parserInstance = new TriGParser(true);
-    expect(parserInstance.isDefault()).toBeTruthy();
+    expect(parserInstance.getConfig()).toEqual({});
+
+    parserInstance = new TriGParser({param: true});
+    expect(parserInstance.getConfig()).toEqual({param: true});
   });
 
   test('should return supported type', () => {

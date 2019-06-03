@@ -17,17 +17,12 @@ describe('ContentParser', () => {
     }).toThrow(Error('Method #parse(content) must be implemented!'));
   });
 
-  test('should initialize #isDefault to false by default if not provided', () => {
-    const parser = new RdfAsXmlParser();
-    expect(parser.isDefault()).toBeFalsy();
-  });
+  test('should store provided with the constructor configuration', () => {
+    let parserInstance = new RdfAsXmlParser();
+    expect(parserInstance.getConfig()).toEqual({});
 
-  test('should initialize #isDefault to provided value', () => {
-    let parser = new RdfAsXmlParser(false);
-    expect(parser.isDefault()).toBeFalsy();
-
-    parser = new RdfAsXmlParser(true);
-    expect(parser.isDefault()).toBeTruthy();
+    parserInstance = new RdfAsXmlParser({param: true});
+    expect(parserInstance.getConfig()).toEqual({param: true});
   });
 
   test('should instantiate a valid implementation properly', () => {

@@ -6,11 +6,12 @@ describe('TurtleParser', () => {
     expect(new TurtleParser().parser).toBeDefined();
   });
 
-  test('should set isDefault if provided to constructor', () => {
+  test('should store provided with the constructor configuration', () => {
     let parserInstance = new TurtleParser();
-    expect(parserInstance.isDefault()).toBeFalsy();
-    parserInstance = new TurtleParser(true);
-    expect(parserInstance.isDefault()).toBeTruthy();
+    expect(parserInstance.getConfig()).toEqual({});
+
+    parserInstance = new TurtleParser({param: true});
+    expect(parserInstance.getConfig()).toEqual({param: true});
   });
 
   test('should return supported type', () => {

@@ -12,11 +12,12 @@ describe('SparqlXmlResultParser', () => {
     expect(new SparqlXmlResultParser().parser.dataFactory.internal).toBeDefined();
   });
 
-  test('should set isDefault if provided to constructor', () => {
+  test('should store provided with the constructor configuration', () => {
     let parserInstance = new SparqlXmlResultParser();
-    expect(parserInstance.isDefault()).toBeFalsy();
-    parserInstance = new SparqlXmlResultParser(true);
-    expect(parserInstance.isDefault()).toBeTruthy();
+    expect(parserInstance.getConfig()).toEqual({});
+
+    parserInstance = new SparqlXmlResultParser({param: true});
+    expect(parserInstance.getConfig()).toEqual({param: true});
   });
 
   test('should return supported type', () => {

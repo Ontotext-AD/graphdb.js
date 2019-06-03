@@ -21,8 +21,8 @@ class SparqlJsonResultParser extends ContentParser {
   /**
    * @inheritDoc
    */
-  constructor(isDefault) {
-    super(isDefault);
+  constructor(config) {
+    super(config);
 
     this.parser = new SparqlJsonParser({
       dataFactory: DataFactory
