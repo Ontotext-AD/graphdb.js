@@ -55,7 +55,7 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "test:report": "rimraf report/ && jest --config jest-report.config.js",
-    "test:coveralls": "cat coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js",
+    "test:coveralls": "cat report/lcov.info | ./node_modules/coveralls/bin/coveralls.js",
     "lint": "eslint ./src",
     "lint:test": "eslint --no-eslintrc --config .eslintrc-test ./test",
     "doc": "jsdoc -c jsdoc.conf.json",
