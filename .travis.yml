@@ -14,9 +14,16 @@ branches:
 
 cache: npm
 
+before_script:
+  - ./scripts/cc-coverage-prepare.sh
+
 script:
   - npm run lint
   - npm run lint:test
   - npm run test:report
+  - npm run test:coveralls
+
+after_script:
+  - ./scripts/cc-coverage-publish.sh
 
 # TODO: Add npm publishing on tags
