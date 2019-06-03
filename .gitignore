@@ -9,4 +9,4 @@ npm-debug.log
 .idea
 dist
 .vscode
-report/
+coverage/
