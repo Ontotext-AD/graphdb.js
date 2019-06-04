@@ -101,10 +101,14 @@ class TransactionalRepositoryClient extends BaseRepositoryClient {
         context: TermConverter.toNTripleValues(payload.getContext()),
         infer: payload.getInference()
       })
-      .addAcceptHeader(payload.getResponseType())
-      .get();
+      .addAcceptHeader(payload.getResponseType());
 
-    return this.execute((http) => http.put('', null, requestConfig))
+    const parser = this.getParser(payload.getResponseType());
+    if (parser && parser.isStreaming()) {
+      requestConfig.setResponseType('stream');
+    }
+
+    return this.execute((http) => http.put('', null, requestConfig.get()))
       .then((response) => {
         this.logger.debug(this.getLogPayload(response, {
           subject: payload.getSubject(),

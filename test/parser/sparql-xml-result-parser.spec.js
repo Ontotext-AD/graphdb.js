@@ -39,4 +39,8 @@ describe('SparqlXmlResultParser', () => {
     expect(parserInstance.parser.parseXmlBooleanStream).toHaveBeenCalledTimes(1);
     expect(parserInstance.parser.parseXmlBooleanStream).toHaveBeenCalledWith('content');
   });
+
+  test('should be a streaming parser', () => {
+    expect(new SparqlXmlResultParser().isStreaming()).toBeTruthy();
+  });
 });

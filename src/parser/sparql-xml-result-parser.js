@@ -61,6 +61,13 @@ class SparqlXmlResultParser extends ContentParser {
   getSupportedType() {
     return RDFMimeType.SPARQL_RESULTS_XML;
   }
+
+  /**
+   * @inheritDoc
+   */
+  isStreaming() {
+    return true;
+  }
 }
 
 module.exports = SparqlXmlResultParser;

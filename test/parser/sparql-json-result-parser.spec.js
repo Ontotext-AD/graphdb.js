@@ -39,4 +39,8 @@ describe('SparqlJsonResultParser', () => {
     expect(parserInstance.parser.parseJsonBooleanStream).toHaveBeenCalledTimes(1);
     expect(parserInstance.parser.parseJsonBooleanStream).toHaveBeenCalledWith('content');
   });
+
+  test('should be a streaming parser', () => {
+    expect(new SparqlJsonResultParser().isStreaming()).toBeTruthy();
+  });
 });
