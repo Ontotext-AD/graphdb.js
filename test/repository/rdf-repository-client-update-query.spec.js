@@ -3,6 +3,7 @@ const RDFRepositoryClient = require('repository/rdf-repository-client');
 const RepositoryClientConfig = require('repository/repository-client-config');
 const UpdateQueryPayload = require('query/update-query-payload');
 const QueryContentType = require('http/query-content-type');
+const HttpRequestConfigBuilder = require('http/http-request-config-builder');
 
 const httpClientStub = require('../http/http-client.stub');
 
@@ -15,8 +16,10 @@ describe('RDFRepositoryClient - update query', () => {
 
   beforeEach(() => {
     HttpClient.mockImplementation(() => httpClientStub());
-    config = new RepositoryClientConfig(
-      ['http://host/repositories/repo1'], {}, '', 1000, 1000);
+    config = new RepositoryClientConfig()
+      .addEndpoint('http://host/repositories/repo1')
+      .setReadTimeout(1000)
+      .setWriteTimeout(1000);
     repository = new RDFRepositoryClient(config);
     postMock = repository.httpClients[0].post;
   });
@@ -25,14 +28,14 @@ describe('RDFRepositoryClient - update query', () => {
     const payload = new UpdateQueryPayload()
       .setQuery('INSERT {?s ?p ?o} WHERE {?s ?p ?o}');
 
+    const expectedRequestConfig = new HttpRequestConfigBuilder().setHeaders({
+      'Content-Type': 'application/sparql-update'
+    });
+
     return repository.update(payload).then(() => {
       expect(postMock).toHaveBeenCalledTimes(1);
       expect(postMock).toHaveBeenCalledWith('/statements',
-        'INSERT {?s ?p ?o} WHERE {?s ?p ?o}', {
-          headers: {
-            'Content-Type': 'application/sparql-update'
-          }
-        });
+        'INSERT {?s ?p ?o} WHERE {?s ?p ?o}', expectedRequestConfig);
     });
   });
 
@@ -43,14 +46,14 @@ describe('RDFRepositoryClient - update query', () => {
       .setInference(true)
       .setTimeout(5);
 
+    const expectedData = 'update=INSERT%20%7B%3Fs%20%3Fp%20%3Fo%7D%20WHERE%20%7B%3Fs%20%3Fp%20%3Fo%7D&infer=true&timeout=5';
+    const expectedRequestConfig = new HttpRequestConfigBuilder().setHeaders({
+      'Content-Type': 'application/x-www-form-urlencoded'
+    });
+
     return repository.update(payload).then(() => {
       expect(postMock).toHaveBeenCalledTimes(1);
-      expect(postMock).toHaveBeenCalledWith('/statements',
-        'update=INSERT%20%7B%3Fs%20%3Fp%20%3Fo%7D%20WHERE%20%7B%3Fs%20%3Fp%20%3Fo%7D&infer=true&timeout=5', {
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded'
-          }
-        });
+      expect(postMock).toHaveBeenCalledWith('/statements', expectedData, expectedRequestConfig);
     });
   });
 

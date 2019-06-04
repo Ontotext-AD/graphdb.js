@@ -1,8 +1,9 @@
 language: node_js
 
 node_js:
-  - 8.16
+  - 8
   - 10
+  - 12
 
 # Build only commits on master and release tags preventing double builds for PRs
 # See https://docs.travis-ci.com/user/pull-requests/#double-builds-on-pull-requests
@@ -14,10 +15,8 @@ branches:
 cache: npm
 
 script:
+  - npm run lint
   - npm run lint:test
   - npm run test:report
 
-# TODO: Notifications on failure ?
-
-# TODO: add coveralls
 # TODO: Add npm publishing on tags

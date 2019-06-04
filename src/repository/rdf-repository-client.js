@@ -67,10 +67,7 @@ class RDFRepositoryClient extends BaseRepositoryClient {
    */
   getSize(context) {
     const requestConfig = new HttpRequestConfigBuilder()
-      .setParams({
-        context: TermConverter.toNTripleValues(context)
-      })
-      .get();
+      .addParam('context', TermConverter.toNTripleValues(context));
 
     return this.execute((http) => http.get('/size', requestConfig))
       .then((response) => {
@@ -88,8 +85,7 @@ class RDFRepositoryClient extends BaseRepositoryClient {
    */
   getNamespaces() {
     const requestConfig = new HttpRequestConfigBuilder()
-      .addAcceptHeader(RDFMimeType.SPARQL_RESULTS_JSON)
-      .get();
+      .addAcceptHeader(RDFMimeType.SPARQL_RESULTS_JSON);
 
     return this.execute((http) => http.get(PATH_NAMESPACES, requestConfig))
       .then((response) => {
@@ -238,7 +234,7 @@ class RDFRepositoryClient extends BaseRepositoryClient {
       reqConfig.setResponseType('stream');
     }
 
-    return this.execute((http) => http.get(PATH_STATEMENTS, reqConfig.get()))
+    return this.execute((http) => http.get(PATH_STATEMENTS, reqConfig))
       .then((response) => {
         this.logger.debug(this.getLogPayload(response, {
           subject: payload.getSubject(),
@@ -265,8 +261,7 @@ class RDFRepositoryClient extends BaseRepositoryClient {
     const requestConfig = new HttpRequestConfigBuilder()
       .setResponseType('stream')
       .addAcceptHeader(payload.getResponseType())
-      .addContentTypeHeader(payload.getContentType())
-      .get();
+      .addContentTypeHeader(payload.getContentType());
 
     return this.execute((http) => http.post('', payload.getParams(),
       requestConfig)).then((response) => {
@@ -299,8 +294,7 @@ class RDFRepositoryClient extends BaseRepositoryClient {
    */
   update(payload) {
     const requestConfig = new HttpRequestConfigBuilder()
-      .addContentTypeHeader(payload.getContentType())
-      .get();
+      .addContentTypeHeader(payload.getContentType());
 
     return this.execute((http) => http.post(PATH_STATEMENTS,
       payload.getParams(), requestConfig)).then((response) => {
@@ -426,8 +420,7 @@ class RDFRepositoryClient extends BaseRepositoryClient {
       .setParams({
         baseURI,
         context: TermConverter.toNTripleValues(context)
-      })
-      .get();
+      });
 
     if (overwrite) {
       return this.execute((http) => http.put(PATH_STATEMENTS, data,
@@ -463,8 +456,7 @@ class RDFRepositoryClient extends BaseRepositoryClient {
         pred: TermConverter.toNTripleValue(predicate),
         obj: TermConverter.toNTripleValue(object),
         context: TermConverter.toNTripleValues(contexts)
-      })
-      .get();
+      });
 
     return this.execute((http) => http.deleteResource(PATH_STATEMENTS,
       requestConfig)).then((response) => {
@@ -516,8 +508,7 @@ class RDFRepositoryClient extends BaseRepositoryClient {
         obj: TermConverter.toNTripleValue(payload.getObject()),
         context: TermConverter.toNTripleValues(payload.getContext()),
         infer: payload.getInference()
-      })
-      .get();
+      });
 
     return this.execute((http) => http.get('/statements', requestConfig))
       .then((response) => {
@@ -667,8 +658,7 @@ class RDFRepositoryClient extends BaseRepositoryClient {
       .setParams({
         baseURI,
         context: TermConverter.toNTripleValues(context)
-      })
-      .get();
+      });
 
     return this.execute((http) => http.post(PATH_STATEMENTS, readStream,
       requestConfig));
@@ -696,8 +686,7 @@ class RDFRepositoryClient extends BaseRepositoryClient {
       .setParams({
         baseURI,
         context: TermConverter.toNTripleValues(context)
-      })
-      .get();
+      });
 
     return this.execute((http) => http.put(PATH_STATEMENTS, readStream,
       requestConfig));
@@ -718,25 +707,24 @@ class RDFRepositoryClient extends BaseRepositoryClient {
    * @return {Promise<TransactionalRepositoryClient>} transactional client
    */
   beginTransaction(isolationLevel) {
-    return this.execute((http) => http.post('/transactions', {
-      params: {
-        'isolation-level': isolationLevel
-      }
-    })).then((response) => {
-      const locationUrl = response.getHeaders()['location'];
-      if (StringUtils.isBlank(locationUrl)) {
-        this.logger.error(this.getLogPayload(response, {isolationLevel}),
-          'Cannot obtain transaction ID');
-        return Promise.reject(new Error('Couldn\'t obtain transaction ID'));
-      }
+    const requestConfig = new HttpRequestConfigBuilder()
+      .addParam('isolation-level', isolationLevel);
+    return this.execute((http) => http.post('/transactions', requestConfig))
+      .then((response) => {
+        const locationUrl = response.getHeaders()['location'];
+        if (StringUtils.isBlank(locationUrl)) {
+          this.logger.error(this.getLogPayload(response, {isolationLevel}),
+            'Cannot obtain transaction ID');
+          return Promise.reject(new Error('Couldn\'t obtain transaction ID'));
+        }
 
-      const config = this.getTransactionalClientConfig(locationUrl);
-      const transactionClient = new TransactionalRepositoryClient(config);
+        const config = this.getTransactionalClientConfig(locationUrl);
+        const transactionClient = new TransactionalRepositoryClient(config);
 
-      this.logger.debug(this.getLogPayload(response, {isolationLevel}),
-        'Started transaction');
-      return transactionClient;
-    });
+        this.logger.debug(this.getLogPayload(response, {isolationLevel}),
+          'Started transaction');
+        return transactionClient;
+      });
   }
 
   /**
@@ -748,8 +736,9 @@ class RDFRepositoryClient extends BaseRepositoryClient {
    */
   getTransactionalClientConfig(locationUrl) {
     const config = this.repositoryClientConfig;
-    return new RepositoryClientConfig([locationUrl], config.headers,
-      config.defaultRDFMimeType, config.readTimeout, config.writeTimeout);
+    return new RepositoryClientConfig([locationUrl], config.getHeaders(),
+      config.getDefaultRDFMimeType(), config.getReadTimeout(),
+      config.getWriteTimeout());
   }
 }
 

@@ -4,6 +4,7 @@ const RDFRepositoryClient = require('repository/rdf-repository-client');
 const RDFMimeType = require('http/rdf-mime-type');
 const AddStatementPayload = require('repository/add-statement-payload');
 const XSD = require('model/types').XSD;
+const HttpRequestConfigBuilder = require('http/http-request-config-builder');
 
 const N3 = require('n3');
 const {DataFactory} = N3;
@@ -24,9 +25,10 @@ describe('RDFRepositoryClient - adding data', () => {
   let rdfRepositoryClient;
 
   beforeEach(() => {
-    repoClientConfig = new RepositoryClientConfig([
-      'http://localhost:8080/repositories/test'
-    ], {}, '', 100, 200);
+    repoClientConfig = new RepositoryClientConfig()
+      .addEndpoint('http://localhost:8080/repositories/test')
+      .setReadTimeout(100)
+      .setWriteTimeout(200);
 
     HttpClient.mockImplementation(() => httpClientStub());
 
@@ -280,16 +282,14 @@ describe('RDFRepositoryClient - adding data', () => {
   }
 
   function verifySentPayload(method, expected, context, baseURI) {
-    expect(method).toHaveBeenCalledTimes(1);
-    expect(method).toHaveBeenCalledWith('/statements', expected, {
-      headers: {
-        'Content-Type': RDFMimeType.TRIG
-      },
-      params: {
-        context,
-        baseURI
-      }
+    const expectedRequestConfig = new HttpRequestConfigBuilder().setHeaders({
+      'Content-Type': RDFMimeType.TRIG
+    }).setParams({
+      context,
+      baseURI
     });
+    expect(method).toHaveBeenCalledTimes(1);
+    expect(method).toHaveBeenCalledWith('/statements', expected, expectedRequestConfig);
   }
 
   function verifyNoPayload() {

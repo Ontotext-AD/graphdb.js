@@ -2,6 +2,9 @@ const axios = require('axios');
 const uuidv4 = require('uuid/v4');
 const qs = require('qs');
 const ConsoleLogger = require('../logging/console-logger');
+const HttpRequestConfigBuilder = require('./http-request-config-builder');
+
+const REQUEST_ID_HEADER = 'x-request-id';
 
 /**
  * Promise based HTTP client that delegates requests to Axios.
@@ -97,13 +100,12 @@ class HttpClient {
    * given URL.
    *
    * @param {string} url URL to the requested resource
-   * @param {object} [config={}] request configuration that can include params
-   *                        and headers
+   * @param {HttpRequestConfigBuilder} [requestConfigBuilder] request
+   * configuration builder that include params and headers
    * @return {Promise<any>} a promise resolving to the request's response
    */
-  get(url, config = {}) {
-    this.addXRequestIdHeader(config);
-    this.addDefaultReadTimeout(config);
+  get(url, requestConfigBuilder) {
+    const config = this.getReadRequestConfig(requestConfigBuilder);
     this.logger.trace({url, config}, 'Executing GET request');
     return this.axios.get(url, config);
   }
@@ -117,13 +119,12 @@ class HttpClient {
    *
    * @param {string} url URL to the requested resource
    * @param {object} data the request body
-   * @param {object} [config={}] request configuration that can include params
-   *                        and headers
+   * @param {HttpRequestConfigBuilder} [requestConfigBuilder] request
+   * configuration builder that include params and headers
    * @return {Promise<any>} a promise resolving to the request's response
    */
-  post(url, data, config = {}) {
-    this.addXRequestIdHeader(config);
-    this.addDefaultWriteTimeout(config);
+  post(url, data, requestConfigBuilder) {
+    const config = this.getWriteRequestConfig(requestConfigBuilder);
     this.logger.trace({url, config, data}, 'Executing POST request');
     return this.axios.post(url, data, config);
   }
@@ -137,13 +138,12 @@ class HttpClient {
    *
    * @param {string} url URL to the requested resource
    * @param {object} data the request body
-   * @param {object} [config={}] request configuration that can include params
-   *                        and headers
+   * @param {HttpRequestConfigBuilder} [requestConfigBuilder] request
+   * configuration builder that include params and headers
    * @return {Promise<any>} a promise resolving to the request's response
    */
-  put(url, data, config = {}) {
-    this.addXRequestIdHeader(config);
-    this.addDefaultWriteTimeout(config);
+  put(url, data, requestConfigBuilder) {
+    const config = this.getWriteRequestConfig(requestConfigBuilder);
     this.logger.trace({url, config, data}, 'Executing PUT request');
     return this.axios.put(url, data, config);
   }
@@ -156,15 +156,61 @@ class HttpClient {
    * given URL.
    *
    * @param {string} url URL to the requested resource
-   * @param {object} [config={}] request configuration that can include params
-   *                        and headers
+   * @param {HttpRequestConfigBuilder} [requestConfigBuilder] request
+   * configuration builder that include params and headers
    * @return {Promise<any>} a promise resolving to the request's response
    */
-  deleteResource(url, config = {}) {
-    this.addXRequestIdHeader(config);
-    this.addDefaultWriteTimeout(config);
+  deleteResource(url, requestConfigBuilder) {
+    const config = this.getWriteRequestConfig(requestConfigBuilder);
     this.logger.trace({url, config}, 'Executing DELETE request');
     return this.axios.delete(url, config);
+  }
+
+  /**
+   * Returns request configuration for GET requests from the
+   * provided request configuration builder.
+   *
+   * @private
+   * @param {HttpRequestConfigBuilder} [requestConfigBuilder] request
+   * configuration builder used to produce the request configuration
+   * @return {Object<string, string>}
+   */
+  getReadRequestConfig(requestConfigBuilder) {
+    return this.getRequestConfig(requestConfigBuilder, this.readTimeout);
+  }
+
+  /**
+   * Returns request configuration for POST/PUT/DELETE requests from the
+   * provided request configuration builder.
+   *
+   * @private
+   * @param {HttpRequestConfigBuilder} [requestConfigBuilder] request
+   * configuration builder used to produce the request configuration
+   * @return {Object<string, string>}
+   */
+  getWriteRequestConfig(requestConfigBuilder) {
+    return this.getRequestConfig(requestConfigBuilder, this.writeTimeout);
+  }
+
+  /**
+   * Returns request configuration suitable for from the provided request
+   * configuration builder and default timeout.
+   *
+   * @private
+   * @param {HttpRequestConfigBuilder} [requestConfigBuilder] request
+   * configuration builder used to produce the request configuration
+   * @param {number} timeout default timeout if one is not specified in the
+   * request config builder
+   * @return {Object<string, string>}
+   */
+  getRequestConfig(requestConfigBuilder, timeout) {
+    requestConfigBuilder = requestConfigBuilder ||
+      new HttpRequestConfigBuilder();
+
+    this.addXRequestIdHeader(requestConfigBuilder);
+    this.addDefaultTimeout(requestConfigBuilder, timeout);
+
+    return requestConfigBuilder.get();
   }
 
   /**
@@ -174,35 +220,21 @@ class HttpClient {
    * @param {Object} requestConfig
    */
   addXRequestIdHeader(requestConfig) {
-    if (!requestConfig.headers) {
-      requestConfig.headers = {};
-    }
-    requestConfig.headers['x-request-id'] = uuidv4();
+    requestConfig.addHeader(REQUEST_ID_HEADER, uuidv4());
   }
 
   /**
-   * Adds a default read timeout if it is not explicitly specified in the
+   * Adds a default timeout if it is not explicitly specified in the
    * request configuration object.
    *
+   * @private
    * @param {object} requestConfig request configuration object supplied to
    * the http client for specific request
+   * @param {number} timeout the timeout to set in the request config
    */
-  addDefaultReadTimeout(requestConfig) {
-    if (!requestConfig.timeout) {
-      requestConfig.timeout = this.readTimeout;
-    }
-  }
-
-  /**
-   * Adds a default write timeout if it is not explicitly specified in the
-   * request configuration object.
-   *
-   * @param {object} requestConfig request configuration object supplied to
-   * the http client for specific request
-   */
-  addDefaultWriteTimeout(requestConfig) {
-    if (!requestConfig.timeout) {
-      requestConfig.timeout = this.writeTimeout;
+  addDefaultTimeout(requestConfig, timeout) {
+    if (!requestConfig.getTimeout()) {
+      requestConfig.setTimeout(timeout);
     }
   }
 

@@ -11,6 +11,7 @@ const GetQueryPayload = require('query/get-query-payload');
 const QueryType = require('query/query-type');
 const UpdateQueryPayload = require('query/update-query-payload');
 const QueryContentType = require('http/query-content-type');
+const HttpRequestConfigBuilder = require('http/http-request-config-builder');
 
 const {namedNode, literal, quad} = require('n3').DataFactory;
 
@@ -37,10 +38,14 @@ describe('RDFRepositoryClient - transactions', () => {
   const testFilePath = path.resolve(__dirname, './data/add-statements-complex.txt');
 
   beforeEach(() => {
-    repoClientConfig = new RepositoryClientConfig([
-      'http://localhost:8080/repositories/test',
-      'http://localhost:8081/repositories/test'
-    ], defaultHeaders, 'application/json', 100, 200);
+    repoClientConfig = new RepositoryClientConfig()
+      .setEndpoints([
+        'http://localhost:8080/repositories/test',
+        'http://localhost:8081/repositories/test'
+      ])
+      .setHeaders(defaultHeaders)
+      .setReadTimeout(100)
+      .setWriteTimeout(200);
 
     HttpClient.mockImplementation((baseUrl) => httpClientStub(baseUrl));
 
@@ -53,6 +58,15 @@ describe('RDFRepositoryClient - transactions', () => {
     };
     when(rdfRepositoryClient.httpClients[0].post).calledWith('/transactions').mockResolvedValue(response);
   });
+
+  /**
+   * Utility for creating HttpRequestConfigBuilder from given config.
+   */
+  function getRequestConfig(config) {
+    const requestConfig = new HttpRequestConfigBuilder();
+    requestConfig.config = config;
+    return requestConfig;
+  }
 
   describe('beginTransaction()', () => {
 
@@ -79,26 +93,25 @@ describe('RDFRepositoryClient - transactions', () => {
         expect(transactionalClient.httpClients[0].baseUrl).toEqual(transactionUrl);
         expect(transactionalClient.httpClients[0].setDefaultHeaders).toHaveBeenCalledWith(defaultHeaders);
 
-        verifyTransactionStart();
         expect(transactionalClient.isActive()).toEqual(true);
+
+        expect(post).toHaveBeenCalledTimes(1);
+        expect(post).toHaveBeenCalledWith('/transactions', new HttpRequestConfigBuilder());
       });
     });
 
     test('should start a transaction with specified isolation level', () => {
       return rdfRepositoryClient.beginTransaction(TransactionIsolationLevel.READ_UNCOMMITTED).then(transactionalClient => {
         expect(transactionalClient).toBeInstanceOf(TransactionalRepositoryClient);
-        verifyTransactionStart(TransactionIsolationLevel.READ_UNCOMMITTED);
+
+        expect(post).toHaveBeenCalledTimes(1);
+        expect(post).toHaveBeenCalledWith('/transactions', getRequestConfig({
+          params: {
+            'isolation-level': TransactionIsolationLevel.READ_UNCOMMITTED
+          }
+        }));
       });
     });
-
-    function verifyTransactionStart(isolation) {
-      expect(post).toHaveBeenCalledTimes(1);
-      expect(post).toHaveBeenCalledWith('/transactions', {
-        params: {
-          'isolation-level': isolation
-        }
-      });
-    }
 
     test('should start a transaction that can be committed', () => {
       let transactionalClient;
@@ -107,11 +120,11 @@ describe('RDFRepositoryClient - transactions', () => {
         return transactionalClient.commit();
       }).then(() => {
         expect(transactionalClient.httpClients[0].put).toHaveBeenCalledTimes(1);
-        expect(transactionalClient.httpClients[0].put).toHaveBeenCalledWith('', null, {
+        expect(transactionalClient.httpClients[0].put).toHaveBeenCalledWith('', null, getRequestConfig({
           params: {
             action: 'COMMIT'
           }
-        });
+        }));
         expect(transactionalClient.isActive()).toEqual(false);
       });
     });
@@ -234,12 +247,12 @@ describe('RDFRepositoryClient - transactions', () => {
         return transaction.getSize().then(size => {
           expect(size).toEqual(123);
           expect(httpPut).toHaveBeenCalledTimes(1);
-          expect(httpPut).toHaveBeenCalledWith('', null, {
+          expect(httpPut).toHaveBeenCalledWith('', null, getRequestConfig({
             params: {
               action: 'SIZE',
               context: undefined
             }
-          });
+          }));
         });
       });
 
@@ -248,12 +261,12 @@ describe('RDFRepositoryClient - transactions', () => {
         return transaction.getSize('<http://domain/context>').then(size => {
           expect(size).toEqual(123);
           expect(httpPut).toHaveBeenCalledTimes(1);
-          expect(httpPut).toHaveBeenCalledWith('', null, {
+          expect(httpPut).toHaveBeenCalledWith('', null, getRequestConfig({
             params: {
               action: 'SIZE',
               context: '<http://domain/context>'
             }
-          });
+          }));
         });
       });
 
@@ -275,7 +288,7 @@ describe('RDFRepositoryClient - transactions', () => {
       test('should properly request to retrieve statements', () => {
         return transaction.get(getStatementPayload()).then(() => {
           expect(httpPut).toHaveBeenCalledTimes(1);
-          expect(httpPut).toHaveBeenCalledWith('', null, {
+          expect(httpPut).toHaveBeenCalledWith('', null, getRequestConfig({
             headers: {'Accept': RDFMimeType.RDF_JSON},
             params: {
               action: 'GET',
@@ -285,7 +298,7 @@ describe('RDFRepositoryClient - transactions', () => {
               pred: '<http://eunis.eea.europa.eu/rdf/schema.rdf#population>',
               subj: '<http://eunis.eea.europa.eu/countries/AZ>'
             }
-          });
+          }));
         });
       });
 
@@ -314,7 +327,7 @@ describe('RDFRepositoryClient - transactions', () => {
         httpPut.mockResolvedValue({data: true});
         return transaction.query(payload).then(() => {
           expect(httpPut).toHaveBeenCalledTimes(1);
-          expect(httpPut).toHaveBeenCalledWith('', 'ask {?s ?p ?o}', {
+          expect(httpPut).toHaveBeenCalledWith('', 'ask {?s ?p ?o}', getRequestConfig({
             params: {
               action: 'QUERY'
             },
@@ -323,7 +336,7 @@ describe('RDFRepositoryClient - transactions', () => {
               'Content-Type': QueryContentType.SPARQL_QUERY
             },
             responseType: 'stream'
-          });
+          }));
         });
       });
 
@@ -342,14 +355,14 @@ describe('RDFRepositoryClient - transactions', () => {
       test('should perform update with proper request', () => {
         return transaction.update(updatePayload).then(() => {
           expect(httpPut).toHaveBeenCalledTimes(1);
-          expect(httpPut).toHaveBeenCalledWith('', 'INSERT {?s ?p ?o} WHERE {?s ?p ?o}', {
+          expect(httpPut).toHaveBeenCalledWith('', 'INSERT {?s ?p ?o} WHERE {?s ?p ?o}', getRequestConfig({
             params: {
               action: 'UPDATE'
             },
             headers: {
               'Content-Type': QueryContentType.SPARQL_UPDATE
             }
-          });
+          }));
         });
       });
 
@@ -491,7 +504,7 @@ describe('RDFRepositoryClient - transactions', () => {
 
     function expectInsertedData(expectedData, expectedContext, expectedBaseURI) {
       expect(httpPut).toHaveBeenCalledTimes(1);
-      expect(httpPut).toHaveBeenCalledWith('', expectedData, {
+      expect(httpPut).toHaveBeenCalledWith('', expectedData, getRequestConfig({
         headers: {
           'Content-Type': RDFMimeType.TRIG
         },
@@ -500,7 +513,7 @@ describe('RDFRepositoryClient - transactions', () => {
           context: expectedContext,
           baseURI: expectedBaseURI
         }
-      });
+      }));
     }
 
     function expectNoInsertedData() {
@@ -511,14 +524,14 @@ describe('RDFRepositoryClient - transactions', () => {
       test('should delete data', () => {
         return transaction.deleteData(data).then(() => {
           expect(httpPut).toHaveBeenCalledTimes(1);
-          expect(httpPut).toHaveBeenCalledWith('', data, {
+          expect(httpPut).toHaveBeenCalledWith('', data, getRequestConfig({
             headers: {
               'Content-Type': RDFMimeType.TRIG
             },
             params: {
               action: 'DELETE'
             }
-          });
+          }));
         });
       });
 
@@ -558,7 +571,7 @@ describe('RDFRepositoryClient - transactions', () => {
         });
         return transaction.download(getStatementPayload()).then(() => {
           expect(httpPut).toHaveBeenCalledTimes(1);
-          expect(httpPut).toHaveBeenCalledWith('', null, {
+          expect(httpPut).toHaveBeenCalledWith('', null, getRequestConfig({
             headers: {'Accept': RDFMimeType.RDF_JSON},
             params: {
               action: 'GET',
@@ -569,7 +582,7 @@ describe('RDFRepositoryClient - transactions', () => {
               subj: '<http://eunis.eea.europa.eu/countries/AZ>'
             },
             responseType: 'stream'
-          });
+          }));
         });
       });
 
@@ -593,7 +606,7 @@ describe('RDFRepositoryClient - transactions', () => {
           expect(url).toEqual('');
 
           const requestConfig = httpPutCall[2];
-          expect(requestConfig).toEqual({
+          expect(requestConfig).toEqual(getRequestConfig({
             headers: {
               'Content-Type': RDFMimeType.TRIG
             },
@@ -603,7 +616,7 @@ describe('RDFRepositoryClient - transactions', () => {
               baseURI
             },
             responseType: 'stream'
-          });
+          }));
 
           const stream = httpPutCall[1];
           return testUtils.readStream(stream);
@@ -641,7 +654,7 @@ describe('RDFRepositoryClient - transactions', () => {
           expect(url).toEqual('');
 
           const requestConfig = httpPutCall[2];
-          expect(requestConfig).toEqual({
+          expect(requestConfig).toEqual(getRequestConfig({
             headers: {
               'Content-Type': RDFMimeType.TRIG
             },
@@ -651,7 +664,7 @@ describe('RDFRepositoryClient - transactions', () => {
               baseURI
             },
             responseType: 'stream'
-          });
+          }));
 
           const stream = httpPutCall[1];
           return testUtils.readStream(stream)

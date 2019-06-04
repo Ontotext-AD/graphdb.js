@@ -74,11 +74,11 @@ class BaseRepositoryClient {
   initHttpClients() {
     const config = this.repositoryClientConfig;
     // Constructs a http client for each endpoint
-    this.httpClients = config.endpoints.map((endpoint) => {
+    this.httpClients = config.getEndpoints().map((endpoint) => {
       return new HttpClient(endpoint)
-        .setDefaultHeaders(config.headers)
-        .setDefaultReadTimeout(config.readTimeout)
-        .setDefaultWriteTimeout(config.writeTimeout);
+        .setDefaultHeaders(config.getHeaders())
+        .setDefaultReadTimeout(config.getReadTimeout())
+        .setDefaultWriteTimeout(config.getWriteTimeout());
     });
   }
 
@@ -254,7 +254,7 @@ class BaseRepositoryClient {
         + 'type!');
     }
 
-    const endpoints = repositoryClientConfig.endpoints;
+    const endpoints = repositoryClientConfig.getEndpoints();
     if (!endpoints || !endpoints.length) {
       throw new Error('Cannot instantiate a repository without repository '
         + 'endpoint configuration! At least one endpoint must be provided.');

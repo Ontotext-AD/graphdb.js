@@ -10,6 +10,7 @@ const SparqlJsonResultParser = require('parser/sparql-json-result-parser');
 const SparqlXmlResultParser = require('parser/sparql-xml-result-parser');
 const DataFactory = require('n3').DataFactory;
 const namedNode = DataFactory.namedNode;
+const HttpRequestConfigBuilder = require('http/http-request-config-builder');
 
 const httpClientStub = require('../http/http-client.stub');
 
@@ -23,8 +24,10 @@ describe('RDFRepositoryClient - query', () => {
 
   beforeEach(() => {
     HttpClient.mockImplementation(() => httpClientStub());
-    config = new RepositoryClientConfig(
-      ['http://host/repositories/repo1'], {}, '', 1000, 1000);
+    config = new RepositoryClientConfig()
+      .addEndpoint('http://host/repositories/repo1')
+      .setReadTimeout(1000)
+      .setWriteTimeout(1000);
     repository = new RDFRepositoryClient(config);
   });
 
@@ -212,16 +215,15 @@ describe('RDFRepositoryClient - query', () => {
       .setOffset(0)
       .setTimeout(5);
 
+    const expectedData = 'query=select%20*%20where%20%7B%3Fs%20%3Fp%20%3Fo%7D&queryLn=sparql&infer=true&distinct=true&limit=100&offset=0&timeout=5';
+    const expectedRequestConfig = new HttpRequestConfigBuilder().setHeaders({
+      'Accept': 'application/sparql-results+json',
+      'Content-Type': 'application/x-www-form-urlencoded'
+    }).setResponseType('stream');
+
     return repository.query(payload).then(() => {
       expect(postMock).toHaveBeenCalledTimes(1);
-      expect(postMock).toHaveBeenCalledWith('',
-        'query=select%20*%20where%20%7B%3Fs%20%3Fp%20%3Fo%7D&queryLn=sparql&infer=true&distinct=true&limit=100&offset=0&timeout=5', {
-          headers: {
-            'Accept': 'application/sparql-results+json',
-            'Content-Type': 'application/x-www-form-urlencoded'
-          },
-          responseType: 'stream'
-        });
+      expect(postMock).toHaveBeenCalledWith('', expectedData, expectedRequestConfig);
     });
   });
 

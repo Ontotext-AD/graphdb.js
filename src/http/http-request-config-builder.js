@@ -35,6 +35,26 @@ class HttpRequestConfigBuilder {
   }
 
   /**
+   * Sets the headers map.
+   *
+   * @param {Object<string, string>} headers the headers map
+   * @return {HttpRequestConfigBuilder}
+   */
+  setHeaders(headers) {
+    this.config.headers = headers;
+    return this;
+  }
+
+  /**
+   * Returns the headers map.
+   *
+   * @return {Object<string, string>}
+   */
+  getHeaders() {
+    return this.config.headers;
+  }
+
+  /**
    * Add a specific header of type <code>Accept</code> with the given value.
    *
    * @param {string} value
@@ -70,15 +90,27 @@ class HttpRequestConfigBuilder {
    * Add a new request param.
    *
    * @param {string} param
-   * @param {any} value
+   * @param {*} value
    * @return {HttpRequestConfigBuilder}
    */
   addParam(param, value) {
+    if (!value) {
+      return this;
+    }
     if (!this.config.params) {
       this.config.params = {};
     }
     this.config.params[param] = value;
     return this;
+  }
+
+  /**
+   * Returns the request parameters map.
+   *
+   * @return {Object<string, *>}
+   */
+  getParams() {
+    return this.config.params;
   }
 
   /**
@@ -90,6 +122,15 @@ class HttpRequestConfigBuilder {
   setTimeout(timeout) {
     this.config.timeout = timeout;
     return this;
+  }
+
+  /**
+   * Returns the request timeout.
+   *
+   * @return {number}
+   */
+  getTimeout() {
+    return this.config.timeout;
   }
 
   /**
