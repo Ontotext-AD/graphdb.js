@@ -61,6 +61,13 @@ class SparqlJsonResultParser extends ContentParser {
   getSupportedType() {
     return RDFMimeType.SPARQL_RESULTS_JSON;
   }
+
+  /**
+   * @inheritDoc
+   */
+  isStreaming() {
+    return true;
+  }
 }
 
 module.exports = SparqlJsonResultParser;

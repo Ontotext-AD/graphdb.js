@@ -29,4 +29,8 @@ describe('ContentParser', () => {
     const parser = new RdfAsXmlParser();
     expect(parser).toBeDefined();
   });
+
+  test('should not be streaming parser by default', () => {
+    expect(new RdfAsXmlParser().isStreaming()).toBeFalsy();
+  });
 });

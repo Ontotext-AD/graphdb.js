@@ -92,6 +92,16 @@ class BaseRepositoryClient {
   }
 
   /**
+   * Obtain a parser instance by type.
+   *
+   * @param {string} responseType
+   * @return {ContentParser}
+   */
+  getParser(responseType) {
+    return this.parserRegistry.get(responseType);
+  }
+
+  /**
    * Parses provided content with registered parser if there is one. Otherwise
    * returns the content untouched. If <code>contentType</code> is provided it
    * should be an instance of {@link RDFMimeType} enum and is used as a key

@@ -25,4 +25,8 @@ describe('TriGParser', () => {
     expect(parserInstance.parser.parse).toHaveBeenCalledTimes(1);
     expect(parserInstance.parser.parse).toHaveBeenCalledWith('content');
   });
+
+  test('should not be a streaming parser', () => {
+    expect(new TriGParser().isStreaming()).toBeFalsy();
+  });
 });

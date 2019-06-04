@@ -32,6 +32,18 @@ class ContentParser {
   }
 
   /**
+   * If implemented by successors, this must return boolean <code>true</code>
+   * when the wrapped parser supports stream reading by default or
+   * <code>false</code> otherwise.
+   *
+   * @abstract
+   * @return {boolean} if the parser supports streaming by default
+   */
+  isStreaming() {
+    return false;
+  }
+
+  /**
    * Implementations should delegate the actual parsing to underlying parser
    * library or to a custom implementation.
    *
