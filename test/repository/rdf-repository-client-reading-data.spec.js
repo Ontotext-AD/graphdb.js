@@ -8,6 +8,7 @@ const NTriplesParser = require('parser/n-triples-parser');
 const NQuadsParser = require('parser/n-quads-parser');
 const N3Parser = require('parser/n3-parser');
 const TriGParser = require('parser/trig-parser');
+const HttpRequestConfigBuilder = require('http/http-request-config-builder');
 const JsonLDParser = require('parser/jsonld-parser');
 
 const DataFactory = require('n3').DataFactory;
@@ -39,15 +40,19 @@ describe('RDFRepositoryClient - reading statements', () => {
   const readTimeout = 1000;
   const writeTimeout = 1000;
 
+  beforeEach(() => {
+    HttpClient.mockImplementation(() => httpClientStub());
+
+    config = new RepositoryClientConfig()
+      .setEndpoints(endpoints)
+      .setHeaders(headers)
+      .setDefaultRDFMimeType(contentType)
+      .setReadTimeout(readTimeout)
+      .setWriteTimeout(writeTimeout);
+    repository = new RDFRepositoryClient(config);
+  });
+
   describe('statements#get returning Quads', () => {
-    beforeEach(() => {
-      HttpClient.mockImplementation(() => httpClientStub());
-
-      config = new RepositoryClientConfig(endpoints, headers, contentType,
-        readTimeout, writeTimeout);
-      repository = new RDFRepositoryClient(config);
-    });
-
     const expected = [quad(
       namedNode('http://eunis.eea.europa.eu/countries/AZ'),
       namedNode('http://eunis.eea.europa.eu/rdf/schema.rdf#population'),
@@ -137,14 +142,6 @@ describe('RDFRepositoryClient - reading statements', () => {
   });
 
   describe('statements#get returning plain string', () => {
-    beforeEach(() => {
-      HttpClient.mockImplementation(() => httpClientStub());
-
-      config = new RepositoryClientConfig(endpoints, headers, contentType,
-        readTimeout, writeTimeout);
-      repository = new RDFRepositoryClient(config);
-    });
-
     test('should reject with error if response fails', () => {
       repository.httpClients[0].get.mockImplementation(() => Promise.reject({response: 'Server error'}));
 
@@ -184,17 +181,18 @@ describe('RDFRepositoryClient - reading statements', () => {
     });
 
     function verifyGetRequest() {
-      const httpGet = repository.httpClients[0].get;
-      expect(httpGet).toHaveBeenCalledWith('/statements', {
-        headers: {'Accept': RDFMimeType.RDF_JSON},
-        params: {
-          infer: true,
-          subj: '<http://eunis.eea.europa.eu/countries/AZ>',
-          pred: '<http://eunis.eea.europa.eu/rdf/schema.rdf#population>',
-          obj: '"7931000"^^http://www.w3.org/2001/XMLSchema#integer',
-          context: '<http://example.org/graph3>'
-        }
+      const expectedRequestConfig = new HttpRequestConfigBuilder().setHeaders({
+        'Accept': RDFMimeType.RDF_JSON
+      }).setParams({
+        infer: true,
+        subj: '<http://eunis.eea.europa.eu/countries/AZ>',
+        pred: '<http://eunis.eea.europa.eu/rdf/schema.rdf#population>',
+        obj: '"7931000"^^http://www.w3.org/2001/XMLSchema#integer',
+        context: '<http://example.org/graph3>'
       });
+
+      const httpGet = repository.httpClients[0].get;
+      expect(httpGet).toHaveBeenCalledWith('/statements', expectedRequestConfig);
     }
 
     test('should fetch and return single statement as plain string', () => {
@@ -230,14 +228,6 @@ describe('RDFRepositoryClient - reading statements', () => {
   });
 
   describe('download', () => {
-    beforeEach(() => {
-      HttpClient.mockImplementation(() => httpClientStub());
-
-      config = new RepositoryClientConfig(endpoints, headers, contentType,
-        readTimeout, writeTimeout);
-      repository = new RDFRepositoryClient(config);
-    });
-
     test('should fetch data and return readable stream to the client', (done) => {
       const source = streamSource();
       const stream = new ObjectReadableMock(source);
@@ -294,20 +284,17 @@ describe('RDFRepositoryClient - reading statements', () => {
     });
 
     function verifyDownloadRequest(getMock) {
+      const expectedRequestConfig = new HttpRequestConfigBuilder().setHeaders({
+        'Accept': 'text/turtle'
+      }).setParams({
+        subj: '<http://eunis.eea.europa.eu/countries/AZ>',
+        pred: '<http://eunis.eea.europa.eu/rdf/schema.rdf#population>',
+        obj: '"7931000"^^http://www.w3.org/2001/XMLSchema#integer',
+        context: '<http://example.org/graph3>',
+        infer: true
+      }).setResponseType('stream');
       expect(getMock).toHaveBeenCalledTimes(1);
-      expect(getMock).toHaveBeenCalledWith('/statements', {
-        headers: {
-          'Accept': 'text/turtle'
-        },
-        responseType: 'stream',
-        params: {
-          subj: '<http://eunis.eea.europa.eu/countries/AZ>',
-          pred: '<http://eunis.eea.europa.eu/rdf/schema.rdf#population>',
-          obj: '"7931000"^^http://www.w3.org/2001/XMLSchema#integer',
-          context: '<http://example.org/graph3>',
-          infer: true
-        }
-      });
+      expect(getMock).toHaveBeenCalledWith('/statements', expectedRequestConfig);
     }
 
     function streamSource() {

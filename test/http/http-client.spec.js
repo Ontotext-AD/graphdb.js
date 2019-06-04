@@ -1,5 +1,6 @@
 const axios = require('axios');
 const HttpClient = require('http/http-client');
+const HttpRequestConfigBuilder = require('http/http-request-config-builder');
 
 jest.mock('axios');
 
@@ -35,14 +36,11 @@ describe('HttpClient', () => {
     axiosMock.put.mockResolvedValue();
     axiosMock.delete.mockResolvedValue();
 
-    requestConfig = {
-      params: {
-        'param-1': 'value-1'
-      },
-      headers: {
-        'Accept': 'application/json'
-      }
-    };
+    requestConfig = new HttpRequestConfigBuilder().setParams({
+      'param-1': 'value-1'
+    }).setHeaders({
+      'Accept': 'application/json'
+    });
 
     httpClient = new HttpClient('/base/url')
       .setDefaultReadTimeout(1000)
@@ -91,7 +89,7 @@ describe('HttpClient', () => {
     test('should perform GET requests with the supplied params', () => {
       return httpClient.get('/api/resources', requestConfig).then(() => {
         expect(axiosMock.get).toHaveBeenCalledTimes(1);
-        expect(axiosMock.get).toHaveBeenCalledWith('/api/resources', requestConfig);
+        expect(axiosMock.get).toHaveBeenCalledWith('/api/resources', requestConfig.config);
       });
     });
 
@@ -108,7 +106,7 @@ describe('HttpClient', () => {
     });
 
     test('should not add default read timeout to request configuration if already provided', () => {
-      requestConfig.timeout = 500;
+      requestConfig.setTimeout(500);
       return httpClient.get('/api/resources', requestConfig).then(() => {
         expect(axiosMock.get.mock.calls[0][1].timeout).toEqual(500);
       });
@@ -128,7 +126,7 @@ describe('HttpClient', () => {
     test('should perform POST requests with the supplied params and data', () => {
       return httpClient.post('/api/resources', requestData, requestConfig).then(() => {
         expect(axiosMock.post).toHaveBeenCalledTimes(1);
-        expect(axiosMock.post).toHaveBeenCalledWith('/api/resources', requestData, requestConfig);
+        expect(axiosMock.post).toHaveBeenCalledWith('/api/resources', requestData, requestConfig.config);
       });
     });
 
@@ -145,7 +143,7 @@ describe('HttpClient', () => {
     });
 
     test('should not add default read timeout to request configuration if already provided', () => {
-      requestConfig.timeout = 500;
+      requestConfig.setTimeout(500);
       return httpClient.post('/api/resources', requestData, requestConfig).then(() => {
         expect(axiosMock.post.mock.calls[0][2].timeout).toEqual(500);
       });
@@ -165,7 +163,7 @@ describe('HttpClient', () => {
     test('should perform PUT requests with the supplied params and data', () => {
       return httpClient.put('/api/resources/1/', requestData, requestConfig).then(() => {
         expect(axiosMock.put).toHaveBeenCalledTimes(1);
-        expect(axiosMock.put).toHaveBeenCalledWith('/api/resources/1/', requestData, requestConfig);
+        expect(axiosMock.put).toHaveBeenCalledWith('/api/resources/1/', requestData, requestConfig.config);
       });
     });
 
@@ -182,7 +180,7 @@ describe('HttpClient', () => {
     });
 
     test('should not add default read timeout to request configuration if already provided', () => {
-      requestConfig.timeout = 500;
+      requestConfig.setTimeout(500);
       return httpClient.put('/api/resources', requestData, requestConfig).then(() => {
         expect(axiosMock.put.mock.calls[0][2].timeout).toEqual(500);
       });
@@ -202,7 +200,7 @@ describe('HttpClient', () => {
     test('should perform DELETE requests with the supplied params', () => {
       return httpClient.deleteResource('/api/resources/1/', requestConfig).then(() => {
         expect(axiosMock.delete).toHaveBeenCalledTimes(1);
-        expect(axiosMock.delete).toHaveBeenCalledWith('/api/resources/1/', requestConfig);
+        expect(axiosMock.delete).toHaveBeenCalledWith('/api/resources/1/', requestConfig.config);
       });
     });
 
@@ -219,7 +217,7 @@ describe('HttpClient', () => {
     });
 
     test('should not add default read timeout to request configuration if already provided', () => {
-      requestConfig.timeout = 500;
+      requestConfig.setTimeout(500);
       return httpClient.deleteResource('/api/resources', requestConfig).then(() => {
         expect(axiosMock.delete.mock.calls[0][1].timeout).toEqual(500);
       });

@@ -2,6 +2,7 @@ const HttpClient = require('http/http-client');
 const RepositoryClientConfig = require('repository/repository-client-config');
 const RdfRepositoryClient = require('repository/rdf-repository-client');
 const RDFMimeType = require('http/rdf-mime-type');
+const HttpRequestConfigBuilder = require('http/http-request-config-builder');
 const {ObjectReadableMock} = require('stream-mock');
 
 const httpClientStub = require('../http/http-client.stub');
@@ -21,7 +22,12 @@ describe('RdfRepositoryClient - streaming data', () => {
   beforeEach(() => {
     HttpClient.mockImplementation(() => httpClientStub());
 
-    repoClientConfig = new RepositoryClientConfig(endpoints, headers, contentType, readTimeout, writeTimeout);
+    repoClientConfig = new RepositoryClientConfig()
+      .setEndpoints(endpoints)
+      .setHeaders(headers)
+      .setDefaultRDFMimeType(contentType)
+      .setReadTimeout(readTimeout)
+      .setWriteTimeout(writeTimeout);
     rdfRepositoryClient = new RdfRepositoryClient(repoClientConfig);
   });
 
@@ -62,17 +68,15 @@ describe('RdfRepositoryClient - streaming data', () => {
     });
 
     function verifyUploadRequest(postMock) {
+      const expectedRequestConfig = new HttpRequestConfigBuilder().setHeaders({
+        'Content-Type': 'text/turtle'
+      }).setParams({
+        context,
+        baseURI
+      }).setResponseType('stream');
+
       expect(postMock).toHaveBeenCalledTimes(1);
-      expect(postMock).toHaveBeenCalledWith('/statements', {}, {
-        headers: {
-          'Content-Type': 'text/turtle'
-        },
-        params: {
-          context,
-          baseURI
-        },
-        responseType: 'stream'
-      });
+      expect(postMock).toHaveBeenCalledWith('/statements', {}, expectedRequestConfig);
     }
   });
 
@@ -113,17 +117,15 @@ describe('RdfRepositoryClient - streaming data', () => {
     });
 
     function verifyOverwriteRequest(putMock) {
+      const expectedRequestConfig = new HttpRequestConfigBuilder().setHeaders({
+        'Content-Type': 'text/turtle'
+      }).setParams({
+        context,
+        baseURI
+      }).setResponseType('stream');
+
       expect(putMock).toHaveBeenCalledTimes(1);
-      expect(putMock).toHaveBeenCalledWith('/statements', {}, {
-        headers: {
-          'Content-Type': 'text/turtle'
-        },
-        params: {
-          context,
-          baseURI
-        },
-        responseType: 'stream'
-      });
+      expect(putMock).toHaveBeenCalledWith('/statements', {}, expectedRequestConfig);
     }
   });
 

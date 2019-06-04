@@ -42,6 +42,18 @@ describe('HttpRequestConfigBuilder', () => {
       });
   });
 
+  test('should get the params mapping', () => {
+    expect(new HttpRequestConfigBuilder()
+      .addParam('subj', 'subj')
+      .addParam('pred', 'pred')
+      .getParams())
+      .toEqual({
+        subj: 'subj',
+        pred: 'pred'
+      });
+  });
+
+
   test('should should set timeout configuration', () => {
     expect(new HttpRequestConfigBuilder()
       .setTimeout(1000)
@@ -49,6 +61,13 @@ describe('HttpRequestConfigBuilder', () => {
       .toEqual({
         timeout: 1000
       });
+  });
+
+  test('should get the timeout configuration', () => {
+    expect(new HttpRequestConfigBuilder()
+      .setTimeout(1000)
+      .getTimeout())
+      .toEqual(1000);
   });
 
   test('should should set response type configuration', () => {
@@ -85,5 +104,14 @@ describe('HttpRequestConfigBuilder', () => {
       .addHeader('custom', null)
       .get())
       .toEqual({});
+  });
+
+  test('should get the headers', () => {
+    expect(new HttpRequestConfigBuilder()
+      .addContentTypeHeader('text/turtle')
+      .getHeaders())
+      .toEqual({
+        'Content-Type': 'text/turtle'
+      });
   });
 });

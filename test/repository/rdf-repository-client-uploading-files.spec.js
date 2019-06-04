@@ -2,6 +2,7 @@ const HttpClient = require('http/http-client');
 const RepositoryClientConfig = require('repository/repository-client-config');
 const RdfRepositoryClient = require('repository/rdf-repository-client');
 const RDFMimeType = require('http/rdf-mime-type');
+const HttpRequestConfigBuilder = require('http/http-request-config-builder');
 
 const httpClientStub = require('../http/http-client.stub');
 const testUtils = require('../utils');
@@ -28,7 +29,12 @@ describe('RdfRepositoryClient - uploading files', () => {
 
   beforeEach(() => {
     HttpClient.mockImplementation(() => httpClientStub());
-    repoClientConfig = new RepositoryClientConfig(endpoints, headers, contentType, readTimeout, writeTimeout);
+    repoClientConfig = new RepositoryClientConfig()
+      .setEndpoints(endpoints)
+      .setHeaders(headers)
+      .setDefaultRDFMimeType(contentType)
+      .setReadTimeout(readTimeout)
+      .setWriteTimeout(writeTimeout);
     rdfRepositoryClient = new RdfRepositoryClient(repoClientConfig);
   });
 
@@ -48,17 +54,15 @@ describe('RdfRepositoryClient - uploading files', () => {
         const url = httpPostCall[0];
         expect(url).toEqual('/statements');
 
+        const expectedRequestConfig = new HttpRequestConfigBuilder().setHeaders({
+          'Content-Type': RDFMimeType.TRIG
+        }).setParams({
+          baseURI,
+          context
+        }).setResponseType('stream');
+
         const requestConfig = httpPostCall[2];
-        expect(requestConfig).toEqual({
-          headers: {
-            'Content-Type': RDFMimeType.TRIG
-          },
-          params: {
-            baseURI,
-            context
-          },
-          responseType: 'stream'
-        });
+        expect(requestConfig).toEqual(expectedRequestConfig);
 
         const fileStream = httpPostCall[1];
         return testUtils.readStream(fileStream)
@@ -103,17 +107,15 @@ describe('RdfRepositoryClient - uploading files', () => {
         const url = httpPutCall[0];
         expect(url).toEqual('/statements');
 
+        const expectedRequestConfig = new HttpRequestConfigBuilder().setHeaders({
+          'Content-Type': RDFMimeType.TRIG
+        }).setParams({
+          baseURI,
+          context
+        }).setResponseType('stream');
+
         const requestConfig = httpPutCall[2];
-        expect(requestConfig).toEqual({
-          headers: {
-            'Content-Type': RDFMimeType.TRIG
-          },
-          params: {
-            baseURI,
-            context
-          },
-          responseType: 'stream'
-        });
+        expect(requestConfig).toEqual(expectedRequestConfig);
 
         const fileStream = httpPutCall[1];
         return testUtils.readStream(fileStream)

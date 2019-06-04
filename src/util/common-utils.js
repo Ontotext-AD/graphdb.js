@@ -8,7 +8,6 @@ class CommonUtils {
   /**
    * Checks if at least one of the supplied arguments is undefined or null.
    *
-   * @private
    * @return {boolean} <code>true</code> if there is null argument or
    *         <code>false</code> otherwise
    */

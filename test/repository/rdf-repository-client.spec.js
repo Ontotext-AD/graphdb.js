@@ -2,6 +2,7 @@ const RepositoryClientConfig = require('repository/repository-client-config');
 const RDFRepositoryClient = require('repository/rdf-repository-client');
 const ServerClientConfig = require('server/server-client-config');
 const HttpClient = require('http/http-client');
+const HttpRequestConfigBuilder = require('http/http-request-config-builder');
 const httpClientStub = require('../http/http-client.stub');
 const {when} = require('jest-when');
 
@@ -19,9 +20,14 @@ describe('RDFRepositoryClient', () => {
   };
 
   test('should initialize according the provided client configuration', () => {
-    let repoClientConfig = new RepositoryClientConfig([
-      'http://localhost:8080/repositories/test'
-    ], defaultHeaders, 'application/json', 100, 200);
+    let repoClientConfig = new RepositoryClientConfig()
+      .setEndpoints([
+        'http://localhost:8080/repositories/test'
+      ])
+      .setHeaders(defaultHeaders)
+      .setDefaultRDFMimeType('application/json')
+      .setReadTimeout(100)
+      .setWriteTimeout(200);
 
     let rdfRepositoryClient = new RDFRepositoryClient(repoClientConfig);
 
@@ -36,13 +42,16 @@ describe('RDFRepositoryClient', () => {
   });
 
   test('should initialize with multiple endpoints from the client configuration', () => {
-    let repoClientConfig = new RepositoryClientConfig([
-      'http://localhost:8081/repositories/test1',
-      'http://localhost:8082/repositories/test2',
-      'http://localhost:8083/repositories/test3'
-    ], {
-      'Accept': 'application/json'
-    }, 'application/json', 100, 200);
+    let repoClientConfig = new RepositoryClientConfig()
+      .setEndpoints([
+        'http://localhost:8081/repositories/test1',
+        'http://localhost:8082/repositories/test2',
+        'http://localhost:8083/repositories/test3'
+      ])
+      .setHeaders(defaultHeaders)
+      .setDefaultRDFMimeType('application/json')
+      .setReadTimeout(100)
+      .setWriteTimeout(200);
 
     let rdfRepositoryClient = new RDFRepositoryClient(repoClientConfig);
 
@@ -67,9 +76,12 @@ describe('RDFRepositoryClient', () => {
     let get;
 
     beforeEach(() => {
-      let repoClientConfig = new RepositoryClientConfig([
-        'http://localhost:8080/repositories/test'
-      ], defaultHeaders, 'application/json', 100, 200);
+      const repoClientConfig = new RepositoryClientConfig()
+        .addEndpoint('http://localhost:8080/repositories/test')
+        .setHeaders(defaultHeaders)
+        .setDefaultRDFMimeType('application/json')
+        .setReadTimeout(100)
+        .setWriteTimeout(200);
       rdfRepositoryClient = new RDFRepositoryClient(repoClientConfig);
       get = rdfRepositoryClient.httpClients[0].get;
       when(get).calledWith('/size').mockResolvedValue({data: 123});
@@ -81,23 +93,17 @@ describe('RDFRepositoryClient', () => {
 
     test('should properly request the number of statements in the repository', () => {
       return rdfRepositoryClient.getSize().then(() => {
+        const expected = new HttpRequestConfigBuilder();
         expect(get).toHaveBeenCalledTimes(1);
-        expect(get).toHaveBeenCalledWith('/size', {
-          params: {
-            context: undefined
-          }
-        });
+        expect(get).toHaveBeenCalledWith('/size', expected);
       });
     });
 
     test('should properly request the number of statements in the repository for the specified contexts', () => {
       return rdfRepositoryClient.getSize(['context-1']).then(() => {
+        const expected = new HttpRequestConfigBuilder().addParam('context', ['<context-1>']);
         expect(get).toHaveBeenCalledTimes(1);
-        expect(get).toHaveBeenCalledWith('/size', {
-          params: {
-            context: ['<context-1>']
-          }
-        });
+        expect(get).toHaveBeenCalledWith('/size', expected);
       });
     });
 

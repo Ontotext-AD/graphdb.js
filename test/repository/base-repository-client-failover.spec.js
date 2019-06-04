@@ -12,11 +12,14 @@ describe('BaseRepositoryClient', () => {
 
   describe('Automatic failover - retrying with different repo endpoint', () => {
     beforeEach(() => {
-      repoClientConfig = new RepositoryClientConfig([
-        'http://localhost:8081/repositories/test1',
-        'http://localhost:8082/repositories/test2',
-        'http://localhost:8083/repositories/test3'
-      ], {}, '', 100, 200, 50, 2);
+      repoClientConfig = new RepositoryClientConfig()
+        .setEndpoints([
+          'http://localhost:8081/repositories/test1',
+          'http://localhost:8082/repositories/test2',
+          'http://localhost:8083/repositories/test3'
+        ])
+        .setReadTimeout(100)
+        .setWriteTimeout(200);
 
       HttpClient.mockImplementation(() => httpClientStub());
 

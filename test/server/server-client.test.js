@@ -2,6 +2,7 @@ const ServerClient = require('server/server-client');
 const ServerClientConfig = require('server/server-client-config');
 const RDFRepositoryClient = require('repository/rdf-repository-client');
 const RepositoryClientConfig = require('repository/repository-client-config');
+const HttpRequestConfigBuilder = require('http/http-request-config-builder');
 
 import data from './server-client.data';
 
@@ -10,7 +11,10 @@ describe('ServerClient', () => {
   let server;
 
   beforeEach(() => {
-    config = new TestServerConfig('server/url', 0, {});
+    config = new TestServerConfig()
+      .setEndpoint('server/url')
+      .setTimeout(0)
+      .setHeaders({});
     server = new ServerClient(config);
 
     server.httpClient.get = jest.fn();
@@ -24,18 +28,12 @@ describe('ServerClient', () => {
 
   describe('initialization', () => {
     test('new ServerClient instance should not return null', () => {
-      const config = new TestServerConfig('server/url', 0, {});
       expect(new ServerClient(config)).not.toBeNull();
     });
 
-    test('should set required class member fields', () => {
-      const config = new TestServerConfig('server/url', 0, {});
-      const server = new ServerClient(config);
-      expect(server.config).toEqual({
-        endpoint: 'server/url',
-        timeout: 0,
-        headers: {}
-      });
+    test('should initialize with the provided server client configuration', () => {
+      expect(server.config).toEqual(config);
+      expect(server.config.getEndpoint()).toEqual('server/url');
     });
   });
 
@@ -43,9 +41,11 @@ describe('ServerClient', () => {
     test('should make request with required service url parameter', () => {
       return server.getRepositoryIDs().then(() => {
         expect(server.httpClient.get).toHaveBeenCalledTimes(1);
-        expect(server.httpClient.get).toHaveBeenCalledWith('/repositories', {
-          headers: {'Accept': 'application/sparql-results+json'}
-        });
+        const expectedRequestConfig = new HttpRequestConfigBuilder()
+          .setHeaders({
+            'Accept': 'application/sparql-results+json'
+          });
+        expect(server.httpClient.get).toHaveBeenCalledWith('/repositories', expectedRequestConfig);
       });
     });
 
@@ -109,7 +109,7 @@ describe('ServerClient', () => {
     });
 
     test('should resolve with a RDFRepositoryClient instance if repository with provided id exists', () => {
-      const repositoryClientConfig = new RepositoryClientConfig(['endpoint'], {}, '', 3000, 3000);
+      const repositoryClientConfig = new RepositoryClientConfig().setEndpoints(['endpoint']);
       const expected = new RDFRepositoryClient(repositoryClientConfig);
       return server.getRepository('automotive', repositoryClientConfig).then((actual) => {
         // Omit axios instances, they fail the deep equal check

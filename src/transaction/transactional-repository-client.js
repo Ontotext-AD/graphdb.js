@@ -67,8 +67,7 @@ class TransactionalRepositoryClient extends BaseRepositoryClient {
       .setParams({
         action: 'SIZE',
         context: TermConverter.toNTripleValues(context)
-      })
-      .get();
+      });
 
     return this.execute((http) => http.put('', null, requestConfig))
       .then((response) => {
@@ -108,7 +107,7 @@ class TransactionalRepositoryClient extends BaseRepositoryClient {
       requestConfig.setResponseType('stream');
     }
 
-    return this.execute((http) => http.put('', null, requestConfig.get()))
+    return this.execute((http) => http.put('', null, requestConfig))
       .then((response) => {
         this.logger.debug(this.getLogPayload(response, {
           subject: payload.getSubject(),
@@ -136,8 +135,7 @@ class TransactionalRepositoryClient extends BaseRepositoryClient {
       .addContentTypeHeader(payload.getContentType())
       .setParams({
         action: 'QUERY'
-      })
-      .get();
+      });
 
     return this.execute((http) => http.put('', payload.getParams(),
       requestConfig)).then((response) => {
@@ -164,8 +162,7 @@ class TransactionalRepositoryClient extends BaseRepositoryClient {
       .addContentTypeHeader(payload.getContentType())
       .setParams({
         action: 'UPDATE'
-      })
-      .get();
+      });
 
     return this.execute((http) => http.put('', payload.getParams(),
       requestConfig)).then((response) => {
@@ -260,8 +257,7 @@ class TransactionalRepositoryClient extends BaseRepositoryClient {
         context: TermConverter.toNTripleValues(context),
         baseURI
       })
-      .addContentTypeHeader(RDFMimeType.TRIG)
-      .get();
+      .addContentTypeHeader(RDFMimeType.TRIG);
 
     return this.execute((http) => http.put('', data, requestConfig))
       .then((response) => {
@@ -290,8 +286,7 @@ class TransactionalRepositoryClient extends BaseRepositoryClient {
       .setParams({
         action: 'DELETE'
       })
-      .addContentTypeHeader(RDFMimeType.TRIG)
-      .get();
+      .addContentTypeHeader(RDFMimeType.TRIG);
 
     return this.execute((http) => http.put('', data, requestConfig))
       .then((response) => {
@@ -325,8 +320,7 @@ class TransactionalRepositoryClient extends BaseRepositoryClient {
         obj: TermConverter.toNTripleValue(payload.getObject()),
         context: TermConverter.toNTripleValues(payload.getContext()),
         infer: payload.getInference()
-      })
-      .get();
+      });
 
     return this.execute((http) => http.put('', null, requestConfig))
       .then((response) => {
@@ -421,8 +415,7 @@ class TransactionalRepositoryClient extends BaseRepositoryClient {
         action: 'ADD',
         context: TermConverter.toNTripleValues(context),
         baseURI
-      })
-      .get();
+      });
 
     return this.execute((http) => http.put('', readStream, requestConfig));
   }
@@ -439,8 +432,7 @@ class TransactionalRepositoryClient extends BaseRepositoryClient {
     const requestConfig = new HttpRequestConfigBuilder()
       .setParams({
         action: 'COMMIT'
-      })
-      .get();
+      });
 
     return this.execute((http) => http.put('', null, requestConfig))
       .then((response) => {

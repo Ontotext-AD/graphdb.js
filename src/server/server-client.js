@@ -32,8 +32,7 @@ class ServerClient {
    */
   getRepositoryIDs() {
     const requestConfig = new HttpRequestConfigBuilder()
-      .addAcceptHeader(RDFMimeType.SPARQL_RESULTS_JSON)
-      .get();
+      .addAcceptHeader(RDFMimeType.SPARQL_RESULTS_JSON);
 
     let elapsedTime = Date.now();
     return this.httpClient.get(SERVICE_URL, requestConfig).then((response) => {
@@ -105,7 +104,9 @@ class ServerClient {
    * Initializes the http client.
    */
   initHttpClient() {
-    this.httpClient = new HttpClient(this.config.endpoint);
+    this.httpClient = new HttpClient(this.config.getEndpoint())
+      .setDefaultReadTimeout(this.config.getTimeout())
+      .setDefaultWriteTimeout(this.config.getTimeout());
   }
 
   /**
@@ -114,7 +115,7 @@ class ServerClient {
   initLogger() {
     this.logger = new ConsoleLogger({
       name: 'ServerClient',
-      serverURL: this.config.endpoint
+      serverURL: this.config.getEndpoint()
     });
   }
 }
