@@ -21,8 +21,8 @@ class SparqlXmlResultParser extends ContentParser {
   /**
    * @inheritDoc
    */
-  constructor(isDefault) {
-    super(isDefault);
+  constructor(config) {
+    super(config);
 
     this.parser = new SparqlXmlParser({
       dataFactory: DataFactory

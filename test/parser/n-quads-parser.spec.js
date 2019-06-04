@@ -6,11 +6,12 @@ describe('NQuadsParser', () => {
     expect(new NQuadsParser().parser).toBeDefined();
   });
 
-  test('should set isDefault if provided to constructor', () => {
+  test('should store provided with the constructor configuration', () => {
     let parserInstance = new NQuadsParser();
-    expect(parserInstance.isDefault()).toBeFalsy();
-    parserInstance = new NQuadsParser(true);
-    expect(parserInstance.isDefault()).toBeTruthy();
+    expect(parserInstance.getConfig()).toEqual({});
+
+    parserInstance = new NQuadsParser({param: true});
+    expect(parserInstance.getConfig()).toEqual({param: true});
   });
 
   test('should return supported type', () => {

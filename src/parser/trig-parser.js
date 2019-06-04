@@ -13,8 +13,8 @@ class TriGParser extends ContentParser {
   /**
    * @inheritDoc
    */
-  constructor(isDefault) {
-    super(isDefault);
+  constructor(config) {
+    super(config);
 
     this.parser = new Parser({
       format: this.getSupportedType()

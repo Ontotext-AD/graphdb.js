@@ -6,11 +6,12 @@ describe('NTriplesParser', () => {
     expect(new NTriplesParser().parser).toBeDefined();
   });
 
-  test('should set isDefault if provided to constructor', () => {
+  test('should store provided with the constructor configuration', () => {
     let parserInstance = new NTriplesParser();
-    expect(parserInstance.isDefault()).toBeFalsy();
-    parserInstance = new NTriplesParser(true);
-    expect(parserInstance.isDefault()).toBeTruthy();
+    expect(parserInstance.getConfig()).toEqual({});
+
+    parserInstance = new NTriplesParser({param: true});
+    expect(parserInstance.getConfig()).toEqual({param: true});
   });
 
   test('should return supported type', () => {

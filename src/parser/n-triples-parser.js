@@ -13,8 +13,8 @@ class NTriplesParser extends ContentParser {
   /**
    * @inheritDoc
    */
-  constructor(isDefault) {
-    super(isDefault);
+  constructor(config) {
+    super(config);
 
     this.parser = new Parser({
       // Not using the supported type as it is text/plain which is the default
