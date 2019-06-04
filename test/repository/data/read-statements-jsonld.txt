@@ -1,0 +1,73 @@
+[ {
+  "@id" : "http://eunis.eea.europa.eu/countries/NO",
+  "@type" : [ "http://eunis.eea.europa.eu/rdf/schema.rdf#Country" ],
+  "http://eunis.eea.europa.eu/rdf/schema.rdf#areaName" : [ {
+    "@value" : "Norge"
+  }, {
+    "@language" : "en",
+    "@value" : "Norway"
+  }, {
+    "@language" : "fr",
+    "@value" : "Norvège"
+  } ],
+  "http://eunis.eea.europa.eu/rdf/schema.rdf#areucd" : [ {
+    "@value" : "NO"
+  } ],
+  "http://eunis.eea.europa.eu/rdf/schema.rdf#capital" : [ {
+    "@value" : "Oslo"
+  } ],
+  "http://eunis.eea.europa.eu/rdf/schema.rdf#eunisAreaCode" : [ {
+    "@value" : "NO"
+  } ],
+  "http://eunis.eea.europa.eu/rdf/schema.rdf#hasCountryBioGeoRegion" : [ {
+    "@id" : "http://eunis.eea.europa.eu/countrybiogeo/NO:AL"
+  }, {
+    "@id" : "http://eunis.eea.europa.eu/countrybiogeo/NO:AR"
+  }, {
+    "@id" : "http://eunis.eea.europa.eu/countrybiogeo/NO:AT"
+  }, {
+    "@id" : "http://eunis.eea.europa.eu/countrybiogeo/NO:BO"
+  } ],
+  "http://eunis.eea.europa.eu/rdf/schema.rdf#isoCode2" : [ {
+    "@value" : "NO"
+  } ],
+  "http://eunis.eea.europa.eu/rdf/schema.rdf#isoCode3" : [ {
+    "@value" : "NOR"
+  } ],
+  "http://eunis.eea.europa.eu/rdf/schema.rdf#iso_2_wcmc" : [ {
+    "@value" : "NO"
+  } ],
+  "http://eunis.eea.europa.eu/rdf/schema.rdf#iso_3_wcmc" : [ {
+    "@value" : "NOR"
+  } ],
+  "http://eunis.eea.europa.eu/rdf/schema.rdf#iso_3_wcmc_parent" : [ {
+    "@value" : "NOR"
+  } ],
+  "http://eunis.eea.europa.eu/rdf/schema.rdf#iso_n" : [ {
+    "@type" : "http://www.w3.org/2001/XMLSchema#int",
+    "@value" : "578"
+  } ],
+  "http://eunis.eea.europa.eu/rdf/schema.rdf#population" : [ {
+    "@type" : "http://www.w3.org/2001/XMLSchema#integer",
+    "@value" : "4920305"
+  } ],
+  "http://eunis.eea.europa.eu/rdf/schema.rdf#selection" : [ {
+    "@type" : "http://www.w3.org/2001/XMLSchema#integer",
+    "@value" : "1"
+  } ],
+  "http://eunis.eea.europa.eu/rdf/schema.rdf#surface" : [ {
+    "@type" : "http://www.w3.org/2001/XMLSchema#integer",
+    "@value" : "323895"
+  } ],
+  "http://www.w3.org/2000/01/rdf-schema#label" : [ {
+    "@value" : "Norway"
+  } ],
+  "http://www.w3.org/2002/07/owl#sameAs" : [ {
+    "@id" : "http://rdfdata.eionet.europa.eu/eea/countries/NO"
+  }, {
+    "@id" : "http://dd.eionet.europa.eu/vocabulary/common/countries/NO"
+  } ],
+  "http://www.w3.org/2004/02/skos/core#notation" : [ {
+    "@value" : "NO"
+  } ]
+} ]
