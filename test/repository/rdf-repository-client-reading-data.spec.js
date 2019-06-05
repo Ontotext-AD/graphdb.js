@@ -8,6 +8,7 @@ const NTriplesParser = require('parser/n-triples-parser');
 const NQuadsParser = require('parser/n-quads-parser');
 const N3Parser = require('parser/n3-parser');
 const TriGParser = require('parser/trig-parser');
+const JsonLDParser = require('parser/jsonld-parser');
 
 const DataFactory = require('n3').DataFactory;
 const namedNode = DataFactory.namedNode;
@@ -17,11 +18,17 @@ const quad = DataFactory.quad;
 
 const {ObjectReadableMock} = require('stream-mock');
 
+const testUtils = require('../utils');
+const FileUtils = require('util/file-utils');
+const path = require('path');
+
 const httpClientStub = require('../http/http-client.stub');
 
 jest.mock('http/http-client');
 
 import data from './data/read-statements';
+
+const jsonldDataFile = path.resolve(__dirname, './data/read-statements-jsonld.txt');
 
 describe('RDFRepositoryClient - reading statements', () => {
   let config;
@@ -103,6 +110,29 @@ describe('RDFRepositoryClient - reading statements', () => {
 
       const payload = buildPayload(RDFMimeType.TURTLE);
       return expect(repository.get(payload)).resolves.toEqual(expected);
+    });
+
+    test('should fetch statement in jsonld format and return it converted to quads', () => {
+      repository.httpClients[0].get.mockResolvedValue({
+        data: FileUtils.getReadStream(jsonldDataFile)
+      });
+
+      repository.registerParser(new JsonLDParser());
+
+      // prepare expected outcome data
+      let expected;
+      const stream = new JsonLDParser().parse(FileUtils.getReadStream(jsonldDataFile));
+      return testUtils.readObjectsStream(stream)
+        .then((parsed) => {
+          expected = parsed;
+          const payload = buildPayload(RDFMimeType.JSON_LD);
+          // call the service and assert
+          return repository.get(payload);
+        })
+        .then((stream) => testUtils.readObjectsStream(stream))
+        .then((data) => {
+          expect(data).toEqual(expected);
+        });
     });
   });
 

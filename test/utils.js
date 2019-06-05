@@ -5,7 +5,7 @@ function loadFile(relativePath) {
   return fs.readFileSync(path.resolve(__dirname, relativePath), 'utf8');
 }
 
-function readStream(stream) {
+function readStream(stream, isObjectsStream) {
   return new Promise((resolve, reject) => {
     const chunks = [];
 
@@ -16,9 +16,17 @@ function readStream(stream) {
     stream.on('error', reject);
 
     stream.on('end', () => {
-      resolve(Buffer.concat(chunks).toString().trim());
+      if (isObjectsStream) {
+        resolve(chunks);
+      } else {
+        resolve(Buffer.concat(chunks).toString().trim());
+      }
     });
   });
 }
 
-module.exports = {loadFile, readStream};
+function readObjectsStream(stream) {
+  return readStream(stream, true);
+}
+
+module.exports = {loadFile, readStream, readObjectsStream};
