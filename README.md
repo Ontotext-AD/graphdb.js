@@ -5,8 +5,10 @@
 A GraphDB and RDF4J data access library written in JavaScript to be used in Node.js.  
 
 ## Installation
-Make sure you have Node.js version 8 or greater and Node Package Manager 
-([npm](https://npmjs.org/)) installed before start working with the library.
+
+### Prerequisites
+* Node >= 8.16
+* NPM ([npm](https://npmjs.org/))
 
 ```
 npm install graphdb
@@ -96,9 +98,6 @@ npm login
 ```
 npm publish
 ```
-
-### Prerequisites
-Node >= 8.16
 
 ## Usage
 
