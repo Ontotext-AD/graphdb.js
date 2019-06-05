@@ -14,6 +14,16 @@ npm install graphdb
 
 ## Development
 
+### Project Structure
+
+`src` : The source code of the library.
+`test` : Unit and component level tests written with Jest.
+`lib` : Transpiled but files are built here when the library is published to npm.
+`docs` : Documentation generated with JSDoc when the library is published to npm.
+`src/index.js` : The library external API exporting main functional classes. This is also present in `lib`.
+`lib/index.d.ts` : The typescript definitions generated when the library is published to npm.
+`scripts` : Service scripts related to building, publishing and so on.
+
 ### Setup Environment
 
 * Checkout or clone the project.
