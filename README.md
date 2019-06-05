@@ -14,6 +14,14 @@ npm install graphdb
 
 ## Development
 
+The library is written in ES2016. During the build process source files `src/`
+are transpiled to ES2015 and copied to `lib/` directory.
+
+A typescript definition file `types.d.ts` is generated in the `lib/` as well.
+
+Documentation is generated in `docs/` from the JSDoc annotations in the source
+code.
+
 ### Project Structure
 
 * `src` : The source code of the library.
@@ -74,17 +82,19 @@ resources.
 Furture the archive could be used as a source for `npm install` where the path
 pointing the archive is provided.
 
-### Production build
-The library is written in ES2016. During the build process source files `src/`
-are transpiled to ES2015 and copied to `lib/` directory.
+### Publishing
 
-A typescript definition file `types.d.ts` is generated in the `lib/` as well.
-
-Documentation is generated in `docs/` from the JSDoc annotations in the source
-code.
-
+* Increase the package version.
 ```
-npm run build
+npm version patch|minor|major
+```
+* Login in npm.
+```
+npm login
+```
+* Publish package in npm.
+```
+npm publish
 ```
 
 ### Prerequisites
