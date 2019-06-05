@@ -10,6 +10,7 @@ const N3Parser = require('parser/n3-parser');
 const TriGParser = require('parser/trig-parser');
 const HttpRequestConfigBuilder = require('http/http-request-config-builder');
 const JsonLDParser = require('parser/jsonld-parser');
+const RDFXmlParser = require('parser/rdfxml-parser');
 
 const DataFactory = require('n3').DataFactory;
 const namedNode = DataFactory.namedNode;
@@ -30,6 +31,7 @@ jest.mock('http/http-client');
 import data from './data/read-statements';
 
 const jsonldDataFile = path.resolve(__dirname, './data/read-statements-jsonld.txt');
+const rdfxmlDataFile = path.resolve(__dirname, './data/read-statements-rdfxml.txt');
 
 describe('RDFRepositoryClient - reading statements', () => {
   let config;
@@ -131,6 +133,29 @@ describe('RDFRepositoryClient - reading statements', () => {
         .then((parsed) => {
           expected = parsed;
           const payload = buildPayload(RDFMimeType.JSON_LD);
+          // call the service and assert
+          return repository.get(payload);
+        })
+        .then((stream) => testUtils.readObjectsStream(stream))
+        .then((data) => {
+          expect(data).toEqual(expected);
+        });
+    });
+
+    test('should fetch statement in rdfxml format and return it converted to quads', () => {
+      repository.httpClients[0].get.mockResolvedValue({
+        data: FileUtils.getReadStream(rdfxmlDataFile)
+      });
+
+      repository.registerParser(new RDFXmlParser());
+
+      // prepare expected outcome data
+      let expected;
+      const stream = new RDFXmlParser().parse(FileUtils.getReadStream(rdfxmlDataFile));
+      return testUtils.readObjectsStream(stream)
+        .then((parsed) => {
+          expected = parsed;
+          const payload = buildPayload(RDFMimeType.RDF_XML);
           // call the service and assert
           return repository.get(payload);
         })

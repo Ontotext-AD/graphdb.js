@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Source: repository/repository-client-config.js</title>
+    <title>JSDoc: Source: parser/jsonld-parser.js</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Source: repository/repository-client-config.js</h1>
+    <h1 class="page-title">Source: parser/jsonld-parser.js</h1>
 
     
 
@@ -26,33 +26,50 @@
     
     <section>
         <article>
-            <pre class="prettyprint source linenums"><code>/**
- * Configuration wrapper used for initialization of {@link BaseRepositoryClient}
- * implementations.
+            <pre class="prettyprint source linenums"><code>const ContentParser = require('../parser/content-parser');
+const RDFMimeType = require('../http/rdf-mime-type');
+const JsonLdParser = require('jsonld-streaming-parser').JsonLdParser;
+
+/**
+ * Parse jsonld data to triple/quads
  *
  * @class
  * @author Mihail Radkov
  * @author Svilen Velikov
  */
-class RepositoryClientConfig {
+class JsonLDParser extends ContentParser {
   /**
-   * @param {string[]} endpoints is an array with repository endpoints
-   * @param {Object} headers is a key:value mapping of http headers and values
-   * @param {string} defaultRDFMimeType one of {@link RDFMimeType} values
-   * @param {number} readTimeout
-   * @param {number} writeTimeout
+   * @inheritDoc
    */
-  constructor(endpoints, headers, defaultRDFMimeType, readTimeout,
-      writeTimeout) {
-    this.endpoints = endpoints;
-    this.headers = headers;
-    this.defaultRDFMimeType = defaultRDFMimeType;
-    this.readTimeout = readTimeout;
-    this.writeTimeout = writeTimeout;
+  constructor(config) {
+    super(config);
+
+    this.parser = new JsonLdParser(this.config);
+  }
+
+  /**
+   * @inheritDoc
+   */
+  parse(content, config) {
+    return this.parser.import(content);
+  }
+
+  /**
+   * @inheritDoc
+   */
+  getSupportedType() {
+    return RDFMimeType.JSON_LD;
+  }
+
+  /**
+   * @inheritDoc
+   */
+  isStreaming() {
+    return true;
   }
 }
 
-module.exports = RepositoryClientConfig;
+module.exports = JsonLDParser;
 </code></pre>
         </article>
     </section>
