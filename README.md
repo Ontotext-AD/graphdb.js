@@ -7,7 +7,7 @@ A GraphDB and RDF4J data access library written in JavaScript to be used in Node
 ## Installation
 
 ### Prerequisites
-* Node >= 8.16
+* Node >= 8
 * NPM ([npm](https://npmjs.org/))
 
 ```
