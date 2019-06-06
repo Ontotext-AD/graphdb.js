@@ -60,11 +60,8 @@ test suite
 npm run test:watch
 ```
 
-The best and preferred way a new feature or changes to be introduced is a test
-case to be written first and then the change to be implemented following the TDD
-approach.
-
 ### Checking the codestyle
+
 The library uses Google [style](https://google.github.io/styleguide/jsguide.html) 
 in conjunction with ESLint's recommended ruleset.
 
@@ -73,6 +70,7 @@ npm run lint
 ```
 
 ### Testing the packaging
+
 Library is managed by NPM package manager. During publishing npm consults the 
 `.gitignore`, `.npmignore` and `package.json#files` property in order to decide 
 which resources should be published. If any change in the project structure, 
@@ -102,6 +100,7 @@ npm publish
 ## Usage
 
 ### ServerClient
+
 The `ServerClient` deals with operations on server level like obtaining a list 
 with available repositories, concrete repository or deleting repositories. In 
 order to work with the `ServerClient` it should be configured `ServerClientConfig`
@@ -186,6 +185,7 @@ return server.getRepository('automotive', repositoryClientConfig).then((rdfRepos
 ```
 
 #### Reading
+
 Statements could be fetched using the `RDFRepositoryClient.get`, `RDFRepositoryClient.query`, 
 `RDFRepositoryClient.download`. 
 
@@ -301,6 +301,7 @@ return repository.update(payload).then(() => {
 ```
 
 #### Deleting
+
 * Delete statement from given context
 
 ```javascript
@@ -310,6 +311,7 @@ repository.deleteStatements(subj, pred, obj, contexts).then(() => {
 ```
 
 ### Transactions
+
 Repository operations can be executed in transaction. In order to work with 
 transactions the `TransactionalRepositoryClient` is used.
 
@@ -376,6 +378,7 @@ including any changes that are not yet committed:
 * `addFile()`
 
 #### Deleting
+
 Deleting data during a transaction is different than the one in 
 `RDFRepositoryClient`, it expects RDF data document instead of statements 
 filter parameters.
@@ -422,6 +425,7 @@ return repository.deleteNamespaces();
 ```
 
 ### Response Parsers
+
 Read responses of different content types might be parsed to data objects with
 parsers registered in the repository instance.
 
@@ -430,6 +434,7 @@ repository instance which in turn will use them to parse the response before
 returning it to the client.
 
 #### Implementing a custom parser
+
 A parser could be implemented by extending the `ContentParser` and implementing
 the `parse` and `getSupportedType` methods.
 
@@ -450,7 +455,8 @@ The `getSupportedType` method must return one of the supported RDF and SPARQL
 MIME types this way defining that the parser is responsible for converting from
 that type. 
 
-#### Register parser in the repository
+#### Registering parser in the repository
+
 Parsers should be registered in the repository before executing any request.
 
 ```javascript
@@ -465,20 +471,20 @@ Multiple parsers could be registered for different response types.
 `Registering a second parser for same content type results in overriding the previously registerted parser!`
 
 #### Predefined parsers
-The library provides parsers for rdf formats using the [N3](https://github.com/rdfjs/N3.js) library:
-* TurtleParser: `text/turtle`
-* N3parser: `text/rdf+n3`
-* NQuadsParser: `text/x-nquads`
-* NTriplesParser: `text/plain` (`N-Triples`)
-* TrigParser: `application/x-trig`
 
-For SELECT query results in `json` and `xml` formats as well as boolean results 
-from ASK queries following parsers are wrapped and exposed: 
-[sparqlxml-parse](https://github.com/rubensworks/sparqlxml-parse.js) and 
-[sparqljson-parse](https://github.com/rubensworks/sparqljson-parse.js)
-* SparqlXmlResultParser: `application/sparql-results+xml`, `text/boolean`
-* SparqlJsonResultParser: `application/sparql-results+json`, `text/boolean`
+The library provides convenient parser wrappers for the rdf formats using thrid party libraries:
 
+* `text/turtle`: TurtleParser ([N3](https://github.com/rdfjs/N3.js))
+* `text/rdf+n3`: N3parser ([N3](https://github.com/rdfjs/N3.js))
+* `text/x-nquads`: NQuadsParser ([N3](https://github.com/rdfjs/N3.js))
+* `text/plain` (`N-Triples`): NTriplesParser ([N3](https://github.com/rdfjs/N3.js))
+* `application/x-trig`: TrigParser ([N3](https://github.com/rdfjs/N3.js))
+* `application/ld-json`: JsonLDParser ([jsonld-streaming-parser](https://github.com/rubensworks/jsonld-streaming-parser.js))
+* `application/rdf+xml`: RDFXmlParser ([rdfxml-streaming-parser](https://github.com/rdfjs/rdfxml-streaming-parser.js))
+
+For SELECT query results in `json` and `xml` formats as well as boolean results from ASK queries following parsers are wrapped and exposed:
+* `application/sparql-results+xml`, `text/boolean`: SparqlXmlResultParser ([sparqlxml-parse](https://github.com/rubensworks/sparqlxml-parse.js))
+* `application/sparql-results+json`, `text/boolean`: SparqlJsonResultParser ([sparqljson-parse](https://github.com/rubensworks/sparqljson-parse.js))
 
 ### License
 [LICENSE](LICENSE)
