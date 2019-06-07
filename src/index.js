@@ -43,6 +43,7 @@ module.exports = {
     TriGParser: require('./parser/trig-parser'),
     TurtleParser: require('./parser/turtle-parser'),
     JsonLDParser: require('./parser/jsonld-parser'),
+    RDFXmlParser: require('./parser/rdfxml-parser'),
     SparqlJsonResultParser: require('./parser/sparql-json-result-parser'),
     SparqlXmlResultParser: require('./parser/sparql-xml-result-parser')
   },

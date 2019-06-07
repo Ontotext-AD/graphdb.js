@@ -82,6 +82,7 @@
     "n3": "^1.0.5",
     "pino": "^5.12.4",
     "qs": "^6.7.0",
+    "rdfxml-streaming-parser": "^1.2.3",
     "sparqljson-parse": "^1.5.0",
     "sparqlxml-parse": "^1.2.1",
     "uuid": "^3.3.2"

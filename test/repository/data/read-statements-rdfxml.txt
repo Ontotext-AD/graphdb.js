@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF
+	xmlns="http://eunis.eea.europa.eu/rdf/schema.rdf#"
+	xmlns:cc="http://creativecommons.org/ns#"
+	xmlns:wgs="http://www.w3.org/2003/01/geo/wgs84_pos#"
+	xmlns:owl="http://www.w3.org/2002/07/owl#"
+	xmlns:gn="http://www.geonames.org/ontology#"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+	xmlns:fn="http://www.w3.org/2005/xpath-functions#"
+	xmlns:skos="http://www.w3.org/2004/02/skos/core#"
+	xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+	xmlns:dwc="http://rs.tdwg.org/dwc/terms/"
+	xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+	xmlns:dcterms="http://purl.org/dc/terms/"
+	xmlns:bibo="http://purl.org/ontology/bibo/"
+	xmlns:sesame="http://www.openrdf.org/schema/sesame#"
+	xmlns:foaf="http://xmlns.com/foaf/0.1/"
+	xmlns:sioc="http://rdfs.org/sioc/ns#"
+	xmlns:dc="http://purl.org/dc/elements/1.1/">
+
+<rdf:Description rdf:about="http://eunis.eea.europa.eu/countries/NO">
+	<rdf:type rdf:resource="http://eunis.eea.europa.eu/rdf/schema.rdf#Country"/>
+	<owl:sameAs rdf:resource="http://rdfdata.eionet.europa.eu/eea/countries/NO"/>
+	<owl:sameAs rdf:resource="http://dd.eionet.europa.eu/vocabulary/common/countries/NO"/>
+	<rdfs:label>Norway</rdfs:label>
+	<skos:notation>NO</skos:notation>
+	<eunisAreaCode>NO</eunisAreaCode>
+	<areaName>Norge</areaName>
+	<areaName xml:lang="en">Norway</areaName>
+	<areaName xml:lang="fr">Norvège</areaName>
+	<isoCode2>NO</isoCode2>
+	<isoCode3>NOR</isoCode3>
+	<iso_n rdf:datatype="http://www.w3.org/2001/XMLSchema#int">578</iso_n>
+	<iso_2_wcmc>NO</iso_2_wcmc>
+	<iso_3_wcmc>NOR</iso_3_wcmc>
+	<iso_3_wcmc_parent>NOR</iso_3_wcmc_parent>
+	<areucd>NO</areucd>
+	<surface rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">323895</surface>
+	<population rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">4920305</population>
+	<capital>Oslo</capital>
+	<selection rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">1</selection>
+	<hasCountryBioGeoRegion rdf:resource="http://eunis.eea.europa.eu/countrybiogeo/NO:AL"/>
+	<hasCountryBioGeoRegion rdf:resource="http://eunis.eea.europa.eu/countrybiogeo/NO:AR"/>
+	<hasCountryBioGeoRegion rdf:resource="http://eunis.eea.europa.eu/countrybiogeo/NO:AT"/>
+	<hasCountryBioGeoRegion rdf:resource="http://eunis.eea.europa.eu/countrybiogeo/NO:BO"/>
+</rdf:Description>
