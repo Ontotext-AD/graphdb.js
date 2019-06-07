@@ -1,6 +1,9 @@
 # graphdb.js
 
 [![Build Status](https://travis-ci.com/Ontotext-AD/graphdb.js.svg?branch=master)](https://travis-ci.com/Ontotext-AD/graphdb.js)
+[![Coverage Status](https://coveralls.io/repos/github/Ontotext-AD/graphdb.js/badge.svg?branch=master)](https://coveralls.io/github/Ontotext-AD/graphdb.js?branch=master)
+<a href="https://codeclimate.com/github/Ontotext-AD/graphdb.js/maintainability"><img src="https://api.codeclimate.com/v1/badges/6fffed099d25a540d504/maintainability" /></a>
+[![install size](https://packagephobia.now.sh/badge?p=graphdb)](https://packagephobia.now.sh/result?p=graphdb)
 
 A GraphDB and RDF4J data access library written in JavaScript to be used in Node.js.  
 
