@@ -2,7 +2,7 @@ const HttpClient = require('http/http-client');
 const RepositoryClientConfig = require('repository/repository-client-config');
 const RdfRepositoryClient = require('repository/rdf-repository-client');
 const RDFMimeType = require('http/rdf-mime-type');
-const HttpRequestConfigBuilder = require('http/http-request-config-builder');
+const HttpRequestBuilder = require('http/http-request-builder');
 
 const httpClientStub = require('../http/http-client.stub');
 const testUtils = require('../utils');
@@ -54,7 +54,7 @@ describe('RdfRepositoryClient - uploading files', () => {
         const url = httpPostCall[0];
         expect(url).toEqual('/statements');
 
-        const expectedRequestConfig = new HttpRequestConfigBuilder().setHeaders({
+        const expectedRequestConfig = new HttpRequestBuilder().setHeaders({
           'Content-Type': RDFMimeType.TRIG
         }).setParams({
           baseURI,
@@ -107,7 +107,7 @@ describe('RdfRepositoryClient - uploading files', () => {
         const url = httpPutCall[0];
         expect(url).toEqual('/statements');
 
-        const expectedRequestConfig = new HttpRequestConfigBuilder().setHeaders({
+        const expectedRequestConfig = new HttpRequestBuilder().setHeaders({
           'Content-Type': RDFMimeType.TRIG
         }).setParams({
           baseURI,

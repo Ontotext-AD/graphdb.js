@@ -8,7 +8,7 @@ const NTriplesParser = require('parser/n-triples-parser');
 const NQuadsParser = require('parser/n-quads-parser');
 const N3Parser = require('parser/n3-parser');
 const TriGParser = require('parser/trig-parser');
-const HttpRequestConfigBuilder = require('http/http-request-config-builder');
+const HttpRequestBuilder = require('http/http-request-builder');
 const JsonLDParser = require('parser/jsonld-parser');
 const RDFXmlParser = require('parser/rdfxml-parser');
 
@@ -206,7 +206,7 @@ describe('RDFRepositoryClient - reading statements', () => {
     });
 
     function verifyGetRequest() {
-      const expectedRequestConfig = new HttpRequestConfigBuilder().setHeaders({
+      const expectedRequestConfig = new HttpRequestBuilder().setHeaders({
         'Accept': RDFMimeType.RDF_JSON
       }).setParams({
         infer: true,
@@ -309,7 +309,7 @@ describe('RDFRepositoryClient - reading statements', () => {
     });
 
     function verifyDownloadRequest(getMock) {
-      const expectedRequestConfig = new HttpRequestConfigBuilder().setHeaders({
+      const expectedRequestConfig = new HttpRequestBuilder().setHeaders({
         'Accept': 'text/turtle'
       }).setParams({
         subj: '<http://eunis.eea.europa.eu/countries/AZ>',

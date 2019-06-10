@@ -2,7 +2,7 @@ const ServerClient = require('server/server-client');
 const ServerClientConfig = require('server/server-client-config');
 const RDFRepositoryClient = require('repository/rdf-repository-client');
 const RepositoryClientConfig = require('repository/repository-client-config');
-const HttpRequestConfigBuilder = require('http/http-request-config-builder');
+const HttpRequestBuilder = require('http/http-request-builder');
 
 import data from './server-client.data';
 
@@ -41,7 +41,7 @@ describe('ServerClient', () => {
     test('should make request with required service url parameter', () => {
       return server.getRepositoryIDs().then(() => {
         expect(server.httpClient.get).toHaveBeenCalledTimes(1);
-        const expectedRequestConfig = new HttpRequestConfigBuilder()
+        const expectedRequestConfig = new HttpRequestBuilder()
           .setHeaders({
             'Accept': 'application/sparql-results+json'
           });

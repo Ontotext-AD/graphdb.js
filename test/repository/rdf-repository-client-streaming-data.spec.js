@@ -2,7 +2,7 @@ const HttpClient = require('http/http-client');
 const RepositoryClientConfig = require('repository/repository-client-config');
 const RdfRepositoryClient = require('repository/rdf-repository-client');
 const RDFMimeType = require('http/rdf-mime-type');
-const HttpRequestConfigBuilder = require('http/http-request-config-builder');
+const HttpRequestBuilder = require('http/http-request-builder');
 const {ObjectReadableMock} = require('stream-mock');
 
 const httpClientStub = require('../http/http-client.stub');
@@ -68,7 +68,7 @@ describe('RdfRepositoryClient - streaming data', () => {
     });
 
     function verifyUploadRequest(postMock) {
-      const expectedRequestConfig = new HttpRequestConfigBuilder().setHeaders({
+      const expectedRequestConfig = new HttpRequestBuilder().setHeaders({
         'Content-Type': 'text/turtle'
       }).setParams({
         context,
@@ -117,7 +117,7 @@ describe('RdfRepositoryClient - streaming data', () => {
     });
 
     function verifyOverwriteRequest(putMock) {
-      const expectedRequestConfig = new HttpRequestConfigBuilder().setHeaders({
+      const expectedRequestConfig = new HttpRequestBuilder().setHeaders({
         'Content-Type': 'text/turtle'
       }).setParams({
         context,

@@ -3,7 +3,7 @@ const ConsoleLogger = require('../logging/console-logger');
 const RDFRepositoryClient = require('../repository/rdf-repository-client');
 const RepositoryClientConfig =
   require('../repository/repository-client-config');
-const HttpRequestConfigBuilder = require('../http/http-request-config-builder');
+const HttpRequestBuilder = require('../http/http-request-builder');
 const RDFMimeType = require('../http/rdf-mime-type');
 
 const SERVICE_URL = '/repositories';
@@ -31,7 +31,7 @@ class ServerClient {
    * @return {Promise} promise which resolves with an Array with repository ids.
    */
   getRepositoryIDs() {
-    const requestConfig = new HttpRequestConfigBuilder()
+    const requestConfig = new HttpRequestBuilder()
       .addAcceptHeader(RDFMimeType.SPARQL_RESULTS_JSON);
 
     let elapsedTime = Date.now();

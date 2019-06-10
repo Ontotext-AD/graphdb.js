@@ -1,12 +1,12 @@
-const HttpRequestConfigBuilder = require('http/http-request-config-builder');
+const HttpRequestBuilder = require('http/http-request-builder');
 
-describe('HttpRequestConfigBuilder', () => {
+describe('HttpRequestBuilder', () => {
   test('should init with an empty config', () => {
-    expect(new HttpRequestConfigBuilder().get()).toEqual({});
+    expect(new HttpRequestBuilder().get()).toEqual({});
   });
 
   test('should add a header in headers map', () => {
-    expect(new HttpRequestConfigBuilder()
+    expect(new HttpRequestBuilder()
       .addHeader('Accept', 'text/turtle')
       .get())
       .toEqual({
@@ -15,7 +15,7 @@ describe('HttpRequestConfigBuilder', () => {
   });
 
   test('should set params provided as argument in the config', () => {
-    expect(new HttpRequestConfigBuilder()
+    expect(new HttpRequestBuilder()
       .setParams({
         subj: 'subj',
         pred: 'pred'
@@ -30,7 +30,7 @@ describe('HttpRequestConfigBuilder', () => {
   });
 
   test('should add param in the params mapping', () => {
-    expect(new HttpRequestConfigBuilder()
+    expect(new HttpRequestBuilder()
       .addParam('subj', 'subj')
       .addParam('pred', 'pred')
       .get())
@@ -43,7 +43,7 @@ describe('HttpRequestConfigBuilder', () => {
   });
 
   test('should get the params mapping', () => {
-    expect(new HttpRequestConfigBuilder()
+    expect(new HttpRequestBuilder()
       .addParam('subj', 'subj')
       .addParam('pred', 'pred')
       .getParams())
@@ -55,7 +55,7 @@ describe('HttpRequestConfigBuilder', () => {
 
 
   test('should should set timeout configuration', () => {
-    expect(new HttpRequestConfigBuilder()
+    expect(new HttpRequestBuilder()
       .setTimeout(1000)
       .get())
       .toEqual({
@@ -64,14 +64,14 @@ describe('HttpRequestConfigBuilder', () => {
   });
 
   test('should get the timeout configuration', () => {
-    expect(new HttpRequestConfigBuilder()
+    expect(new HttpRequestBuilder()
       .setTimeout(1000)
       .getTimeout())
       .toEqual(1000);
   });
 
   test('should should set response type configuration', () => {
-    expect(new HttpRequestConfigBuilder()
+    expect(new HttpRequestBuilder()
       .setResponseType('stream')
       .get())
       .toEqual({
@@ -80,7 +80,7 @@ describe('HttpRequestConfigBuilder', () => {
   });
 
   test('should add Accept header', () => {
-    expect(new HttpRequestConfigBuilder()
+    expect(new HttpRequestBuilder()
       .addAcceptHeader('text/turtle')
       .get())
       .toEqual({
@@ -89,7 +89,7 @@ describe('HttpRequestConfigBuilder', () => {
   });
 
   test('should add Content-Type header', () => {
-    expect(new HttpRequestConfigBuilder()
+    expect(new HttpRequestBuilder()
       .addContentTypeHeader('text/turtle')
       .get())
       .toEqual({
@@ -98,7 +98,7 @@ describe('HttpRequestConfigBuilder', () => {
   });
 
   test('should skip empty header values', () => {
-    expect(new HttpRequestConfigBuilder()
+    expect(new HttpRequestBuilder()
       .addContentTypeHeader('')
       .addAcceptHeader()
       .addHeader('custom', null)
@@ -107,7 +107,7 @@ describe('HttpRequestConfigBuilder', () => {
   });
 
   test('should get the headers', () => {
-    expect(new HttpRequestConfigBuilder()
+    expect(new HttpRequestBuilder()
       .addContentTypeHeader('text/turtle')
       .getHeaders())
       .toEqual({

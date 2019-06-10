@@ -1,14 +1,14 @@
 const StringUtils = require('../util/string-utils');
 
 /**
- * Holds request configuration applicable to the http client.
+ * Holds request information applicable to {@link HttpClient}.
  *
  * @class
  *
  * @author Mihail Radkov
  * @author Svilen Velikov
  */
-class HttpRequestConfigBuilder {
+class HttpRequestBuilder {
   /**
    * Does default initialization of the configuration.
    */
@@ -21,7 +21,7 @@ class HttpRequestConfigBuilder {
    *
    * @param {string} header type
    * @param {string} value the header value
-   * @return {HttpRequestConfigBuilder}
+   * @return {HttpRequestBuilder}
    */
   addHeader(header, value) {
     if (StringUtils.isBlank(value)) {
@@ -38,7 +38,7 @@ class HttpRequestConfigBuilder {
    * Sets the headers map.
    *
    * @param {Object<string, string>} headers the headers map
-   * @return {HttpRequestConfigBuilder}
+   * @return {HttpRequestBuilder}
    */
   setHeaders(headers) {
     this.config.headers = headers;
@@ -58,7 +58,7 @@ class HttpRequestConfigBuilder {
    * Add a specific header of type <code>Accept</code> with the given value.
    *
    * @param {string} value
-   * @return {HttpRequestConfigBuilder}
+   * @return {HttpRequestBuilder}
    */
   addAcceptHeader(value) {
     return this.addHeader('Accept', value);
@@ -69,7 +69,7 @@ class HttpRequestConfigBuilder {
    * value.
    *
    * @param {string} value
-   * @return {HttpRequestConfigBuilder}
+   * @return {HttpRequestBuilder}
    */
   addContentTypeHeader(value) {
     return this.addHeader('Content-Type', value);
@@ -79,7 +79,7 @@ class HttpRequestConfigBuilder {
    * Set request parameters object.
    *
    * @param {Object} params
-   * @return {HttpRequestConfigBuilder}
+   * @return {HttpRequestBuilder}
    */
   setParams(params) {
     this.config.params = params;
@@ -91,7 +91,7 @@ class HttpRequestConfigBuilder {
    *
    * @param {string} param
    * @param {*} value
-   * @return {HttpRequestConfigBuilder}
+   * @return {HttpRequestBuilder}
    */
   addParam(param, value) {
     if (!value) {
@@ -117,7 +117,7 @@ class HttpRequestConfigBuilder {
    * Set timeout configuration.
    *
    * @param {number} timeout in ms
-   * @return {HttpRequestConfigBuilder}
+   * @return {HttpRequestBuilder}
    */
   setTimeout(timeout) {
     this.config.timeout = timeout;
@@ -137,7 +137,7 @@ class HttpRequestConfigBuilder {
    * Set a responseType config.
    *
    * @param {string} responseType
-   * @return {HttpRequestConfigBuilder}
+   * @return {HttpRequestBuilder}
    */
   setResponseType(responseType) {
     this.config.responseType = responseType;
@@ -153,4 +153,4 @@ class HttpRequestConfigBuilder {
   }
 }
 
-module.exports = HttpRequestConfigBuilder;
+module.exports = HttpRequestBuilder;

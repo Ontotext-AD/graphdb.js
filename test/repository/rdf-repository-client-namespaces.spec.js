@@ -5,7 +5,7 @@ const RDFMimeType = require('http/rdf-mime-type');
 const DataFactory = require('n3').DataFactory;
 const NamedNode = DataFactory.internal.NamedNode;
 const Namespace = require('model/namespace');
-const HttpRequestConfigBuilder = require('http/http-request-config-builder');
+const HttpRequestBuilder = require('http/http-request-builder');
 const httpClientStub = require('../http/http-client.stub');
 const namespaceData = require('./data/namespaces.json');
 
@@ -43,7 +43,7 @@ describe('RDFRepositoryClient - Namespace management', () => {
 
         let get = rdfRepositoryClient.httpClients[0].get;
         expect(get).toHaveBeenCalledTimes(1);
-        expect(get).toHaveBeenCalledWith('/namespaces', new HttpRequestConfigBuilder().setHeaders({
+        expect(get).toHaveBeenCalledWith('/namespaces', new HttpRequestBuilder().setHeaders({
           'Accept': RDFMimeType.SPARQL_RESULTS_JSON
         }));
       });

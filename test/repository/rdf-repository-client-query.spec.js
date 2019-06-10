@@ -10,7 +10,7 @@ const SparqlJsonResultParser = require('parser/sparql-json-result-parser');
 const SparqlXmlResultParser = require('parser/sparql-xml-result-parser');
 const DataFactory = require('n3').DataFactory;
 const namedNode = DataFactory.namedNode;
-const HttpRequestConfigBuilder = require('http/http-request-config-builder');
+const HttpRequestBuilder = require('http/http-request-builder');
 
 const httpClientStub = require('../http/http-client.stub');
 
@@ -216,7 +216,7 @@ describe('RDFRepositoryClient - query', () => {
       .setTimeout(5);
 
     const expectedData = 'query=select%20*%20where%20%7B%3Fs%20%3Fp%20%3Fo%7D&queryLn=sparql&infer=true&distinct=true&limit=100&offset=0&timeout=5';
-    const expectedRequestConfig = new HttpRequestConfigBuilder().setHeaders({
+    const expectedRequestConfig = new HttpRequestBuilder().setHeaders({
       'Accept': 'application/sparql-results+json',
       'Content-Type': 'application/x-www-form-urlencoded'
     }).setResponseType('stream');

@@ -2,7 +2,7 @@ const axios = require('axios');
 const uuidv4 = require('uuid/v4');
 const qs = require('qs');
 const ConsoleLogger = require('../logging/console-logger');
-const HttpRequestConfigBuilder = require('./http-request-config-builder');
+const HttpRequestBuilder = require('./http-request-builder');
 
 const REQUEST_ID_HEADER = 'x-request-id';
 
@@ -100,7 +100,7 @@ class HttpClient {
    * given URL.
    *
    * @param {string} url URL to the requested resource
-   * @param {HttpRequestConfigBuilder} [requestConfigBuilder] request
+   * @param {HttpRequestBuilder} [requestConfigBuilder] request
    * configuration builder that include params and headers
    * @return {Promise<any>} a promise resolving to the request's response
    */
@@ -119,7 +119,7 @@ class HttpClient {
    *
    * @param {string} url URL to the requested resource
    * @param {object} data the request body
-   * @param {HttpRequestConfigBuilder} [requestConfigBuilder] request
+   * @param {HttpRequestBuilder} [requestConfigBuilder] request
    * configuration builder that include params and headers
    * @return {Promise<any>} a promise resolving to the request's response
    */
@@ -138,7 +138,7 @@ class HttpClient {
    *
    * @param {string} url URL to the requested resource
    * @param {object} data the request body
-   * @param {HttpRequestConfigBuilder} [requestConfigBuilder] request
+   * @param {HttpRequestBuilder} [requestConfigBuilder] request
    * configuration builder that include params and headers
    * @return {Promise<any>} a promise resolving to the request's response
    */
@@ -156,7 +156,7 @@ class HttpClient {
    * given URL.
    *
    * @param {string} url URL to the requested resource
-   * @param {HttpRequestConfigBuilder} [requestConfigBuilder] request
+   * @param {HttpRequestBuilder} [requestConfigBuilder] request
    * configuration builder that include params and headers
    * @return {Promise<any>} a promise resolving to the request's response
    */
@@ -171,7 +171,7 @@ class HttpClient {
    * provided request configuration builder.
    *
    * @private
-   * @param {HttpRequestConfigBuilder} [requestConfigBuilder] request
+   * @param {HttpRequestBuilder} [requestConfigBuilder] request
    * configuration builder used to produce the request configuration
    * @return {Object<string, string>}
    */
@@ -184,7 +184,7 @@ class HttpClient {
    * provided request configuration builder.
    *
    * @private
-   * @param {HttpRequestConfigBuilder} [requestConfigBuilder] request
+   * @param {HttpRequestBuilder} [requestConfigBuilder] request
    * configuration builder used to produce the request configuration
    * @return {Object<string, string>}
    */
@@ -197,7 +197,7 @@ class HttpClient {
    * configuration builder and default timeout.
    *
    * @private
-   * @param {HttpRequestConfigBuilder} [requestConfigBuilder] request
+   * @param {HttpRequestBuilder} [requestConfigBuilder] request
    * configuration builder used to produce the request configuration
    * @param {number} timeout default timeout if one is not specified in the
    * request config builder
@@ -205,7 +205,7 @@ class HttpClient {
    */
   getRequestConfig(requestConfigBuilder, timeout) {
     requestConfigBuilder = requestConfigBuilder ||
-      new HttpRequestConfigBuilder();
+      new HttpRequestBuilder();
 
     this.addXRequestIdHeader(requestConfigBuilder);
     this.addDefaultTimeout(requestConfigBuilder, timeout);

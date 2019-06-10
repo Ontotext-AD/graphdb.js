@@ -3,7 +3,7 @@ const RDFRepositoryClient = require('repository/rdf-repository-client');
 const RepositoryClientConfig = require('repository/repository-client-config');
 const UpdateQueryPayload = require('query/update-query-payload');
 const QueryContentType = require('http/query-content-type');
-const HttpRequestConfigBuilder = require('http/http-request-config-builder');
+const HttpRequestBuilder = require('http/http-request-builder');
 
 const httpClientStub = require('../http/http-client.stub');
 
@@ -28,7 +28,7 @@ describe('RDFRepositoryClient - update query', () => {
     const payload = new UpdateQueryPayload()
       .setQuery('INSERT {?s ?p ?o} WHERE {?s ?p ?o}');
 
-    const expectedRequestConfig = new HttpRequestConfigBuilder().setHeaders({
+    const expectedRequestConfig = new HttpRequestBuilder().setHeaders({
       'Content-Type': 'application/sparql-update'
     });
 
@@ -47,7 +47,7 @@ describe('RDFRepositoryClient - update query', () => {
       .setTimeout(5);
 
     const expectedData = 'update=INSERT%20%7B%3Fs%20%3Fp%20%3Fo%7D%20WHERE%20%7B%3Fs%20%3Fp%20%3Fo%7D&infer=true&timeout=5';
-    const expectedRequestConfig = new HttpRequestConfigBuilder().setHeaders({
+    const expectedRequestConfig = new HttpRequestBuilder().setHeaders({
       'Content-Type': 'application/x-www-form-urlencoded'
     });
 

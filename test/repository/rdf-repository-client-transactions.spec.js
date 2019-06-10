@@ -11,7 +11,7 @@ const GetQueryPayload = require('query/get-query-payload');
 const QueryType = require('query/query-type');
 const UpdateQueryPayload = require('query/update-query-payload');
 const QueryContentType = require('http/query-content-type');
-const HttpRequestConfigBuilder = require('http/http-request-config-builder');
+const HttpRequestBuilder = require('http/http-request-builder');
 
 const {namedNode, literal, quad} = require('n3').DataFactory;
 
@@ -60,10 +60,10 @@ describe('RDFRepositoryClient - transactions', () => {
   });
 
   /**
-   * Utility for creating HttpRequestConfigBuilder from given config.
+   * Utility for creating HttpRequestBuilder from given config.
    */
   function getRequestConfig(config) {
-    const requestConfig = new HttpRequestConfigBuilder();
+    const requestConfig = new HttpRequestBuilder();
     requestConfig.config = config;
     return requestConfig;
   }
@@ -96,7 +96,7 @@ describe('RDFRepositoryClient - transactions', () => {
         expect(transactionalClient.isActive()).toEqual(true);
 
         expect(post).toHaveBeenCalledTimes(1);
-        expect(post).toHaveBeenCalledWith('/transactions', new HttpRequestConfigBuilder());
+        expect(post).toHaveBeenCalledWith('/transactions', new HttpRequestBuilder());
       });
     });
 

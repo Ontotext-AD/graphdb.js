@@ -4,7 +4,7 @@ const RDFRepositoryClient = require('repository/rdf-repository-client');
 const RDFMimeType = require('http/rdf-mime-type');
 const AddStatementPayload = require('repository/add-statement-payload');
 const XSD = require('model/types').XSD;
-const HttpRequestConfigBuilder = require('http/http-request-config-builder');
+const HttpRequestBuilder = require('http/http-request-builder');
 
 const N3 = require('n3');
 const {DataFactory} = N3;
@@ -282,7 +282,7 @@ describe('RDFRepositoryClient - adding data', () => {
   }
 
   function verifySentPayload(method, expected, context, baseURI) {
-    const expectedRequestConfig = new HttpRequestConfigBuilder().setHeaders({
+    const expectedRequestConfig = new HttpRequestBuilder().setHeaders({
       'Content-Type': RDFMimeType.TRIG
     }).setParams({
       context,

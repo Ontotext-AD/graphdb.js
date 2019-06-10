@@ -1,7 +1,7 @@
 const HttpClient = require('http/http-client');
 const RepositoryClientConfig = require('repository/repository-client-config');
 const RDFRepositoryClient = require('repository/rdf-repository-client');
-const HttpRequestConfigBuilder = require('http/http-request-config-builder');
+const HttpRequestBuilder = require('http/http-request-builder');
 const httpClientStub = require('../http/http-client.stub');
 const {when} = require('jest-when');
 
@@ -36,7 +36,7 @@ describe('RDFRepositoryClient - Deleting statements', () => {
       return rdfRepositoryClient.deleteStatements(subj).then(() => {
         let deleteResource = rdfRepositoryClient.httpClients[0].deleteResource;
         expect(deleteResource).toHaveBeenCalledTimes(1);
-        expect(deleteResource).toHaveBeenCalledWith('/statements', new HttpRequestConfigBuilder().setParams({
+        expect(deleteResource).toHaveBeenCalledWith('/statements', new HttpRequestBuilder().setParams({
           subj, pred: undefined, obj: undefined, context: undefined
         }));
       });
@@ -46,7 +46,7 @@ describe('RDFRepositoryClient - Deleting statements', () => {
       return rdfRepositoryClient.deleteStatements(subj, pred, obj).then(() => {
         let deleteResource = rdfRepositoryClient.httpClients[0].deleteResource;
         expect(deleteResource).toHaveBeenCalledTimes(1);
-        expect(deleteResource).toHaveBeenCalledWith('/statements', new HttpRequestConfigBuilder().setParams({
+        expect(deleteResource).toHaveBeenCalledWith('/statements', new HttpRequestBuilder().setParams({
           subj, pred, obj, context: undefined
         }));
       });
@@ -57,7 +57,7 @@ describe('RDFRepositoryClient - Deleting statements', () => {
       return rdfRepositoryClient.deleteStatements(subj, pred, obj, contexts).then(() => {
         let deleteResource = rdfRepositoryClient.httpClients[0].deleteResource;
         expect(deleteResource).toHaveBeenCalledTimes(1);
-        expect(deleteResource).toHaveBeenCalledWith('/statements', new HttpRequestConfigBuilder().setParams({
+        expect(deleteResource).toHaveBeenCalledWith('/statements', new HttpRequestBuilder().setParams({
           subj, pred, obj, context: contexts
         }));
       });
@@ -67,7 +67,7 @@ describe('RDFRepositoryClient - Deleting statements', () => {
       return rdfRepositoryClient.deleteStatements(null, null, null, context).then(() => {
         let deleteResource = rdfRepositoryClient.httpClients[0].deleteResource;
         expect(deleteResource).toHaveBeenCalledTimes(1);
-        expect(deleteResource).toHaveBeenCalledWith('/statements', new HttpRequestConfigBuilder().setParams({
+        expect(deleteResource).toHaveBeenCalledWith('/statements', new HttpRequestBuilder().setParams({
           subj: undefined, pred: undefined, obj: undefined, context
         }));
       });
@@ -86,7 +86,7 @@ describe('RDFRepositoryClient - Deleting statements', () => {
         'http://domain/graph/1').then(() => {
         let deleteResource = rdfRepositoryClient.httpClients[0].deleteResource;
         expect(deleteResource).toHaveBeenCalledTimes(1);
-        expect(deleteResource).toHaveBeenCalledWith('/statements', new HttpRequestConfigBuilder().setParams({
+        expect(deleteResource).toHaveBeenCalledWith('/statements', new HttpRequestBuilder().setParams({
           subj, pred, obj, context
         }));
       });

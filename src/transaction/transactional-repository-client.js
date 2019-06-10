@@ -5,7 +5,7 @@ const TermConverter = require('../model/term-converter');
 const StringUtils = require('../util/string-utils');
 const FileUtils = require('../util/file-utils');
 const CommonUtils = require('../util/common-utils');
-const HttpRequestConfigBuilder = require('../http/http-request-config-builder');
+const HttpRequestBuilder = require('../http/http-request-builder');
 
 /**
  * Transactional RDF repository client implementation realizing transaction
@@ -63,7 +63,7 @@ class TransactionalRepositoryClient extends BaseRepositoryClient {
    * @return {Promise<number>} a promise resolving to the size of the repo
    */
   getSize(context) {
-    const requestConfig = new HttpRequestConfigBuilder()
+    const requestConfig = new HttpRequestBuilder()
       .setParams({
         action: 'SIZE',
         context: TermConverter.toNTripleValues(context)
@@ -91,7 +91,7 @@ class TransactionalRepositoryClient extends BaseRepositoryClient {
    *      to provided response type.
    */
   get(payload) {
-    const requestConfig = new HttpRequestConfigBuilder()
+    const requestConfig = new HttpRequestBuilder()
       .setParams({
         action: 'GET',
         subj: TermConverter.toNTripleValue(payload.getSubject()),
@@ -129,7 +129,7 @@ class TransactionalRepositoryClient extends BaseRepositoryClient {
    * soon as they are available.
    */
   query(payload) {
-    const requestConfig = new HttpRequestConfigBuilder()
+    const requestConfig = new HttpRequestBuilder()
       .setResponseType('stream')
       .addAcceptHeader(payload.getResponseType())
       .addContentTypeHeader(payload.getContentType())
@@ -158,7 +158,7 @@ class TransactionalRepositoryClient extends BaseRepositoryClient {
    * successful or rejected in case of failure
    */
   update(payload) {
-    const requestConfig = new HttpRequestConfigBuilder()
+    const requestConfig = new HttpRequestBuilder()
       .addContentTypeHeader(payload.getContentType())
       .setParams({
         action: 'UPDATE'
@@ -251,7 +251,7 @@ class TransactionalRepositoryClient extends BaseRepositoryClient {
       throw new Error('Turtle data is required when adding statements');
     }
 
-    const requestConfig = new HttpRequestConfigBuilder()
+    const requestConfig = new HttpRequestBuilder()
       .setParams({
         action: 'ADD',
         context: TermConverter.toNTripleValues(context),
@@ -282,7 +282,7 @@ class TransactionalRepositoryClient extends BaseRepositoryClient {
       throw new Error('Turtle data is required when deleting statements');
     }
 
-    const requestConfig = new HttpRequestConfigBuilder()
+    const requestConfig = new HttpRequestBuilder()
       .setParams({
         action: 'DELETE'
       })
@@ -310,7 +310,7 @@ class TransactionalRepositoryClient extends BaseRepositoryClient {
    * response type as soon as they are available.
    */
   download(payload) {
-    const requestConfig = new HttpRequestConfigBuilder()
+    const requestConfig = new HttpRequestBuilder()
       .addAcceptHeader(payload.getResponseType())
       .setResponseType('stream')
       .setParams({
@@ -408,7 +408,7 @@ class TransactionalRepositoryClient extends BaseRepositoryClient {
    * the stream has been successfully consumed by the server
    */
   uploadData(readStream, contentType, context, baseURI) {
-    const requestConfig = new HttpRequestConfigBuilder()
+    const requestConfig = new HttpRequestBuilder()
       .addContentTypeHeader(contentType)
       .setResponseType('stream')
       .setParams({
@@ -429,7 +429,7 @@ class TransactionalRepositoryClient extends BaseRepositoryClient {
    * @return {Promise<void>} that will be resolved after successful commit
    */
   commit() {
-    const requestConfig = new HttpRequestConfigBuilder()
+    const requestConfig = new HttpRequestBuilder()
       .setParams({
         action: 'COMMIT'
       });

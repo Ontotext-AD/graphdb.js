@@ -1,6 +1,6 @@
 const axios = require('axios');
 const HttpClient = require('http/http-client');
-const HttpRequestConfigBuilder = require('http/http-request-config-builder');
+const HttpRequestBuilder = require('http/http-request-builder');
 
 jest.mock('axios');
 
@@ -36,7 +36,7 @@ describe('HttpClient', () => {
     axiosMock.put.mockResolvedValue();
     axiosMock.delete.mockResolvedValue();
 
-    requestConfig = new HttpRequestConfigBuilder().setParams({
+    requestConfig = new HttpRequestBuilder().setParams({
       'param-1': 'value-1'
     }).setHeaders({
       'Accept': 'application/json'

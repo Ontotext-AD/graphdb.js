@@ -10,7 +10,7 @@ const RepositoryClientConfig =
   require('../repository/repository-client-config');
 const TransactionalRepositoryClient =
   require('../transaction/transactional-repository-client');
-const HttpRequestConfigBuilder = require('../http/http-request-config-builder');
+const HttpRequestBuilder = require('../http/http-request-builder');
 const DataFactory = require('n3').DataFactory;
 const NamedNode = DataFactory.internal.NamedNode;
 
@@ -66,7 +66,7 @@ class RDFRepositoryClient extends BaseRepositoryClient {
    *                           statements in the repository
    */
   getSize(context) {
-    const requestConfig = new HttpRequestConfigBuilder()
+    const requestConfig = new HttpRequestBuilder()
       .addParam('context', TermConverter.toNTripleValues(context));
 
     return this.execute((http) => http.get('/size', requestConfig))
@@ -84,7 +84,7 @@ class RDFRepositoryClient extends BaseRepositoryClient {
    *                                {@link Namespace}
    */
   getNamespaces() {
-    const requestConfig = new HttpRequestConfigBuilder()
+    const requestConfig = new HttpRequestBuilder()
       .addAcceptHeader(RDFMimeType.SPARQL_RESULTS_JSON);
 
     return this.execute((http) => http.get(PATH_NAMESPACES, requestConfig))
@@ -219,7 +219,7 @@ class RDFRepositoryClient extends BaseRepositoryClient {
    *      to provided response type.
    */
   get(payload) {
-    const reqConfig = new HttpRequestConfigBuilder()
+    const reqConfig = new HttpRequestBuilder()
       .setParams({
         subj: TermConverter.toNTripleValue(payload.getSubject()),
         pred: TermConverter.toNTripleValue(payload.getPredicate()),
@@ -258,7 +258,7 @@ class RDFRepositoryClient extends BaseRepositoryClient {
    * soon as they are available.
    */
   query(payload) {
-    const requestConfig = new HttpRequestConfigBuilder()
+    const requestConfig = new HttpRequestBuilder()
       .setResponseType('stream')
       .addAcceptHeader(payload.getResponseType())
       .addContentTypeHeader(payload.getContentType());
@@ -293,7 +293,7 @@ class RDFRepositoryClient extends BaseRepositoryClient {
    * successful or rejected in case of failure
    */
   update(payload) {
-    const requestConfig = new HttpRequestConfigBuilder()
+    const requestConfig = new HttpRequestBuilder()
       .addContentTypeHeader(payload.getContentType());
 
     return this.execute((http) => http.post(PATH_STATEMENTS,
@@ -415,7 +415,7 @@ class RDFRepositoryClient extends BaseRepositoryClient {
       throw new Error('Turtle/trig data is required when adding statements');
     }
 
-    const requestConfig = new HttpRequestConfigBuilder()
+    const requestConfig = new HttpRequestBuilder()
       .addContentTypeHeader(RDFMimeType.TRIG)
       .setParams({
         baseURI,
@@ -450,7 +450,7 @@ class RDFRepositoryClient extends BaseRepositoryClient {
    *                         successful or rejected in case of failure
    */
   deleteStatements(subject, predicate, object, contexts) {
-    const requestConfig = new HttpRequestConfigBuilder()
+    const requestConfig = new HttpRequestBuilder()
       .setParams({
         subj: TermConverter.toNTripleValue(subject),
         pred: TermConverter.toNTripleValue(predicate),
@@ -499,7 +499,7 @@ class RDFRepositoryClient extends BaseRepositoryClient {
    * response type as soon as they are available.
    */
   download(payload) {
-    const requestConfig = new HttpRequestConfigBuilder()
+    const requestConfig = new HttpRequestBuilder()
       .addAcceptHeader(payload.getResponseType())
       .setResponseType('stream')
       .setParams({
@@ -652,7 +652,7 @@ class RDFRepositoryClient extends BaseRepositoryClient {
    * the stream has been successfully consumed by the server
    */
   uploadData(readStream, contentType, context, baseURI) {
-    const requestConfig = new HttpRequestConfigBuilder()
+    const requestConfig = new HttpRequestBuilder()
       .addContentTypeHeader(contentType)
       .setResponseType('stream')
       .setParams({
@@ -680,7 +680,7 @@ class RDFRepositoryClient extends BaseRepositoryClient {
    * the stream has been successfully consumed by the server
    */
   overwriteData(readStream, contentType, context, baseURI) {
-    const requestConfig = new HttpRequestConfigBuilder()
+    const requestConfig = new HttpRequestBuilder()
       .addContentTypeHeader(contentType)
       .setResponseType('stream')
       .setParams({
@@ -707,7 +707,7 @@ class RDFRepositoryClient extends BaseRepositoryClient {
    * @return {Promise<TransactionalRepositoryClient>} transactional client
    */
   beginTransaction(isolationLevel) {
-    const requestConfig = new HttpRequestConfigBuilder()
+    const requestConfig = new HttpRequestBuilder()
       .addParam('isolation-level', isolationLevel);
     return this.execute((http) => http.post('/transactions', requestConfig))
       .then((response) => {

@@ -2,7 +2,7 @@ const RepositoryClientConfig = require('repository/repository-client-config');
 const RDFRepositoryClient = require('repository/rdf-repository-client');
 const ServerClientConfig = require('server/server-client-config');
 const HttpClient = require('http/http-client');
-const HttpRequestConfigBuilder = require('http/http-request-config-builder');
+const HttpRequestBuilder = require('http/http-request-builder');
 const httpClientStub = require('../http/http-client.stub');
 const {when} = require('jest-when');
 
@@ -93,7 +93,7 @@ describe('RDFRepositoryClient', () => {
 
     test('should properly request the number of statements in the repository', () => {
       return rdfRepositoryClient.getSize().then(() => {
-        const expected = new HttpRequestConfigBuilder();
+        const expected = new HttpRequestBuilder();
         expect(get).toHaveBeenCalledTimes(1);
         expect(get).toHaveBeenCalledWith('/size', expected);
       });
@@ -101,7 +101,7 @@ describe('RDFRepositoryClient', () => {
 
     test('should properly request the number of statements in the repository for the specified contexts', () => {
       return rdfRepositoryClient.getSize(['context-1']).then(() => {
-        const expected = new HttpRequestConfigBuilder().addParam('context', ['<context-1>']);
+        const expected = new HttpRequestBuilder().addParam('context', ['<context-1>']);
         expect(get).toHaveBeenCalledTimes(1);
         expect(get).toHaveBeenCalledWith('/size', expected);
       });

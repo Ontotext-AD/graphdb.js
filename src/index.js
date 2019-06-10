@@ -2,7 +2,7 @@
 module.exports = {
   http: {
     HttpClient: require('./http/http-client'),
-    HttpRequestConfigBuilder: require('./http/http-request-config-builder'),
+    HttpRequestBuilder: require('./http/http-request-builder'),
     QueryContentType: require('./http/query-content-type'),
     RDFMimeType: require('./http/rdf-mime-type')
   },
