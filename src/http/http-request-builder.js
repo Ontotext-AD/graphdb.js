@@ -17,6 +17,50 @@ class HttpRequestBuilder {
   }
 
   /**
+   * Prepares new builder for HTTP GET request against the provided URL.
+   *
+   * @static
+   * @param {string} url
+   * @return {HttpRequestBuilder}
+   */
+  static httpGet(url) {
+    return new HttpRequestBuilder().setMethod('get').setUrl(url);
+  }
+
+  /**
+   * Prepares new builder for HTTP POST request against the provided URL.
+   *
+   * @static
+   * @param {string} url
+   * @return {HttpRequestBuilder}
+   */
+  static httpPost(url) {
+    return new HttpRequestBuilder().setMethod('post').setUrl(url);
+  }
+
+  /**
+   * Prepares new builder for HTTP PUT request against the provided URL.
+   *
+   * @static
+   * @param {string} url
+   * @return {HttpRequestBuilder}
+   */
+  static httpPut(url) {
+    return new HttpRequestBuilder().setMethod('put').setUrl(url);
+  }
+
+  /**
+   * Prepares new builder for HTTP DELETE request against the provided URL.
+   *
+   * @static
+   * @param {string} url
+   * @return {HttpRequestBuilder}
+   */
+  static httpDelete(url) {
+    return new HttpRequestBuilder().setMethod('delete').setUrl(url);
+  }
+
+  /**
    * Add a new http header entry. Blank values are skipped.
    *
    * @param {string} header type
@@ -142,6 +186,75 @@ class HttpRequestBuilder {
   setResponseType(responseType) {
     this.config.responseType = responseType;
     return this;
+  }
+
+  /**
+   * Returns the request's response type.
+   *
+   * @return {string}
+   */
+  getResponseType() {
+    return this.config.responseType;
+  }
+
+  /**
+   * Sets the data to be sent as request payload.
+   *
+   * @param {*} data the payload
+   * @return {HttpRequestBuilder}
+   */
+  setData(data) {
+    this.config.data = data;
+    return this;
+  }
+
+  /**
+   * Gets the data to be sent as payload.
+   *
+   * @return {*}
+   */
+  getData() {
+    return this.config.data;
+  }
+
+  /**
+   * Sets the URL against which to perform the request.
+   *
+   * @param {string} url
+   * @return {HttpRequestBuilder}
+   */
+  setUrl(url) {
+    this.config.url = url;
+    return this;
+  }
+
+  /**
+   * Gets the URL.
+   *
+   * @return {string}
+   */
+  getUrl() {
+    return this.config.url;
+  }
+
+  /**
+   * Sets the HTTP method.
+   *
+   * @param {string} method
+   * @return {HttpRequestBuilder}
+   */
+  setMethod(method) {
+    this.config.method = method;
+    return this;
+  }
+
+  /**
+   * Gets the HTTP method.
+   *
+   * @return {string}
+   */
+  getMethod() {
+    return this.config.method;
   }
 
   /**

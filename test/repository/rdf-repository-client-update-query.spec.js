@@ -12,7 +12,7 @@ jest.mock('http/http-client');
 describe('RDFRepositoryClient - update query', () => {
   let config;
   let repository;
-  let postMock;
+  let httpRequest;
 
   beforeEach(() => {
     HttpClient.mockImplementation(() => httpClientStub());
@@ -21,21 +21,22 @@ describe('RDFRepositoryClient - update query', () => {
       .setReadTimeout(1000)
       .setWriteTimeout(1000);
     repository = new RDFRepositoryClient(config);
-    postMock = repository.httpClients[0].post;
+    httpRequest = repository.httpClients[0].request;
   });
 
   test('should make a POST request with Content-Type/sparql-update header and unencoded sparql query as body', () => {
     const payload = new UpdateQueryPayload()
       .setQuery('INSERT {?s ?p ?o} WHERE {?s ?p ?o}');
 
-    const expectedRequestConfig = new HttpRequestBuilder().setHeaders({
-      'Content-Type': 'application/sparql-update'
-    });
+    const expectedRequestConfig = HttpRequestBuilder.httpPost('/statements')
+      .setData('INSERT {?s ?p ?o} WHERE {?s ?p ?o}')
+      .setHeaders({
+        'Content-Type': 'application/sparql-update'
+      });
 
     return repository.update(payload).then(() => {
-      expect(postMock).toHaveBeenCalledTimes(1);
-      expect(postMock).toHaveBeenCalledWith('/statements',
-        'INSERT {?s ?p ?o} WHERE {?s ?p ?o}', expectedRequestConfig);
+      expect(httpRequest).toHaveBeenCalledTimes(1);
+      expect(httpRequest).toHaveBeenCalledWith(expectedRequestConfig);
     });
   });
 
@@ -47,13 +48,15 @@ describe('RDFRepositoryClient - update query', () => {
       .setTimeout(5);
 
     const expectedData = 'update=INSERT%20%7B%3Fs%20%3Fp%20%3Fo%7D%20WHERE%20%7B%3Fs%20%3Fp%20%3Fo%7D&infer=true&timeout=5';
-    const expectedRequestConfig = new HttpRequestBuilder().setHeaders({
-      'Content-Type': 'application/x-www-form-urlencoded'
-    });
+    const expectedRequestConfig = HttpRequestBuilder.httpPost('/statements')
+      .setData(expectedData)
+      .setHeaders({
+        'Content-Type': 'application/x-www-form-urlencoded'
+      });
 
     return repository.update(payload).then(() => {
-      expect(postMock).toHaveBeenCalledTimes(1);
-      expect(postMock).toHaveBeenCalledWith('/statements', expectedData, expectedRequestConfig);
+      expect(httpRequest).toHaveBeenCalledTimes(1);
+      expect(httpRequest).toHaveBeenCalledWith(expectedRequestConfig);
     });
   });
 
@@ -62,7 +65,7 @@ describe('RDFRepositoryClient - update query', () => {
       const payload = new UpdateQueryPayload()
         .setContentType(QueryContentType.X_WWW_FORM_URLENCODED);
 
-      return expect(repository.update(payload)).rejects.toEqual(Error('Parameter query is mandatory!'));
+      return expect(() => repository.update(payload)).toThrow(Error('Parameter query is mandatory!'));
     });
   });
 

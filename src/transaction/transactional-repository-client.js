@@ -63,13 +63,13 @@ class TransactionalRepositoryClient extends BaseRepositoryClient {
    * @return {Promise<number>} a promise resolving to the size of the repo
    */
   getSize(context) {
-    const requestConfig = new HttpRequestBuilder()
+    const requestBuilder = HttpRequestBuilder.httpPut('')
       .setParams({
         action: 'SIZE',
         context: TermConverter.toNTripleValues(context)
       });
 
-    return this.execute((http) => http.put('', null, requestConfig))
+    return this.execute((http) => http.request(requestBuilder))
       .then((response) => {
         this.logger.debug(this.getLogPayload(response, {context}),
           'Fetched size');
@@ -91,7 +91,7 @@ class TransactionalRepositoryClient extends BaseRepositoryClient {
    *      to provided response type.
    */
   get(payload) {
-    const requestConfig = new HttpRequestBuilder()
+    const requestBuilder = HttpRequestBuilder.httpPut('')
       .setParams({
         action: 'GET',
         subj: TermConverter.toNTripleValue(payload.getSubject()),
@@ -104,10 +104,10 @@ class TransactionalRepositoryClient extends BaseRepositoryClient {
 
     const parser = this.getParser(payload.getResponseType());
     if (parser && parser.isStreaming()) {
-      requestConfig.setResponseType('stream');
+      requestBuilder.setResponseType('stream');
     }
 
-    return this.execute((http) => http.put('', null, requestConfig))
+    return this.execute((http) => http.request(requestBuilder))
       .then((response) => {
         this.logger.debug(this.getLogPayload(response, {
           subject: payload.getSubject(),
@@ -127,9 +127,11 @@ class TransactionalRepositoryClient extends BaseRepositoryClient {
    * @return {Promise} the client can subscribe to the stream events and consume
    * the emitted strings or Quads depending on the provided response type as
    * soon as they are available.
+   * @throws {Error} if the payload is misconfigured
    */
   query(payload) {
-    const requestConfig = new HttpRequestBuilder()
+    const requestBuilder = HttpRequestBuilder.httpPut('')
+      .setData(payload.getParams())
       .setResponseType('stream')
       .addAcceptHeader(payload.getResponseType())
       .addContentTypeHeader(payload.getContentType())
@@ -137,17 +139,17 @@ class TransactionalRepositoryClient extends BaseRepositoryClient {
         action: 'QUERY'
       });
 
-    return this.execute((http) => http.put('', payload.getParams(),
-      requestConfig)).then((response) => {
-      this.logger.debug(this.getLogPayload(response, {
-        query: payload.getQuery(),
-        queryType: payload.getQueryType()
-      }), 'Queried data');
+    return this.execute((http) => http.request(requestBuilder))
+      .then((response) => {
+        this.logger.debug(this.getLogPayload(response, {
+          query: payload.getQuery(),
+          queryType: payload.getQueryType()
+        }), 'Queried data');
 
-      return this.parse(response.getData(), payload.getResponseType(), {
-        queryType: payload.getQueryType()
+        return this.parse(response.getData(), payload.getResponseType(), {
+          queryType: payload.getQueryType()
+        });
       });
-    });
   }
 
   /**
@@ -156,19 +158,21 @@ class TransactionalRepositoryClient extends BaseRepositoryClient {
    * @param {UpdateQueryPayload} payload request object containing the query
    * @return {Promise<void>} promise that will be resolved if the update is
    * successful or rejected in case of failure
+   * @throws {Error} if the payload is misconfigured
    */
   update(payload) {
-    const requestConfig = new HttpRequestBuilder()
+    const requestBuilder = HttpRequestBuilder.httpPut('')
+      .setData(payload.getParams())
       .addContentTypeHeader(payload.getContentType())
       .setParams({
         action: 'UPDATE'
       });
 
-    return this.execute((http) => http.put('', payload.getParams(),
-      requestConfig)).then((response) => {
-      this.logger.debug(this.getLogPayload(response,
-        {query: payload.getQuery()}), 'Performed update');
-    });
+    return this.execute((http) => http.request(requestBuilder))
+      .then((response) => {
+        this.logger.debug(this.getLogPayload(response,
+          {query: payload.getQuery()}), 'Performed update');
+      });
   }
 
   /**
@@ -251,7 +255,8 @@ class TransactionalRepositoryClient extends BaseRepositoryClient {
       throw new Error('Turtle data is required when adding statements');
     }
 
-    const requestConfig = new HttpRequestBuilder()
+    const requestBuilder = HttpRequestBuilder.httpPut('')
+      .setData(data)
       .setParams({
         action: 'ADD',
         context: TermConverter.toNTripleValues(context),
@@ -259,7 +264,7 @@ class TransactionalRepositoryClient extends BaseRepositoryClient {
       })
       .addContentTypeHeader(RDFMimeType.TRIG);
 
-    return this.execute((http) => http.put('', data, requestConfig))
+    return this.execute((http) => http.request(requestBuilder))
       .then((response) => {
         this.logger.debug(this.getLogPayload(response, {
           data,
@@ -282,13 +287,14 @@ class TransactionalRepositoryClient extends BaseRepositoryClient {
       throw new Error('Turtle data is required when deleting statements');
     }
 
-    const requestConfig = new HttpRequestBuilder()
+    const requestBuilder = HttpRequestBuilder.httpPut('')
+      .setData(data)
       .setParams({
         action: 'DELETE'
       })
       .addContentTypeHeader(RDFMimeType.TRIG);
 
-    return this.execute((http) => http.put('', data, requestConfig))
+    return this.execute((http) => http.request(requestBuilder))
       .then((response) => {
         this.logger.debug(this.getLogPayload(response, {data}), 'Deleted data');
       });
@@ -310,7 +316,7 @@ class TransactionalRepositoryClient extends BaseRepositoryClient {
    * response type as soon as they are available.
    */
   download(payload) {
-    const requestConfig = new HttpRequestBuilder()
+    const requestBuilder = HttpRequestBuilder.httpPut('')
       .addAcceptHeader(payload.getResponseType())
       .setResponseType('stream')
       .setParams({
@@ -322,7 +328,7 @@ class TransactionalRepositoryClient extends BaseRepositoryClient {
         infer: payload.getInference()
       });
 
-    return this.execute((http) => http.put('', null, requestConfig))
+    return this.execute((http) => http.request(requestBuilder))
       .then((response) => {
         this.logger.debug(this.getLogPayload(response, {
           subject: payload.getSubject(),
@@ -408,7 +414,8 @@ class TransactionalRepositoryClient extends BaseRepositoryClient {
    * the stream has been successfully consumed by the server
    */
   uploadData(readStream, contentType, context, baseURI) {
-    const requestConfig = new HttpRequestBuilder()
+    const requestBuilder = HttpRequestBuilder.httpPut('')
+      .setData(readStream)
       .addContentTypeHeader(contentType)
       .setResponseType('stream')
       .setParams({
@@ -417,7 +424,7 @@ class TransactionalRepositoryClient extends BaseRepositoryClient {
         baseURI
       });
 
-    return this.execute((http) => http.put('', readStream, requestConfig));
+    return this.execute((http) => http.request(requestBuilder));
   }
 
   /**
@@ -429,12 +436,12 @@ class TransactionalRepositoryClient extends BaseRepositoryClient {
    * @return {Promise<void>} that will be resolved after successful commit
    */
   commit() {
-    const requestConfig = new HttpRequestBuilder()
+    const requestBuilder = HttpRequestBuilder.httpPut('')
       .setParams({
         action: 'COMMIT'
       });
 
-    return this.execute((http) => http.put('', null, requestConfig))
+    return this.execute((http) => http.request(requestBuilder))
       .then((response) => {
         this.active = false;
         this.logger.debug(this.getLogPayload(response), 'Transaction commit');
@@ -452,13 +459,15 @@ class TransactionalRepositoryClient extends BaseRepositoryClient {
    * @return {Promise<void>} that will be resolved after successful rollback
    */
   rollback() {
-    return this.execute((http) => http.deleteResource('')).then((response) => {
-      this.active = false;
-      this.logger.debug(this.getLogPayload(response), 'Transaction rollback');
-    }).catch((err) => {
-      this.active = false;
-      return Promise.reject(err);
-    });
+    const requestBuilder = HttpRequestBuilder.httpDelete('');
+    return this.execute((http) => http.request(requestBuilder))
+      .then((response) => {
+        this.active = false;
+        this.logger.debug(this.getLogPayload(response), 'Transaction rollback');
+      }).catch((err) => {
+        this.active = false;
+        return Promise.reject(err);
+      });
   }
 
   /**

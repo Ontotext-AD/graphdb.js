@@ -18,6 +18,7 @@ describe('RDFRepositoryClient - Namespace management', () => {
 
   let repoClientConfig;
   let rdfRepositoryClient;
+  let httpRequest;
 
   beforeEach(() => {
     repoClientConfig = new RepositoryClientConfig()
@@ -28,6 +29,7 @@ describe('RDFRepositoryClient - Namespace management', () => {
     HttpClient.mockImplementation(() => stubHttpClient());
 
     rdfRepositoryClient = new RDFRepositoryClient(repoClientConfig);
+    httpRequest = rdfRepositoryClient.httpClients[0].request;
   });
 
   describe('getNamespaces()', () => {
@@ -41,16 +43,15 @@ describe('RDFRepositoryClient - Namespace management', () => {
           expect(namespace.getNamespace()).toBeInstanceOf(NamedNode);
         });
 
-        let get = rdfRepositoryClient.httpClients[0].get;
-        expect(get).toHaveBeenCalledTimes(1);
-        expect(get).toHaveBeenCalledWith('/namespaces', new HttpRequestBuilder().setHeaders({
+        expect(httpRequest).toHaveBeenCalledTimes(1);
+        expect(httpRequest).toHaveBeenCalledWith(HttpRequestBuilder.httpGet('/namespaces').setHeaders({
           'Accept': RDFMimeType.SPARQL_RESULTS_JSON
         }));
       });
     });
 
     test('should reject retrieving all namespaces when the server request is unsuccessful', () => {
-      rdfRepositoryClient.httpClients[0].get.mockRejectedValue({});
+      httpRequest.mockRejectedValue({});
       return expect(rdfRepositoryClient.getNamespaces()).rejects.toBeTruthy();
     });
   });
@@ -61,19 +62,18 @@ describe('RDFRepositoryClient - Namespace management', () => {
         expect(namespace).toBeInstanceOf(NamedNode);
         expect(namespace.value).toEqual('http://www.w3.org/2000/01/rdf-schema#');
 
-        let get = rdfRepositoryClient.httpClients[0].get;
-        expect(get).toHaveBeenCalledTimes(1);
-        expect(get).toHaveBeenCalledWith('/namespaces/rdfs');
+        expect(httpRequest).toHaveBeenCalledTimes(1);
+        expect(httpRequest).toHaveBeenCalledWith(HttpRequestBuilder.httpGet('/namespaces/rdfs'));
       });
     });
 
     test('should not retrieve a namespace if not provided with prefix', () => {
       expect(() => rdfRepositoryClient.getNamespace('')).toThrow(Error);
-      expect(rdfRepositoryClient.httpClients[0].get).toHaveBeenCalledTimes(0);
+      expect(httpRequest).toHaveBeenCalledTimes(0);
     });
 
     test('should reject retrieving a namespace when the server request is unsuccessful', () => {
-      rdfRepositoryClient.httpClients[0].get.mockRejectedValue({});
+      httpRequest.mockRejectedValue({});
       return expect(rdfRepositoryClient.getNamespace('rdfs')).rejects.toBeTruthy();
     });
   });
@@ -83,18 +83,18 @@ describe('RDFRepositoryClient - Namespace management', () => {
 
     test('should save a namespace from string', () => {
       return rdfRepositoryClient.saveNamespace('new', newNamespace).then(() => {
-        let put = rdfRepositoryClient.httpClients[0].put;
-        expect(put).toHaveBeenCalledTimes(1);
-        expect(put).toHaveBeenCalledWith('/namespaces/new', newNamespace);
+        const expectedRequest = HttpRequestBuilder.httpPut('/namespaces/new').setData(newNamespace);
+        expect(httpRequest).toHaveBeenCalledTimes(1);
+        expect(httpRequest).toHaveBeenCalledWith(expectedRequest);
       });
     });
 
     test('should save a namespace from NamedNode', () => {
       const namespaceTerm = DataFactory.namedNode(newNamespace);
       return rdfRepositoryClient.saveNamespace('new', namespaceTerm).then(() => {
-        let put = rdfRepositoryClient.httpClients[0].put;
-        expect(put).toHaveBeenCalledTimes(1);
-        expect(put).toHaveBeenCalledWith('/namespaces/new', namespaceTerm.value);
+        const expectedRequest = HttpRequestBuilder.httpPut('/namespaces/new').setData(namespaceTerm.value);
+        expect(httpRequest).toHaveBeenCalledTimes(1);
+        expect(httpRequest).toHaveBeenCalledWith(expectedRequest);
       });
     });
 
@@ -109,7 +109,7 @@ describe('RDFRepositoryClient - Namespace management', () => {
     });
 
     test('should reject saving a namespace when the server request is unsuccessful', () => {
-      rdfRepositoryClient.httpClients[0].put.mockRejectedValue({});
+      httpRequest.mockRejectedValue({});
       return expect(rdfRepositoryClient.saveNamespace('new', 'http://new.namespace.com/schema#')).rejects.toBeTruthy();
     });
 
@@ -121,9 +121,9 @@ describe('RDFRepositoryClient - Namespace management', () => {
   describe('deleteNamespace(prefix)', () => {
     test('should delete a namespace', () => {
       return rdfRepositoryClient.deleteNamespace('rdfs').then(() => {
-        let deleteResource = rdfRepositoryClient.httpClients[0].deleteResource;
-        expect(deleteResource).toHaveBeenCalledTimes(1);
-        expect(deleteResource).toHaveBeenCalledWith('/namespaces/rdfs');
+        const expectedRequest = HttpRequestBuilder.httpDelete('/namespaces/rdfs');
+        expect(httpRequest).toHaveBeenCalledTimes(1);
+        expect(httpRequest).toHaveBeenCalledWith(expectedRequest);
       });
     });
 
@@ -132,7 +132,7 @@ describe('RDFRepositoryClient - Namespace management', () => {
     });
 
     test('should reject deleting a namespace when the server request is unsuccessful', () => {
-      rdfRepositoryClient.httpClients[0].deleteResource.mockRejectedValue({});
+      httpRequest.mockRejectedValue({});
       return expect(rdfRepositoryClient.deleteNamespace('rdfs')).rejects.toBeTruthy();
     });
 
@@ -144,14 +144,13 @@ describe('RDFRepositoryClient - Namespace management', () => {
   describe('deleteNamespaces()', () => {
     test('should delete all namespaces', () => {
       return rdfRepositoryClient.deleteNamespaces().then(() => {
-        let deleteResource = rdfRepositoryClient.httpClients[0].deleteResource;
-        expect(deleteResource).toHaveBeenCalledTimes(1);
-        expect(deleteResource).toHaveBeenCalledWith('/namespaces');
+        expect(httpRequest).toHaveBeenCalledTimes(1);
+        expect(httpRequest).toHaveBeenCalledWith(HttpRequestBuilder.httpDelete('/namespaces'));
       });
     });
 
     test('should reject deleting all namespaces when the server request is unsuccessful', () => {
-      rdfRepositoryClient.httpClients[0].deleteResource.mockRejectedValue({});
+      httpRequest.mockRejectedValue({});
       return expect(rdfRepositoryClient.deleteNamespaces()).rejects.toBeTruthy();
     });
 
@@ -163,8 +162,13 @@ describe('RDFRepositoryClient - Namespace management', () => {
   function stubHttpClient() {
     let stub = httpClientStub();
 
-    // Stub get to handle namespaces
-    stub.get = jest.fn().mockImplementation((url) => {
+    // Stub get to handle namespaces GET
+    stub.request = jest.fn().mockImplementation((requestBuilder) => {
+      if (requestBuilder.getMethod() !== 'get') {
+        return Promise.resolve({});
+      }
+
+      const url = requestBuilder.getUrl();
       // all
       if (url === '/namespaces') {
         return Promise.resolve({data: namespaceData.GET});

@@ -13,12 +13,7 @@ describe('HttpClient', () => {
 
   let axiosMock;
   let httpClient;
-
-  let requestConfig;
-
-  const requestData = {
-    'property': 'payload'
-  };
+  let requestBuilder;
 
   beforeEach(() => {
     axios.mockReset();
@@ -31,16 +26,14 @@ describe('HttpClient', () => {
     });
 
     // Stub methods to return promises
-    axiosMock.get.mockResolvedValue();
-    axiosMock.post.mockResolvedValue();
-    axiosMock.put.mockResolvedValue();
-    axiosMock.delete.mockResolvedValue();
+    axiosMock.request.mockResolvedValue();
 
-    requestConfig = new HttpRequestBuilder().setParams({
-      'param-1': 'value-1'
-    }).setHeaders({
-      'Accept': 'application/json'
-    });
+    requestBuilder = HttpRequestBuilder.httpGet('/api/resources')
+      .setParams({
+        'param-1': 'value-1'
+      }).setHeaders({
+        'Accept': 'application/json'
+      });
 
     httpClient = new HttpClient('/base/url')
       .setDefaultReadTimeout(1000)
@@ -85,150 +78,45 @@ describe('HttpClient', () => {
     expect(httpClient.getBaseURL()).toEqual('/base/url');
   });
 
-  describe('GET', () => {
-    test('should perform GET requests with the supplied params', () => {
-      return httpClient.get('/api/resources', requestConfig).then(() => {
-        expect(axiosMock.get).toHaveBeenCalledTimes(1);
-        expect(axiosMock.get).toHaveBeenCalledWith('/api/resources', requestConfig.config);
+  describe('request()', () => {
+    test('should perform request with the supplied http request builder', () => {
+      return httpClient.request(requestBuilder).then(() => {
+        expect(axiosMock.request).toHaveBeenCalledTimes(1);
+        expect(axiosMock.request).toHaveBeenCalledWith(requestBuilder.config);
       });
     });
 
     test('should add x-request-id header', () => {
-      return httpClient.get('/api/resources', requestConfig).then(() => {
-        expect(axiosMock.get.mock.calls[0][1].headers).toHaveProperty(X_REQUEST_ID_HEADER);
+      return httpClient.request(requestBuilder).then(() => {
+        expect(axiosMock.request.mock.calls[0][0].headers).toHaveProperty(X_REQUEST_ID_HEADER);
       });
     });
 
     test('should add default read timeout to request configuration', () => {
-      return httpClient.get('/api/resources', requestConfig).then(() => {
-        expect(axiosMock.get.mock.calls[0][1].timeout).toEqual(1000);
+      return httpClient.request(requestBuilder).then(() => {
+        expect(axiosMock.request.mock.calls[0][0].timeout).toEqual(1000);
+      });
+    });
+
+    test('should add default write timeout to request configuration', () => {
+      requestBuilder.setMethod('post');
+      return httpClient.request(requestBuilder).then(() => {
+        expect(axiosMock.request.mock.calls[0][0].timeout).toEqual(2000);
       });
     });
 
     test('should not add default read timeout to request configuration if already provided', () => {
-      requestConfig.setTimeout(500);
-      return httpClient.get('/api/resources', requestConfig).then(() => {
-        expect(axiosMock.get.mock.calls[0][1].timeout).toEqual(500);
+      requestBuilder.setTimeout(500);
+      return httpClient.request(requestBuilder).then(() => {
+        expect(axiosMock.request.mock.calls[0][0].timeout).toEqual(500);
       });
     });
 
-    test('should work without providing request config', () => {
-      return httpClient.get('/api/resources').then(() => {
-        expect(axiosMock.get).toHaveBeenCalledTimes(1);
-        expect(axiosMock.get.mock.calls[0][1]).toHaveProperty('headers');
-        expect(axiosMock.get.mock.calls[0][1].headers).toHaveProperty(X_REQUEST_ID_HEADER);
-        expect(axiosMock.get.mock.calls[0][1]).toHaveProperty('timeout');
-      });
-    });
-  });
-
-  describe('POST', () => {
-    test('should perform POST requests with the supplied params and data', () => {
-      return httpClient.post('/api/resources', requestData, requestConfig).then(() => {
-        expect(axiosMock.post).toHaveBeenCalledTimes(1);
-        expect(axiosMock.post).toHaveBeenCalledWith('/api/resources', requestData, requestConfig.config);
-      });
-    });
-
-    test('should add x-request-id header', () => {
-      return httpClient.post('/api/resources', requestData, requestConfig).then(() => {
-        expect(axiosMock.post.mock.calls[0][2].headers).toHaveProperty(X_REQUEST_ID_HEADER);
-      });
-    });
-
-    test('should add default read timeout to request configuration', () => {
-      return httpClient.post('/api/resources', requestData, requestConfig).then(() => {
-        expect(axiosMock.post.mock.calls[0][2].timeout).toEqual(2000);
-      });
-    });
-
-    test('should not add default read timeout to request configuration if already provided', () => {
-      requestConfig.setTimeout(500);
-      return httpClient.post('/api/resources', requestData, requestConfig).then(() => {
-        expect(axiosMock.post.mock.calls[0][2].timeout).toEqual(500);
-      });
-    });
-
-    test('should work without providing request config', () => {
-      return httpClient.post('/api/resources', requestData).then(() => {
-        expect(axiosMock.post).toHaveBeenCalledTimes(1);
-        expect(axiosMock.post.mock.calls[0][2]).toHaveProperty('headers');
-        expect(axiosMock.post.mock.calls[0][2].headers).toHaveProperty(X_REQUEST_ID_HEADER);
-        expect(axiosMock.post.mock.calls[0][2]).toHaveProperty('timeout');
-      });
-    });
-  });
-
-  describe('PUT', () => {
-    test('should perform PUT requests with the supplied params and data', () => {
-      return httpClient.put('/api/resources/1/', requestData, requestConfig).then(() => {
-        expect(axiosMock.put).toHaveBeenCalledTimes(1);
-        expect(axiosMock.put).toHaveBeenCalledWith('/api/resources/1/', requestData, requestConfig.config);
-      });
-    });
-
-    test('should add x-request-id header', () => {
-      return httpClient.put('/api/resources', requestData, requestConfig).then(() => {
-        expect(axiosMock.put.mock.calls[0][2].headers).toHaveProperty(X_REQUEST_ID_HEADER);
-      });
-    });
-
-    test('should add default read timeout to request configuration', () => {
-      return httpClient.put('/api/resources', requestData, requestConfig).then(() => {
-        expect(axiosMock.put.mock.calls[0][2].timeout).toEqual(2000);
-      });
-    });
-
-    test('should not add default read timeout to request configuration if already provided', () => {
-      requestConfig.setTimeout(500);
-      return httpClient.put('/api/resources', requestData, requestConfig).then(() => {
-        expect(axiosMock.put.mock.calls[0][2].timeout).toEqual(500);
-      });
-    });
-
-    test('should work without providing request config', () => {
-      return httpClient.put('/api/resources', requestData).then(() => {
-        expect(axiosMock.put).toHaveBeenCalledTimes(1);
-        expect(axiosMock.put.mock.calls[0][2]).toHaveProperty('headers');
-        expect(axiosMock.put.mock.calls[0][2].headers).toHaveProperty(X_REQUEST_ID_HEADER);
-        expect(axiosMock.put.mock.calls[0][2]).toHaveProperty('timeout');
-      });
-    });
-  });
-
-  describe('DELETE', () => {
-    test('should perform DELETE requests with the supplied params', () => {
-      return httpClient.deleteResource('/api/resources/1/', requestConfig).then(() => {
-        expect(axiosMock.delete).toHaveBeenCalledTimes(1);
-        expect(axiosMock.delete).toHaveBeenCalledWith('/api/resources/1/', requestConfig.config);
-      });
-    });
-
-    test('should add x-request-id header', () => {
-      return httpClient.deleteResource('/api/resources', requestConfig).then(() => {
-        expect(axiosMock.delete.mock.calls[0][1].headers).toHaveProperty(X_REQUEST_ID_HEADER);
-      });
-    });
-
-    test('should add default read timeout to request configuration', () => {
-      return httpClient.deleteResource('/api/resources', requestConfig).then(() => {
-        expect(axiosMock.delete.mock.calls[0][1].timeout).toEqual(2000);
-      });
-    });
-
-    test('should not add default read timeout to request configuration if already provided', () => {
-      requestConfig.setTimeout(500);
-      return httpClient.deleteResource('/api/resources', requestConfig).then(() => {
-        expect(axiosMock.delete.mock.calls[0][1].timeout).toEqual(500);
-      });
-    });
-
-    test('should work without providing request config', () => {
-      return httpClient.deleteResource('/api/resources').then(() => {
-        expect(axiosMock.delete).toHaveBeenCalledTimes(1);
-        expect(axiosMock.delete.mock.calls[0][1]).toHaveProperty('headers');
-        expect(axiosMock.delete.mock.calls[0][1].headers).toHaveProperty(X_REQUEST_ID_HEADER);
-        expect(axiosMock.delete.mock.calls[0][1]).toHaveProperty('timeout');
+    test('should not add default write timeout to request configuration if already provided', () => {
+      requestBuilder.setMethod('post');
+      requestBuilder.setTimeout(500);
+      return httpClient.request(requestBuilder).then(() => {
+        expect(axiosMock.request.mock.calls[0][0].timeout).toEqual(500);
       });
     });
   });

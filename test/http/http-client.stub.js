@@ -7,10 +7,7 @@ function stub(baseUrl) {
     setDefaultHeaders: jest.fn().mockReturnThis(),
     setDefaultReadTimeout: jest.fn().mockReturnThis(),
     setDefaultWriteTimeout: jest.fn().mockReturnThis(),
-    get: jest.fn().mockResolvedValue({}),
-    post: jest.fn().mockResolvedValue({}),
-    put: jest.fn().mockResolvedValue({}),
-    deleteResource: jest.fn().mockResolvedValue({}),
+    request: jest.fn().mockResolvedValue({}),
     getBaseURL: () => baseUrl
   };
 }

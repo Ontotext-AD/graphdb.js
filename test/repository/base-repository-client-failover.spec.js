@@ -37,10 +37,10 @@ describe('BaseRepositoryClient', () => {
       let httpClient3 = repositoryClient.httpClients[2];
       stubHttpClient(httpClient3, 200);
 
-      return repositoryClient.execute((client) => client.get('url')).then(() => {
-        expect(httpClient1.get).toHaveBeenCalledTimes(1);
-        expect(httpClient2.get).toHaveBeenCalledTimes(1);
-        expect(httpClient3.get).toHaveBeenCalledTimes(1);
+      return repositoryClient.execute((client) => client.request('url')).then(() => {
+        expect(httpClient1.request).toHaveBeenCalledTimes(1);
+        expect(httpClient2.request).toHaveBeenCalledTimes(1);
+        expect(httpClient3.request).toHaveBeenCalledTimes(1);
       });
     });
 
@@ -54,10 +54,10 @@ describe('BaseRepositoryClient', () => {
       let httpClient3 = repositoryClient.httpClients[2];
       stubHttpClient(httpClient3, 503);
 
-      return repositoryClient.execute((client) => client.get('url')).catch(() => {
-        expect(httpClient1.get).toHaveBeenCalledTimes(1);
-        expect(httpClient2.get).toHaveBeenCalledTimes(1);
-        expect(httpClient3.get).toHaveBeenCalledTimes(1);
+      return repositoryClient.execute((client) => client.request('url')).catch(() => {
+        expect(httpClient1.request).toHaveBeenCalledTimes(1);
+        expect(httpClient2.request).toHaveBeenCalledTimes(1);
+        expect(httpClient3.request).toHaveBeenCalledTimes(1);
       });
     });
 
@@ -72,10 +72,10 @@ describe('BaseRepositoryClient', () => {
       let httpClient3 = repositoryClient.httpClients[2];
       stubHttpClient(httpClient3, 200);
 
-      return repositoryClient.execute((client) => client.get('url')).then(() => {
-        expect(httpClient1.get).toHaveBeenCalledTimes(1);
-        expect(httpClient2.get).toHaveBeenCalledTimes(1);
-        expect(httpClient3.get).toHaveBeenCalledTimes(1);
+      return repositoryClient.execute((client) => client.request('url')).then(() => {
+        expect(httpClient1.request).toHaveBeenCalledTimes(1);
+        expect(httpClient2.request).toHaveBeenCalledTimes(1);
+        expect(httpClient3.request).toHaveBeenCalledTimes(1);
       });
     });
 
@@ -90,53 +90,58 @@ describe('BaseRepositoryClient', () => {
       let httpClient3 = repositoryClient.httpClients[2];
       stubHttpClientWithoutResponse(httpClient3);
 
-      return repositoryClient.execute((client) => client.get('url')).catch(() => {
-        expect(httpClient1.get).toHaveBeenCalledTimes(1);
-        expect(httpClient2.get).toHaveBeenCalledTimes(1);
-        expect(httpClient3.get).toHaveBeenCalledTimes(1);
+      return repositoryClient.execute((client) => client.request('url')).catch(() => {
+        expect(httpClient1.request).toHaveBeenCalledTimes(1);
+        expect(httpClient2.request).toHaveBeenCalledTimes(1);
+        expect(httpClient3.request).toHaveBeenCalledTimes(1);
       });
     });
 
     test('should reject if the error is not from the HTTP request', () => {
       //
       let httpClient1 = repositoryClient.httpClients[0];
-      httpClient1.get.mockRejectedValue(new Error('Error before/after request'));
+      httpClient1.request.mockRejectedValue(new Error('Error before/after request'));
 
       let httpClient2 = repositoryClient.httpClients[1];
       let httpClient3 = repositoryClient.httpClients[2];
 
-      return repositoryClient.execute((client) => client.get('url')).catch(() => {
-        expect(httpClient1.get).toHaveBeenCalledTimes(1);
-        expect(httpClient2.get).toHaveBeenCalledTimes(0);
-        expect(httpClient3.get).toHaveBeenCalledTimes(0);
+      return repositoryClient.execute((client) => client.request('url')).catch(() => {
+        expect(httpClient1.request).toHaveBeenCalledTimes(1);
+        expect(httpClient2.request).toHaveBeenCalledTimes(0);
+        expect(httpClient3.request).toHaveBeenCalledTimes(0);
       });
     });
 
     test('should reject if there is no provided error', () => {
       // No error/response
       let httpClient1 = repositoryClient.httpClients[0];
-      httpClient1.get.mockRejectedValue();
+      httpClient1.request.mockRejectedValue();
 
       let httpClient2 = repositoryClient.httpClients[1];
       let httpClient3 = repositoryClient.httpClients[2];
 
-      return repositoryClient.execute((client) => client.get('url')).catch(() => {
-        expect(httpClient1.get).toHaveBeenCalledTimes(1);
-        expect(httpClient2.get).toHaveBeenCalledTimes(0);
-        expect(httpClient3.get).toHaveBeenCalledTimes(0);
+      return repositoryClient.execute((client) => client.request('url')).catch(() => {
+        expect(httpClient1.request).toHaveBeenCalledTimes(1);
+        expect(httpClient2.request).toHaveBeenCalledTimes(0);
+        expect(httpClient3.request).toHaveBeenCalledTimes(0);
       });
+    });
+
+    it('should reject if it cannot properly execute requests', () => {
+      // Not providing a consumer function should cause the client blow and reject
+      expect(repositoryClient.execute()).rejects.toEqual(Error);
     });
   });
 
   function stubHttpClient(client, status) {
-    client.get = jest.fn();
+    client.request = jest.fn();
     if (status < 400) {
-      client.get.mockResolvedValueOnce({
+      client.request.mockResolvedValueOnce({
         request: {},
         status
       });
     } else {
-      client.get.mockRejectedValueOnce({
+      client.request.mockRejectedValueOnce({
         request: {},
         response: {status}
       });
@@ -144,7 +149,7 @@ describe('BaseRepositoryClient', () => {
   }
 
   function stubHttpClientWithoutResponse(client) {
-    client.get.mockRejectedValue({
+    client.request.mockRejectedValue({
       request: {}
     });
   }

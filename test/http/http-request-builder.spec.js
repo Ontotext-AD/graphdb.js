@@ -5,6 +5,28 @@ describe('HttpRequestBuilder', () => {
     expect(new HttpRequestBuilder().get()).toEqual({});
   });
 
+  test('should assign request with HTTP method and URL', () => {
+    let builder = new HttpRequestBuilder();
+    expect(builder.getMethod()).toBeUndefined();
+    expect(builder.getUrl()).toBeUndefined();
+
+    builder = HttpRequestBuilder.httpGet('/get');
+    expect(builder.getMethod()).toEqual('get');
+    expect(builder.getUrl()).toEqual('/get');
+
+    builder = HttpRequestBuilder.httpPost('/post');
+    expect(builder.getMethod()).toEqual('post');
+    expect(builder.getUrl()).toEqual('/post');
+
+    builder = HttpRequestBuilder.httpPut('/put');
+    expect(builder.getMethod()).toEqual('put');
+    expect(builder.getUrl()).toEqual('/put');
+
+    builder = HttpRequestBuilder.httpDelete('/delete');
+    expect(builder.getMethod()).toEqual('delete');
+    expect(builder.getUrl()).toEqual('/delete');
+  });
+
   test('should add a header in headers map', () => {
     expect(new HttpRequestBuilder()
       .addHeader('Accept', 'text/turtle')
@@ -53,7 +75,6 @@ describe('HttpRequestBuilder', () => {
       });
   });
 
-
   test('should should set timeout configuration', () => {
     expect(new HttpRequestBuilder()
       .setTimeout(1000)
@@ -77,6 +98,13 @@ describe('HttpRequestBuilder', () => {
       .toEqual({
         responseType: 'stream'
       });
+  });
+
+  test('should get the response type configuration', () => {
+    expect(new HttpRequestBuilder()
+      .setResponseType('stream')
+      .getResponseType())
+      .toEqual('stream');
   });
 
   test('should add Accept header', () => {
@@ -112,6 +140,33 @@ describe('HttpRequestBuilder', () => {
       .getHeaders())
       .toEqual({
         'Content-Type': 'text/turtle'
+      });
+  });
+
+  test('should set HTTP method', () => {
+    expect(new HttpRequestBuilder()
+      .setMethod('get')
+      .get())
+      .toEqual({
+        method: 'get'
+      });
+  });
+
+  test('should set request URL', () => {
+    expect(new HttpRequestBuilder()
+      .setUrl('/service')
+      .get())
+      .toEqual({
+        url: '/service'
+      });
+  });
+
+  test('should set data payload', () => {
+    expect(new HttpRequestBuilder()
+      .setData('some text data')
+      .get())
+      .toEqual({
+        data: 'some text data'
       });
   });
 });

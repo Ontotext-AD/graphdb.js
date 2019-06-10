@@ -17,13 +17,14 @@ describe('ServerClient', () => {
       .setHeaders({});
     server = new ServerClient(config);
 
-    server.httpClient.get = jest.fn();
-    server.httpClient.get.mockImplementation(() => Promise.resolve({
-      data: data.repositories.GET
-    }));
-
-    server.httpClient.deleteResource = jest.fn();
-    server.httpClient.deleteResource.mockImplementation(() => Promise.resolve(true));
+    server.httpClient.request = jest.fn().mockImplementation((request) => {
+      if (request.getMethod() === 'get') {
+        return Promise.resolve({data: data.repositories.GET});
+      } else if (request.getMethod() === 'delete') {
+        return Promise.resolve(true);
+      }
+      return Promise.reject();
+    });
   });
 
   describe('initialization', () => {
@@ -40,12 +41,12 @@ describe('ServerClient', () => {
   describe('getRepositoryIDs', () => {
     test('should make request with required service url parameter', () => {
       return server.getRepositoryIDs().then(() => {
-        expect(server.httpClient.get).toHaveBeenCalledTimes(1);
-        const expectedRequestConfig = new HttpRequestBuilder()
+        expect(server.httpClient.request).toHaveBeenCalledTimes(1);
+        const expectedRequest = HttpRequestBuilder.httpGet('/repositories')
           .setHeaders({
             'Accept': 'application/sparql-results+json'
           });
-        expect(server.httpClient.get).toHaveBeenCalledWith('/repositories', expectedRequestConfig);
+        expect(server.httpClient.request).toHaveBeenCalledWith(expectedRequest);
       });
     });
 
@@ -55,18 +56,18 @@ describe('ServerClient', () => {
     });
 
     test('should resolve with an empty array if no repositories are present', () => {
-      server.httpClient.get.mockImplementation(() => Promise.resolve({
+      server.httpClient.request.mockResolvedValue({
         data: {
           results: {
             bindings: []
           }
         }
-      }));
+      });
       return expect(server.getRepositoryIDs()).resolves.toEqual([]);
     });
 
     test('should reject with error if request fails', () => {
-      server.httpClient.get.mockImplementation(() => Promise.reject('Server error'));
+      server.httpClient.request.mockRejectedValue('Server error');
       return expect(server.getRepositoryIDs()).rejects.toEqual('Server error');
     });
   });
@@ -85,7 +86,7 @@ describe('ServerClient', () => {
     });
 
     test('should reject with error if request fails', () => {
-      server.httpClient.get.mockImplementation(() => Promise.reject('Server error'));
+      server.httpClient.request.mockRejectedValue('Server error');
       return expect(server.hasRepository('automotive')).rejects.toEqual('Server error');
     });
   });
@@ -123,8 +124,9 @@ describe('ServerClient', () => {
   describe('deleteRepository', () => {
     test('should make request with required parameter', () => {
       return server.deleteRepository('automotive').then(() => {
-        expect(server.httpClient.deleteResource).toHaveBeenCalledTimes(1);
-        expect(server.httpClient.deleteResource).toHaveBeenCalledWith('/repositories/automotive');
+        expect(server.httpClient.request).toHaveBeenCalledTimes(1);
+        const expectedRequest = HttpRequestBuilder.httpDelete('/repositories/automotive');
+        expect(server.httpClient.request).toHaveBeenCalledWith(expectedRequest);
       });
     });
 
@@ -137,7 +139,7 @@ describe('ServerClient', () => {
     });
 
     test('should reject with an error if request fails', () => {
-      server.httpClient.deleteResource.mockImplementation(() => Promise.reject('Server error'));
+      server.httpClient.request.mockRejectedValue('Server error');
       return expect(server.deleteRepository('automotive')).rejects.toEqual('Server error');
     });
   });
