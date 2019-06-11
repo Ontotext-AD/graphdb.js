@@ -756,9 +756,12 @@ class RDFRepositoryClient extends BaseRepositoryClient {
    */
   getTransactionalClientConfig(locationUrl) {
     const config = this.repositoryClientConfig;
-    return new RepositoryClientConfig([locationUrl], config.getHeaders(),
-      config.getDefaultRDFMimeType(), config.getReadTimeout(),
-      config.getWriteTimeout());
+    return new RepositoryClientConfig()
+      .setEndpoints([locationUrl])
+      .setHeaders(config.getHeaders())
+      .setDefaultRDFMimeType(config.getDefaultRDFMimeType())
+      .setReadTimeout(config.getReadTimeout())
+      .setWriteTimeout(config.getWriteTimeout());
   }
 }
 
