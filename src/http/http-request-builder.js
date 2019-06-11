@@ -120,6 +120,27 @@ class HttpRequestBuilder {
   }
 
   /**
+   * Add a custom GraphDB header which holds a user password for base
+   * authentication.
+   *
+   * @param {string} value
+   * @return {HttpRequestBuilder}
+   */
+  addGraphDBPasswordHeader(value) {
+    return this.addHeader('x-graphdb-password', value);
+  }
+
+  /**
+   * Add an Authorization header which holds an authorization token.
+   *
+   * @param {string} value
+   * @return {HttpRequestBuilder}
+   */
+  addAuthorizationHeader(value) {
+    return this.addHeader('authorization', value);
+  }
+
+  /**
    * Set request parameters object.
    *
    * @param {Object} params

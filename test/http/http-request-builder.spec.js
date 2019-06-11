@@ -125,6 +125,24 @@ describe('HttpRequestBuilder', () => {
       });
   });
 
+  test('should add x-graphdb-password header', () => {
+    expect(new HttpRequestBuilder()
+      .addGraphDBPasswordHeader('pass123')
+      .get())
+      .toEqual({
+        headers: {'x-graphdb-password': 'pass123'}
+      });
+  });
+
+  test('should add authorization header', () => {
+    expect(new HttpRequestBuilder()
+      .addAuthorizationHeader('token123')
+      .get())
+      .toEqual({
+        headers: {'authorization': 'token123'}
+      });
+  });
+
   test('should skip empty header values', () => {
     expect(new HttpRequestBuilder()
       .addContentTypeHeader('')

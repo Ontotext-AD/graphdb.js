@@ -3,28 +3,18 @@ const ServerClientConfig = require('server/server-client-config');
 const RDFRepositoryClient = require('repository/rdf-repository-client');
 const RepositoryClientConfig = require('repository/repository-client-config');
 const HttpRequestBuilder = require('http/http-request-builder');
+const RDFMimeType = require('http/rdf-mime-type');
+const User = require('auth/user');
 
-import data from './server-client.data';
+import data from './data/server-client.data';
+import userdata from '../auth/data/logged-user-data';
 
 describe('ServerClient', () => {
   let config;
   let server;
 
   beforeEach(() => {
-    config = new TestServerConfig()
-      .setEndpoint('server/url')
-      .setTimeout(0)
-      .setHeaders({});
-    server = new ServerClient(config);
-
-    server.httpClient.request = jest.fn().mockImplementation((request) => {
-      if (request.getMethod() === 'get') {
-        return Promise.resolve({data: data.repositories.GET});
-      } else if (request.getMethod() === 'delete') {
-        return Promise.resolve(true);
-      }
-      return Promise.reject();
-    });
+    createUnsecuredClient();
   });
 
   describe('initialization', () => {
@@ -35,6 +25,82 @@ describe('ServerClient', () => {
     test('should initialize with the provided server client configuration', () => {
       expect(server.config).toEqual(config);
       expect(server.config.getEndpoint()).toEqual('server/url');
+    });
+  });
+
+  describe('authorization', () => {
+    test('should login and then execute request with auth token', () => {
+      createSecuredClient();
+
+      return server.getRepositoryIDs().then((ids) => {
+        const requestMock = server.httpClient.request;
+        // expect 2 invocations: first login, second getRepositoryIDs
+        expect(requestMock).toHaveBeenCalledTimes(2);
+
+        const expectedLoginRequest = HttpRequestBuilder.httpPost('/rest/login/testuser')
+          .addGraphDBPasswordHeader('pass123');
+        expect(requestMock).toHaveBeenNthCalledWith(1, expectedLoginRequest);
+
+        const expectedAPIRequest = HttpRequestBuilder.httpGet('/repositories')
+          .addAcceptHeader(RDFMimeType.SPARQL_RESULTS_JSON)
+          .addAuthorizationHeader('token123');
+        expect(requestMock).toHaveBeenNthCalledWith(2, expectedAPIRequest);
+      });
+    });
+
+    test('should try relogin after token gets expired', () => {
+      createSecuredClient();
+
+      return server.getRepositoryIDs()
+        .then(() => {
+          return server.getRepositoryIDs();
+        }).then((ids) => {
+          const requestMock = server.httpClient.request;
+          // expecting 5 invocations:
+          // login
+          // first getRepositoryIDs
+          // second getRepositoryIDs which fails with 401 unauthorized
+          // re-login
+          // third getRepositoryIDs
+          expect(requestMock).toHaveBeenCalledTimes(5);
+        });
+    });
+
+    test('should not pass auth token if there is no authenticated user', () => {
+      return server.getRepositoryIDs().then((ids) => {
+        const expectedRequest = HttpRequestBuilder.httpGet('/repositories')
+          .addAcceptHeader(RDFMimeType.SPARQL_RESULTS_JSON);
+        const requestMock = server.httpClient.request;
+        expect(requestMock).toHaveBeenCalledWith(expectedRequest);
+      });
+    });
+
+    test('should maintain logged in User after successful login', () => {
+      createSecuredClient();
+
+      return server.getRepositoryIDs().then((ids) => {
+        const expectedUser = new User('token123', 'pass123', userdata);
+        expect(server.authenticationService.getLoggedUser()).toEqual(expectedUser);
+      });
+    });
+
+    test('should not perform login if username and password are not provided', () => {
+      return server.getRepositoryIDs().then((ids) => {
+        expect(server.loggedUser).toBeUndefined();
+        const requestMock = server.httpClient.request;
+        // expect 1 invocation for the getRepositoryIDs API call but not for the login
+        expect(requestMock).toHaveBeenCalledTimes(1);
+      });
+    });
+
+    test('should remove the auth token from the logged in user', () => {
+      createSecuredClient();
+
+      return server.getRepositoryIDs()
+        .then((ids) => server.logout())
+        .then(() => {
+          expect(server.authenticationService.getLoggedUser().getToken()).toBeUndefined();
+        });
     });
   });
 
@@ -140,6 +206,56 @@ describe('ServerClient', () => {
       return expect(server.deleteRepository('automotive')).rejects.toEqual('Server error');
     });
   });
+
+  function createUnsecuredClient() {
+    config = new TestServerConfig()
+      .setEndpoint('server/url')
+      .setTimeout(0)
+      .setHeaders({});
+    server = new ServerClient(config);
+    mockClient();
+  }
+
+  function createSecuredClient() {
+    config = new TestServerConfig()
+      .setEndpoint('server/url')
+      .setTimeout(0)
+      .setHeaders({})
+      .setUsername('testuser')
+      .setPass('pass123');
+    server = new ServerClient(config);
+    mockClient();
+  }
+
+  function mockClient() {
+    let calls = 0;
+
+    server.httpClient.request = jest.fn().mockImplementation((request) => {
+      if (request.getMethod() === 'get') {
+        calls++;
+        if (server.authenticationService.getLoggedUser() && calls === 2) {
+          // emulate token expiration
+          server.authenticationService.getLoggedUser().clearToken();
+          return Promise.reject({
+            response: {
+              status: 401
+            }
+          });
+        }
+        return Promise.resolve({data: data.repositories.GET});
+      } else if (request.getMethod() === 'delete') {
+        return Promise.resolve(true);
+      } else if (request.getMethod() === 'post') {
+        return Promise.resolve({
+          headers: {
+            authorization: 'token123'
+          },
+          data: userdata
+        });
+      }
+      return Promise.reject();
+    });
+  }
 });
 
 /**
