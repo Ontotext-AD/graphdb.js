@@ -1,6 +1,7 @@
 const HttpClient = require('http/http-client');
 const RepositoryClientConfig = require('repository/repository-client-config');
 const BaseRepositoryClient = require('repository/base-repository-client');
+const HttpRequestBuilder = require('http/http-request-builder');
 const httpClientStub = require('../http/http-client.stub');
 
 jest.mock('http/http-client');
@@ -9,6 +10,7 @@ describe('BaseRepositoryClient', () => {
 
   let repoClientConfig;
   let repositoryClient;
+  let requestBuilder;
 
   describe('Automatic failover - retrying with different repo endpoint', () => {
     beforeEach(() => {
@@ -24,6 +26,7 @@ describe('BaseRepositoryClient', () => {
       HttpClient.mockImplementation(() => httpClientStub());
 
       repositoryClient = new TestRepositoryClient(repoClientConfig);
+      requestBuilder = HttpRequestBuilder.httpGet('/service');
     });
 
     test('should automatically switch to another repository endpoint if the status is allowed for retry', () => {
@@ -37,7 +40,7 @@ describe('BaseRepositoryClient', () => {
       let httpClient3 = repositoryClient.httpClients[2];
       stubHttpClient(httpClient3, 200);
 
-      return repositoryClient.execute((client) => client.request('url')).then(() => {
+      return repositoryClient.execute(requestBuilder).then(() => {
         expect(httpClient1.request).toHaveBeenCalledTimes(1);
         expect(httpClient2.request).toHaveBeenCalledTimes(1);
         expect(httpClient3.request).toHaveBeenCalledTimes(1);
@@ -54,7 +57,7 @@ describe('BaseRepositoryClient', () => {
       let httpClient3 = repositoryClient.httpClients[2];
       stubHttpClient(httpClient3, 503);
 
-      return repositoryClient.execute((client) => client.request('url')).catch(() => {
+      return repositoryClient.execute(requestBuilder).catch(() => {
         expect(httpClient1.request).toHaveBeenCalledTimes(1);
         expect(httpClient2.request).toHaveBeenCalledTimes(1);
         expect(httpClient3.request).toHaveBeenCalledTimes(1);
@@ -72,7 +75,7 @@ describe('BaseRepositoryClient', () => {
       let httpClient3 = repositoryClient.httpClients[2];
       stubHttpClient(httpClient3, 200);
 
-      return repositoryClient.execute((client) => client.request('url')).then(() => {
+      return repositoryClient.execute(requestBuilder).then(() => {
         expect(httpClient1.request).toHaveBeenCalledTimes(1);
         expect(httpClient2.request).toHaveBeenCalledTimes(1);
         expect(httpClient3.request).toHaveBeenCalledTimes(1);
@@ -90,7 +93,7 @@ describe('BaseRepositoryClient', () => {
       let httpClient3 = repositoryClient.httpClients[2];
       stubHttpClientWithoutResponse(httpClient3);
 
-      return repositoryClient.execute((client) => client.request('url')).catch(() => {
+      return repositoryClient.execute(requestBuilder).catch(() => {
         expect(httpClient1.request).toHaveBeenCalledTimes(1);
         expect(httpClient2.request).toHaveBeenCalledTimes(1);
         expect(httpClient3.request).toHaveBeenCalledTimes(1);
@@ -105,7 +108,7 @@ describe('BaseRepositoryClient', () => {
       let httpClient2 = repositoryClient.httpClients[1];
       let httpClient3 = repositoryClient.httpClients[2];
 
-      return repositoryClient.execute((client) => client.request('url')).catch(() => {
+      return repositoryClient.execute(requestBuilder).catch(() => {
         expect(httpClient1.request).toHaveBeenCalledTimes(1);
         expect(httpClient2.request).toHaveBeenCalledTimes(0);
         expect(httpClient3.request).toHaveBeenCalledTimes(0);
@@ -120,7 +123,7 @@ describe('BaseRepositoryClient', () => {
       let httpClient2 = repositoryClient.httpClients[1];
       let httpClient3 = repositoryClient.httpClients[2];
 
-      return repositoryClient.execute((client) => client.request('url')).catch(() => {
+      return repositoryClient.execute(requestBuilder).catch(() => {
         expect(httpClient1.request).toHaveBeenCalledTimes(1);
         expect(httpClient2.request).toHaveBeenCalledTimes(0);
         expect(httpClient3.request).toHaveBeenCalledTimes(0);

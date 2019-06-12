@@ -129,8 +129,8 @@ class BaseRepositoryClient {
   }
 
   /**
-   * Executor for http requests. It supplies the provided HTTP client consumer
-   * with a HTTP client for executing requests.
+   * Executor for http requests. It passes the provided HTTP request builder
+   * to a HTTP client for executing requests.
    *
    * If the request was unsuccessful it will be retried with another endpoint
    * HTTP client in case the request's status is one of
@@ -140,16 +140,16 @@ class BaseRepositoryClient {
    * with promise rejection.
    *
    * @protected
-   * @param {Function} httpClientConsumer the consumer of supplied http client
-   *                                      that performs the request execution
+   * @param {HttpRequestBuilder} requestBuilder the http request data to be
+   * passed to a http client
    * @return {Promise<HttpResponse|Error>} a promise which resolves to response
    * wrapper or rejects with error if thrown during execution.
    */
-  execute(httpClientConsumer) {
+  execute(requestBuilder) {
     try {
       const startTime = Date.now();
       const httpClients = new Iterable(this.httpClients);
-      return this.retryExecution(httpClients, httpClientConsumer)
+      return this.retryExecution(httpClients, requestBuilder)
         .then((executionResponse) => {
           executionResponse.setElapsedTime(Date.now() - startTime);
           return executionResponse;
@@ -165,14 +165,14 @@ class BaseRepositoryClient {
    *
    * @private
    * @param {Iterable} httpClients iterable collection of http clients
-   * @param {Function} httpClientConsumer the consumer of supplied http client
-   *                                      that performs the request execution
+   * @param {HttpRequestBuilder} requestBuilder the http request data to be
+   * passed to a http client
    * @return {Promise<HttpResponse|Error>} a promise which resolves to response
    * wrapper or rejects with error if thrown during execution.
    */
-  retryExecution(httpClients, httpClientConsumer) {
+  retryExecution(httpClients, requestBuilder) {
     const httpClient = httpClients.next();
-    return httpClientConsumer(httpClient).then((response) => {
+    return httpClient.request(requestBuilder).then((response) => {
       return new HttpResponse(response, httpClient);
     }).catch((error) => {
       const canRetry = BaseRepositoryClient.canRetryExecution(error);
@@ -183,7 +183,7 @@ class BaseRepositoryClient {
       // Try the next repo http client (if any)
       if (canRetry && hasNext) {
         this.logger.warn(loggerPayload, 'Retrying execution');
-        return this.retryExecution(httpClients, httpClientConsumer);
+        return this.retryExecution(httpClients, requestBuilder);
       }
 
       if (!canRetry) {

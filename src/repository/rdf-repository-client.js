@@ -69,12 +69,11 @@ class RDFRepositoryClient extends BaseRepositoryClient {
     const requestBuilder = HttpRequestBuilder.httpGet('/size')
       .addParam('context', TermConverter.toNTripleValues(context));
 
-    return this.execute((http) => http.request(requestBuilder))
-      .then((response) => {
-        this.logger.debug(this.getLogPayload(response, {context}),
-          'Fetched size');
-        return response.getData();
-      });
+    return this.execute(requestBuilder).then((response) => {
+      this.logger.debug(this.getLogPayload(response, {context}),
+        'Fetched size');
+      return response.getData();
+    });
   }
 
   /**
@@ -87,11 +86,10 @@ class RDFRepositoryClient extends BaseRepositoryClient {
     const requestBuilder = HttpRequestBuilder.httpGet(PATH_NAMESPACES)
       .addAcceptHeader(RDFMimeType.SPARQL_RESULTS_JSON);
 
-    return this.execute((http) => http.request(requestBuilder))
-      .then((response) => {
-        this.logger.debug(this.getLogPayload(response), 'Fetched namespaces');
-        return this.mapNamespaceResponse(response.getData());
-      });
+    return this.execute(requestBuilder).then((response) => {
+      this.logger.debug(this.getLogPayload(response), 'Fetched namespaces');
+      return this.mapNamespaceResponse(response.getData());
+    });
   }
 
   /**
@@ -131,12 +129,11 @@ class RDFRepositoryClient extends BaseRepositoryClient {
     const namespaceUrl = `${PATH_NAMESPACES}/${prefix}`;
     const requestBuilder = HttpRequestBuilder.httpGet(namespaceUrl);
 
-    return this.execute((http) => http.request(requestBuilder))
-      .then((response) => {
-        this.logger.debug(this.getLogPayload(response, {prefix}),
-          'Fetched namespace');
-        return DataFactory.namedNode(response.getData());
-      });
+    return this.execute(requestBuilder).then((response) => {
+      this.logger.debug(this.getLogPayload(response, {prefix}),
+        'Fetched namespace');
+      return DataFactory.namedNode(response.getData());
+    });
   }
 
   /**
@@ -167,11 +164,10 @@ class RDFRepositoryClient extends BaseRepositoryClient {
       .httpPut(`${PATH_NAMESPACES}/${prefix}`)
       .setData(payload);
 
-    return this.execute((http) => http.request(requestBuilder))
-      .then((response) => {
-        this.logger.debug(this.getLogPayload(response, {prefix, namespace}),
-          'Saved namespace');
-      });
+    return this.execute(requestBuilder).then((response) => {
+      this.logger.debug(this.getLogPayload(response, {prefix, namespace}),
+        'Saved namespace');
+    });
   }
 
   /**
@@ -196,11 +192,10 @@ class RDFRepositoryClient extends BaseRepositoryClient {
     const requestBuilder = HttpRequestBuilder
       .httpDelete(`${PATH_NAMESPACES}/${prefix}`);
 
-    return this.execute((http) => http.request(requestBuilder))
-      .then((response) => {
-        this.logger.debug(this.getLogPayload(response, {prefix}),
-          'Deleted namespace');
-      });
+    return this.execute(requestBuilder).then((response) => {
+      this.logger.debug(this.getLogPayload(response, {prefix}),
+        'Deleted namespace');
+    });
   }
 
   /**
@@ -212,11 +207,10 @@ class RDFRepositoryClient extends BaseRepositoryClient {
   deleteNamespaces() {
     const requestBuilder = HttpRequestBuilder.httpDelete(PATH_NAMESPACES);
 
-    return this.execute((http) => http.request(requestBuilder))
-      .then((response) => {
-        this.logger.debug(this.getLogPayload(response),
-          'Deleted all namespaces');
-      });
+    return this.execute(requestBuilder).then((response) => {
+      this.logger.debug(this.getLogPayload(response),
+        'Deleted all namespaces');
+    });
   }
 
   /**
@@ -246,16 +240,15 @@ class RDFRepositoryClient extends BaseRepositoryClient {
       requestBuilder.setResponseType('stream');
     }
 
-    return this.execute((http) => http.request(requestBuilder))
-      .then((response) => {
-        this.logger.debug(this.getLogPayload(response, {
-          subject: payload.getSubject(),
-          predicate: payload.getPredicate(),
-          object: payload.getObject(),
-          context: payload.getContext()
-        }), 'Fetched data');
-        return this.parse(response.getData(), payload.getResponseType());
-      });
+    return this.execute(requestBuilder).then((response) => {
+      this.logger.debug(this.getLogPayload(response, {
+        subject: payload.getSubject(),
+        predicate: payload.getPredicate(),
+        object: payload.getObject(),
+        context: payload.getContext()
+      }), 'Fetched data');
+      return this.parse(response.getData(), payload.getResponseType());
+    });
   }
 
   /**
@@ -277,16 +270,15 @@ class RDFRepositoryClient extends BaseRepositoryClient {
       .addAcceptHeader(payload.getResponseType())
       .addContentTypeHeader(payload.getContentType());
 
-    return this.execute((http) => http.request(requestBuilder))
-      .then((response) => {
-        this.logger.debug(this.getLogPayload(response, {
-          query: payload.getQuery(),
-          queryType: payload.getQueryType()
-        }), 'Queried data');
-        return this.parse(response.getData(), payload.getResponseType(), {
-          queryType: payload.getQueryType()
-        });
+    return this.execute(requestBuilder).then((response) => {
+      this.logger.debug(this.getLogPayload(response, {
+        query: payload.getQuery(),
+        queryType: payload.getQueryType()
+      }), 'Queried data');
+      return this.parse(response.getData(), payload.getResponseType(), {
+        queryType: payload.getQueryType()
       });
+    });
   }
 
   /**
@@ -312,11 +304,10 @@ class RDFRepositoryClient extends BaseRepositoryClient {
       .setData(payload.getParams())
       .addContentTypeHeader(payload.getContentType());
 
-    return this.execute((http) => http.request(requestBuilder))
-      .then((response) => {
-        this.logger.debug(this.getLogPayload(response,
-          {query: payload.getQuery()}), 'Performed update');
-      });
+    return this.execute(requestBuilder).then((response) => {
+      this.logger.debug(this.getLogPayload(response,
+        {query: payload.getQuery()}), 'Performed update');
+    });
   }
 
   /**
@@ -446,7 +437,7 @@ class RDFRepositoryClient extends BaseRepositoryClient {
       requestBuilder.setMethod('post');
     }
 
-    return this.execute((http) => http.request(requestBuilder));
+    return this.execute(requestBuilder);
   }
 
   /**
@@ -476,15 +467,14 @@ class RDFRepositoryClient extends BaseRepositoryClient {
         context: TermConverter.toNTripleValues(contexts)
       });
 
-    return this.execute((http) => http.request(requestBuilder))
-      .then((response) => {
-        this.logger.debug(this.getLogPayload(response, {
-          subject,
-          predicate,
-          object,
-          contexts
-        }), 'Deleted statements');
-      });
+    return this.execute(requestBuilder).then((response) => {
+      this.logger.debug(this.getLogPayload(response, {
+        subject,
+        predicate,
+        object,
+        contexts
+      }), 'Deleted statements');
+    });
   }
 
   /**
@@ -495,11 +485,10 @@ class RDFRepositoryClient extends BaseRepositoryClient {
    */
   deleteAllStatements() {
     const requestBuilder = HttpRequestBuilder.httpDelete(PATH_STATEMENTS);
-    return this.execute((http) => http.request(requestBuilder))
-      .then((response) => {
-        this.logger.debug(this.getLogPayload(response),
-          'Deleted all statements');
-      });
+    return this.execute(requestBuilder).then((response) => {
+      this.logger.debug(this.getLogPayload(response),
+        'Deleted all statements');
+    });
   }
 
   /**
@@ -529,16 +518,15 @@ class RDFRepositoryClient extends BaseRepositoryClient {
         infer: payload.getInference()
       });
 
-    return this.execute((http) => http.request(requestBuilder))
-      .then((response) => {
-        this.logger.debug(this.getLogPayload(response, {
-          subject: payload.getSubject(),
-          predicate: payload.getPredicate(),
-          object: payload.getObject(),
-          context: payload.getContext()
-        }), 'Downloaded data');
-        return response.getData();
-      });
+    return this.execute(requestBuilder).then((response) => {
+      this.logger.debug(this.getLogPayload(response, {
+        subject: payload.getSubject(),
+        predicate: payload.getPredicate(),
+        object: payload.getObject(),
+        context: payload.getContext()
+      }), 'Downloaded data');
+      return response.getData();
+    });
   }
 
   /**
@@ -680,7 +668,7 @@ class RDFRepositoryClient extends BaseRepositoryClient {
         context: TermConverter.toNTripleValues(context)
       });
 
-    return this.execute((http) => http.request(requestBuilder));
+    return this.execute(requestBuilder);
   }
 
   /**
@@ -708,7 +696,7 @@ class RDFRepositoryClient extends BaseRepositoryClient {
         context: TermConverter.toNTripleValues(context)
       });
 
-    return this.execute((http) => http.request(requestBuilder));
+    return this.execute(requestBuilder);
   }
 
   /**
@@ -729,22 +717,21 @@ class RDFRepositoryClient extends BaseRepositoryClient {
     const requestBuilder = HttpRequestBuilder.httpPost('/transactions')
       .addParam('isolation-level', isolationLevel);
 
-    return this.execute((http) => http.request(requestBuilder))
-      .then((response) => {
-        const locationUrl = response.getHeaders()['location'];
-        if (StringUtils.isBlank(locationUrl)) {
-          this.logger.error(this.getLogPayload(response, {isolationLevel}),
-            'Cannot obtain transaction ID');
-          return Promise.reject(new Error('Couldn\'t obtain transaction ID'));
-        }
+    return this.execute(requestBuilder).then((response) => {
+      const locationUrl = response.getHeaders()['location'];
+      if (StringUtils.isBlank(locationUrl)) {
+        this.logger.error(this.getLogPayload(response, {isolationLevel}),
+          'Cannot obtain transaction ID');
+        return Promise.reject(new Error('Couldn\'t obtain transaction ID'));
+      }
 
-        const config = this.getTransactionalClientConfig(locationUrl);
-        const transactionClient = new TransactionalRepositoryClient(config);
+      const config = this.getTransactionalClientConfig(locationUrl);
+      const transactionClient = new TransactionalRepositoryClient(config);
 
-        this.logger.debug(this.getLogPayload(response, {isolationLevel}),
-          'Started transaction');
-        return transactionClient;
-      });
+      this.logger.debug(this.getLogPayload(response, {isolationLevel}),
+        'Started transaction');
+      return transactionClient;
+    });
   }
 
   /**

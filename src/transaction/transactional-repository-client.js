@@ -69,12 +69,11 @@ class TransactionalRepositoryClient extends BaseRepositoryClient {
         context: TermConverter.toNTripleValues(context)
       });
 
-    return this.execute((http) => http.request(requestBuilder))
-      .then((response) => {
-        this.logger.debug(this.getLogPayload(response, {context}),
-          'Fetched size');
-        return response.getData();
-      });
+    return this.execute(requestBuilder).then((response) => {
+      this.logger.debug(this.getLogPayload(response, {context}),
+        'Fetched size');
+      return response.getData();
+    });
   }
 
   /**
@@ -107,16 +106,15 @@ class TransactionalRepositoryClient extends BaseRepositoryClient {
       requestBuilder.setResponseType('stream');
     }
 
-    return this.execute((http) => http.request(requestBuilder))
-      .then((response) => {
-        this.logger.debug(this.getLogPayload(response, {
-          subject: payload.getSubject(),
-          predicate: payload.getPredicate(),
-          object: payload.getObject(),
-          context: payload.getContext()
-        }), 'Fetched data');
-        return this.parse(response.getData(), payload.getResponseType());
-      });
+    return this.execute(requestBuilder).then((response) => {
+      this.logger.debug(this.getLogPayload(response, {
+        subject: payload.getSubject(),
+        predicate: payload.getPredicate(),
+        object: payload.getObject(),
+        context: payload.getContext()
+      }), 'Fetched data');
+      return this.parse(response.getData(), payload.getResponseType());
+    });
   }
 
   /**
@@ -139,17 +137,16 @@ class TransactionalRepositoryClient extends BaseRepositoryClient {
         action: 'QUERY'
       });
 
-    return this.execute((http) => http.request(requestBuilder))
-      .then((response) => {
-        this.logger.debug(this.getLogPayload(response, {
-          query: payload.getQuery(),
-          queryType: payload.getQueryType()
-        }), 'Queried data');
+    return this.execute(requestBuilder).then((response) => {
+      this.logger.debug(this.getLogPayload(response, {
+        query: payload.getQuery(),
+        queryType: payload.getQueryType()
+      }), 'Queried data');
 
-        return this.parse(response.getData(), payload.getResponseType(), {
-          queryType: payload.getQueryType()
-        });
+      return this.parse(response.getData(), payload.getResponseType(), {
+        queryType: payload.getQueryType()
       });
+    });
   }
 
   /**
@@ -168,11 +165,10 @@ class TransactionalRepositoryClient extends BaseRepositoryClient {
         action: 'UPDATE'
       });
 
-    return this.execute((http) => http.request(requestBuilder))
-      .then((response) => {
-        this.logger.debug(this.getLogPayload(response,
-          {query: payload.getQuery()}), 'Performed update');
-      });
+    return this.execute(requestBuilder).then((response) => {
+      this.logger.debug(this.getLogPayload(response,
+        {query: payload.getQuery()}), 'Performed update');
+    });
   }
 
   /**
@@ -264,14 +260,13 @@ class TransactionalRepositoryClient extends BaseRepositoryClient {
       })
       .addContentTypeHeader(RDFMimeType.TRIG);
 
-    return this.execute((http) => http.request(requestBuilder))
-      .then((response) => {
-        this.logger.debug(this.getLogPayload(response, {
-          data,
-          context,
-          baseURI
-        }), 'Inserted statements');
-      });
+    return this.execute(requestBuilder).then((response) => {
+      this.logger.debug(this.getLogPayload(response, {
+        data,
+        context,
+        baseURI
+      }), 'Inserted statements');
+    });
   }
 
   /**
@@ -294,10 +289,9 @@ class TransactionalRepositoryClient extends BaseRepositoryClient {
       })
       .addContentTypeHeader(RDFMimeType.TRIG);
 
-    return this.execute((http) => http.request(requestBuilder))
-      .then((response) => {
-        this.logger.debug(this.getLogPayload(response, {data}), 'Deleted data');
-      });
+    return this.execute(requestBuilder).then((response) => {
+      this.logger.debug(this.getLogPayload(response, {data}), 'Deleted data');
+    });
   }
 
   /**
@@ -328,16 +322,15 @@ class TransactionalRepositoryClient extends BaseRepositoryClient {
         infer: payload.getInference()
       });
 
-    return this.execute((http) => http.request(requestBuilder))
-      .then((response) => {
-        this.logger.debug(this.getLogPayload(response, {
-          subject: payload.getSubject(),
-          predicate: payload.getPredicate(),
-          object: payload.getObject(),
-          context: payload.getContext()
-        }), 'Downloaded data');
-        return response.getData();
-      });
+    return this.execute(requestBuilder).then((response) => {
+      this.logger.debug(this.getLogPayload(response, {
+        subject: payload.getSubject(),
+        predicate: payload.getPredicate(),
+        object: payload.getObject(),
+        context: payload.getContext()
+      }), 'Downloaded data');
+      return response.getData();
+    });
   }
 
   /**
@@ -424,7 +417,7 @@ class TransactionalRepositoryClient extends BaseRepositoryClient {
         baseURI
       });
 
-    return this.execute((http) => http.request(requestBuilder));
+    return this.execute(requestBuilder);
   }
 
   /**
@@ -441,14 +434,13 @@ class TransactionalRepositoryClient extends BaseRepositoryClient {
         action: 'COMMIT'
       });
 
-    return this.execute((http) => http.request(requestBuilder))
-      .then((response) => {
-        this.active = false;
-        this.logger.debug(this.getLogPayload(response), 'Transaction commit');
-      }).catch((err) => {
-        this.active = false;
-        return Promise.reject(err);
-      });
+    return this.execute(requestBuilder).then((response) => {
+      this.active = false;
+      this.logger.debug(this.getLogPayload(response), 'Transaction commit');
+    }).catch((err) => {
+      this.active = false;
+      return Promise.reject(err);
+    });
   }
 
   /**
@@ -460,14 +452,13 @@ class TransactionalRepositoryClient extends BaseRepositoryClient {
    */
   rollback() {
     const requestBuilder = HttpRequestBuilder.httpDelete('');
-    return this.execute((http) => http.request(requestBuilder))
-      .then((response) => {
-        this.active = false;
-        this.logger.debug(this.getLogPayload(response), 'Transaction rollback');
-      }).catch((err) => {
-        this.active = false;
-        return Promise.reject(err);
-      });
+    return this.execute(requestBuilder).then((response) => {
+      this.active = false;
+      this.logger.debug(this.getLogPayload(response), 'Transaction rollback');
+    }).catch((err) => {
+      this.active = false;
+      return Promise.reject(err);
+    });
   }
 
   /**
