@@ -80,7 +80,7 @@ Library is managed by NPM package manager. During publishing npm consults the
 which resources should be published. If any change in the project structure, 
 `.gitignore` or `.npmignore` is made, then publishing must be verified in order
 to be guaranteed that needed sources will be properly published.
-The packaging could be verified using the `npm package` command which generates 
+The packaging could be verified using the `npm pack` command which generates 
 a `*.tgz` archive in the project root. The archive should contain only the needed
 resources.
 Furture the archive could be used as a source for `npm install` where the path
