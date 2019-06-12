@@ -33,4 +33,25 @@ describe('UpdateQueryPayload', () => {
       expect(new UpdateQueryPayload().getSupportedContentTypes()).toEqual(['application/x-www-form-urlencoded', 'application/sparql-update']);
     });
   });
+
+  test('should populate graphs parameters in the update payload', () => {
+    let payload = new UpdateQueryPayload()
+      .setDefaultGraphs('<http://example.org/graph1>')
+      .setNamedGraphs('<http://example.org/graph2>')
+      .setRemoveGraphs('<http://example.org/graph3>')
+      .setInsertGraphs('<http://example.org/graph4>');
+    expect(payload.getDefaultGraphs()).toEqual('<http://example.org/graph1>');
+    expect(payload.getNamedGraphs()).toEqual('<http://example.org/graph2>');
+    expect(payload.getRemoveGraphs()).toEqual('<http://example.org/graph3>');
+    expect(payload.getInsertGraphs()).toEqual('<http://example.org/graph4>');
+    expect(payload).toEqual({
+      contentType: QueryContentType.SPARQL_UPDATE,
+      payload: {
+        'using-graph-uri': '<http://example.org/graph1>',
+        'using-named-graph-uri': '<http://example.org/graph2>',
+        'remove-graph-uri': '<http://example.org/graph3>',
+        'insert-graph-uri': '<http://example.org/graph4>' 
+      }
+    });
+  });
 });

@@ -45,9 +45,13 @@ describe('RDFRepositoryClient - update query', () => {
       .setQuery('INSERT {?s ?p ?o} WHERE {?s ?p ?o}')
       .setContentType(QueryContentType.X_WWW_FORM_URLENCODED)
       .setInference(true)
+      .setDefaultGraphs('<http://example.org/graph1>')
+      .setNamedGraphs('<http://example.org/graph2>')
+      .setRemoveGraphs('<http://example.org/graph3>')
+      .setInsertGraphs('<http://example.org/graph4>')
       .setTimeout(5);
 
-    const expectedData = 'update=INSERT%20%7B%3Fs%20%3Fp%20%3Fo%7D%20WHERE%20%7B%3Fs%20%3Fp%20%3Fo%7D&infer=true&timeout=5';
+    const expectedData = 'update=INSERT%20%7B%3Fs%20%3Fp%20%3Fo%7D%20WHERE%20%7B%3Fs%20%3Fp%20%3Fo%7D&infer=true&using-graph-uri=%3Chttp%3A%2F%2Fexample.org%2Fgraph1%3E&using-named-graph-uri=%3Chttp%3A%2F%2Fexample.org%2Fgraph2%3E&remove-graph-uri=%3Chttp%3A%2F%2Fexample.org%2Fgraph3%3E&insert-graph-uri=%3Chttp%3A%2F%2Fexample.org%2Fgraph4%3E&timeout=5';
     const expectedRequestConfig = HttpRequestBuilder.httpPost('/statements')
       .setData(expectedData)
       .setHeaders({

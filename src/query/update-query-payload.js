@@ -50,6 +50,73 @@ class UpdateQueryPayload extends QueryPayload {
   }
 
   /**
+   * One or more named graph URIs to be used as default graph(s) for retrieving.
+   * @param {(string|string[])} [defaultGraphs]
+   * @return {UpdateQueryPayload}
+   */
+  setDefaultGraphs(defaultGraphs) {
+    this.payload['using-graph-uri'] = defaultGraphs;
+    return this;
+  }
+
+  /**
+   * @return {(string|string[])} Default graphs for the query for retrieving.
+   */
+  getDefaultGraphs() {
+    return this.payload['using-graph-uri'];
+  }
+
+  /**
+   * One or more named graph URIs to be used as named graph(s) for retrieving.
+   * @param {(string|string[])} [namedGraphs]
+   * @return {UpdateQueryPayload}
+   */
+  setNamedGraphs(namedGraphs) {
+    this.payload['using-named-graph-uri'] = namedGraphs;
+    return this;
+  }
+
+  /**
+   * @return {(string|string[])} Named graphs set for the query for retrieving.
+   */
+  getNamedGraphs() {
+    return this.payload['using-named-graph-uri'];
+  }
+
+  /**
+   * One or more default graphs for removing statements.
+   * @param {(string|string[])} [removeGraphs]
+   * @return {UpdateQueryPayload}
+   */
+  setRemoveGraphs(removeGraphs) {
+    this.payload['remove-graph-uri'] = removeGraphs;
+    return this;
+  }
+
+  /**
+   * @return {(string|string[])} Default graphs set for the query for removing.
+   */
+  getRemoveGraphs() {
+    return this.payload['remove-graph-uri'];
+  }
+
+  /**
+   * One or more default graphs for inserting statements.
+   * @param {(string|string[])} [insertGraphs]
+   * @return {UpdateQueryPayload}
+   */
+  setInsertGraphs(insertGraphs) {
+    this.payload['insert-graph-uri'] = insertGraphs;
+    return this;
+  }
+
+  /**
+   * @return {(string|string[])} Default graphs set for the query for inserting.
+   */
+  getInsertGraphs() {
+    return this.payload['insert-graph-uri'];
+  }
+  /**
    * @inheritDoc
    */
   validateParams() {
