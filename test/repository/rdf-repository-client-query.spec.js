@@ -10,7 +10,7 @@ const SparqlJsonResultParser = require('parser/sparql-json-result-parser');
 const SparqlXmlResultParser = require('parser/sparql-xml-result-parser');
 const DataFactory = require('n3').DataFactory;
 const namedNode = DataFactory.namedNode;
-const HttpRequestConfigBuilder = require('http/http-request-config-builder');
+const HttpRequestBuilder = require('http/http-request-builder');
 
 const httpClientStub = require('../http/http-client.stub');
 
@@ -21,6 +21,7 @@ jest.mock('http/http-client');
 describe('RDFRepositoryClient - query', () => {
   let config;
   let repository;
+  let httpRequest;
 
   beforeEach(() => {
     HttpClient.mockImplementation(() => httpClientStub());
@@ -29,6 +30,7 @@ describe('RDFRepositoryClient - query', () => {
       .setReadTimeout(1000)
       .setWriteTimeout(1000);
     repository = new RDFRepositoryClient(config);
+    httpRequest = repository.httpClients[0].request;
   });
 
   describe('should execute query and stream the result', () => {
@@ -42,7 +44,7 @@ describe('RDFRepositoryClient - query', () => {
       reader = new ObjectReadableMock(source);
       expected = expectedStream();
       expectedIt = expected[Symbol.iterator]();
-      repository.httpClients[0].post.mockResolvedValue({
+      httpRequest.mockResolvedValue({
         data: reader
       });
     });
@@ -114,7 +116,7 @@ describe('RDFRepositoryClient - query', () => {
       const reader = new ObjectReadableMock(source);
       const expected = expectedParsedStream();
       const expectedIt = expected[Symbol.iterator]();
-      repository.httpClients[0].post.mockResolvedValue({
+      httpRequest.mockResolvedValue({
         data: reader
       });
 
@@ -137,7 +139,7 @@ describe('RDFRepositoryClient - query', () => {
     test('xml boolean result', (done) => {
       const source = [data.ask.xml];
       const reader = new ObjectReadableMock(source);
-      repository.httpClients[0].post.mockResolvedValue({
+      httpRequest.mockResolvedValue({
         data: reader
       });
 
@@ -160,7 +162,7 @@ describe('RDFRepositoryClient - query', () => {
       const reader = new ObjectReadableMock(source);
       const expected = expectedParsedStream();
       const expectedIt = expected[Symbol.iterator]();
-      repository.httpClients[0].post.mockResolvedValue({
+      httpRequest.mockResolvedValue({
         data: reader
       });
 
@@ -183,7 +185,7 @@ describe('RDFRepositoryClient - query', () => {
     test('json boolean result', (done) => {
       const source = [data.ask.json];
       const reader = new ObjectReadableMock(source);
-      repository.httpClients[0].post.mockResolvedValue({
+      httpRequest.mockResolvedValue({
         data: reader
       });
 
@@ -202,8 +204,6 @@ describe('RDFRepositoryClient - query', () => {
   });
 
   test('should make a POST request with proper parameters and headers', () => {
-    const postMock = repository.httpClients[0].post;
-
     const payload = new GetQueryPayload()
       .setQuery('select * where {?s ?p ?o}')
       .setQueryType(QueryType.SELECT)
@@ -216,14 +216,17 @@ describe('RDFRepositoryClient - query', () => {
       .setTimeout(5);
 
     const expectedData = 'query=select%20*%20where%20%7B%3Fs%20%3Fp%20%3Fo%7D&queryLn=sparql&infer=true&distinct=true&limit=100&offset=0&timeout=5';
-    const expectedRequestConfig = new HttpRequestConfigBuilder().setHeaders({
-      'Accept': 'application/sparql-results+json',
-      'Content-Type': 'application/x-www-form-urlencoded'
-    }).setResponseType('stream');
+    const expectedRequestConfig = HttpRequestBuilder.httpPost('')
+      .setData(expectedData)
+      .setHeaders({
+        'Accept': 'application/sparql-results+json',
+        'Content-Type': 'application/x-www-form-urlencoded'
+      })
+      .setResponseType('stream');
 
     return repository.query(payload).then(() => {
-      expect(postMock).toHaveBeenCalledTimes(1);
-      expect(postMock).toHaveBeenCalledWith('', expectedData, expectedRequestConfig);
+      expect(httpRequest).toHaveBeenCalledTimes(1);
+      expect(httpRequest).toHaveBeenCalledWith(expectedRequestConfig);
     });
   });
 
@@ -234,7 +237,7 @@ describe('RDFRepositoryClient - query', () => {
         .setQueryType(QueryType.SELECT)
         .setResponseType(RDFMimeType.RDF_XML);
 
-      return expect(repository.query(payload)).rejects.toBeTruthy();
+      return expect(() => repository.query(payload)).toThrow(Error);
     });
 
     test('should throw error if responseType is not properly configured for DESCRIBE query', () => {
@@ -243,7 +246,7 @@ describe('RDFRepositoryClient - query', () => {
         .setQueryType(QueryType.DESCRIBE)
         .setResponseType(RDFMimeType.SPARQL_RESULTS_JSON);
 
-      return expect(repository.query(payload)).rejects.toBeTruthy();
+      return expect(() => repository.query(payload)).toThrow(Error);
     });
 
     test('should throw error if responseType is not properly configured for CONSTRUCT query', () => {
@@ -252,7 +255,7 @@ describe('RDFRepositoryClient - query', () => {
         .setQueryType(QueryType.CONSTRUCT)
         .setResponseType(RDFMimeType.SPARQL_RESULTS_JSON);
 
-      return expect(repository.query(payload)).rejects.toBeTruthy();
+      return expect(() => repository.query(payload)).toThrow(Error);
     });
 
     test('should throw error if responseType is not properly configured for ASK query', () => {
@@ -261,7 +264,7 @@ describe('RDFRepositoryClient - query', () => {
         .setQueryType(QueryType.ASK)
         .setResponseType(RDFMimeType.BINARY_RDF);
 
-      return expect(repository.query(payload)).rejects.toBeTruthy();
+      return expect(() => repository.query(payload)).toThrow(Error);
     });
   });
 

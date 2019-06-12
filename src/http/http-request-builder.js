@@ -1,14 +1,14 @@
 const StringUtils = require('../util/string-utils');
 
 /**
- * Holds request configuration applicable to the http client.
+ * Holds request information applicable to {@link HttpClient}.
  *
  * @class
  *
  * @author Mihail Radkov
  * @author Svilen Velikov
  */
-class HttpRequestConfigBuilder {
+class HttpRequestBuilder {
   /**
    * Does default initialization of the configuration.
    */
@@ -17,11 +17,55 @@ class HttpRequestConfigBuilder {
   }
 
   /**
+   * Prepares new builder for HTTP GET request against the provided URL.
+   *
+   * @static
+   * @param {string} url
+   * @return {HttpRequestBuilder}
+   */
+  static httpGet(url) {
+    return new HttpRequestBuilder().setMethod('get').setUrl(url);
+  }
+
+  /**
+   * Prepares new builder for HTTP POST request against the provided URL.
+   *
+   * @static
+   * @param {string} url
+   * @return {HttpRequestBuilder}
+   */
+  static httpPost(url) {
+    return new HttpRequestBuilder().setMethod('post').setUrl(url);
+  }
+
+  /**
+   * Prepares new builder for HTTP PUT request against the provided URL.
+   *
+   * @static
+   * @param {string} url
+   * @return {HttpRequestBuilder}
+   */
+  static httpPut(url) {
+    return new HttpRequestBuilder().setMethod('put').setUrl(url);
+  }
+
+  /**
+   * Prepares new builder for HTTP DELETE request against the provided URL.
+   *
+   * @static
+   * @param {string} url
+   * @return {HttpRequestBuilder}
+   */
+  static httpDelete(url) {
+    return new HttpRequestBuilder().setMethod('delete').setUrl(url);
+  }
+
+  /**
    * Add a new http header entry. Blank values are skipped.
    *
    * @param {string} header type
    * @param {string} value the header value
-   * @return {HttpRequestConfigBuilder}
+   * @return {HttpRequestBuilder}
    */
   addHeader(header, value) {
     if (StringUtils.isBlank(value)) {
@@ -38,7 +82,7 @@ class HttpRequestConfigBuilder {
    * Sets the headers map.
    *
    * @param {Object<string, string>} headers the headers map
-   * @return {HttpRequestConfigBuilder}
+   * @return {HttpRequestBuilder}
    */
   setHeaders(headers) {
     this.config.headers = headers;
@@ -58,7 +102,7 @@ class HttpRequestConfigBuilder {
    * Add a specific header of type <code>Accept</code> with the given value.
    *
    * @param {string} value
-   * @return {HttpRequestConfigBuilder}
+   * @return {HttpRequestBuilder}
    */
   addAcceptHeader(value) {
     return this.addHeader('Accept', value);
@@ -69,7 +113,7 @@ class HttpRequestConfigBuilder {
    * value.
    *
    * @param {string} value
-   * @return {HttpRequestConfigBuilder}
+   * @return {HttpRequestBuilder}
    */
   addContentTypeHeader(value) {
     return this.addHeader('Content-Type', value);
@@ -79,7 +123,7 @@ class HttpRequestConfigBuilder {
    * Set request parameters object.
    *
    * @param {Object} params
-   * @return {HttpRequestConfigBuilder}
+   * @return {HttpRequestBuilder}
    */
   setParams(params) {
     this.config.params = params;
@@ -91,7 +135,7 @@ class HttpRequestConfigBuilder {
    *
    * @param {string} param
    * @param {*} value
-   * @return {HttpRequestConfigBuilder}
+   * @return {HttpRequestBuilder}
    */
   addParam(param, value) {
     if (!value) {
@@ -117,7 +161,7 @@ class HttpRequestConfigBuilder {
    * Set timeout configuration.
    *
    * @param {number} timeout in ms
-   * @return {HttpRequestConfigBuilder}
+   * @return {HttpRequestBuilder}
    */
   setTimeout(timeout) {
     this.config.timeout = timeout;
@@ -137,11 +181,80 @@ class HttpRequestConfigBuilder {
    * Set a responseType config.
    *
    * @param {string} responseType
-   * @return {HttpRequestConfigBuilder}
+   * @return {HttpRequestBuilder}
    */
   setResponseType(responseType) {
     this.config.responseType = responseType;
     return this;
+  }
+
+  /**
+   * Returns the request's response type.
+   *
+   * @return {string}
+   */
+  getResponseType() {
+    return this.config.responseType;
+  }
+
+  /**
+   * Sets the data to be sent as request payload.
+   *
+   * @param {*} data the payload
+   * @return {HttpRequestBuilder}
+   */
+  setData(data) {
+    this.config.data = data;
+    return this;
+  }
+
+  /**
+   * Gets the data to be sent as payload.
+   *
+   * @return {*}
+   */
+  getData() {
+    return this.config.data;
+  }
+
+  /**
+   * Sets the URL against which to perform the request.
+   *
+   * @param {string} url
+   * @return {HttpRequestBuilder}
+   */
+  setUrl(url) {
+    this.config.url = url;
+    return this;
+  }
+
+  /**
+   * Gets the URL.
+   *
+   * @return {string}
+   */
+  getUrl() {
+    return this.config.url;
+  }
+
+  /**
+   * Sets the HTTP method.
+   *
+   * @param {string} method
+   * @return {HttpRequestBuilder}
+   */
+  setMethod(method) {
+    this.config.method = method;
+    return this;
+  }
+
+  /**
+   * Gets the HTTP method.
+   *
+   * @return {string}
+   */
+  getMethod() {
+    return this.config.method;
   }
 
   /**
@@ -153,4 +266,4 @@ class HttpRequestConfigBuilder {
   }
 }
 
-module.exports = HttpRequestConfigBuilder;
+module.exports = HttpRequestBuilder;

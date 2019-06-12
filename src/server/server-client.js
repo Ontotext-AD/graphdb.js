@@ -3,7 +3,7 @@ const ConsoleLogger = require('../logging/console-logger');
 const RDFRepositoryClient = require('../repository/rdf-repository-client');
 const RepositoryClientConfig =
   require('../repository/repository-client-config');
-const HttpRequestConfigBuilder = require('../http/http-request-config-builder');
+const HttpRequestBuilder = require('../http/http-request-builder');
 const RDFMimeType = require('../http/rdf-mime-type');
 
 const SERVICE_URL = '/repositories';
@@ -31,11 +31,11 @@ class ServerClient {
    * @return {Promise} promise which resolves with an Array with repository ids.
    */
   getRepositoryIDs() {
-    const requestConfig = new HttpRequestConfigBuilder()
+    const requestBuilder = HttpRequestBuilder.httpGet(SERVICE_URL)
       .addAcceptHeader(RDFMimeType.SPARQL_RESULTS_JSON);
 
     let elapsedTime = Date.now();
-    return this.httpClient.get(SERVICE_URL, requestConfig).then((response) => {
+    return this.httpClient.request(requestBuilder).then((response) => {
       elapsedTime = Date.now() - elapsedTime;
       this.logger.debug({elapsedTime}, 'Retrieved repository IDs');
       return response.data.results.bindings.map(({id}) => id.value);
@@ -92,12 +92,14 @@ class ServerClient {
       throw new Error('Repository id is required parameter!');
     }
 
+    const requestBuilder = HttpRequestBuilder
+      .httpDelete(`${SERVICE_URL}/${id}`);
+
     let elapsedTime = Date.now();
-    return this.httpClient.deleteResource(`${SERVICE_URL}/${id}`)
-      .then(() => {
-        elapsedTime = Date.now() - elapsedTime;
-        this.logger.info({repoId: id, elapsedTime}, 'Deleted repository');
-      });
+    return this.httpClient.request(requestBuilder).then(() => {
+      elapsedTime = Date.now() - elapsedTime;
+      this.logger.info({repoId: id, elapsedTime}, 'Deleted repository');
+    });
   }
 
   /**

@@ -2,9 +2,8 @@ const RepositoryClientConfig = require('repository/repository-client-config');
 const RDFRepositoryClient = require('repository/rdf-repository-client');
 const ServerClientConfig = require('server/server-client-config');
 const HttpClient = require('http/http-client');
-const HttpRequestConfigBuilder = require('http/http-request-config-builder');
+const HttpRequestBuilder = require('http/http-request-builder');
 const httpClientStub = require('../http/http-client.stub');
-const {when} = require('jest-when');
 
 jest.mock('http/http-client');
 
@@ -73,7 +72,7 @@ describe('RDFRepositoryClient', () => {
   describe('getSize()', () => {
 
     let rdfRepositoryClient;
-    let get;
+    let httpRequest;
 
     beforeEach(() => {
       const repoClientConfig = new RepositoryClientConfig()
@@ -83,8 +82,9 @@ describe('RDFRepositoryClient', () => {
         .setReadTimeout(100)
         .setWriteTimeout(200);
       rdfRepositoryClient = new RDFRepositoryClient(repoClientConfig);
-      get = rdfRepositoryClient.httpClients[0].get;
-      when(get).calledWith('/size').mockResolvedValue({data: 123});
+      httpRequest = rdfRepositoryClient.httpClients[0].request;
+
+      httpRequest.mockResolvedValue({data: 123});
     });
 
     test('should retrieve the number of statements in the repository', () => {
@@ -93,22 +93,22 @@ describe('RDFRepositoryClient', () => {
 
     test('should properly request the number of statements in the repository', () => {
       return rdfRepositoryClient.getSize().then(() => {
-        const expected = new HttpRequestConfigBuilder();
-        expect(get).toHaveBeenCalledTimes(1);
-        expect(get).toHaveBeenCalledWith('/size', expected);
+        const expected = HttpRequestBuilder.httpGet('/size');
+        expect(httpRequest).toHaveBeenCalledTimes(1);
+        expect(httpRequest).toHaveBeenCalledWith(expected);
       });
     });
 
     test('should properly request the number of statements in the repository for the specified contexts', () => {
       return rdfRepositoryClient.getSize(['context-1']).then(() => {
-        const expected = new HttpRequestConfigBuilder().addParam('context', ['<context-1>']);
-        expect(get).toHaveBeenCalledTimes(1);
-        expect(get).toHaveBeenCalledWith('/size', expected);
+        const expected = HttpRequestBuilder.httpGet('/size').addParam('context', ['<context-1>']);
+        expect(httpRequest).toHaveBeenCalledTimes(1);
+        expect(httpRequest).toHaveBeenCalledWith(expected);
       });
     });
 
     test('should reject size retrieving when the server request is unsuccessful', () => {
-      when(get).calledWith('/size').mockRejectedValue('get-size-error');
+      httpRequest.mockRejectedValue('get-size-error');
       return expect(rdfRepositoryClient.getSize()).rejects.toEqual('get-size-error');
     });
   });

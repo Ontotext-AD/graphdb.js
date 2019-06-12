@@ -2,7 +2,7 @@ const HttpClient = require('http/http-client');
 const RepositoryClientConfig = require('repository/repository-client-config');
 const RdfRepositoryClient = require('repository/rdf-repository-client');
 const RDFMimeType = require('http/rdf-mime-type');
-const HttpRequestConfigBuilder = require('http/http-request-config-builder');
+const HttpRequestBuilder = require('http/http-request-builder');
 const {ObjectReadableMock} = require('stream-mock');
 
 const httpClientStub = require('../http/http-client.stub');
@@ -12,14 +12,15 @@ jest.mock('http/http-client');
 describe('RdfRepositoryClient - streaming data', () => {
   let repoClientConfig;
   let rdfRepositoryClient;
-
-  const endpoints = ['http://host/repositories/repo1'];
-  const headers = {};
-  const contentType = '';
-  const readTimeout = 1000;
-  const writeTimeout = 1000;
+  let httpRequest;
 
   beforeEach(() => {
+    const endpoints = ['http://host/repositories/repo1'];
+    const headers = {};
+    const contentType = '';
+    const readTimeout = 1000;
+    const writeTimeout = 1000;
+
     HttpClient.mockImplementation(() => httpClientStub());
 
     repoClientConfig = new RepositoryClientConfig()
@@ -29,6 +30,7 @@ describe('RdfRepositoryClient - streaming data', () => {
       .setReadTimeout(readTimeout)
       .setWriteTimeout(writeTimeout);
     rdfRepositoryClient = new RdfRepositoryClient(repoClientConfig);
+    httpRequest = rdfRepositoryClient.httpClients[0].request;
   });
 
   describe('upload', () => {
@@ -51,32 +53,30 @@ describe('RdfRepositoryClient - streaming data', () => {
     });
 
     test('should make a POST request with proper parameters and headers', () => {
-      const postMock = rdfRepositoryClient.httpClients[0].post;
-
       return rdfRepositoryClient.upload({}, contentType, context, baseURI).then(() => {
-        verifyUploadRequest(postMock);
+        verifyUploadRequest();
       });
     });
 
     test('should make a POST request with properly encoded context parameter', () => {
-      const postMock = rdfRepositoryClient.httpClients[0].post;
-
       // Not encoded as N-Triple
       return rdfRepositoryClient.upload({}, contentType, 'urn:x-local:graph1', baseURI).then(() => {
-        verifyUploadRequest(postMock);
+        verifyUploadRequest();
       });
     });
 
-    function verifyUploadRequest(postMock) {
-      const expectedRequestConfig = new HttpRequestConfigBuilder().setHeaders({
-        'Content-Type': 'text/turtle'
-      }).setParams({
-        context,
-        baseURI
-      }).setResponseType('stream');
+    function verifyUploadRequest() {
+      const expectedRequestConfig = HttpRequestBuilder.httpPost('/statements')
+        .setData({})
+        .setHeaders({
+          'Content-Type': 'text/turtle'
+        }).setParams({
+          context,
+          baseURI
+        }).setResponseType('stream');
 
-      expect(postMock).toHaveBeenCalledTimes(1);
-      expect(postMock).toHaveBeenCalledWith('/statements', {}, expectedRequestConfig);
+      expect(httpRequest).toHaveBeenCalledTimes(1);
+      expect(httpRequest).toHaveBeenCalledWith(expectedRequestConfig);
     }
   });
 
@@ -100,32 +100,30 @@ describe('RdfRepositoryClient - streaming data', () => {
     });
 
     test('should make a PUT request with proper parameters and headers', () => {
-      const putMock = rdfRepositoryClient.httpClients[0].put;
-
       return rdfRepositoryClient.overwrite({}, contentType, context, baseURI).then(() => {
-        verifyOverwriteRequest(putMock);
+        verifyOverwriteRequest();
       });
     });
 
     test('should make a PUT request with properly encoded context parameter', () => {
-      const putMock = rdfRepositoryClient.httpClients[0].put;
-
       // Not encoded as N-Triple
       return rdfRepositoryClient.overwrite({}, contentType, 'urn:x-local:graph1', baseURI).then(() => {
-        verifyOverwriteRequest(putMock);
+        verifyOverwriteRequest();
       });
     });
 
-    function verifyOverwriteRequest(putMock) {
-      const expectedRequestConfig = new HttpRequestConfigBuilder().setHeaders({
-        'Content-Type': 'text/turtle'
-      }).setParams({
-        context,
-        baseURI
-      }).setResponseType('stream');
+    function verifyOverwriteRequest() {
+      const expectedRequestConfig = HttpRequestBuilder.httpPut('/statements')
+        .setData({})
+        .setHeaders({
+          'Content-Type': 'text/turtle'
+        }).setParams({
+          context,
+          baseURI
+        }).setResponseType('stream');
 
-      expect(putMock).toHaveBeenCalledTimes(1);
-      expect(putMock).toHaveBeenCalledWith('/statements', {}, expectedRequestConfig);
+      expect(httpRequest).toHaveBeenCalledTimes(1);
+      expect(httpRequest).toHaveBeenCalledWith(expectedRequestConfig);
     }
   });
 

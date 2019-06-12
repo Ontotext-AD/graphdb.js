@@ -4,7 +4,7 @@ const RDFRepositoryClient = require('repository/rdf-repository-client');
 const RDFMimeType = require('http/rdf-mime-type');
 const AddStatementPayload = require('repository/add-statement-payload');
 const XSD = require('model/types').XSD;
-const HttpRequestConfigBuilder = require('http/http-request-config-builder');
+const HttpRequestBuilder = require('http/http-request-builder');
 
 const N3 = require('n3');
 const {DataFactory} = N3;
@@ -12,7 +12,6 @@ const {namedNode, literal, quad} = DataFactory;
 
 const httpClientStub = require('../http/http-client.stub');
 const testUtils = require('../utils');
-const {when} = require('jest-when');
 
 jest.mock('http/http-client');
 
@@ -192,7 +191,7 @@ describe('RDFRepositoryClient - adding data', () => {
     });
 
     test('should reject adding the payload when the server request is unsuccessful', () => {
-      rdfRepositoryClient.httpClients[0].post.mockRejectedValue({});
+      rdfRepositoryClient.httpClients[0].request.mockRejectedValue({});
       const payload = new AddStatementPayload()
         .setSubject(subj('resource-1'))
         .setPredicate(pred('relation-1'))
@@ -233,7 +232,7 @@ describe('RDFRepositoryClient - adding data', () => {
     });
 
     test('should reject adding quads when the server request is unsuccessful', () => {
-      when(rdfRepositoryClient.httpClients[0].post).calledWith('/statements').mockRejectedValue('error-adding');
+      rdfRepositoryClient.httpClients[0].request.mockRejectedValue('error-adding');
       const quads = [getQuad('resource-1', 'relation-1', 'uri-1')];
       return expect(rdfRepositoryClient.addQuads(quads)).rejects.toEqual('error-adding');
     });
@@ -265,36 +264,40 @@ describe('RDFRepositoryClient - adding data', () => {
     });
 
     test('should reject putting quads when the server request is unsuccessful', () => {
-      when(rdfRepositoryClient.httpClients[0].put).calledWith('/statements').mockRejectedValue('error-overwriting');
+      rdfRepositoryClient.httpClients[0].request.mockRejectedValue('error-overwriting');
       const quads = [getQuad('resource-1', 'relation-1', 'uri-1')];
       return expect(rdfRepositoryClient.putQuads(quads)).rejects.toEqual('error-overwriting');
     });
   });
 
   function verifyAddPayload(expected, context, baseURI) {
-    const post = rdfRepositoryClient.httpClients[0].post;
-    verifySentPayload(post, expected, context, baseURI);
+    verifySentPayload('post', expected, context, baseURI);
   }
 
   function verifyPutPayload(expected, context, baseURI) {
-    const put = rdfRepositoryClient.httpClients[0].put;
-    verifySentPayload(put, expected, context, baseURI);
+    verifySentPayload('put', expected, context, baseURI);
   }
 
   function verifySentPayload(method, expected, context, baseURI) {
-    const expectedRequestConfig = new HttpRequestConfigBuilder().setHeaders({
-      'Content-Type': RDFMimeType.TRIG
-    }).setParams({
-      context,
-      baseURI
-    });
-    expect(method).toHaveBeenCalledTimes(1);
-    expect(method).toHaveBeenCalledWith('/statements', expected, expectedRequestConfig);
+    const httpRequest = rdfRepositoryClient.httpClients[0].request;
+    const expectedRequestConfig = new HttpRequestBuilder()
+      .setMethod(method)
+      .setUrl('/statements')
+      .setData(expected)
+      .setHeaders({
+        'Content-Type': RDFMimeType.TRIG
+      })
+      .setParams({
+        context,
+        baseURI
+      });
+    expect(httpRequest).toHaveBeenCalledTimes(1);
+    expect(httpRequest).toHaveBeenCalledWith(expectedRequestConfig);
   }
 
   function verifyNoPayload() {
-    const post = rdfRepositoryClient.httpClients[0].post;
-    expect(post).toHaveBeenCalledTimes(0);
+    const httpRequest = rdfRepositoryClient.httpClients[0].request;
+    expect(httpRequest).toHaveBeenCalledTimes(0);
   }
 
   function getQuadsDataSet() {

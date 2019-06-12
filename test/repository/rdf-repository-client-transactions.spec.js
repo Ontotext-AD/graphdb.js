@@ -11,12 +11,12 @@ const GetQueryPayload = require('query/get-query-payload');
 const QueryType = require('query/query-type');
 const UpdateQueryPayload = require('query/update-query-payload');
 const QueryContentType = require('http/query-content-type');
-const HttpRequestConfigBuilder = require('http/http-request-config-builder');
+const HttpRequestBuilder = require('http/http-request-builder');
+const Stream = require('stream');
 
 const {namedNode, literal, quad} = require('n3').DataFactory;
 
 const httpClientStub = require('../http/http-client.stub');
-const {when} = require('jest-when');
 const testUtils = require('../utils');
 const path = require('path');
 
@@ -26,6 +26,7 @@ describe('RDFRepositoryClient - transactions', () => {
 
   let repoClientConfig;
   let rdfRepositoryClient;
+  let httpRequest;
 
   const defaultHeaders = {
     'Accept': 'application/json'
@@ -50,31 +51,17 @@ describe('RDFRepositoryClient - transactions', () => {
     HttpClient.mockImplementation((baseUrl) => httpClientStub(baseUrl));
 
     rdfRepositoryClient = new RDFRepositoryClient(repoClientConfig);
+    httpRequest = rdfRepositoryClient.httpClients[0].request;
 
     const response = {
       headers: {
         'location': transactionUrl
       }
     };
-    when(rdfRepositoryClient.httpClients[0].post).calledWith('/transactions').mockResolvedValue(response);
+    httpRequest.mockResolvedValue(response);
   });
 
-  /**
-   * Utility for creating HttpRequestConfigBuilder from given config.
-   */
-  function getRequestConfig(config) {
-    const requestConfig = new HttpRequestConfigBuilder();
-    requestConfig.config = config;
-    return requestConfig;
-  }
-
   describe('beginTransaction()', () => {
-
-    let post;
-    beforeEach(() => {
-      post = rdfRepositoryClient.httpClients[0].post;
-    });
-
     test('should start a transaction and produce transactional client', () => {
       return rdfRepositoryClient.beginTransaction().then(transactionalClient => {
         expect(transactionalClient).toBeInstanceOf(TransactionalRepositoryClient);
@@ -95,8 +82,8 @@ describe('RDFRepositoryClient - transactions', () => {
 
         expect(transactionalClient.isActive()).toEqual(true);
 
-        expect(post).toHaveBeenCalledTimes(1);
-        expect(post).toHaveBeenCalledWith('/transactions', new HttpRequestConfigBuilder());
+        expect(httpRequest).toHaveBeenCalledTimes(1);
+        expect(httpRequest).toHaveBeenCalledWith(HttpRequestBuilder.httpPost('/transactions'));
       });
     });
 
@@ -104,12 +91,12 @@ describe('RDFRepositoryClient - transactions', () => {
       return rdfRepositoryClient.beginTransaction(TransactionIsolationLevel.READ_UNCOMMITTED).then(transactionalClient => {
         expect(transactionalClient).toBeInstanceOf(TransactionalRepositoryClient);
 
-        expect(post).toHaveBeenCalledTimes(1);
-        expect(post).toHaveBeenCalledWith('/transactions', getRequestConfig({
-          params: {
+        const expectedRequest = HttpRequestBuilder.httpPost('/transactions')
+          .setParams({
             'isolation-level': TransactionIsolationLevel.READ_UNCOMMITTED
-          }
-        }));
+          });
+        expect(httpRequest).toHaveBeenCalledTimes(1);
+        expect(httpRequest).toHaveBeenCalledWith(expectedRequest);
       });
     });
 
@@ -119,12 +106,12 @@ describe('RDFRepositoryClient - transactions', () => {
         transactionalClient = client;
         return transactionalClient.commit();
       }).then(() => {
-        expect(transactionalClient.httpClients[0].put).toHaveBeenCalledTimes(1);
-        expect(transactionalClient.httpClients[0].put).toHaveBeenCalledWith('', null, getRequestConfig({
-          params: {
-            action: 'COMMIT'
-          }
-        }));
+        const expectedRequest = HttpRequestBuilder.httpPut('').setParams({
+          action: 'COMMIT'
+        });
+        const transactionalHttpRequest = transactionalClient.httpClients[0].request;
+        expect(transactionalHttpRequest).toHaveBeenCalledTimes(1);
+        expect(transactionalHttpRequest).toHaveBeenCalledWith(expectedRequest);
         expect(transactionalClient.isActive()).toEqual(false);
       });
     });
@@ -135,15 +122,16 @@ describe('RDFRepositoryClient - transactions', () => {
         transactionalClient = client;
         return transactionalClient.rollback();
       }).then(() => {
-        expect(transactionalClient.httpClients[0].deleteResource).toHaveBeenCalledTimes(1);
-        expect(transactionalClient.httpClients[0].deleteResource).toHaveBeenCalledWith('');
+        const transactionalHttpRequest = transactionalClient.httpClients[0].request;
+        expect(transactionalHttpRequest).toHaveBeenCalledTimes(1);
+        expect(transactionalHttpRequest).toHaveBeenCalledWith(HttpRequestBuilder.httpDelete(''));
         expect(transactionalClient.isActive()).toEqual(false);
       });
     });
 
     test('should reject if it cannot start a transaction', () => {
       const err = new Error('Cannot begin transaction');
-      when(post).calledWith('/transactions').mockRejectedValue(err);
+      httpRequest.mockRejectedValue(err);
       return expect(rdfRepositoryClient.beginTransaction()).rejects.toEqual(err);
     });
 
@@ -164,7 +152,7 @@ describe('RDFRepositoryClient - transactions', () => {
       let transactionalClient;
       return rdfRepositoryClient.beginTransaction().then(client => {
         transactionalClient = client;
-        transactionalClient.httpClients[0].put.mockRejectedValue(err);
+        transactionalClient.httpClients[0].request.mockRejectedValue(err);
         return expect(transactionalClient.commit()).rejects.toEqual(err);
       });
     });
@@ -174,7 +162,7 @@ describe('RDFRepositoryClient - transactions', () => {
       let transactionalClient;
       return rdfRepositoryClient.beginTransaction().then(client => {
         transactionalClient = client;
-        transactionalClient.httpClients[0].put.mockRejectedValue(err);
+        transactionalClient.httpClients[0].request.mockRejectedValue(err);
         return transactionalClient.commit();
       }).catch(() => {
         expect(() => transactionalClient.getSize()).toThrow();
@@ -200,7 +188,7 @@ describe('RDFRepositoryClient - transactions', () => {
       let transactionalClient;
       return rdfRepositoryClient.beginTransaction().then(client => {
         transactionalClient = client;
-        transactionalClient.httpClients[0].deleteResource.mockRejectedValue(err);
+        transactionalClient.httpClients[0].request.mockRejectedValue(err);
         return expect(transactionalClient.rollback()).rejects.toEqual(err);
       });
     });
@@ -210,7 +198,7 @@ describe('RDFRepositoryClient - transactions', () => {
       let transactionalClient;
       return rdfRepositoryClient.beginTransaction().then(client => {
         transactionalClient = client;
-        transactionalClient.httpClients[0].deleteResource.mockRejectedValue(err);
+        transactionalClient.httpClients[0].request.mockRejectedValue(err);
         return transactionalClient.rollback();
       }).catch(() => {
         expect(() => transactionalClient.getSize()).toThrow();
@@ -222,7 +210,7 @@ describe('RDFRepositoryClient - transactions', () => {
     test('should reject if it cannot obtain transaction ID', () => {
       // Reset headers
       const response = {headers: {}};
-      when(rdfRepositoryClient.httpClients[0].post).calledWith('/transactions').mockResolvedValue(response);
+      httpRequest.mockResolvedValue(response);
       return expect(rdfRepositoryClient.beginTransaction()).rejects.toEqual(Error('Couldn\'t obtain transaction ID'));
     });
   });
@@ -230,48 +218,48 @@ describe('RDFRepositoryClient - transactions', () => {
   describe('Having started transaction', () => {
 
     let transaction;
-    let httpPut;
+    let transactionHttpRequest;
 
     const data = '<http://domain/resource/resource-1> <http://domain/property/relation-1> "Title"@en.';
 
     beforeEach(() => {
       return rdfRepositoryClient.beginTransaction().then(tr => {
         transaction = tr;
-        httpPut = transaction.httpClients[0].put;
+        transactionHttpRequest = transaction.httpClients[0].request;
       });
     });
 
     describe('getSize()', () => {
       test('should retrieve the repository size', () => {
-        httpPut.mockResolvedValue({data: 123});
+        transactionHttpRequest.mockResolvedValue({data: 123});
         return transaction.getSize().then(size => {
           expect(size).toEqual(123);
-          expect(httpPut).toHaveBeenCalledTimes(1);
-          expect(httpPut).toHaveBeenCalledWith('', null, getRequestConfig({
-            params: {
-              action: 'SIZE',
-              context: undefined
-            }
-          }));
+
+          const expectedRequest = HttpRequestBuilder.httpPut('').setParams({
+            action: 'SIZE',
+            context: undefined
+          });
+          expect(transactionHttpRequest).toHaveBeenCalledTimes(1);
+          expect(transactionHttpRequest).toHaveBeenCalledWith(expectedRequest);
         });
       });
 
       test('should retrieve the repository size in specific context', () => {
-        httpPut.mockResolvedValue({data: 123});
+        transactionHttpRequest.mockResolvedValue({data: 123});
         return transaction.getSize('<http://domain/context>').then(size => {
           expect(size).toEqual(123);
-          expect(httpPut).toHaveBeenCalledTimes(1);
-          expect(httpPut).toHaveBeenCalledWith('', null, getRequestConfig({
-            params: {
-              action: 'SIZE',
-              context: '<http://domain/context>'
-            }
-          }));
+
+          const expectedRequest = HttpRequestBuilder.httpPut('').setParams({
+            action: 'SIZE',
+            context: '<http://domain/context>'
+          });
+          expect(transactionHttpRequest).toHaveBeenCalledTimes(1);
+          expect(transactionHttpRequest).toHaveBeenCalledWith(expectedRequest);
         });
       });
 
       test('should reject if the transaction cannot retrieve the repository size', () => {
-        httpPut.mockRejectedValue('Error during size retrieve');
+        transactionHttpRequest.mockRejectedValue('Error during size retrieve');
         return expect(transaction.getSize()).rejects.toEqual('Error during size retrieve');
       });
     });
@@ -279,7 +267,7 @@ describe('RDFRepositoryClient - transactions', () => {
     describe('get()', () => {
       test('should retrieve statements', () => {
         const data = testUtils.loadFile(testFilePath).trim();
-        httpPut.mockResolvedValue({data});
+        transactionHttpRequest.mockResolvedValue({data});
         return transaction.get(getStatementPayload()).then((result) => {
           expect(result).toEqual(data);
         });
@@ -287,23 +275,25 @@ describe('RDFRepositoryClient - transactions', () => {
 
       test('should properly request to retrieve statements', () => {
         return transaction.get(getStatementPayload()).then(() => {
-          expect(httpPut).toHaveBeenCalledTimes(1);
-          expect(httpPut).toHaveBeenCalledWith('', null, getRequestConfig({
-            headers: {'Accept': RDFMimeType.RDF_JSON},
-            params: {
+          const expectedRequest = HttpRequestBuilder.httpPut('')
+            .setHeaders({
+              'Accept': RDFMimeType.RDF_JSON
+            })
+            .setParams({
               action: 'GET',
               context: '<http://example.org/graph3>',
               infer: true,
               obj: '"7931000"^^http://www.w3.org/2001/XMLSchema#integer',
               pred: '<http://eunis.eea.europa.eu/rdf/schema.rdf#population>',
               subj: '<http://eunis.eea.europa.eu/countries/AZ>'
-            }
-          }));
+            });
+          expect(transactionHttpRequest).toHaveBeenCalledTimes(1);
+          expect(transactionHttpRequest).toHaveBeenCalledWith(expectedRequest);
         });
       });
 
       test('should reject if the transaction cannot retrieve statements', () => {
-        httpPut.mockRejectedValue('Error during retrieve');
+        transactionHttpRequest.mockRejectedValue('Error during retrieve');
         return expect(transaction.get(getStatementPayload())).rejects.toEqual('Error during retrieve');
       });
     });
@@ -317,32 +307,33 @@ describe('RDFRepositoryClient - transactions', () => {
         .setTimeout(5);
 
       test('should query data', () => {
-        httpPut.mockResolvedValue({data: true});
+        transactionHttpRequest.mockResolvedValue({data: true});
         return transaction.query(payload).then((response) => {
           expect(response).toEqual(true);
         });
       });
 
       test('should properly perform query request', () => {
-        httpPut.mockResolvedValue({data: true});
+        transactionHttpRequest.mockResolvedValue({data: true});
         return transaction.query(payload).then(() => {
-          expect(httpPut).toHaveBeenCalledTimes(1);
-          expect(httpPut).toHaveBeenCalledWith('', 'ask {?s ?p ?o}', getRequestConfig({
-            params: {
-              action: 'QUERY'
-            },
-            headers: {
+          const expectedRequest = HttpRequestBuilder.httpPut('')
+            .setData('ask {?s ?p ?o}')
+            .setHeaders({
               'Accept': 'text/boolean',
               'Content-Type': QueryContentType.SPARQL_QUERY
-            },
-            responseType: 'stream'
-          }));
+            })
+            .setParams({
+              action: 'QUERY'
+            })
+            .setResponseType('stream');
+          expect(transactionHttpRequest).toHaveBeenCalledTimes(1);
+          expect(transactionHttpRequest).toHaveBeenCalledWith(expectedRequest);
         });
       });
 
       test('should reject if the transaction cannot perform a query request', () => {
         const err = new Error('Cannot query');
-        httpPut.mockRejectedValue(err);
+        transactionHttpRequest.mockRejectedValue(err);
         return expect(transaction.query(payload)).rejects.toEqual(err);
       });
     });
@@ -354,21 +345,22 @@ describe('RDFRepositoryClient - transactions', () => {
 
       test('should perform update with proper request', () => {
         return transaction.update(updatePayload).then(() => {
-          expect(httpPut).toHaveBeenCalledTimes(1);
-          expect(httpPut).toHaveBeenCalledWith('', 'INSERT {?s ?p ?o} WHERE {?s ?p ?o}', getRequestConfig({
-            params: {
-              action: 'UPDATE'
-            },
-            headers: {
+          const expectedRequest = HttpRequestBuilder.httpPut('')
+            .setData('INSERT {?s ?p ?o} WHERE {?s ?p ?o}')
+            .setHeaders({
               'Content-Type': QueryContentType.SPARQL_UPDATE
-            }
-          }));
+            })
+            .setParams({
+              action: 'UPDATE'
+            });
+          expect(transactionHttpRequest).toHaveBeenCalledTimes(1);
+          expect(transactionHttpRequest).toHaveBeenCalledWith(expectedRequest);
         });
       });
 
       test('should reject if the transaction cannot perform an update request', () => {
         const err = new Error('Cannot update');
-        httpPut.mockRejectedValue(err);
+        transactionHttpRequest.mockRejectedValue(err);
         return expect(transaction.update(updatePayload)).rejects.toEqual(err);
       });
 
@@ -427,7 +419,7 @@ describe('RDFRepositoryClient - transactions', () => {
       });
 
       test('should reject if the transaction cannot insert statements', () => {
-        httpPut.mockRejectedValue('Error during add');
+        transactionHttpRequest.mockRejectedValue('Error during add');
         return expect(transaction.add(payload)).rejects.toEqual('Error during add');
       });
 
@@ -465,7 +457,7 @@ describe('RDFRepositoryClient - transactions', () => {
           namedNode('http://domain/property/relation-1'),
           literal('Title', 'en'));
 
-        httpPut.mockRejectedValue('Error during quads add');
+        transactionHttpRequest.mockRejectedValue('Error during quads add');
         return expect(transaction.addQuads([q])).rejects.toEqual('Error during quads add');
       });
 
@@ -489,11 +481,11 @@ describe('RDFRepositoryClient - transactions', () => {
         expect(() => transaction.sendData()).toThrow();
         expect(() => transaction.sendData('')).toThrow();
         expect(() => transaction.sendData('  ')).toThrow();
-        expect(httpPut).toHaveBeenCalledTimes(0);
+        expect(transactionHttpRequest).toHaveBeenCalledTimes(0);
       });
 
       test('should reject if the transaction cannot add data', () => {
-        httpPut.mockRejectedValue('Error during add');
+        transactionHttpRequest.mockRejectedValue('Error during add');
         return expect(transaction.sendData(data)).rejects.toEqual('Error during add');
       });
 
@@ -503,35 +495,37 @@ describe('RDFRepositoryClient - transactions', () => {
     });
 
     function expectInsertedData(expectedData, expectedContext, expectedBaseURI) {
-      expect(httpPut).toHaveBeenCalledTimes(1);
-      expect(httpPut).toHaveBeenCalledWith('', expectedData, getRequestConfig({
-        headers: {
+      const expectedRequest = HttpRequestBuilder.httpPut('')
+        .setData(expectedData)
+        .setHeaders({
           'Content-Type': RDFMimeType.TRIG
-        },
-        params: {
+        })
+        .setParams({
           action: 'ADD',
           context: expectedContext,
           baseURI: expectedBaseURI
-        }
-      }));
+        });
+      expect(transactionHttpRequest).toHaveBeenCalledTimes(1);
+      expect(transactionHttpRequest).toHaveBeenCalledWith(expectedRequest);
     }
 
     function expectNoInsertedData() {
-      expect(httpPut).toHaveBeenCalledTimes(0);
+      expect(transactionHttpRequest).toHaveBeenCalledTimes(0);
     }
 
     describe('deleteData()', () => {
       test('should delete data', () => {
         return transaction.deleteData(data).then(() => {
-          expect(httpPut).toHaveBeenCalledTimes(1);
-          expect(httpPut).toHaveBeenCalledWith('', data, getRequestConfig({
-            headers: {
+          const expectedRequest = HttpRequestBuilder.httpPut('')
+            .setData(data)
+            .setHeaders({
               'Content-Type': RDFMimeType.TRIG
-            },
-            params: {
+            })
+            .setParams({
               action: 'DELETE'
-            }
-          }));
+            });
+          expect(transactionHttpRequest).toHaveBeenCalledTimes(1);
+          expect(transactionHttpRequest).toHaveBeenCalledWith(expectedRequest);
         });
       });
 
@@ -539,11 +533,11 @@ describe('RDFRepositoryClient - transactions', () => {
         expect(() => transaction.deleteData()).toThrow();
         expect(() => transaction.deleteData('')).toThrow();
         expect(() => transaction.deleteData('  ')).toThrow();
-        expect(httpPut).toHaveBeenCalledTimes(0);
+        expect(transactionHttpRequest).toHaveBeenCalledTimes(0);
       });
 
       test('should reject if the transaction cannot delete data', () => {
-        httpPut.mockRejectedValue('Error during delete');
+        transactionHttpRequest.mockRejectedValue('Error during delete');
         return expect(transaction.deleteData(data)).rejects.toEqual('Error during delete');
       });
 
@@ -554,7 +548,7 @@ describe('RDFRepositoryClient - transactions', () => {
 
     describe('download()', () => {
       test('should download data', () => {
-        httpPut.mockResolvedValue({
+        transactionHttpRequest.mockResolvedValue({
           data: FileUtils.getReadStream(testFilePath)
         });
         return transaction.download(getStatementPayload()).then((dataStream) => {
@@ -566,29 +560,31 @@ describe('RDFRepositoryClient - transactions', () => {
       });
 
       test('should properly request to download data', () => {
-        httpPut.mockResolvedValue({
+        transactionHttpRequest.mockResolvedValue({
           data: FileUtils.getReadStream(testFilePath)
         });
         return transaction.download(getStatementPayload()).then(() => {
-          expect(httpPut).toHaveBeenCalledTimes(1);
-          expect(httpPut).toHaveBeenCalledWith('', null, getRequestConfig({
-            headers: {'Accept': RDFMimeType.RDF_JSON},
-            params: {
+          const expectedRequest = HttpRequestBuilder.httpPut('')
+            .setHeaders({
+              'Accept': RDFMimeType.RDF_JSON
+            })
+            .setParams({
               action: 'GET',
               context: '<http://example.org/graph3>',
               infer: true,
               obj: '"7931000"^^http://www.w3.org/2001/XMLSchema#integer',
               pred: '<http://eunis.eea.europa.eu/rdf/schema.rdf#population>',
               subj: '<http://eunis.eea.europa.eu/countries/AZ>'
-            },
-            responseType: 'stream'
-          }));
+            })
+            .setResponseType('stream');
+          expect(transactionHttpRequest).toHaveBeenCalledTimes(1);
+          expect(transactionHttpRequest).toHaveBeenCalledWith(expectedRequest);
         });
       });
 
       test('should reject if the transaction cannot download data', () => {
         const err = new Error('Cannot download data');
-        httpPut.mockRejectedValue(err);
+        transactionHttpRequest.mockRejectedValue(err);
         return expect(transaction.download(getStatementPayload())).rejects.toEqual(err);
       });
     });
@@ -598,28 +594,10 @@ describe('RDFRepositoryClient - transactions', () => {
         const turtleStream = FileUtils.getReadStream(testFilePath);
 
         return transaction.upload(turtleStream, RDFMimeType.TRIG, context, baseURI).then(() => {
-          expect(httpPut).toHaveBeenCalledTimes(1);
-
-          const httpPutCall = httpPut.mock.calls[0];
-
-          const url = httpPutCall[0];
-          expect(url).toEqual('');
-
-          const requestConfig = httpPutCall[2];
-          expect(requestConfig).toEqual(getRequestConfig({
-            headers: {
-              'Content-Type': RDFMimeType.TRIG
-            },
-            params: {
-              action: 'ADD',
-              context,
-              baseURI
-            },
-            responseType: 'stream'
-          }));
-
-          const stream = httpPutCall[1];
-          return testUtils.readStream(stream);
+          expect(transactionHttpRequest).toHaveBeenCalledTimes(1);
+          const requestBuilder = transactionHttpRequest.mock.calls[0][0];
+          verifyUploadRequestBuilder(requestBuilder);
+          return testUtils.readStream(requestBuilder.getData());
         }).then((streamData) => {
           const turtleData = testUtils.loadFile(testFilePath).trim();
           expect(streamData).toEqual(turtleData);
@@ -628,7 +606,7 @@ describe('RDFRepositoryClient - transactions', () => {
 
       test('should reject if the server cannot consume the upload request', () => {
         const error = new Error('cannot-upload');
-        httpPut.mockRejectedValue(error);
+        transactionHttpRequest.mockRejectedValue(error);
 
         const turtleStream = FileUtils.getReadStream(testFilePath);
         const promise = transaction.upload(turtleStream, RDFMimeType.TRIG, context, null);
@@ -646,28 +624,10 @@ describe('RDFRepositoryClient - transactions', () => {
 
       test('should upload file with data as stream in given context and base URI', () => {
         return transaction.addFile(testFilePath, RDFMimeType.TRIG, context, baseURI).then(() => {
-          expect(httpPut).toHaveBeenCalledTimes(1);
-
-          const httpPutCall = httpPut.mock.calls[0];
-
-          const url = httpPutCall[0];
-          expect(url).toEqual('');
-
-          const requestConfig = httpPutCall[2];
-          expect(requestConfig).toEqual(getRequestConfig({
-            headers: {
-              'Content-Type': RDFMimeType.TRIG
-            },
-            params: {
-              action: 'ADD',
-              context,
-              baseURI
-            },
-            responseType: 'stream'
-          }));
-
-          const stream = httpPutCall[1];
-          return testUtils.readStream(stream)
+          expect(transactionHttpRequest).toHaveBeenCalledTimes(1);
+          const requestBuilder = transactionHttpRequest.mock.calls[0][0];
+          verifyUploadRequestBuilder(requestBuilder);
+          return testUtils.readStream(requestBuilder.getData());
         }).then((streamData) => {
           const turtleData = testUtils.loadFile(testFilePath).trim();
           expect(streamData).toEqual(turtleData);
@@ -676,7 +636,7 @@ describe('RDFRepositoryClient - transactions', () => {
 
       test('should reject if the server cannot consume the file upload request', () => {
         const error = new Error('cannot-upload');
-        httpPut.mockRejectedValue(error);
+        transactionHttpRequest.mockRejectedValue(error);
 
         const promise = transaction.addFile(testFilePath, RDFMimeType.TRIG, context, null);
         return expect(promise).rejects.toEqual(error);
@@ -692,6 +652,22 @@ describe('RDFRepositoryClient - transactions', () => {
         return expect(transaction.addFile(testFilePath, RDFMimeType.TRIG, context, baseURI)).resolves.toEqual();
       });
     });
+
+    function verifyUploadRequestBuilder(requestBuilder) {
+      expect(requestBuilder).toBeInstanceOf(HttpRequestBuilder);
+      expect(requestBuilder.getMethod()).toEqual('put');
+      expect(requestBuilder.getUrl()).toEqual('');
+      expect(requestBuilder.getData()).toBeInstanceOf(Stream);
+      expect(requestBuilder.getHeaders()).toEqual({
+        'Content-Type': RDFMimeType.TRIG
+      });
+      expect(requestBuilder.getParams()).toEqual({
+        action: 'ADD',
+        baseURI,
+        context
+      });
+      expect(requestBuilder.getResponseType()).toEqual('stream');
+    }
 
     function getStatementPayload() {
       return new GetStatementsPayload()

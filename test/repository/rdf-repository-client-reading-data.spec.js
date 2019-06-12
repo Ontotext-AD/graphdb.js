@@ -8,7 +8,7 @@ const NTriplesParser = require('parser/n-triples-parser');
 const NQuadsParser = require('parser/n-quads-parser');
 const N3Parser = require('parser/n3-parser');
 const TriGParser = require('parser/trig-parser');
-const HttpRequestConfigBuilder = require('http/http-request-config-builder');
+const HttpRequestBuilder = require('http/http-request-builder');
 const JsonLDParser = require('parser/jsonld-parser');
 const RDFXmlParser = require('parser/rdfxml-parser');
 
@@ -34,16 +34,19 @@ const jsonldDataFile = path.resolve(__dirname, './data/read-statements-jsonld.tx
 const rdfxmlDataFile = path.resolve(__dirname, './data/read-statements-rdfxml.txt');
 
 describe('RDFRepositoryClient - reading statements', () => {
+
   let config;
   let repository;
-  const endpoints = ['http://host/repositories/repo1'];
-  const headers = {};
-  const contentType = '';
-  const readTimeout = 1000;
-  const writeTimeout = 1000;
+  let httpRequest;
 
   beforeEach(() => {
     HttpClient.mockImplementation(() => httpClientStub());
+
+    const endpoints = ['http://host/repositories/repo1'];
+    const headers = {};
+    const contentType = '';
+    const readTimeout = 1000;
+    const writeTimeout = 1000;
 
     config = new RepositoryClientConfig()
       .setEndpoints(endpoints)
@@ -52,6 +55,7 @@ describe('RDFRepositoryClient - reading statements', () => {
       .setReadTimeout(readTimeout)
       .setWriteTimeout(writeTimeout);
     repository = new RDFRepositoryClient(config);
+    httpRequest = repository.httpClients[0].request;
   });
 
   describe('statements#get returning Quads', () => {
@@ -61,10 +65,10 @@ describe('RDFRepositoryClient - reading statements', () => {
       literal(7931000),
       defaultGraph())];
 
-    function mockHttpGET(type) {
-      repository.httpClients[0].get.mockImplementation(() => Promise.resolve({
+    function mockHttpRequest(type) {
+      httpRequest.mockResolvedValue({
         data: data.repositories.repo1.statements.GET[type]
-      }));
+      });
     }
 
     function buildPayload(type) {
@@ -77,7 +81,7 @@ describe('RDFRepositoryClient - reading statements', () => {
     test('should fetch statement in N-Triples format and return it converted to quads', () => {
       repository.registerParser(new NTriplesParser());
 
-      mockHttpGET(RDFMimeType.N_TRIPLES);
+      mockHttpRequest(RDFMimeType.N_TRIPLES);
 
       const payload = buildPayload(RDFMimeType.N_TRIPLES);
       return expect(repository.get(payload)).resolves.toEqual(expected);
@@ -86,7 +90,7 @@ describe('RDFRepositoryClient - reading statements', () => {
     test('should fetch statement in N3 format and return it converted to quads', () => {
       repository.registerParser(new N3Parser());
 
-      mockHttpGET(RDFMimeType.N3);
+      mockHttpRequest(RDFMimeType.N3);
 
       const payload = buildPayload(RDFMimeType.N3);
       return expect(repository.get(payload)).resolves.toEqual(expected);
@@ -95,7 +99,7 @@ describe('RDFRepositoryClient - reading statements', () => {
     test('should fetch statement in TriG format and return it converted to quads', () => {
       repository.registerParser(new TriGParser());
 
-      mockHttpGET(RDFMimeType.TRIG);
+      mockHttpRequest(RDFMimeType.TRIG);
 
       const payload = buildPayload(RDFMimeType.TRIG);
       return expect(repository.get(payload)).resolves.toEqual(expected);
@@ -104,7 +108,7 @@ describe('RDFRepositoryClient - reading statements', () => {
     test('should fetch statement in N-Quads format and return it converted to quads', () => {
       repository.registerParser(new NQuadsParser());
 
-      mockHttpGET(RDFMimeType.N_QUADS);
+      mockHttpRequest(RDFMimeType.N_QUADS);
 
       const payload = buildPayload(RDFMimeType.N_QUADS);
       return expect(repository.get(payload)).resolves.toEqual(expected);
@@ -113,14 +117,14 @@ describe('RDFRepositoryClient - reading statements', () => {
     test('should fetch statement in Turtle format and return it converted to quads', () => {
       repository.registerParser(new TurtleParser());
 
-      mockHttpGET(RDFMimeType.TURTLE);
+      mockHttpRequest(RDFMimeType.TURTLE);
 
       const payload = buildPayload(RDFMimeType.TURTLE);
       return expect(repository.get(payload)).resolves.toEqual(expected);
     });
 
     test('should fetch statement in jsonld format and return it converted to quads', () => {
-      repository.httpClients[0].get.mockResolvedValue({
+      httpRequest.mockResolvedValue({
         data: FileUtils.getReadStream(jsonldDataFile)
       });
 
@@ -143,7 +147,7 @@ describe('RDFRepositoryClient - reading statements', () => {
     });
 
     test('should fetch statement in rdfxml format and return it converted to quads', () => {
-      repository.httpClients[0].get.mockResolvedValue({
+      httpRequest.mockResolvedValue({
         data: FileUtils.getReadStream(rdfxmlDataFile)
       });
 
@@ -168,15 +172,13 @@ describe('RDFRepositoryClient - reading statements', () => {
 
   describe('statements#get returning plain string', () => {
     test('should reject with error if response fails', () => {
-      repository.httpClients[0].get.mockImplementation(() => Promise.reject({response: 'Server error'}));
+      httpRequest.mockRejectedValue({response: 'Server error'});
 
       return expect(repository.get(new GetStatementsPayload())).rejects.toEqual({response: 'Server error'});
     });
 
     test('should populate http header and parameters according to provided data', () => {
-      repository.httpClients[0].get.mockImplementation(() => {
-        return Promise.resolve({data: ''});
-      });
+      httpRequest.mockResolvedValue({data: ''});
 
       const payload = new GetStatementsPayload()
         .setResponseType(RDFMimeType.RDF_JSON)
@@ -206,24 +208,24 @@ describe('RDFRepositoryClient - reading statements', () => {
     });
 
     function verifyGetRequest() {
-      const expectedRequestConfig = new HttpRequestConfigBuilder().setHeaders({
-        'Accept': RDFMimeType.RDF_JSON
-      }).setParams({
-        infer: true,
-        subj: '<http://eunis.eea.europa.eu/countries/AZ>',
-        pred: '<http://eunis.eea.europa.eu/rdf/schema.rdf#population>',
-        obj: '"7931000"^^http://www.w3.org/2001/XMLSchema#integer',
-        context: '<http://example.org/graph3>'
-      });
+      const expectedRequestConfig = HttpRequestBuilder.httpGet('/statements')
+        .setHeaders({
+          'Accept': RDFMimeType.RDF_JSON
+        }).setParams({
+          infer: true,
+          subj: '<http://eunis.eea.europa.eu/countries/AZ>',
+          pred: '<http://eunis.eea.europa.eu/rdf/schema.rdf#population>',
+          obj: '"7931000"^^http://www.w3.org/2001/XMLSchema#integer',
+          context: '<http://example.org/graph3>'
+        });
 
-      const httpGet = repository.httpClients[0].get;
-      expect(httpGet).toHaveBeenCalledWith('/statements', expectedRequestConfig);
+      expect(httpRequest).toHaveBeenCalledWith(expectedRequestConfig);
     }
 
     test('should fetch and return single statement as plain string', () => {
-      repository.httpClients[0].get.mockImplementation(() => Promise.resolve({
+      httpRequest.mockResolvedValue({
         data: data.repositories.repo1.statements.GET['single_application/rdf+xml']
-      }));
+      });
 
       const payload = new GetStatementsPayload()
         .setSubject('<http://eunis.eea.europa.eu/countries/AZ>')
@@ -242,9 +244,9 @@ describe('RDFRepositoryClient - reading statements', () => {
     });
 
     test('should fetch and return all statement as plain string', () => {
-      repository.httpClients[0].get.mockImplementation(() => Promise.resolve({
+      httpRequest.mockResolvedValue({
         data: data.repositories.repo1.statements.GET['all_application/rdf+xml']
-      }));
+      });
       const expected = '<?xml version="1.0" encoding="UTF-8"?><rdf:RDF xmlns="http://eunis.eea.europa.eu/rdf/schema.rdf#"><rdf:Description rdf:about="http://www.w3.org/1999/02/22-rdf-syntax-ns#type"><rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"/></rdf:Description><rdf:Description rdf:about="http://www.w3.org/2000/01/rdf-schema#subPropertyOf"><rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"/><rdf:type rdf:resource="http://www.w3.org/2002/07/owl#TransitiveProperty"/></rdf:Description><rdf:Description rdf:about="http://www.w3.org/2000/01/rdf-schema#subClassOf"><rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"/><rdf:type rdf:resource="http://www.w3.org/2002/07/owl#TransitiveProperty"/></rdf:Description><rdf:Description rdf:about="http://www.w3.org/2000/01/rdf-schema#domain"><rdf:type rdf:resource="http://www.w3.org/1999/02/22-rdf-syntax-ns#Property"/></rdf:Description></rdf:RDF>';
 
       const payload = new GetStatementsPayload();
@@ -266,7 +268,7 @@ describe('RDFRepositoryClient - reading statements', () => {
         .setObject('"7931000"^^http://www.w3.org/2001/XMLSchema#integer')
         .setContext('<http://example.org/graph3>');
 
-      repository.httpClients[0].get.mockResolvedValue({
+      httpRequest.mockResolvedValue({
         data: stream
       });
 
@@ -279,7 +281,6 @@ describe('RDFRepositoryClient - reading statements', () => {
     });
 
     test('should make a GET request with proper arguments', () => {
-      const getMock = repository.httpClients[0].get;
       const payload = new GetStatementsPayload()
         .setResponseType(RDFMimeType.TURTLE)
         .setSubject('<http://eunis.eea.europa.eu/countries/AZ>')
@@ -289,12 +290,11 @@ describe('RDFRepositoryClient - reading statements', () => {
         .setInference(true);
 
       return repository.download(payload).then(() => {
-        verifyDownloadRequest(getMock);
+        verifyDownloadRequest();
       });
     });
 
     test('should convert the download request to N-Triple resources if not already encoded', () => {
-      const getMock = repository.httpClients[0].get;
       const payload = new GetStatementsPayload()
         .setResponseType(RDFMimeType.TURTLE)
         .setSubject('http://eunis.eea.europa.eu/countries/AZ')
@@ -304,22 +304,24 @@ describe('RDFRepositoryClient - reading statements', () => {
         .setInference(true);
 
       return repository.download(payload).then(() => {
-        verifyDownloadRequest(getMock);
+        verifyDownloadRequest();
       });
     });
 
-    function verifyDownloadRequest(getMock) {
-      const expectedRequestConfig = new HttpRequestConfigBuilder().setHeaders({
-        'Accept': 'text/turtle'
-      }).setParams({
-        subj: '<http://eunis.eea.europa.eu/countries/AZ>',
-        pred: '<http://eunis.eea.europa.eu/rdf/schema.rdf#population>',
-        obj: '"7931000"^^http://www.w3.org/2001/XMLSchema#integer',
-        context: '<http://example.org/graph3>',
-        infer: true
-      }).setResponseType('stream');
-      expect(getMock).toHaveBeenCalledTimes(1);
-      expect(getMock).toHaveBeenCalledWith('/statements', expectedRequestConfig);
+    function verifyDownloadRequest() {
+      const expectedRequestConfig = HttpRequestBuilder.httpGet('/statements')
+        .setHeaders({
+          'Accept': 'text/turtle'
+        }).setParams({
+          subj: '<http://eunis.eea.europa.eu/countries/AZ>',
+          pred: '<http://eunis.eea.europa.eu/rdf/schema.rdf#population>',
+          obj: '"7931000"^^http://www.w3.org/2001/XMLSchema#integer',
+          context: '<http://example.org/graph3>',
+          infer: true
+        })
+        .setResponseType('stream');
+      expect(httpRequest).toHaveBeenCalledTimes(1);
+      expect(httpRequest).toHaveBeenCalledWith(expectedRequestConfig);
     }
 
     function streamSource() {

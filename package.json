@@ -70,7 +70,6 @@
     "eslint-config-google": "^0.12.0",
     "eslint-plugin-no-only-tests": "^2.3.0",
     "jest": "^24.7.1",
-    "jest-when": "^2.4.0",
     "jsdoc": "^3.6.2",
     "stream-mock": "^2.0.2",
     "tsd-jsdoc": "^2.1.3",
