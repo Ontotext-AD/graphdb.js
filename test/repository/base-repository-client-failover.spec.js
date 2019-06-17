@@ -131,8 +131,12 @@ describe('BaseRepositoryClient', () => {
     });
 
     it('should reject if it cannot properly execute requests', () => {
-      // Not providing a consumer function should cause the client blow and reject
-      expect(repositoryClient.execute()).rejects.toEqual(Error);
+      const err = new Error('Cannot request');
+      let httpClient1 = repositoryClient.httpClients[0];
+      httpClient1.request = () => {
+        throw err;
+      };
+      return expect(repositoryClient.execute()).rejects.toEqual(err);
     });
   });
 

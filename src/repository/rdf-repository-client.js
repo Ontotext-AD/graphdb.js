@@ -405,8 +405,7 @@ class RDFRepositoryClient extends BaseRepositoryClient {
    * @return {Promise<TransactionalRepositoryClient>} transactional client
    */
   beginTransaction(isolationLevel) {
-    return this.transactionService.beginTransaction(isolationLevel,
-      this.repositoryClientConfig);
+    return this.transactionService.beginTransaction(isolationLevel);
   }
 }
 
