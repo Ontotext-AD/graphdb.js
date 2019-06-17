@@ -230,8 +230,7 @@ class TransactionalRepositoryClient extends BaseRepositoryClient {
    * is successful or rejected in case of failure
    */
   addQuads(quads, context, baseURI) {
-    return TermConverter.toString(quads)
-      .then((payload) => this.sendData(payload, context, baseURI));
+    return this.sendData(TermConverter.toString(quads), context, baseURI);
   }
 
   /**

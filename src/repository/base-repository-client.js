@@ -5,6 +5,7 @@ const RepositoryClientConfig =
   require('../repository/repository-client-config');
 const Iterable = require('../util/iterable');
 const HttpResponse = require('../http/http-response');
+const LoggingUtils = require('../logging/logging-utils');
 
 /**
  * Set of HTTP status codes for which requests could be re-attempted.
@@ -210,13 +211,8 @@ class BaseRepositoryClient {
    * @param {object} [params] additional parameters to be appended
    * @return {object} the constructed payload object for logging
    */
-  getLogPayload(response, params = {}) {
-    const payload = {
-      elapsedTime: response.getElapsedTime(),
-      repositoryUrl: response.getBaseURL()
-    };
-    Object.assign(payload, params);
-    return payload;
+  getLogPayload(response, params) {
+    return LoggingUtils.getLogPayload(response, params);
   }
 
   /**

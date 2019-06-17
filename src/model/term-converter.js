@@ -90,21 +90,22 @@ class TermConverter {
    * @public
    * @static
    * @param {Quad[]} quads the collection of quads to serialize to Turtle
-   * @return {Promise<string>} a promise that will be resolved to Turtle or Trig
+   * @return {string} a promise that will be resolved to Turtle or Trig
    * text or rejected if the quads cannot be serialized
    */
   static toString(quads) {
     const writer = TermConverter.getWriter();
     writer.addQuads(quads);
-    return new Promise((resolve, reject) => {
-      writer.end((error, result) => {
-        if (error) {
-          reject(error);
-        } else {
-          resolve(result.trim());
-        }
-      });
+
+    let converted = '';
+    writer.end((error, result) => {
+      if (error) {
+        throw new Error(error);
+      } else {
+        converted = result.trim();
+      }
     });
+    return converted;
   }
 
   /**

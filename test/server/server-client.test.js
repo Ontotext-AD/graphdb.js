@@ -113,10 +113,7 @@ describe('ServerClient', () => {
       const repositoryClientConfig = new RepositoryClientConfig().setEndpoints(['endpoint']);
       const expected = new RDFRepositoryClient(repositoryClientConfig);
       return server.getRepository('automotive', repositoryClientConfig).then((actual) => {
-        // Omit axios instances, they fail the deep equal check
-        actual.httpClients.forEach((client) => delete client.axios);
-        expected.httpClients.forEach((client) => delete client.axios);
-        expect(actual).toEqual(expected);
+        expect(actual.repositoryClientConfig).toEqual(expected.repositoryClientConfig);
       });
     });
   });
