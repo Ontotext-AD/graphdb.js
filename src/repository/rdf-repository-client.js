@@ -37,7 +37,7 @@ const PATH_STATEMENTS = '/statements';
  */
 class RDFRepositoryClient extends BaseRepositoryClient {
   /**
-   * @inheritdoc
+   * @param {RepositoryClientConfig} repositoryClientConfig
    */
   constructor(repositoryClientConfig) {
     super(repositoryClientConfig);

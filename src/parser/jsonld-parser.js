@@ -11,7 +11,7 @@ const JsonLdParser = require('jsonld-streaming-parser').JsonLdParser;
  */
 class JsonLDParser extends ContentParser {
   /**
-   * @inheritDoc
+   * @param {Object} config is an object containing the parser configuration.
    */
   constructor(config) {
     super(config);

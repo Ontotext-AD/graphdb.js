@@ -59,7 +59,7 @@ const QUERY_TO_RESPONSE_TYPE_FORMATS_MAPPING = {
  */
 class GetQueryPayload extends QueryPayload {
   /**
-   * @inheritDoc
+   * Does basic initialization.
    */
   constructor() {
     super();
