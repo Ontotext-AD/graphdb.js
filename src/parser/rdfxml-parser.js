@@ -11,7 +11,7 @@ const RdfXmlParser = require('rdfxml-streaming-parser').RdfXmlParser;
  */
 class RDFXmlParser extends ContentParser {
   /**
-   * @inheritDoc
+   * @param {Object} config is an object containing the parser configuration.
    */
   constructor(config) {
     super(config);

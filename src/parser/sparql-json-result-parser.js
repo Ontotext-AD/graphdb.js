@@ -19,7 +19,7 @@ import {SparqlJsonParser} from 'sparqljson-parse';
  */
 class SparqlJsonResultParser extends ContentParser {
   /**
-   * @inheritDoc
+   * @param {Object} config is an object containing the parser configuration.
    */
   constructor(config) {
     super(config);

@@ -11,7 +11,7 @@ const Parser = require('n3').Parser;
  */
 class TurtleParser extends ContentParser {
   /**
-   * @inheritDoc
+   * @param {Object} config is an object containing the parser configuration.
    */
   constructor(config) {
     super(config);
