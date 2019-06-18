@@ -21,8 +21,8 @@ describe('Should test repositories', () => {
     let repositoryClientConfig = new RepositoryClientConfig([`${Config.serverAddress}/repositories/`], {}, '', 3001, 3001);
 
     return client.getRepositoryIDs().then((response) => {
-      let expected = ['Test_repo_2', 'Test_repo'];
-      expect(response).toEqual(expected);
+      let expected = ['Test_repo', 'Test_repo_2'];
+      expect(response.sort()).toEqual(expected);
       return client.hasRepository('Test_repo');
     }).then((response) => {
       expect(response).toBeTruthy();
