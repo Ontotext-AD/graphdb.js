@@ -14,14 +14,25 @@ branches:
 
 cache: npm
 
+before_install:
+  - docker pull docker-registry.ontotext.com/graphdb-free:8.10-SNAPSHOT
+  - docker run -d -p 7200:7200 --name graphdb docker-registry.ontotext.com/graphdb-free:8.10-SNAPSHOT
+
 before_script:
   - ./scripts/cc-coverage-prepare.sh
+  - npm install -g wait-on
 
 script:
   - npm run lint
   - npm run lint:test
   - npm run test:report
   - npm run test:coveralls
+  - npm run build
+  - npm run install:local
+
+  # E2E Acceptance tests
+  - wait-on http://localhost:7200 -t 60000
+  - (cd test-e2e/ && npm install && npm run test)
 
 after_script:
   - ./scripts/cc-coverage-publish.sh
