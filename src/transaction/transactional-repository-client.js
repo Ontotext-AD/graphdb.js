@@ -1,11 +1,15 @@
 const BaseRepositoryClient = require('../repository/base-repository-client');
+const HttpRequestBuilder = require('../http/http-request-builder');
+
+const RepositoryService = require('../service/repository-service');
+const StatementsService = require('../service/statements-service');
+const QueryService = require('../service/query-service');
+const UploadService = require('../service/upload-service');
+const DownloadService = require('../service/download-service');
+
 const ConsoleLogger = require('../logging/console-logger');
 const RDFMimeType = require('../http/rdf-mime-type');
-const TermConverter = require('../model/term-converter');
 const StringUtils = require('../util/string-utils');
-const FileUtils = require('../util/file-utils');
-const CommonUtils = require('../util/common-utils');
-const HttpRequestBuilder = require('../http/http-request-builder');
 
 /**
  * Transactional RDF repository client implementation realizing transaction
@@ -28,6 +32,7 @@ class TransactionalRepositoryClient extends BaseRepositoryClient {
    */
   constructor(repositoryClientConfig) {
     super(repositoryClientConfig);
+    this.initServices();
     this.active = true;
   }
 
@@ -41,15 +46,42 @@ class TransactionalRepositoryClient extends BaseRepositoryClient {
   }
 
   /**
+   * Instantiates dependent services.
+   */
+  initServices() {
+    const httpRequestExecutor = this.execute.bind(this);
+    const parseExecutor = this.parse.bind(this);
+
+    this.repositoryService = new RepositoryService(httpRequestExecutor);
+    this.statementsService = new StatementsService(httpRequestExecutor,
+      this.parserRegistry, parseExecutor);
+    this.queryService = new QueryService(httpRequestExecutor, parseExecutor);
+    this.uploadService = new UploadService(httpRequestExecutor);
+    this.downloadService = new DownloadService(httpRequestExecutor);
+  }
+
+  /**
    * @inheritDoc
    * @override
    * @throws {Error} if the transaction has been committed or rollbacked
    */
-  execute(httpClientConsumer) {
+  execute(requestBuilder) {
     if (!this.active) {
       throw new Error('Transaction is inactive');
     }
-    return super.execute(httpClientConsumer);
+    return super.execute(requestBuilder);
+  }
+
+  /**
+   * Updates the http request builder in the provided service request for
+   * executing requests in a transaction.
+   *
+   * @param {ServiceRequest} serviceRequest the request to mutate
+   * @param {string} action the transaction action
+   */
+  decorateServiceRequest(serviceRequest, action) {
+    const requestBuilder = serviceRequest.getHttpRequestBuilder();
+    requestBuilder.setMethod('put').setUrl('').addParam('action', action);
   }
 
   /**
@@ -63,18 +95,9 @@ class TransactionalRepositoryClient extends BaseRepositoryClient {
    * @return {Promise<number>} a promise resolving to the size of the repo
    */
   getSize(context) {
-    const requestBuilder = HttpRequestBuilder.httpPut('')
-      .setParams({
-        action: 'SIZE',
-        context: TermConverter.toNTripleValues(context)
-      });
-
-    return this.execute((http) => http.request(requestBuilder))
-      .then((response) => {
-        this.logger.debug(this.getLogPayload(response, {context}),
-          'Fetched size');
-        return response.getData();
-      });
+    const serviceRequest = this.repositoryService.getSize(context);
+    this.decorateServiceRequest(serviceRequest, 'SIZE');
+    return serviceRequest.execute();
   }
 
   /**
@@ -91,32 +114,9 @@ class TransactionalRepositoryClient extends BaseRepositoryClient {
    *      to provided response type.
    */
   get(payload) {
-    const requestBuilder = HttpRequestBuilder.httpPut('')
-      .setParams({
-        action: 'GET',
-        subj: TermConverter.toNTripleValue(payload.getSubject()),
-        pred: TermConverter.toNTripleValue(payload.getPredicate()),
-        obj: TermConverter.toNTripleValue(payload.getObject()),
-        context: TermConverter.toNTripleValues(payload.getContext()),
-        infer: payload.getInference()
-      })
-      .addAcceptHeader(payload.getResponseType());
-
-    const parser = this.getParser(payload.getResponseType());
-    if (parser && parser.isStreaming()) {
-      requestBuilder.setResponseType('stream');
-    }
-
-    return this.execute((http) => http.request(requestBuilder))
-      .then((response) => {
-        this.logger.debug(this.getLogPayload(response, {
-          subject: payload.getSubject(),
-          predicate: payload.getPredicate(),
-          object: payload.getObject(),
-          context: payload.getContext()
-        }), 'Fetched data');
-        return this.parse(response.getData(), payload.getResponseType());
-      });
+    const serviceRequest = this.statementsService.get(payload);
+    this.decorateServiceRequest(serviceRequest, 'GET');
+    return serviceRequest.execute();
   }
 
   /**
@@ -130,26 +130,9 @@ class TransactionalRepositoryClient extends BaseRepositoryClient {
    * @throws {Error} if the payload is misconfigured
    */
   query(payload) {
-    const requestBuilder = HttpRequestBuilder.httpPut('')
-      .setData(payload.getParams())
-      .setResponseType('stream')
-      .addAcceptHeader(payload.getResponseType())
-      .addContentTypeHeader(payload.getContentType())
-      .setParams({
-        action: 'QUERY'
-      });
-
-    return this.execute((http) => http.request(requestBuilder))
-      .then((response) => {
-        this.logger.debug(this.getLogPayload(response, {
-          query: payload.getQuery(),
-          queryType: payload.getQueryType()
-        }), 'Queried data');
-
-        return this.parse(response.getData(), payload.getResponseType(), {
-          queryType: payload.getQueryType()
-        });
-      });
+    const serviceRequest = this.queryService.query(payload);
+    this.decorateServiceRequest(serviceRequest, 'QUERY');
+    return serviceRequest.execute();
   }
 
   /**
@@ -161,18 +144,9 @@ class TransactionalRepositoryClient extends BaseRepositoryClient {
    * @throws {Error} if the payload is misconfigured
    */
   update(payload) {
-    const requestBuilder = HttpRequestBuilder.httpPut('')
-      .setData(payload.getParams())
-      .addContentTypeHeader(payload.getContentType())
-      .setParams({
-        action: 'UPDATE'
-      });
-
-    return this.execute((http) => http.request(requestBuilder))
-      .then((response) => {
-        this.logger.debug(this.getLogPayload(response,
-          {query: payload.getQuery()}), 'Performed update');
-      });
+    const serviceRequest = this.queryService.update(payload);
+    this.decorateServiceRequest(serviceRequest, 'UPDATE');
+    return serviceRequest.execute();
   }
 
   /**
@@ -194,29 +168,9 @@ class TransactionalRepositoryClient extends BaseRepositoryClient {
    * subject, predicate and/or object
    */
   add(payload) {
-    if (!payload) {
-      throw new Error('Cannot add statement without payload');
-    }
-
-    const subject = payload.getSubject();
-    const predicate = payload.getPredicate();
-    const object = payload.getObject();
-    const context = payload.getContext();
-
-    if (CommonUtils.hasNullArguments(subject, predicate, object)) {
-      throw new Error('Cannot add statement with null ' +
-        'subject, predicate or object');
-    }
-
-    let quads;
-    if (payload.isLiteral()) {
-      quads = TermConverter.getLiteralQuads(subject, predicate, object, context,
-        payload.getDataType(), payload.getLanguage());
-    } else {
-      quads = TermConverter.getQuads(subject, predicate, object, context);
-    }
-
-    return this.addQuads(quads, payload.getContext(), payload.getBaseURI());
+    const serviceRequest = this.statementsService.add(payload);
+    this.decorateServiceRequest(serviceRequest, 'ADD');
+    return serviceRequest.execute();
   }
 
   /**
@@ -234,44 +188,10 @@ class TransactionalRepositoryClient extends BaseRepositoryClient {
    * is successful or rejected in case of failure
    */
   addQuads(quads, context, baseURI) {
-    return TermConverter.toString(quads)
-      .then((payload) => this.sendData(payload, context, baseURI));
-  }
-
-  /**
-   * Inserts the statements in the provided Turtle or Trig formatted data.
-   *
-   * @private
-   * @param {string} data payload data in Turtle or Trig format
-   * @param {string|string[]} [context] restricts the insertion to the given
-   * context. Will be encoded as N-Triple if it is not already one
-   * @param {string} [baseURI] used to resolve relative URIs in the data
-   * @return {Promise<void>} promise resolving after the data has been inserted
-   * successfully
-   * @throws {Error} if no data is provided for saving
-   */
-  sendData(data, context, baseURI) {
-    if (StringUtils.isBlank(data)) {
-      throw new Error('Turtle data is required when adding statements');
-    }
-
-    const requestBuilder = HttpRequestBuilder.httpPut('')
-      .setData(data)
-      .setParams({
-        action: 'ADD',
-        context: TermConverter.toNTripleValues(context),
-        baseURI
-      })
-      .addContentTypeHeader(RDFMimeType.TRIG);
-
-    return this.execute((http) => http.request(requestBuilder))
-      .then((response) => {
-        this.logger.debug(this.getLogPayload(response, {
-          data,
-          context,
-          baseURI
-        }), 'Inserted statements');
-      });
+    const serviceRequest = this.statementsService.addQuads(quads, context,
+      baseURI);
+    this.decorateServiceRequest(serviceRequest, 'ADD');
+    return serviceRequest.execute();
   }
 
   /**
@@ -294,10 +214,9 @@ class TransactionalRepositoryClient extends BaseRepositoryClient {
       })
       .addContentTypeHeader(RDFMimeType.TRIG);
 
-    return this.execute((http) => http.request(requestBuilder))
-      .then((response) => {
-        this.logger.debug(this.getLogPayload(response, {data}), 'Deleted data');
-      });
+    return this.execute(requestBuilder).then((response) => {
+      this.logger.debug(this.getLogPayload(response, {data}), 'Deleted data');
+    });
   }
 
   /**
@@ -316,28 +235,9 @@ class TransactionalRepositoryClient extends BaseRepositoryClient {
    * response type as soon as they are available.
    */
   download(payload) {
-    const requestBuilder = HttpRequestBuilder.httpPut('')
-      .addAcceptHeader(payload.getResponseType())
-      .setResponseType('stream')
-      .setParams({
-        action: 'GET',
-        subj: TermConverter.toNTripleValue(payload.getSubject()),
-        pred: TermConverter.toNTripleValue(payload.getPredicate()),
-        obj: TermConverter.toNTripleValue(payload.getObject()),
-        context: TermConverter.toNTripleValues(payload.getContext()),
-        infer: payload.getInference()
-      });
-
-    return this.execute((http) => http.request(requestBuilder))
-      .then((response) => {
-        this.logger.debug(this.getLogPayload(response, {
-          subject: payload.getSubject(),
-          predicate: payload.getPredicate(),
-          object: payload.getObject(),
-          context: payload.getContext()
-        }), 'Downloaded data');
-        return response.getData();
-      });
+    const serviceRequest = this.downloadService.download(payload);
+    this.decorateServiceRequest(serviceRequest, 'GET');
+    return serviceRequest.execute();
   }
 
   /**
@@ -359,14 +259,10 @@ class TransactionalRepositoryClient extends BaseRepositoryClient {
    * been successfully consumed by the server
    */
   upload(readStream, contentType, context, baseURI) {
-    return this.uploadData(readStream, contentType, context, baseURI)
-      .then((response) => {
-        this.logger.debug(this.getLogPayload(response, {
-          contentType,
-          context,
-          baseURI
-        }), 'Uploaded data stream');
-      });
+    const serviceRequest = this.uploadService.upload(readStream, contentType,
+      context, baseURI);
+    this.decorateServiceRequest(serviceRequest, 'ADD');
+    return serviceRequest.execute();
   }
 
   /**
@@ -384,47 +280,10 @@ class TransactionalRepositoryClient extends BaseRepositoryClient {
    * been successfully consumed by the server
    */
   addFile(filePath, contentType, context, baseURI) {
-    return this.uploadData(FileUtils.getReadStream(filePath), contentType,
-      context, baseURI).then((response) => {
-      this.logger.debug(this.getLogPayload(response, {
-        filePath,
-        contentType,
-        context,
-        baseURI
-      }), 'Uploaded file');
-    });
-  }
-
-  /**
-   * Streams data to the repository from the provided readable stream.
-   *
-   * This method is useful for library client who wants to upload a big data set
-   * into the repository during a transaction
-   *
-   * @private
-   * @param {ReadableStream} readStream stream with the data to be uploaded
-   * @param {string} contentType is one of RDF mime type formats,
-   *                application/x-rdftransaction' for a transaction document or
-   *                application/x-www-form-urlencoded
-   * @param {NamedNode|string} [context] optional context to restrict the
-   * operation. Will be encoded as N-Triple if it is not already one
-   * @param {string} [baseURI] optional uri against which any relative URIs
-   * found in the data would be resolved.
-   * @return {Promise<HttpResponse|Error>} a promise that will be resolved when
-   * the stream has been successfully consumed by the server
-   */
-  uploadData(readStream, contentType, context, baseURI) {
-    const requestBuilder = HttpRequestBuilder.httpPut('')
-      .setData(readStream)
-      .addContentTypeHeader(contentType)
-      .setResponseType('stream')
-      .setParams({
-        action: 'ADD',
-        context: TermConverter.toNTripleValues(context),
-        baseURI
-      });
-
-    return this.execute((http) => http.request(requestBuilder));
+    const serviceRequest = this.uploadService.addFile(filePath, contentType,
+      context, baseURI);
+    this.decorateServiceRequest(serviceRequest, 'ADD');
+    return serviceRequest.execute();
   }
 
   /**
@@ -441,14 +300,13 @@ class TransactionalRepositoryClient extends BaseRepositoryClient {
         action: 'COMMIT'
       });
 
-    return this.execute((http) => http.request(requestBuilder))
-      .then((response) => {
-        this.active = false;
-        this.logger.debug(this.getLogPayload(response), 'Transaction commit');
-      }).catch((err) => {
-        this.active = false;
-        return Promise.reject(err);
-      });
+    return this.execute(requestBuilder).then((response) => {
+      this.active = false;
+      this.logger.debug(this.getLogPayload(response), 'Transaction commit');
+    }).catch((err) => {
+      this.active = false;
+      return Promise.reject(err);
+    });
   }
 
   /**
@@ -460,14 +318,13 @@ class TransactionalRepositoryClient extends BaseRepositoryClient {
    */
   rollback() {
     const requestBuilder = HttpRequestBuilder.httpDelete('');
-    return this.execute((http) => http.request(requestBuilder))
-      .then((response) => {
-        this.active = false;
-        this.logger.debug(this.getLogPayload(response), 'Transaction rollback');
-      }).catch((err) => {
-        this.active = false;
-        return Promise.reject(err);
-      });
+    return this.execute(requestBuilder).then((response) => {
+      this.active = false;
+      this.logger.debug(this.getLogPayload(response), 'Transaction rollback');
+    }).catch((err) => {
+      this.active = false;
+      return Promise.reject(err);
+    });
   }
 
   /**

@@ -14,6 +14,6 @@ describe('TermConverter', () => {
         end: (callback) => callback('error')
       };
     };
-    return expect(TermConverter.toString([])).rejects.toEqual('error');
+    expect(() => TermConverter.toString([])).toThrow('error');
   });
 });

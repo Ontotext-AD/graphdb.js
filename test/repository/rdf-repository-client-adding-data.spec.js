@@ -203,8 +203,8 @@ describe('RDFRepositoryClient - adding data', () => {
   describe('addQuads(quads)', () => {
     test('should throw error when no data is provided', () => {
       const quads = [];
-      return expect(rdfRepositoryClient.addQuads(quads))
-        .rejects.toEqual(Error('Turtle/trig data is required when adding statements'));
+      return expect(() => rdfRepositoryClient.addQuads(quads))
+        .toThrow(Error('Turtle/trig data is required when adding statements'));
     });
 
     test('should convert the quads to turtle and send a request', () => {

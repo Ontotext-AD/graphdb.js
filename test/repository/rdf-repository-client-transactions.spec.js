@@ -470,30 +470,6 @@ describe('RDFRepositoryClient - transactions', () => {
       });
     });
 
-    describe('sendData()', () => {
-      test('should add data', () => {
-        return transaction.sendData(data).then(() => {
-          expectInsertedData(data, undefined, undefined);
-        });
-      });
-
-      test('should require data when adding', () => {
-        expect(() => transaction.sendData()).toThrow();
-        expect(() => transaction.sendData('')).toThrow();
-        expect(() => transaction.sendData('  ')).toThrow();
-        expect(transactionHttpRequest).toHaveBeenCalledTimes(0);
-      });
-
-      test('should reject if the transaction cannot add data', () => {
-        transactionHttpRequest.mockRejectedValue('Error during add');
-        return expect(transaction.sendData(data)).rejects.toEqual('Error during add');
-      });
-
-      test('should resolve to empty response (HTTP 204)', () => {
-        return expect(transaction.sendData(data)).resolves.toEqual();
-      });
-    });
-
     function expectInsertedData(expectedData, expectedContext, expectedBaseURI) {
       const expectedRequest = HttpRequestBuilder.httpPut('')
         .setData(expectedData)

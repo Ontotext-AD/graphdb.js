@@ -5,6 +5,7 @@ const RepositoryClientConfig =
   require('../repository/repository-client-config');
 const Iterable = require('../util/iterable');
 const HttpResponse = require('../http/http-response');
+const LoggingUtils = require('../logging/logging-utils');
 
 /**
  * Set of HTTP status codes for which requests could be re-attempted.
@@ -92,16 +93,6 @@ class BaseRepositoryClient {
   }
 
   /**
-   * Obtain a parser instance by type.
-   *
-   * @param {string} responseType
-   * @return {ContentParser}
-   */
-  getParser(responseType) {
-    return this.parserRegistry.get(responseType);
-  }
-
-  /**
    * Parses provided content with registered parser if there is one. Otherwise
    * returns the content untouched. If <code>contentType</code> is provided it
    * should be an instance of {@link RDFMimeType} enum and is used as a key
@@ -129,8 +120,8 @@ class BaseRepositoryClient {
   }
 
   /**
-   * Executor for http requests. It supplies the provided HTTP client consumer
-   * with a HTTP client for executing requests.
+   * Executor for http requests. It passes the provided HTTP request builder
+   * to a HTTP client for executing requests.
    *
    * If the request was unsuccessful it will be retried with another endpoint
    * HTTP client in case the request's status is one of
@@ -140,16 +131,16 @@ class BaseRepositoryClient {
    * with promise rejection.
    *
    * @protected
-   * @param {Function} httpClientConsumer the consumer of supplied http client
-   *                                      that performs the request execution
+   * @param {HttpRequestBuilder} requestBuilder the http request data to be
+   * passed to a http client
    * @return {Promise<HttpResponse|Error>} a promise which resolves to response
    * wrapper or rejects with error if thrown during execution.
    */
-  execute(httpClientConsumer) {
+  execute(requestBuilder) {
     try {
       const startTime = Date.now();
       const httpClients = new Iterable(this.httpClients);
-      return this.retryExecution(httpClients, httpClientConsumer)
+      return this.retryExecution(httpClients, requestBuilder)
         .then((executionResponse) => {
           executionResponse.setElapsedTime(Date.now() - startTime);
           return executionResponse;
@@ -165,14 +156,14 @@ class BaseRepositoryClient {
    *
    * @private
    * @param {Iterable} httpClients iterable collection of http clients
-   * @param {Function} httpClientConsumer the consumer of supplied http client
-   *                                      that performs the request execution
+   * @param {HttpRequestBuilder} requestBuilder the http request data to be
+   * passed to a http client
    * @return {Promise<HttpResponse|Error>} a promise which resolves to response
    * wrapper or rejects with error if thrown during execution.
    */
-  retryExecution(httpClients, httpClientConsumer) {
+  retryExecution(httpClients, requestBuilder) {
     const httpClient = httpClients.next();
-    return httpClientConsumer(httpClient).then((response) => {
+    return httpClient.request(requestBuilder).then((response) => {
       return new HttpResponse(response, httpClient);
     }).catch((error) => {
       const canRetry = BaseRepositoryClient.canRetryExecution(error);
@@ -183,7 +174,7 @@ class BaseRepositoryClient {
       // Try the next repo http client (if any)
       if (canRetry && hasNext) {
         this.logger.warn(loggerPayload, 'Retrying execution');
-        return this.retryExecution(httpClients, httpClientConsumer);
+        return this.retryExecution(httpClients, requestBuilder);
       }
 
       if (!canRetry) {
@@ -210,13 +201,8 @@ class BaseRepositoryClient {
    * @param {object} [params] additional parameters to be appended
    * @return {object} the constructed payload object for logging
    */
-  getLogPayload(response, params = {}) {
-    const payload = {
-      elapsedTime: response.getElapsedTime(),
-      repositoryUrl: response.getBaseURL()
-    };
-    Object.assign(payload, params);
-    return payload;
+  getLogPayload(response, params) {
+    return LoggingUtils.getLogPayload(response, params);
   }
 
   /**
