@@ -1,0 +1,71 @@
+{
+  "head": {
+    "vars": [
+      "s"
+    ]
+  },
+  "results": {
+    "bindings": [
+      {
+        "s": {
+          "type": "uri",
+          "value": "http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#Beringer"
+        }
+      },
+      {
+        "s": {
+          "type": "uri",
+          "value": "http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#Bancroft"
+        }
+      },
+      {
+        "s": {
+          "type": "uri",
+          "value": "http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#ChateauChevalBlanc"
+        }
+      },
+      {
+        "s": {
+          "type": "uri",
+          "value": "http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#ChateauDYchem"
+        }
+      },
+      {
+        "s": {
+          "type": "uri",
+          "value": "http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#ChateauDeMeursault"
+        }
+      },
+      {
+        "s": {
+          "type": "uri",
+          "value": "http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#ChateauLafiteRothschild"
+        }
+      },
+      {
+        "s": {
+          "type": "uri",
+          "value": "http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#ChateauMargauxWinery"
+        }
+      },
+      {
+        "s": {
+          "type": "uri",
+          "value": "http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#ChateauMorgon"
+        }
+      },
+      {
+        "s": {
+          "type": "uri",
+          "value": "http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#McGuinnesso"
+        }
+      },
+      {
+        "s": {
+          "type": "uri",
+          "value": "http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#ClosDeLaPoussie"
+        }
+      }
+    ]
+  }
+}

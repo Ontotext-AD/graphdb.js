@@ -1,0 +1,14 @@
+{
+  "http://example/book1" : {
+    "http://purl.org/dc/elements/1.1/title" : [
+      {
+        "value" : "A new book",
+        "type" : "literal",
+        "datatype" : "http://www.w3.org/2001/XMLSchema#string",
+        "graphs" : [
+          "http://wine.com/graph/wine2"
+        ]
+      }
+    ]
+  }
+}

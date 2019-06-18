@@ -1,0 +1,8 @@
+PREFIX vin: <http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#>
+
+SELECT (COUNT(*) as ?cnt)
+WHERE {
+    ?s a ?o .
+    ?s1 vin:hasFlavor ?o2 .
+    ?s2 ?p2 ?o3 .
+}

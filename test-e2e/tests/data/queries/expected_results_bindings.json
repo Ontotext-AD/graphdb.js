@@ -1,0 +1,18 @@
+{
+  "head": {
+    "vars": [
+      "o"
+    ]
+  },
+  "results": {
+    "bindings": [
+      {
+        "o": {
+          "xml:lang": "fr",
+          "type": "literal",
+          "value": "vin"
+        }
+      }
+    ]
+  }
+}

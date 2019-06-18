@@ -1,0 +1,14 @@
+{
+  "http://learningsparql.com/ns/data/i0432": {
+    "http://learningsparql.com/ns/addressbook/firstName": [
+      {
+        "value": "Richard",
+        "type": "literal",
+        "datatype": "http://www.w3.org/2001/XMLSchema#string",
+        "graphs": [
+          "http://domain/graph/data-graph-3"
+        ]
+      }
+    ]
+  }
+}

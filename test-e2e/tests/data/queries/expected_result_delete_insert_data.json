@@ -1,0 +1,27 @@
+{
+  "head": {
+    "vars": [
+      "s",
+      "p",
+      "o"
+    ]
+  },
+  "results": {
+    "bindings": [
+      {
+        "p": {
+          "type": "uri",
+          "value": "http://purl.org/dc/elements/1.1/title"
+        },
+        "s": {
+          "type": "uri",
+          "value": "http://example/book1"
+        },
+        "o": {
+          "type": "literal",
+          "value": "Fundamentals of Compiler Design"
+        }
+      }
+    ]
+  }
+}

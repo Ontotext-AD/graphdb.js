@@ -1,0 +1,8 @@
+PREFIX vin: <http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#>
+
+CONSTRUCT{vin:MariettaZinfandel vin:hasSugar ?o}
+WHERE
+{?s ?p ?o
+    FILTER (!isBlank(?o))
+    FILTER (isLiteral(?o))
+}
