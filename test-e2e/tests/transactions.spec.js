@@ -1,13 +1,13 @@
 const path = require('path');
 const Utils = require('utils');
-const {RDFRepositoryClient, GetStatementsPayload} = require('graphdb').repository;
-const {TransactionIsolationLevel} = require('graphdb').transaction;
+const {RDFRepositoryClient, GetStatementsPayload, AddStatementPayload} = require('graphdb').repository;
 const {RDFMimeType, QueryContentType} = require('graphdb').http;
 const N3 = require('n3');
 const {DataFactory} = N3;
 const {namedNode, literal, quad} = DataFactory;
 const Config = require('config');
 const {GetQueryPayload, QueryType, QueryLanguage, UpdateQueryPayload} = require('graphdb').query;
+const {XSD} = require('graphdb').model.Types;
 
 describe('Should test transactions', () => {
 
@@ -25,7 +25,7 @@ describe('Should test transactions', () => {
     let wineRdf = path.resolve(__dirname, './data/wine.rdf');
     let transactionalClient;
     return rdfClient.addFile(wineRdf, RDFMimeType.RDF_XML, null, null).then(() => {
-      return rdfClient.beginTransaction(TransactionIsolationLevel.NONE);
+      return rdfClient.beginTransaction();
     }).then(transaction => {
       transactionalClient = transaction;
       return transactionalClient.getSize();
@@ -47,7 +47,7 @@ describe('Should test transactions', () => {
     let transactionalClient;
     let rowsRdf = path.resolve(__dirname, './data/rows.rdf');
 
-    return rdfClient.beginTransaction(TransactionIsolationLevel.NONE).then(transaction => {
+    return rdfClient.beginTransaction().then(transaction => {
       transactionalClient = transaction;
       return transactionalClient.addFile(rowsRdf, RDFMimeType.RDF_XML, null, null);
     }).then(() => {
@@ -71,7 +71,7 @@ describe('Should test transactions', () => {
     let transactionalClient;
     let rowsRdf = path.resolve(__dirname, './data/rows.rdf');
 
-    return rdfClient.beginTransaction(TransactionIsolationLevel.NONE).then(transaction => {
+    return rdfClient.beginTransaction().then(transaction => {
       transactionalClient = transaction;
       return transactionalClient.addFile(rowsRdf, RDFMimeType.RDF_XML, null, null);
     }).then(() => {
@@ -95,7 +95,7 @@ describe('Should test transactions', () => {
     let turtleStream = Utils.getReadStream(sampleRdf);
     let context = '<http://domain/graph/data-graph-3>';
 
-    return rdfClient.beginTransaction(TransactionIsolationLevel.NONE).then((transaction) => {
+    return rdfClient.beginTransaction().then((transaction) => {
       transactionalClient = transaction;
       return transactionalClient.upload(turtleStream, RDFMimeType.TURTLE, context, null);
     }).then(() => {
@@ -120,7 +120,7 @@ describe('Should test transactions', () => {
           ]
         }
       });
-      return rdfClient.beginTransaction(TransactionIsolationLevel.NONE);
+      return rdfClient.beginTransaction();
     }).then((transaction) => {
       transactionalClient = transaction;
       return transactionalClient.deleteData('<http://learningsparql.com/ns/data/i0432> <http://learningsparql.com/ns/addressbook/firstName> "Richard" .')
@@ -137,20 +137,24 @@ describe('Should test transactions', () => {
   });
 
   test('Should add and delete data', () => {
-    let data = '<http://domain/resource/resource-1> <http://domain/property/relation-1> "Title"@en.';
-    let transactionalClient;
-    let params = new GetStatementsPayload()
+    let addPayload = new AddStatementPayload()
+      .setSubject('http://domain/resource/resource-1')
+      .setPredicate('http://domain/property/relation-1')
+      .setObjectLiteral('Title', XSD.STRING, 'en');
+
+    let getPayload = new GetStatementsPayload()
       .setResponseType(RDFMimeType.RDF_JSON)
       .setSubject('<http://domain/resource/resource-1>')
       .setPredicate('<http://domain/property/relation-1>');
 
-    return rdfClient.beginTransaction(TransactionIsolationLevel.NONE).then(transaction => {
+    let transactionalClient;
+    return rdfClient.beginTransaction().then(transaction => {
       transactionalClient = transaction;
-      return transactionalClient.sendData(data);
+      return transactionalClient.add(addPayload);
     }).then(() => {
       return transactionalClient.commit();
     }).then(() => {
-      return rdfClient.get(params);
+      return rdfClient.get(getPayload);
     }).then((resp) => {
       expect(resp).toEqual({
         "http://domain/resource/resource-1": {
@@ -164,34 +168,40 @@ describe('Should test transactions', () => {
         }
       })
     }).then(() => {
-      return rdfClient.beginTransaction(TransactionIsolationLevel.NONE);
+      return rdfClient.beginTransaction();
     }).then((transaction) => {
       transactionalClient = transaction;
+      // Deletion works only with turtle/trig currently
+      let data = '<http://domain/resource/resource-1> <http://domain/property/relation-1> "Title"@en.';
       return transactionalClient.deleteData(data);
     }).then(() => {
       return transactionalClient.commit();
     }).then(() => {
-      return rdfClient.get(params);
+      return rdfClient.get(getPayload);
     }).then((resp) => {
       expect(resp).toEqual({});
     });
   });
 
   test('Should get data in a transaction', () => {
-    let data = '<http://domain/resource/resource-1> <http://domain/property/relation-1> "Title"@en.';
-    let transactionalClient;
+    let addPayload = new AddStatementPayload()
+      .setSubject('http://domain/resource/resource-1')
+      .setPredicate('http://domain/property/relation-1')
+      .setObjectLiteral('Title', XSD.STRING, 'en');
+
     let params = new GetStatementsPayload()
       .setResponseType(RDFMimeType.RDF_JSON)
       .setSubject('<http://domain/resource/resource-1>')
       .setPredicate('<http://domain/property/relation-1>');
 
-    return rdfClient.beginTransaction(TransactionIsolationLevel.NONE).then(transaction => {
+    let transactionalClient;
+    return rdfClient.beginTransaction().then(transaction => {
       transactionalClient = transaction;
-      return transactionalClient.sendData(data);
+      return transactionalClient.add(addPayload);
     }).then(() => {
       return transactionalClient.commit();
     }).then(() => {
-      return rdfClient.beginTransaction(TransactionIsolationLevel.NONE);
+      return rdfClient.beginTransaction();
     }).then((transaction) => {
       transactionalClient = transaction;
       return transactionalClient.get(params);
@@ -229,7 +239,7 @@ describe('Should test transactions', () => {
 
     let expectedResponseResource1 = Utils.loadFile('./data/transactions/expected_response_resource1.json');
 
-    return rdfClient.beginTransaction(TransactionIsolationLevel.NONE).then((transaction) => {
+    return rdfClient.beginTransaction().then((transaction) => {
       transactionalClient = transaction;
       return transactionalClient.addQuads(quads);
     }).then(() => {
@@ -259,7 +269,7 @@ describe('Should test transactions', () => {
 
       let transactionalClient;
 
-      return rdfClient.beginTransaction(TransactionIsolationLevel.NONE).then((transaction) => {
+      return rdfClient.beginTransaction().then((transaction) => {
         transactionalClient = transaction;
         return transactionalClient.query(payloadWithInferenceTrue);
       }).then((resp) => {
@@ -291,7 +301,7 @@ describe('Should test transactions', () => {
 
       let transactionalClient;
 
-      return rdfClient.beginTransaction(TransactionIsolationLevel.NONE).then((transaction) => {
+      return rdfClient.beginTransaction().then((transaction) => {
         transactionalClient = transaction;
         return transactionalClient.update(insertData);
       }).then(() => {
@@ -303,7 +313,7 @@ describe('Should test transactions', () => {
       }).then((stream) => {
         expect(JSON.parse(stream)).toEqual(JSON.parse(expectedEmptyGraph));
       }).then(() => {
-        return rdfClient.beginTransaction(TransactionIsolationLevel.NONE);
+        return rdfClient.beginTransaction();
       }).then((transaction) => {
         transactionalClient = transaction;
         return transactionalClient.update(insertData);
@@ -333,7 +343,7 @@ describe('Should test transactions', () => {
 
       let transactionalClient;
 
-      return rdfClient.beginTransaction(TransactionIsolationLevel.NONE).then((transaction) => {
+      return rdfClient.beginTransaction().then((transaction) => {
         transactionalClient = transaction;
         return transactionalClient.update(insertData);
       }).then(() => {
@@ -345,7 +355,7 @@ describe('Should test transactions', () => {
       }).then(() => {
         return transactionalClient.rollback();
       }).then(() => {
-        return rdfClient.beginTransaction(TransactionIsolationLevel.NONE)
+        return rdfClient.beginTransaction()
       }).then((transaction) => {
         transactionalClient = transaction;
         return transactionalClient.download(payload);
