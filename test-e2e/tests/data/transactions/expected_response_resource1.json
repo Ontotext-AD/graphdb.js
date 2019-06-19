@@ -1,0 +1,35 @@
+{
+  "http://domain/resource/resource-1": {
+    "http://domain/property/boolean-property": [
+      {
+        "value": "true",
+        "type": "literal",
+        "datatype": "xsd:boolean"
+      }
+    ],
+    "http://domain/property/relation-1": [
+      {
+        "value": "http://domain/value/uri-1",
+        "type": "uri"
+      }
+    ],
+    "http://domain/property/relation-2": [
+      {
+        "value": "http://domain/value/uri-2",
+        "type": "uri"
+      }
+    ],
+    "http://domain/property/title": [
+      {
+        "value": "Titel",
+        "type": "literal",
+        "lang": "de"
+      },
+      {
+        "value": "Title",
+        "type": "literal",
+        "lang": "en"
+      }
+    ]
+  }
+}

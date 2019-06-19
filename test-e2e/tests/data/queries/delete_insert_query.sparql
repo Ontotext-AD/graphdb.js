@@ -1,0 +1,14 @@
+PREFIX dc: <http://purl.org/dc/elements/1.1/>
+
+DELETE DATA {
+	GRAPH <http://wine.com/graph/wine2>
+		{ <http://example/book1>  dc:title  "A new book" ;
+          						  dc:creator  "A.N.Other" .
+    }
+};
+
+INSERT DATA {
+	GRAPH <http://wine.com/graph/wine2>
+		{ <http://example/book1>  dc:title  "Fundamentals of Compiler Design"
+	}
+}

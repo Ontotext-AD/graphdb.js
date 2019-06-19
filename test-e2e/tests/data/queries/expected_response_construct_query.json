@@ -1,0 +1,51 @@
+{
+  "http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#MariettaZinfandel": {
+    "http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#hasSugar": [
+      {
+        "value": "1",
+        "type": "literal",
+        "datatype": "http://www.w3.org/2001/XMLSchema#nonNegativeInteger"
+      },
+      {
+        "value": "2",
+        "type": "literal",
+        "datatype": "http://www.w3.org/2001/XMLSchema#nonNegativeInteger"
+      },
+      {
+        "value": "1998",
+        "type": "literal",
+        "datatype": "http://www.w3.org/2001/XMLSchema#positiveInteger"
+      },
+      {
+        "value": "wine",
+        "type": "literal",
+        "lang": "en"
+      },
+      {
+        "value": "vin",
+        "type": "literal",
+        "lang": "fr"
+      },
+      {
+        "value": "An example OWL ontology",
+        "type": "literal",
+        "datatype": "http://www.w3.org/2001/XMLSchema#string"
+      },
+      {
+        "value": "Derived from the DAML Wine ontology at \n      http://ontolingua.stanford.edu/doc/chimaera/ontologies/wines.daml\n      Substantially changed, in particular the Region based relations.\n    ",
+        "type": "literal",
+        "datatype": "http://www.w3.org/2001/XMLSchema#string"
+      },
+      {
+        "value": "Made WineDescriptor unionType of tastes and color",
+        "type": "literal",
+        "datatype": "http://www.w3.org/2001/XMLSchema#string"
+      },
+      {
+        "value": "Wine Ontology",
+        "type": "literal",
+        "datatype": "http://www.w3.org/2001/XMLSchema#string"
+      }
+    ]
+  }
+}

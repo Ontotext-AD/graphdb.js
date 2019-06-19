@@ -1,0 +1,71 @@
+{
+  "head": {
+    "vars": [
+      "s"
+    ]
+  },
+  "results": {
+    "bindings": [
+      {
+        "s": {
+          "type": "uri",
+          "value": "http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#ClosDeVougeot"
+        }
+      },
+      {
+        "s": {
+          "type": "uri",
+          "value": "http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#CongressSprings"
+        }
+      },
+      {
+        "s": {
+          "type": "uri",
+          "value": "http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#Corbans"
+        }
+      },
+      {
+        "s": {
+          "type": "uri",
+          "value": "http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#CortonMontrachet"
+        }
+      },
+      {
+        "s": {
+          "type": "uri",
+          "value": "http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#Cotturi"
+        }
+      },
+      {
+        "s": {
+          "type": "uri",
+          "value": "http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#DAnjou"
+        }
+      },
+      {
+        "s": {
+          "type": "uri",
+          "value": "http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#Elyse"
+        }
+      },
+      {
+        "s": {
+          "type": "uri",
+          "value": "http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#Forman"
+        }
+      },
+      {
+        "s": {
+          "type": "uri",
+          "value": "http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#Foxen"
+        }
+      },
+      {
+        "s": {
+          "type": "uri",
+          "value": "http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#GaryFarrell"
+        }
+      }
+    ]
+  }
+}

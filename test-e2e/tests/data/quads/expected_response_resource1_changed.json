@@ -1,0 +1,16 @@
+{
+  "http://domain/resource/resource-1": {
+    "http://domain/property/relation-1": [
+      {
+        "value": "http://domain/value/uri-2",
+        "type": "uri"
+      }
+    ],
+    "http://domain/property/relation-2": [
+      {
+        "value": "http://domain/value/uri-3",
+        "type": "uri"
+      }
+    ]
+  }
+}

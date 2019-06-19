@@ -1,0 +1,40 @@
+{
+  "http://domain/resource/resource-2": {
+    "http://domain/property/relation-1": [
+      {
+        "value": "http://domain/value/uri-2",
+        "type": "uri",
+        "graphs": [
+          "http://domain/graph/data-graph-1"
+        ]
+      }
+    ],
+    "http://domain/property/relation-2": [
+      {
+        "value": "http://domain/value/uri-3",
+        "type": "uri",
+        "graphs": [
+          "http://domain/graph/data-graph-1"
+        ]
+      }
+    ],
+    "http://domain/property/title": [
+      {
+        "value": "Titel",
+        "type": "literal",
+        "lang": "de",
+        "graphs": [
+          "http://domain/graph/data-graph-2"
+        ]
+      },
+      {
+        "value": "Title",
+        "type": "literal",
+        "lang": "en",
+        "graphs": [
+          "http://domain/graph/data-graph-2"
+        ]
+      }
+    ]
+  }
+}

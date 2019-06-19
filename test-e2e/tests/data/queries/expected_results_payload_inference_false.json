@@ -1,0 +1,72 @@
+{
+  "head": {
+    "vars": [
+      "p",
+      "o"
+    ]
+  },
+  "results": {
+    "bindings": [
+      {
+        "p": {
+          "type": "uri",
+          "value": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"
+        },
+        "o": {
+          "type": "uri",
+          "value": "http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#SauvignonBlanc"
+        }
+      },
+      {
+        "p": {
+          "type": "uri",
+          "value": "http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#hasMaker"
+        },
+        "o": {
+          "type": "uri",
+          "value": "http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#Stonleigh"
+        }
+      },
+      {
+        "p": {
+          "type": "uri",
+          "value": "http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#hasSugar"
+        },
+        "o": {
+          "type": "uri",
+          "value": "http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#Dry"
+        }
+      },
+      {
+        "p": {
+          "type": "uri",
+          "value": "http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#hasFlavor"
+        },
+        "o": {
+          "type": "uri",
+          "value": "http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#Delicate"
+        }
+      },
+      {
+        "p": {
+          "type": "uri",
+          "value": "http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#hasBody"
+        },
+        "o": {
+          "type": "uri",
+          "value": "http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#Medium"
+        }
+      },
+      {
+        "p": {
+          "type": "uri",
+          "value": "http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#locatedIn"
+        },
+        "o": {
+          "type": "uri",
+          "value": "http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#NewZealandRegion"
+        }
+      }
+    ]
+  }
+}

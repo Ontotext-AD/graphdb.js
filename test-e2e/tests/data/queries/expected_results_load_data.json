@@ -1,0 +1,1200 @@
+{
+  "head": {
+    "vars": [
+      "s",
+      "p",
+      "o"
+    ]
+  },
+  "results": {
+    "bindings": [
+      {
+        "p": {
+          "type": "uri",
+          "value": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"
+        },
+        "s": {
+          "type": "uri",
+          "value": "http://www.worldcat.org/oclc/41238513"
+        },
+        "o": {
+          "type": "uri",
+          "value": "http://schema.org/Book"
+        }
+      },
+      {
+        "p": {
+          "type": "uri",
+          "value": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"
+        },
+        "s": {
+          "type": "uri",
+          "value": "http://www.worldcat.org/oclc/41238513"
+        },
+        "o": {
+          "type": "uri",
+          "value": "http://schema.org/CreativeWork"
+        }
+      },
+      {
+        "p": {
+          "type": "uri",
+          "value": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"
+        },
+        "s": {
+          "type": "uri",
+          "value": "http://experiment.worldcat.org/entity/work/data/27331745#Place/san_francisco"
+        },
+        "o": {
+          "type": "uri",
+          "value": "http://schema.org/Place"
+        }
+      },
+      {
+        "p": {
+          "type": "uri",
+          "value": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"
+        },
+        "s": {
+          "type": "uri",
+          "value": "http://id.loc.gov/vocabulary/countries/cau"
+        },
+        "o": {
+          "type": "uri",
+          "value": "http://schema.org/Place"
+        }
+      },
+      {
+        "p": {
+          "type": "uri",
+          "value": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"
+        },
+        "s": {
+          "type": "uri",
+          "value": "http://experiment.worldcat.org/entity/work/data/27331745#Person/berners_lee_tim"
+        },
+        "o": {
+          "type": "uri",
+          "value": "http://schema.org/Person"
+        }
+      },
+      {
+        "p": {
+          "type": "uri",
+          "value": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"
+        },
+        "s": {
+          "type": "uri",
+          "value": "http://experiment.worldcat.org/entity/work/data/27331745#Topic/world_wide_web_information_retrieval_system_history"
+        },
+        "o": {
+          "type": "uri",
+          "value": "http://schema.org/Intangible"
+        }
+      },
+      {
+        "p": {
+          "type": "uri",
+          "value": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"
+        },
+        "s": {
+          "type": "uri",
+          "value": "http://experiment.worldcat.org/entity/work/data/27331745#Topic/world_wide_web"
+        },
+        "o": {
+          "type": "uri",
+          "value": "http://schema.org/Intangible"
+        }
+      },
+      {
+        "p": {
+          "type": "uri",
+          "value": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"
+        },
+        "s": {
+          "type": "uri",
+          "value": "http://experiment.worldcat.org/entity/work/data/27331745#Topic/world_wide_web_history"
+        },
+        "o": {
+          "type": "uri",
+          "value": "http://schema.org/Intangible"
+        }
+      },
+      {
+        "p": {
+          "type": "uri",
+          "value": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"
+        },
+        "s": {
+          "type": "uri",
+          "value": "http://dewey.info/class/025.04/e21/"
+        },
+        "o": {
+          "type": "uri",
+          "value": "http://schema.org/Intangible"
+        }
+      },
+      {
+        "p": {
+          "type": "uri",
+          "value": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"
+        },
+        "s": {
+          "type": "uri",
+          "value": "http://viaf.org/viaf/85312226"
+        },
+        "o": {
+          "type": "uri",
+          "value": "http://schema.org/Person"
+        }
+      },
+      {
+        "p": {
+          "type": "uri",
+          "value": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"
+        },
+        "s": {
+          "type": "uri",
+          "value": "http://experiment.worldcat.org/entity/work/data/27331745#Topic/web_histoire"
+        },
+        "o": {
+          "type": "uri",
+          "value": "http://schema.org/Intangible"
+        }
+      },
+      {
+        "p": {
+          "type": "uri",
+          "value": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"
+        },
+        "s": {
+          "type": "uri",
+          "value": "http://id.worldcat.org/fast/1181326"
+        },
+        "o": {
+          "type": "uri",
+          "value": "http://schema.org/Intangible"
+        }
+      },
+      {
+        "p": {
+          "type": "uri",
+          "value": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"
+        },
+        "s": {
+          "type": "uri",
+          "value": "http://experiment.worldcat.org/entity/work/data/27331745#Topic/erfindung"
+        },
+        "o": {
+          "type": "uri",
+          "value": "http://schema.org/Intangible"
+        }
+      },
+      {
+        "p": {
+          "type": "uri",
+          "value": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"
+        },
+        "s": {
+          "type": "uri",
+          "value": "http://viaf.org/viaf/874883"
+        },
+        "o": {
+          "type": "uri",
+          "value": "http://schema.org/Person"
+        }
+      },
+      {
+        "p": {
+          "type": "uri",
+          "value": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"
+        },
+        "s": {
+          "type": "uri",
+          "value": "http://www.worldcat.org/title/-/oclc/41238513#PublicationEvent/san_francisco_harpersanfrancisco_1999"
+        },
+        "o": {
+          "type": "uri",
+          "value": "http://schema.org/PublicationEvent"
+        }
+      },
+      {
+        "p": {
+          "type": "uri",
+          "value": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"
+        },
+        "s": {
+          "type": "uri",
+          "value": "http://experiment.worldcat.org/entity/work/data/27331745#Agent/harpersanfrancisco"
+        },
+        "o": {
+          "type": "uri",
+          "value": "http://bibliograph.net/Agent"
+        }
+      },
+      {
+        "p": {
+          "type": "uri",
+          "value": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"
+        },
+        "s": {
+          "type": "uri",
+          "value": "http://www.worldcat.org/title/-/oclc/41238513#Review/-680623604"
+        },
+        "o": {
+          "type": "uri",
+          "value": "http://schema.org/Review"
+        }
+      },
+      {
+        "p": {
+          "type": "uri",
+          "value": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"
+        },
+        "s": {
+          "type": "uri",
+          "value": "http://worldcat.org/isbn/9780062515865"
+        },
+        "o": {
+          "type": "uri",
+          "value": "http://schema.org/ProductModel"
+        }
+      },
+      {
+        "p": {
+          "type": "uri",
+          "value": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"
+        },
+        "s": {
+          "type": "uri",
+          "value": "http://worldcat.org/isbn/9780062515872"
+        },
+        "o": {
+          "type": "uri",
+          "value": "http://schema.org/ProductModel"
+        }
+      },
+      {
+        "p": {
+          "type": "uri",
+          "value": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"
+        },
+        "s": {
+          "type": "uri",
+          "value": "http://www.worldcat.org/title/-/oclc/41238513"
+        },
+        "o": {
+          "type": "uri",
+          "value": "http://www.w3.org/2006/gen/ont#ContentTypeGenericResource"
+        }
+      },
+      {
+        "p": {
+          "type": "uri",
+          "value": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"
+        },
+        "s": {
+          "type": "uri",
+          "value": "http://www.worldcat.org/title/-/oclc/41238513"
+        },
+        "o": {
+          "type": "uri",
+          "value": "http://www.w3.org/2006/gen/ont#InformationResource"
+        }
+      },
+      {
+        "p": {
+          "type": "uri",
+          "value": "http://purl.org/library/oclcnum"
+        },
+        "s": {
+          "type": "uri",
+          "value": "http://www.worldcat.org/oclc/41238513"
+        },
+        "o": {
+          "type": "literal",
+          "value": "41238513"
+        }
+      },
+      {
+        "p": {
+          "type": "uri",
+          "value": "http://purl.org/library/placeOfPublication"
+        },
+        "s": {
+          "type": "uri",
+          "value": "http://www.worldcat.org/oclc/41238513"
+        },
+        "o": {
+          "type": "uri",
+          "value": "http://experiment.worldcat.org/entity/work/data/27331745#Place/san_francisco"
+        }
+      },
+      {
+        "p": {
+          "type": "uri",
+          "value": "http://purl.org/library/placeOfPublication"
+        },
+        "s": {
+          "type": "uri",
+          "value": "http://www.worldcat.org/oclc/41238513"
+        },
+        "o": {
+          "type": "uri",
+          "value": "http://id.loc.gov/vocabulary/countries/cau"
+        }
+      },
+      {
+        "p": {
+          "type": "uri",
+          "value": "http://schema.org/about"
+        },
+        "s": {
+          "type": "uri",
+          "value": "http://www.worldcat.org/oclc/41238513"
+        },
+        "o": {
+          "type": "uri",
+          "value": "http://experiment.worldcat.org/entity/work/data/27331745#Person/berners_lee_tim"
+        }
+      },
+      {
+        "p": {
+          "type": "uri",
+          "value": "http://schema.org/about"
+        },
+        "s": {
+          "type": "uri",
+          "value": "http://www.worldcat.org/oclc/41238513"
+        },
+        "o": {
+          "type": "uri",
+          "value": "http://experiment.worldcat.org/entity/work/data/27331745#Topic/world_wide_web_information_retrieval_system_history"
+        }
+      },
+      {
+        "p": {
+          "type": "uri",
+          "value": "http://schema.org/about"
+        },
+        "s": {
+          "type": "uri",
+          "value": "http://www.worldcat.org/oclc/41238513"
+        },
+        "o": {
+          "type": "uri",
+          "value": "http://experiment.worldcat.org/entity/work/data/27331745#Topic/world_wide_web"
+        }
+      },
+      {
+        "p": {
+          "type": "uri",
+          "value": "http://schema.org/about"
+        },
+        "s": {
+          "type": "uri",
+          "value": "http://www.worldcat.org/oclc/41238513"
+        },
+        "o": {
+          "type": "uri",
+          "value": "http://experiment.worldcat.org/entity/work/data/27331745#Topic/world_wide_web_history"
+        }
+      },
+      {
+        "p": {
+          "type": "uri",
+          "value": "http://schema.org/about"
+        },
+        "s": {
+          "type": "uri",
+          "value": "http://www.worldcat.org/oclc/41238513"
+        },
+        "o": {
+          "type": "uri",
+          "value": "http://dewey.info/class/025.04/e21/"
+        }
+      },
+      {
+        "p": {
+          "type": "uri",
+          "value": "http://schema.org/about"
+        },
+        "s": {
+          "type": "uri",
+          "value": "http://www.worldcat.org/oclc/41238513"
+        },
+        "o": {
+          "type": "uri",
+          "value": "http://viaf.org/viaf/85312226"
+        }
+      },
+      {
+        "p": {
+          "type": "uri",
+          "value": "http://schema.org/about"
+        },
+        "s": {
+          "type": "uri",
+          "value": "http://www.worldcat.org/oclc/41238513"
+        },
+        "o": {
+          "type": "uri",
+          "value": "http://experiment.worldcat.org/entity/work/data/27331745#Topic/web_histoire"
+        }
+      },
+      {
+        "p": {
+          "type": "uri",
+          "value": "http://schema.org/about"
+        },
+        "s": {
+          "type": "uri",
+          "value": "http://www.worldcat.org/oclc/41238513"
+        },
+        "o": {
+          "type": "uri",
+          "value": "http://id.worldcat.org/fast/1181326"
+        }
+      },
+      {
+        "p": {
+          "type": "uri",
+          "value": "http://schema.org/about"
+        },
+        "s": {
+          "type": "uri",
+          "value": "http://www.worldcat.org/oclc/41238513"
+        },
+        "o": {
+          "type": "uri",
+          "value": "http://experiment.worldcat.org/entity/work/data/27331745#Topic/erfindung"
+        }
+      },
+      {
+        "p": {
+          "type": "uri",
+          "value": "http://schema.org/about"
+        },
+        "s": {
+          "type": "uri",
+          "value": "http://www.worldcat.org/title/-/oclc/41238513"
+        },
+        "o": {
+          "type": "uri",
+          "value": "http://www.worldcat.org/oclc/41238513"
+        }
+      },
+      {
+        "p": {
+          "type": "uri",
+          "value": "http://schema.org/bookEdition"
+        },
+        "s": {
+          "type": "uri",
+          "value": "http://www.worldcat.org/oclc/41238513"
+        },
+        "o": {
+          "type": "literal",
+          "value": "1st ed."
+        }
+      },
+      {
+        "p": {
+          "type": "uri",
+          "value": "http://schema.org/bookFormat"
+        },
+        "s": {
+          "type": "uri",
+          "value": "http://www.worldcat.org/oclc/41238513"
+        },
+        "o": {
+          "type": "uri",
+          "value": "http://bibliograph.net/PrintBook"
+        }
+      },
+      {
+        "p": {
+          "type": "uri",
+          "value": "http://schema.org/contributor"
+        },
+        "s": {
+          "type": "uri",
+          "value": "http://www.worldcat.org/oclc/41238513"
+        },
+        "o": {
+          "type": "uri",
+          "value": "http://viaf.org/viaf/874883"
+        }
+      },
+      {
+        "p": {
+          "type": "uri",
+          "value": "http://schema.org/copyrightYear"
+        },
+        "s": {
+          "type": "uri",
+          "value": "http://www.worldcat.org/oclc/41238513"
+        },
+        "o": {
+          "type": "literal",
+          "value": "1999"
+        }
+      },
+      {
+        "p": {
+          "type": "uri",
+          "value": "http://schema.org/creator"
+        },
+        "s": {
+          "type": "uri",
+          "value": "http://www.worldcat.org/oclc/41238513"
+        },
+        "o": {
+          "type": "uri",
+          "value": "http://viaf.org/viaf/85312226"
+        }
+      },
+      {
+        "p": {
+          "type": "uri",
+          "value": "http://schema.org/datePublished"
+        },
+        "s": {
+          "type": "uri",
+          "value": "http://www.worldcat.org/oclc/41238513"
+        },
+        "o": {
+          "type": "literal",
+          "value": "1999"
+        }
+      },
+      {
+        "p": {
+          "type": "uri",
+          "value": "http://schema.org/description"
+        },
+        "s": {
+          "type": "uri",
+          "value": "http://www.worldcat.org/oclc/41238513"
+        },
+        "o": {
+          "xml:lang": "en",
+          "type": "literal",
+          "value": "Enquire within upon everything -- Tangles, links, and webs -- info.cern.ch -- Protocols: simple rules for global systems -- Going global -- Browsing -- Changes -- Consortium -- Competition and consensus -- Web of people -- Privacy -- Mind to mind -- Machines and the Web -- Weaving the Web."
+        }
+      },
+      {
+        "p": {
+          "type": "uri",
+          "value": "http://schema.org/exampleOfWork"
+        },
+        "s": {
+          "type": "uri",
+          "value": "http://www.worldcat.org/oclc/41238513"
+        },
+        "o": {
+          "type": "uri",
+          "value": "http://worldcat.org/entity/work/id/27331745"
+        }
+      },
+      {
+        "p": {
+          "type": "uri",
+          "value": "http://schema.org/genre"
+        },
+        "s": {
+          "type": "uri",
+          "value": "http://www.worldcat.org/oclc/41238513"
+        },
+        "o": {
+          "xml:lang": "en",
+          "type": "literal",
+          "value": "History"
+        }
+      },
+      {
+        "p": {
+          "type": "uri",
+          "value": "http://schema.org/inLanguage"
+        },
+        "s": {
+          "type": "uri",
+          "value": "http://www.worldcat.org/oclc/41238513"
+        },
+        "o": {
+          "type": "literal",
+          "value": "en"
+        }
+      },
+      {
+        "p": {
+          "type": "uri",
+          "value": "http://schema.org/name"
+        },
+        "s": {
+          "type": "uri",
+          "value": "http://www.worldcat.org/oclc/41238513"
+        },
+        "o": {
+          "xml:lang": "en",
+          "type": "literal",
+          "value": "Weaving the Web : the original design and ultimate destiny of the World Wide Web by its inventor"
+        }
+      },
+      {
+        "p": {
+          "type": "uri",
+          "value": "http://schema.org/name"
+        },
+        "s": {
+          "type": "uri",
+          "value": "http://experiment.worldcat.org/entity/work/data/27331745#Place/san_francisco"
+        },
+        "o": {
+          "type": "literal",
+          "value": "San Francisco"
+        }
+      },
+      {
+        "p": {
+          "type": "uri",
+          "value": "http://schema.org/name"
+        },
+        "s": {
+          "type": "uri",
+          "value": "http://experiment.worldcat.org/entity/work/data/27331745#Person/berners_lee_tim"
+        },
+        "o": {
+          "type": "literal",
+          "value": "Tim Berners-Lee"
+        }
+      },
+      {
+        "p": {
+          "type": "uri",
+          "value": "http://schema.org/name"
+        },
+        "s": {
+          "type": "uri",
+          "value": "http://experiment.worldcat.org/entity/work/data/27331745#Topic/world_wide_web_information_retrieval_system_history"
+        },
+        "o": {
+          "xml:lang": "en",
+          "type": "literal",
+          "value": "World Wide Web (Information retrieval system)--History"
+        }
+      },
+      {
+        "p": {
+          "type": "uri",
+          "value": "http://schema.org/name"
+        },
+        "s": {
+          "type": "uri",
+          "value": "http://experiment.worldcat.org/entity/work/data/27331745#Topic/world_wide_web"
+        },
+        "o": {
+          "xml:lang": "en",
+          "type": "literal",
+          "value": "World Wide Web"
+        }
+      },
+      {
+        "p": {
+          "type": "uri",
+          "value": "http://schema.org/name"
+        },
+        "s": {
+          "type": "uri",
+          "value": "http://experiment.worldcat.org/entity/work/data/27331745#Topic/world_wide_web"
+        },
+        "o": {
+          "xml:lang": "en",
+          "type": "literal",
+          "value": "World wide web"
+        }
+      },
+      {
+        "p": {
+          "type": "uri",
+          "value": "http://schema.org/name"
+        },
+        "s": {
+          "type": "uri",
+          "value": "http://experiment.worldcat.org/entity/work/data/27331745#Topic/world_wide_web_history"
+        },
+        "o": {
+          "xml:lang": "en",
+          "type": "literal",
+          "value": "World Wide Web--History"
+        }
+      },
+      {
+        "p": {
+          "type": "uri",
+          "value": "http://schema.org/name"
+        },
+        "s": {
+          "type": "uri",
+          "value": "http://viaf.org/viaf/85312226"
+        },
+        "o": {
+          "type": "literal",
+          "value": "Tim Berners-Lee"
+        }
+      },
+      {
+        "p": {
+          "type": "uri",
+          "value": "http://schema.org/name"
+        },
+        "s": {
+          "type": "uri",
+          "value": "http://experiment.worldcat.org/entity/work/data/27331745#Topic/web_histoire"
+        },
+        "o": {
+          "xml:lang": "fr",
+          "type": "literal",
+          "value": "Web--Histoire"
+        }
+      },
+      {
+        "p": {
+          "type": "uri",
+          "value": "http://schema.org/name"
+        },
+        "s": {
+          "type": "uri",
+          "value": "http://experiment.worldcat.org/entity/work/data/27331745#Topic/web_histoire"
+        },
+        "o": {
+          "xml:lang": "en",
+          "type": "literal",
+          "value": "Web--Histoire"
+        }
+      },
+      {
+        "p": {
+          "type": "uri",
+          "value": "http://schema.org/name"
+        },
+        "s": {
+          "type": "uri",
+          "value": "http://id.worldcat.org/fast/1181326"
+        },
+        "o": {
+          "xml:lang": "en",
+          "type": "literal",
+          "value": "World Wide Web"
+        }
+      },
+      {
+        "p": {
+          "type": "uri",
+          "value": "http://schema.org/name"
+        },
+        "s": {
+          "type": "uri",
+          "value": "http://experiment.worldcat.org/entity/work/data/27331745#Topic/erfindung"
+        },
+        "o": {
+          "xml:lang": "en",
+          "type": "literal",
+          "value": "Erfindung"
+        }
+      },
+      {
+        "p": {
+          "type": "uri",
+          "value": "http://schema.org/name"
+        },
+        "s": {
+          "type": "uri",
+          "value": "http://viaf.org/viaf/874883"
+        },
+        "o": {
+          "type": "literal",
+          "value": "Mark Fischetti"
+        }
+      },
+      {
+        "p": {
+          "type": "uri",
+          "value": "http://schema.org/name"
+        },
+        "s": {
+          "type": "uri",
+          "value": "http://experiment.worldcat.org/entity/work/data/27331745#Agent/harpersanfrancisco"
+        },
+        "o": {
+          "type": "literal",
+          "value": "HarperSanFrancisco"
+        }
+      },
+      {
+        "p": {
+          "type": "uri",
+          "value": "http://schema.org/productID"
+        },
+        "s": {
+          "type": "uri",
+          "value": "http://www.worldcat.org/oclc/41238513"
+        },
+        "o": {
+          "type": "literal",
+          "value": "41238513"
+        }
+      },
+      {
+        "p": {
+          "type": "uri",
+          "value": "http://schema.org/publication"
+        },
+        "s": {
+          "type": "uri",
+          "value": "http://www.worldcat.org/oclc/41238513"
+        },
+        "o": {
+          "type": "uri",
+          "value": "http://www.worldcat.org/title/-/oclc/41238513#PublicationEvent/san_francisco_harpersanfrancisco_1999"
+        }
+      },
+      {
+        "p": {
+          "type": "uri",
+          "value": "http://schema.org/publisher"
+        },
+        "s": {
+          "type": "uri",
+          "value": "http://www.worldcat.org/oclc/41238513"
+        },
+        "o": {
+          "type": "uri",
+          "value": "http://experiment.worldcat.org/entity/work/data/27331745#Agent/harpersanfrancisco"
+        }
+      },
+      {
+        "p": {
+          "type": "uri",
+          "value": "http://schema.org/reviews"
+        },
+        "s": {
+          "type": "uri",
+          "value": "http://www.worldcat.org/oclc/41238513"
+        },
+        "o": {
+          "type": "uri",
+          "value": "http://www.worldcat.org/title/-/oclc/41238513#Review/-680623604"
+        }
+      },
+      {
+        "p": {
+          "type": "uri",
+          "value": "http://schema.org/url"
+        },
+        "s": {
+          "type": "uri",
+          "value": "http://www.worldcat.org/oclc/41238513"
+        },
+        "o": {
+          "type": "uri",
+          "value": "http://www.gbv.de/dms/bowker/toc/9780062515865.pdf"
+        }
+      },
+      {
+        "p": {
+          "type": "uri",
+          "value": "http://schema.org/workExample"
+        },
+        "s": {
+          "type": "uri",
+          "value": "http://www.worldcat.org/oclc/41238513"
+        },
+        "o": {
+          "type": "uri",
+          "value": "http://worldcat.org/isbn/9780062515865"
+        }
+      },
+      {
+        "p": {
+          "type": "uri",
+          "value": "http://schema.org/workExample"
+        },
+        "s": {
+          "type": "uri",
+          "value": "http://www.worldcat.org/oclc/41238513"
+        },
+        "o": {
+          "type": "uri",
+          "value": "http://worldcat.org/isbn/9780062515872"
+        }
+      },
+      {
+        "p": {
+          "type": "uri",
+          "value": "http://www.w3.org/2007/05/powder-s#describedby"
+        },
+        "s": {
+          "type": "uri",
+          "value": "http://www.worldcat.org/oclc/41238513"
+        },
+        "o": {
+          "type": "uri",
+          "value": "http://www.worldcat.org/title/-/oclc/41238513"
+        }
+      },
+      {
+        "p": {
+          "type": "uri",
+          "value": "http://schema.org/hasPart"
+        },
+        "s": {
+          "type": "uri",
+          "value": "http://experiment.worldcat.org/entity/work/data/27331745#Topic/world_wide_web_history"
+        },
+        "o": {
+          "type": "uri",
+          "value": "http://id.loc.gov/authorities/subjects/sh95000541"
+        }
+      },
+      {
+        "p": {
+          "type": "uri",
+          "value": "http://schema.org/familyName"
+        },
+        "s": {
+          "type": "uri",
+          "value": "http://experiment.worldcat.org/entity/work/data/27331745#Person/berners_lee_tim"
+        },
+        "o": {
+          "type": "literal",
+          "value": "Berners-Lee"
+        }
+      },
+      {
+        "p": {
+          "type": "uri",
+          "value": "http://schema.org/familyName"
+        },
+        "s": {
+          "type": "uri",
+          "value": "http://viaf.org/viaf/85312226"
+        },
+        "o": {
+          "type": "literal",
+          "value": "Berners-Lee"
+        }
+      },
+      {
+        "p": {
+          "type": "uri",
+          "value": "http://schema.org/familyName"
+        },
+        "s": {
+          "type": "uri",
+          "value": "http://viaf.org/viaf/874883"
+        },
+        "o": {
+          "type": "literal",
+          "value": "Fischetti"
+        }
+      },
+      {
+        "p": {
+          "type": "uri",
+          "value": "http://schema.org/givenName"
+        },
+        "s": {
+          "type": "uri",
+          "value": "http://experiment.worldcat.org/entity/work/data/27331745#Person/berners_lee_tim"
+        },
+        "o": {
+          "type": "literal",
+          "value": "Tim"
+        }
+      },
+      {
+        "p": {
+          "type": "uri",
+          "value": "http://schema.org/givenName"
+        },
+        "s": {
+          "type": "uri",
+          "value": "http://viaf.org/viaf/85312226"
+        },
+        "o": {
+          "type": "literal",
+          "value": "Tim"
+        }
+      },
+      {
+        "p": {
+          "type": "uri",
+          "value": "http://schema.org/givenName"
+        },
+        "s": {
+          "type": "uri",
+          "value": "http://viaf.org/viaf/874883"
+        },
+        "o": {
+          "type": "literal",
+          "value": "Mark"
+        }
+      },
+      {
+        "p": {
+          "type": "uri",
+          "value": "http://rdfs.org/ns/void#inDataset"
+        },
+        "s": {
+          "type": "uri",
+          "value": "http://www.worldcat.org/title/-/oclc/41238513"
+        },
+        "o": {
+          "type": "uri",
+          "value": "http://purl.oclc.org/dataset/WorldCat"
+        }
+      },
+      {
+        "p": {
+          "type": "uri",
+          "value": "http://schema.org/dateModified"
+        },
+        "s": {
+          "type": "uri",
+          "value": "http://www.worldcat.org/title/-/oclc/41238513"
+        },
+        "o": {
+          "type": "literal",
+          "value": "2019-04-19"
+        }
+      },
+      {
+        "p": {
+          "type": "uri",
+          "value": "http://purl.org/dc/terms/identifier"
+        },
+        "s": {
+          "type": "uri",
+          "value": "http://id.loc.gov/vocabulary/countries/cau"
+        },
+        "o": {
+          "type": "literal",
+          "value": "cau"
+        }
+      },
+      {
+        "p": {
+          "type": "uri",
+          "value": "http://schema.org/isbn"
+        },
+        "s": {
+          "type": "uri",
+          "value": "http://worldcat.org/isbn/9780062515865"
+        },
+        "o": {
+          "type": "literal",
+          "value": "9780062515865"
+        }
+      },
+      {
+        "p": {
+          "type": "uri",
+          "value": "http://schema.org/isbn"
+        },
+        "s": {
+          "type": "uri",
+          "value": "http://worldcat.org/isbn/9780062515865"
+        },
+        "o": {
+          "type": "literal",
+          "value": "0062515861"
+        }
+      },
+      {
+        "p": {
+          "type": "uri",
+          "value": "http://schema.org/isbn"
+        },
+        "s": {
+          "type": "uri",
+          "value": "http://worldcat.org/isbn/9780062515872"
+        },
+        "o": {
+          "type": "literal",
+          "value": "9780062515872"
+        }
+      },
+      {
+        "p": {
+          "type": "uri",
+          "value": "http://schema.org/isbn"
+        },
+        "s": {
+          "type": "uri",
+          "value": "http://worldcat.org/isbn/9780062515872"
+        },
+        "o": {
+          "type": "literal",
+          "value": "006251587X"
+        }
+      },
+      {
+        "p": {
+          "type": "uri",
+          "value": "http://schema.org/location"
+        },
+        "s": {
+          "type": "uri",
+          "value": "http://www.worldcat.org/title/-/oclc/41238513#PublicationEvent/san_francisco_harpersanfrancisco_1999"
+        },
+        "o": {
+          "type": "uri",
+          "value": "http://experiment.worldcat.org/entity/work/data/27331745#Place/san_francisco"
+        }
+      },
+      {
+        "p": {
+          "type": "uri",
+          "value": "http://schema.org/organizer"
+        },
+        "s": {
+          "type": "uri",
+          "value": "http://www.worldcat.org/title/-/oclc/41238513#PublicationEvent/san_francisco_harpersanfrancisco_1999"
+        },
+        "o": {
+          "type": "uri",
+          "value": "http://experiment.worldcat.org/entity/work/data/27331745#Agent/harpersanfrancisco"
+        }
+      },
+      {
+        "p": {
+          "type": "uri",
+          "value": "http://schema.org/itemReviewed"
+        },
+        "s": {
+          "type": "uri",
+          "value": "http://www.worldcat.org/title/-/oclc/41238513#Review/-680623604"
+        },
+        "o": {
+          "type": "uri",
+          "value": "http://www.worldcat.org/oclc/41238513"
+        }
+      },
+      {
+        "p": {
+          "type": "uri",
+          "value": "http://schema.org/reviewBody"
+        },
+        "s": {
+          "type": "uri",
+          "value": "http://www.worldcat.org/title/-/oclc/41238513#Review/-680623604"
+        },
+        "o": {
+          "type": "literal",
+          "value": "\"Tim Berners-Lee, the inventor of the World Wide Web, has been hailed by Time magazine as one of the 100 greatest minds of this century. His creation has already changed the way people do business, entertain themselves, exchange ideas, and socialize with one another.\" \"Berners-Lee offers insights to help readers understand the true nature of the Web, enabling them to use it to their fullest advantage. He shares his views on such critical issues as censorship, privacy, the increasing power of software companies in the online world, and the need to find the ideal balance between the commercial and social forces on the Web. His criticism of the Web's current state makes clear that there is still much work to be done. Finally, Berners-Lee presents his own plan for the Web's future, one that calls for the active support and participation of programmers, computer manufacturers, and social organizations to make it happen.\"--Jacket."
+        }
+      }
+    ]
+  }
+}
