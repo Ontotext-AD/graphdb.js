@@ -32,7 +32,7 @@ script:
 
   # E2E Acceptance tests
   - wait-on http://localhost:7200 -t 60000
-  - (cd test-e2e/ && npm install && npm run test)
+  - (cd test-e2e/ && npm install && npm link graphdb && npm run test)
 
 after_script:
   - ./scripts/cc-coverage-publish.sh
