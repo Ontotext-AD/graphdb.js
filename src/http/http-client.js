@@ -32,6 +32,7 @@ class HttpClient {
   constructor(baseURL) {
     this.axios = axios.create({
       baseURL,
+      maxContentLength: Infinity,
       paramsSerializer: HttpClient.paramsSerializer
     });
     this.readTimeout = 0;
