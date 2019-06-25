@@ -132,7 +132,7 @@ describe('Should test queries', () => {
         .setQueryType(QueryType.SELECT)
         .setResponseType(RDFMimeType.SPARQL_RESULTS_JSON)
         .setQueryLn(QueryLanguage.SPARQL)
-        .setTimeout(5);
+        .setTimeout(1);
 
       return rdfClient.query(payload).catch(error => {
         expect(error.toString()).toBe('Error: Request failed with status code 503');
