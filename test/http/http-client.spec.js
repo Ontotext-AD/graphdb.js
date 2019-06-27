@@ -46,6 +46,7 @@ describe('HttpClient', () => {
     expect(axios.create).toHaveBeenCalledTimes(1);
     expect(axios.create).toHaveBeenCalledWith({
       baseURL: '/base/url',
+      maxContentLength: Infinity,
       paramsSerializer: expect.any(Function)
     });
     expect(httpClient.readTimeout).toEqual(1000);
