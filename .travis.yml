@@ -38,9 +38,17 @@ after_script:
   - ./scripts/cc-coverage-publish.sh
 
 deploy:
-  skip_cleanup: true
-  provider: npm
-  email: graphdb-support@ontotext.com
-  api_key: $NPM_TOKEN
-  on:
-    tags: true
+  - provider: npm
+    skip_cleanup: true
+    email: graphdb-support@ontotext.com
+    api_key: $NPM_TOKEN
+    on:
+      tags: true
+
+  - provider: pages
+    skip_cleanup: true
+    local_dir: ./docs
+    github_token: $GITHUB_TOKEN
+    keep_history: true
+    on:
+      branch: master
