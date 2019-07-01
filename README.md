@@ -20,6 +20,8 @@ npm install graphdb
 
 ## Development
 
+*Library documentation* can be found [here](https://ontotext-ad.github.io/graphdb.js/)
+
 The library is written in ES2016. During the build process source files `src/`
 are transpiled to ES2015 and copied to `lib/` directory.
 
