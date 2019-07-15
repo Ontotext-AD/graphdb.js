@@ -44,11 +44,12 @@ deploy:
     api_key: $NPM_TOKEN
     on:
       tags: true
+      node_js: '12'
 
   - provider: pages
     skip_cleanup: true
     local_dir: ./docs
     github_token: $GITHUB_TOKEN
-    keep_history: true
     on:
       branch: master
+      node_js: '12'
