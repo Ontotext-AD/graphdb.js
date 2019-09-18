@@ -8,13 +8,12 @@
   "homepage": "https://github.com/Ontotext-AD/graphdb.js",
   "license": "Apache-2.0",
   "scripts": {
-    "test": "jest --runInBand --config=jest-e2e.config.js"
+    "test": "jest --runInBand --config=jest-e2e.config.js",
+    "debug": "node --inspect-brk node_modules/.bin/jest --runInBand --config=jest-e2e.config.js"
   },
   "devDependencies": {
-    "@babel/core": "^7.4.3",
-    "@babel/preset-env": "^7.4.3",
     "axios": "^0.18.1",
-    "babel-loader": "^8.0.5",
+    "express": "^4.17.1",
     "form-data": "^2.3.3",
     "graphdb": "^1.0.0",
     "jest": "^24.8.0",
