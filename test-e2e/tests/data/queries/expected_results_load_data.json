@@ -71,6 +71,20 @@
         },
         "s": {
           "type": "uri",
+          "value": "http://experiment.worldcat.org/entity/work/data/27331745#Topic/information_systems"
+        },
+        "o": {
+          "type": "uri",
+          "value": "http://schema.org/Intangible"
+        }
+      },
+      {
+        "p": {
+          "type": "uri",
+          "value": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"
+        },
+        "s": {
+          "type": "uri",
           "value": "http://experiment.worldcat.org/entity/work/data/27331745#Person/berners_lee_tim"
         },
         "o": {
@@ -85,7 +99,7 @@
         },
         "s": {
           "type": "uri",
-          "value": "http://experiment.worldcat.org/entity/work/data/27331745#Topic/world_wide_web_information_retrieval_system_history"
+          "value": "http://experiment.worldcat.org/entity/work/data/27331745#Topic/world_wide_web"
         },
         "o": {
           "type": "uri",
@@ -99,7 +113,21 @@
         },
         "s": {
           "type": "uri",
-          "value": "http://experiment.worldcat.org/entity/work/data/27331745#Topic/world_wide_web"
+          "value": "http://experiment.worldcat.org/entity/work/data/27331745#Topic/internets"
+        },
+        "o": {
+          "type": "uri",
+          "value": "http://schema.org/Intangible"
+        }
+      },
+      {
+        "p": {
+          "type": "uri",
+          "value": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"
+        },
+        "s": {
+          "type": "uri",
+          "value": "http://experiment.worldcat.org/entity/work/data/27331745#Topic/communication_networks"
         },
         "o": {
           "type": "uri",
@@ -127,7 +155,35 @@
         },
         "s": {
           "type": "uri",
+          "value": "http://experiment.worldcat.org/entity/work/data/27331745#Topic/computer_networks"
+        },
+        "o": {
+          "type": "uri",
+          "value": "http://schema.org/Intangible"
+        }
+      },
+      {
+        "p": {
+          "type": "uri",
+          "value": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"
+        },
+        "s": {
+          "type": "uri",
           "value": "http://dewey.info/class/025.04/e21/"
+        },
+        "o": {
+          "type": "uri",
+          "value": "http://schema.org/Intangible"
+        }
+      },
+      {
+        "p": {
+          "type": "uri",
+          "value": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"
+        },
+        "s": {
+          "type": "uri",
+          "value": "http://experiment.worldcat.org/entity/work/data/27331745#Topic/histories"
         },
         "o": {
           "type": "uri",
@@ -146,6 +202,20 @@
         "o": {
           "type": "uri",
           "value": "http://schema.org/Person"
+        }
+      },
+      {
+        "p": {
+          "type": "uri",
+          "value": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"
+        },
+        "s": {
+          "type": "uri",
+          "value": "http://experiment.worldcat.org/entity/work/data/27331745#Topic/information_retrieval"
+        },
+        "o": {
+          "type": "uri",
+          "value": "http://schema.org/Intangible"
         }
       },
       {
@@ -355,7 +425,7 @@
         },
         "o": {
           "type": "uri",
-          "value": "http://experiment.worldcat.org/entity/work/data/27331745#Person/berners_lee_tim"
+          "value": "http://experiment.worldcat.org/entity/work/data/27331745#Topic/information_systems"
         }
       },
       {
@@ -369,7 +439,7 @@
         },
         "o": {
           "type": "uri",
-          "value": "http://experiment.worldcat.org/entity/work/data/27331745#Topic/world_wide_web_information_retrieval_system_history"
+          "value": "http://experiment.worldcat.org/entity/work/data/27331745#Person/berners_lee_tim"
         }
       },
       {
@@ -397,7 +467,49 @@
         },
         "o": {
           "type": "uri",
+          "value": "http://experiment.worldcat.org/entity/work/data/27331745#Topic/internets"
+        }
+      },
+      {
+        "p": {
+          "type": "uri",
+          "value": "http://schema.org/about"
+        },
+        "s": {
+          "type": "uri",
+          "value": "http://www.worldcat.org/oclc/41238513"
+        },
+        "o": {
+          "type": "uri",
+          "value": "http://experiment.worldcat.org/entity/work/data/27331745#Topic/communication_networks"
+        }
+      },
+      {
+        "p": {
+          "type": "uri",
+          "value": "http://schema.org/about"
+        },
+        "s": {
+          "type": "uri",
+          "value": "http://www.worldcat.org/oclc/41238513"
+        },
+        "o": {
+          "type": "uri",
           "value": "http://experiment.worldcat.org/entity/work/data/27331745#Topic/world_wide_web_history"
+        }
+      },
+      {
+        "p": {
+          "type": "uri",
+          "value": "http://schema.org/about"
+        },
+        "s": {
+          "type": "uri",
+          "value": "http://www.worldcat.org/oclc/41238513"
+        },
+        "o": {
+          "type": "uri",
+          "value": "http://experiment.worldcat.org/entity/work/data/27331745#Topic/computer_networks"
         }
       },
       {
@@ -425,7 +537,35 @@
         },
         "o": {
           "type": "uri",
+          "value": "http://experiment.worldcat.org/entity/work/data/27331745#Topic/histories"
+        }
+      },
+      {
+        "p": {
+          "type": "uri",
+          "value": "http://schema.org/about"
+        },
+        "s": {
+          "type": "uri",
+          "value": "http://www.worldcat.org/oclc/41238513"
+        },
+        "o": {
+          "type": "uri",
           "value": "http://viaf.org/viaf/85312226"
+        }
+      },
+      {
+        "p": {
+          "type": "uri",
+          "value": "http://schema.org/about"
+        },
+        "s": {
+          "type": "uri",
+          "value": "http://www.worldcat.org/oclc/41238513"
+        },
+        "o": {
+          "type": "uri",
+          "value": "http://experiment.worldcat.org/entity/work/data/27331745#Topic/information_retrieval"
         }
       },
       {
@@ -662,11 +802,12 @@
         },
         "s": {
           "type": "uri",
-          "value": "http://experiment.worldcat.org/entity/work/data/27331745#Person/berners_lee_tim"
+          "value": "http://experiment.worldcat.org/entity/work/data/27331745#Topic/information_systems"
         },
         "o": {
+          "xml:lang": "en",
           "type": "literal",
-          "value": "Tim Berners-Lee"
+          "value": "INFORMATION SYSTEMS"
         }
       },
       {
@@ -676,12 +817,11 @@
         },
         "s": {
           "type": "uri",
-          "value": "http://experiment.worldcat.org/entity/work/data/27331745#Topic/world_wide_web_information_retrieval_system_history"
+          "value": "http://experiment.worldcat.org/entity/work/data/27331745#Person/berners_lee_tim"
         },
         "o": {
-          "xml:lang": "en",
           "type": "literal",
-          "value": "World Wide Web (Information retrieval system)--History"
+          "value": "Tim Berners-Lee"
         }
       },
       {
@@ -721,6 +861,51 @@
         },
         "s": {
           "type": "uri",
+          "value": "http://experiment.worldcat.org/entity/work/data/27331745#Topic/world_wide_web"
+        },
+        "o": {
+          "xml:lang": "en",
+          "type": "literal",
+          "value": "WORLD WIDE WEB"
+        }
+      },
+      {
+        "p": {
+          "type": "uri",
+          "value": "http://schema.org/name"
+        },
+        "s": {
+          "type": "uri",
+          "value": "http://experiment.worldcat.org/entity/work/data/27331745#Topic/internets"
+        },
+        "o": {
+          "xml:lang": "en",
+          "type": "literal",
+          "value": "INTERNETS"
+        }
+      },
+      {
+        "p": {
+          "type": "uri",
+          "value": "http://schema.org/name"
+        },
+        "s": {
+          "type": "uri",
+          "value": "http://experiment.worldcat.org/entity/work/data/27331745#Topic/communication_networks"
+        },
+        "o": {
+          "xml:lang": "en",
+          "type": "literal",
+          "value": "COMMUNICATION NETWORKS"
+        }
+      },
+      {
+        "p": {
+          "type": "uri",
+          "value": "http://schema.org/name"
+        },
+        "s": {
+          "type": "uri",
           "value": "http://experiment.worldcat.org/entity/work/data/27331745#Topic/world_wide_web_history"
         },
         "o": {
@@ -736,11 +921,56 @@
         },
         "s": {
           "type": "uri",
+          "value": "http://experiment.worldcat.org/entity/work/data/27331745#Topic/computer_networks"
+        },
+        "o": {
+          "xml:lang": "en",
+          "type": "literal",
+          "value": "COMPUTER NETWORKS"
+        }
+      },
+      {
+        "p": {
+          "type": "uri",
+          "value": "http://schema.org/name"
+        },
+        "s": {
+          "type": "uri",
+          "value": "http://experiment.worldcat.org/entity/work/data/27331745#Topic/histories"
+        },
+        "o": {
+          "xml:lang": "en",
+          "type": "literal",
+          "value": "HISTORIES"
+        }
+      },
+      {
+        "p": {
+          "type": "uri",
+          "value": "http://schema.org/name"
+        },
+        "s": {
+          "type": "uri",
           "value": "http://viaf.org/viaf/85312226"
         },
         "o": {
           "type": "literal",
           "value": "Tim Berners-Lee"
+        }
+      },
+      {
+        "p": {
+          "type": "uri",
+          "value": "http://schema.org/name"
+        },
+        "s": {
+          "type": "uri",
+          "value": "http://experiment.worldcat.org/entity/work/data/27331745#Topic/information_retrieval"
+        },
+        "o": {
+          "xml:lang": "en",
+          "type": "literal",
+          "value": "INFORMATION RETRIEVAL"
         }
       },
       {
@@ -960,6 +1190,34 @@
       {
         "p": {
           "type": "uri",
+          "value": "http://rdfs.org/ns/void#inDataset"
+        },
+        "s": {
+          "type": "uri",
+          "value": "http://www.worldcat.org/title/-/oclc/41238513"
+        },
+        "o": {
+          "type": "uri",
+          "value": "http://purl.oclc.org/dataset/WorldCat"
+        }
+      },
+      {
+        "p": {
+          "type": "uri",
+          "value": "http://schema.org/dateModified"
+        },
+        "s": {
+          "type": "uri",
+          "value": "http://www.worldcat.org/title/-/oclc/41238513"
+        },
+        "o": {
+          "type": "literal",
+          "value": "2019-07-30"
+        }
+      },
+      {
+        "p": {
+          "type": "uri",
           "value": "http://schema.org/familyName"
         },
         "s": {
@@ -1039,34 +1297,6 @@
         "o": {
           "type": "literal",
           "value": "Mark"
-        }
-      },
-      {
-        "p": {
-          "type": "uri",
-          "value": "http://rdfs.org/ns/void#inDataset"
-        },
-        "s": {
-          "type": "uri",
-          "value": "http://www.worldcat.org/title/-/oclc/41238513"
-        },
-        "o": {
-          "type": "uri",
-          "value": "http://purl.oclc.org/dataset/WorldCat"
-        }
-      },
-      {
-        "p": {
-          "type": "uri",
-          "value": "http://schema.org/dateModified"
-        },
-        "s": {
-          "type": "uri",
-          "value": "http://www.worldcat.org/title/-/oclc/41238513"
-        },
-        "o": {
-          "type": "literal",
-          "value": "2019-04-19"
         }
       },
       {

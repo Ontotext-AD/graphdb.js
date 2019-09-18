@@ -1,0 +1,136 @@
+@prefix schema: <http://schema.org/> .
+@prefix void:  <http://rdfs.org/ns/void#> .
+@prefix genont: <http://www.w3.org/2006/gen/ont#> .
+@prefix library: <http://purl.org/library/> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix bgn:   <http://bibliograph.net/> .
+@prefix wdrs:  <http://www.w3.org/2007/05/powder-s#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix pto:   <http://www.productontology.org/id/> .
+
+<http://www.worldcat.org/oclc/41238513>
+        a                           schema:Book , schema:CreativeWork ;
+        library:oclcnum             "41238513" ;
+        library:placeOfPublication  <http://experiment.worldcat.org/entity/work/data/27331745#Place/san_francisco> , <http://id.loc.gov/vocabulary/countries/cau> ;
+        schema:about                <http://experiment.worldcat.org/entity/work/data/27331745#Topic/information_systems> , <http://experiment.worldcat.org/entity/work/data/27331745#Person/berners_lee_tim> , <http://experiment.worldcat.org/entity/work/data/27331745#Topic/world_wide_web> , <http://experiment.worldcat.org/entity/work/data/27331745#Topic/internets> , <http://experiment.worldcat.org/entity/work/data/27331745#Topic/communication_networks> , <http://experiment.worldcat.org/entity/work/data/27331745#Topic/world_wide_web_history> , <http://experiment.worldcat.org/entity/work/data/27331745#Topic/computer_networks> , <http://dewey.info/class/025.04/e21/> , <http://experiment.worldcat.org/entity/work/data/27331745#Topic/histories> , <http://viaf.org/viaf/85312226> , <http://experiment.worldcat.org/entity/work/data/27331745#Topic/information_retrieval> , <http://experiment.worldcat.org/entity/work/data/27331745#Topic/web_histoire> , <http://id.worldcat.org/fast/1181326> , <http://experiment.worldcat.org/entity/work/data/27331745#Topic/erfindung> ;
+        schema:bookEdition          "1st ed." ;
+        schema:bookFormat           bgn:PrintBook ;
+        schema:contributor          <http://viaf.org/viaf/874883> ;
+        schema:copyrightYear        "1999" ;
+        schema:creator              <http://viaf.org/viaf/85312226> ;
+        schema:datePublished        "1999" ;
+        schema:description          "Enquire within upon everything -- Tangles, links, and webs -- info.cern.ch -- Protocols: simple rules for global systems -- Going global -- Browsing -- Changes -- Consortium -- Competition and consensus -- Web of people -- Privacy -- Mind to mind -- Machines and the Web -- Weaving the Web."@en ;
+        schema:exampleOfWork        <http://worldcat.org/entity/work/id/27331745> ;
+        schema:genre                "History"@en ;
+        schema:inLanguage           "en" ;
+        schema:name                 "Weaving the Web : the original design and ultimate destiny of the World Wide Web by its inventor"@en ;
+        schema:productID            "41238513" ;
+        schema:publication          <http://www.worldcat.org/title/-/oclc/41238513#PublicationEvent/san_francisco_harpersanfrancisco_1999> ;
+        schema:publisher            <http://experiment.worldcat.org/entity/work/data/27331745#Agent/harpersanfrancisco> ;
+        schema:reviews              <http://www.worldcat.org/title/-/oclc/41238513#Review/-680623604> ;
+        schema:url                  <http://www.gbv.de/dms/bowker/toc/9780062515865.pdf> ;
+        schema:workExample          <http://worldcat.org/isbn/9780062515865> , <http://worldcat.org/isbn/9780062515872> ;
+        wdrs:describedby            <http://www.worldcat.org/title/-/oclc/41238513> .
+
+<http://experiment.worldcat.org/entity/work/data/27331745#Topic/world_wide_web_history>
+        a               schema:Intangible ;
+        schema:hasPart  <http://id.loc.gov/authorities/subjects/sh95000541> ;
+        schema:name     "World Wide Web--History"@en .
+
+<http://experiment.worldcat.org/entity/work/data/27331745#Topic/information_retrieval>
+        a            schema:Intangible ;
+        schema:name  "INFORMATION RETRIEVAL"@en .
+
+<http://www.worldcat.org/title/-/oclc/41238513>
+        a                    genont:ContentTypeGenericResource , genont:InformationResource ;
+        void:inDataset       <http://purl.oclc.org/dataset/WorldCat> ;
+        schema:about         <http://www.worldcat.org/oclc/41238513> ;
+        schema:dateModified  "2019-07-30" .
+
+<http://viaf.org/viaf/874883>
+        a                  schema:Person ;
+        schema:familyName  "Fischetti" ;
+        schema:givenName   "Mark" ;
+        schema:name        "Mark Fischetti" .
+
+<http://viaf.org/viaf/85312226>
+        a                  schema:Person ;
+        schema:familyName  "Berners-Lee" ;
+        schema:givenName   "Tim" ;
+        schema:name        "Tim Berners-Lee" .
+
+<http://id.loc.gov/vocabulary/countries/cau>
+        a                   schema:Place ;
+        dcterms:identifier  "cau" .
+
+<http://experiment.worldcat.org/entity/work/data/27331745#Topic/web_histoire>
+        a            schema:Intangible ;
+        schema:name  "Web--Histoire"@fr , "Web--Histoire"@en .
+
+<http://experiment.worldcat.org/entity/work/data/27331745#Topic/computer_networks>
+        a            schema:Intangible ;
+        schema:name  "COMPUTER NETWORKS"@en .
+
+<http://experiment.worldcat.org/entity/work/data/27331745#Topic/information_systems>
+        a            schema:Intangible ;
+        schema:name  "INFORMATION SYSTEMS"@en .
+
+<http://experiment.worldcat.org/entity/work/data/27331745#Topic/communication_networks>
+        a            schema:Intangible ;
+        schema:name  "COMMUNICATION NETWORKS"@en .
+
+<http://experiment.worldcat.org/entity/work/data/27331745#Place/san_francisco>
+        a            schema:Place ;
+        schema:name  "San Francisco" .
+
+<http://worldcat.org/isbn/9780062515865>
+        a            schema:ProductModel ;
+        schema:isbn  "9780062515865" , "0062515861" .
+
+<http://experiment.worldcat.org/entity/work/data/27331745#Agent/harpersanfrancisco>
+        a            bgn:Agent ;
+        schema:name  "HarperSanFrancisco" .
+
+<http://www.worldcat.org/title/-/oclc/41238513#PublicationEvent/san_francisco_harpersanfrancisco_1999>
+        a                 schema:PublicationEvent ;
+        schema:location   <http://experiment.worldcat.org/entity/work/data/27331745#Place/san_francisco> ;
+        schema:organizer  <http://experiment.worldcat.org/entity/work/data/27331745#Agent/harpersanfrancisco> .
+
+<http://experiment.worldcat.org/entity/work/data/27331745#Topic/erfindung>
+        a            schema:Intangible ;
+        schema:name  "Erfindung"@en .
+
+<http://experiment.worldcat.org/entity/work/data/27331745#Topic/internets>
+        a            schema:Intangible ;
+        schema:name  "INTERNETS"@en .
+
+<http://id.worldcat.org/fast/1181326>
+        a            schema:Intangible ;
+        schema:name  "World Wide Web"@en .
+
+<http://experiment.worldcat.org/entity/work/data/27331745#Topic/histories>
+        a            schema:Intangible ;
+        schema:name  "HISTORIES"@en .
+
+<http://www.worldcat.org/title/-/oclc/41238513#Review/-680623604>
+        a                    schema:Review ;
+        schema:itemReviewed  <http://www.worldcat.org/oclc/41238513> ;
+        schema:reviewBody    "\"Tim Berners-Lee, the inventor of the World Wide Web, has been hailed by Time magazine as one of the 100 greatest minds of this century. His creation has already changed the way people do business, entertain themselves, exchange ideas, and socialize with one another.\" \"Berners-Lee offers insights to help readers understand the true nature of the Web, enabling them to use it to their fullest advantage. He shares his views on such critical issues as censorship, privacy, the increasing power of software companies in the online world, and the need to find the ideal balance between the commercial and social forces on the Web. His criticism of the Web's current state makes clear that there is still much work to be done. Finally, Berners-Lee presents his own plan for the Web's future, one that calls for the active support and participation of programmers, computer manufacturers, and social organizations to make it happen.\"--Jacket." .
+
+<http://worldcat.org/isbn/9780062515872>
+        a            schema:ProductModel ;
+        schema:isbn  "9780062515872" , "006251587X" .
+
+<http://experiment.worldcat.org/entity/work/data/27331745#Person/berners_lee_tim>
+        a                  schema:Person ;
+        schema:familyName  "Berners-Lee" ;
+        schema:givenName   "Tim" ;
+        schema:name        "Tim Berners-Lee" .
+
+<http://dewey.info/class/025.04/e21/>
+        a       schema:Intangible .
+
+<http://experiment.worldcat.org/entity/work/data/27331745#Topic/world_wide_web>
+        a            schema:Intangible ;
+        schema:name  "World Wide Web"@en , "World wide web"@en , "WORLD WIDE WEB"@en .
