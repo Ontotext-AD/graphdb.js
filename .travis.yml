@@ -15,8 +15,7 @@ branches:
 cache: npm
 
 before_install:
-  - docker pull docker-registry.ontotext.com/graphdb-free:8.10-SNAPSHOT
-  - docker run -d -p 7200:7200 --name graphdb docker-registry.ontotext.com/graphdb-free:8.10-SNAPSHOT
+  - docker-compose -f test-e2e/docker-compose.yml up -d
 
 before_script:
   - ./scripts/cc-coverage-prepare.sh
