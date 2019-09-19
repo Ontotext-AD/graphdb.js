@@ -3,7 +3,7 @@ version: '3.3'
 services:
 
   graphdb:
-    image: docker-registry.ontotext.com/graphdb-free:8.10-SNAPSHOT
+    image: docker-registry.ontotext.com/graphdb-free:9.0.0-RC2-free
     container_name: graphdb
     # This will allow GraphDB to access host resources (locally running or in Travis)
     # Needed to load data from localhost (see queries.spec.js)
