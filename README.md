@@ -486,7 +486,7 @@ Multiple parsers could be registered for different response types.
 
 #### Predefined parsers
 
-The library provides convenient parser wrappers for the rdf formats using thrid party libraries:
+The library provides convenient parser wrappers for the rdf formats using third party libraries:
 
 * `text/turtle`: TurtleParser ([N3](https://github.com/rdfjs/N3.js))
 * `text/rdf+n3`: N3parser ([N3](https://github.com/rdfjs/N3.js))
