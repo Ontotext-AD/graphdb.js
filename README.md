@@ -430,6 +430,10 @@ return repository.deleteNamespace('rdf');
 return repository.deleteNamespaces();
 ```
 
+### Repository management
+
+Repository operations like create, edit, delete, shutdown are not supported by the library at the moment. Supporting these is planned for next versions. Follow the [issue](https://github.com/Ontotext-AD/graphdb.js/issues/25).
+
 ### Authorization
 
 *This is a Work In Progress feature (See [this](https://github.com/Ontotext-AD/graphdb.js/pull/28) pull request)*
