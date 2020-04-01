@@ -504,5 +504,52 @@ For SELECT query results in `json` and `xml` formats as well as boolean results 
 * `application/sparql-results+xml`, `text/boolean`: SparqlXmlResultParser ([sparqlxml-parse](https://github.com/rubensworks/sparqlxml-parse.js))
 * `application/sparql-results+json`, `text/boolean`: SparqlJsonResultParser ([sparqljson-parse](https://github.com/rubensworks/sparqljson-parse.js))
 
+### rdf*/sparql*
+ The library provides basic support of extend RDF with a notion of nested triples, also known as [reification](https://www.w3.org/TR/rdf-mt/#Reif).
+ Parsers for RDFStar triples are planned for next versions.
+ 
+ When used against server with RDFStar support, for SELECT queries the following Mime-Types are used:
+ * `application/x-sparqlstar-results+json`
+ * `application/x-sparqlstar-results+tsv`
+  
+ For DESCRIBE and CONSTRUCT queries, the following Mime-Types can be used:
+ * `application/x-turtlestar`
+ * `application/x-trigstar`
+ 
+ ```javascript
+const payload = new GetQueryPayload()
+     .setQuery('describe <<<http://www.wikidata.org/entity/Q472> <http://www.wikidata.org/prop/direct/P1889> <http://www.wikidata.org/entity/Q202904>>>')
+     .setQueryType(QueryType.DESCRIBE)
+     .setResponseType(RDFMimeType.TRIG_STAR)
+     .setLimit(100);
+
+return repository.query(payload).then((stream) => {
+     stream.on('data', (data) => {
+       	// data contains requested statements in trig star format
+     });
+});
+```
+
+When RDFStart triple is requested with non supportive Mime-Types, it resolves to an encoded Base64url string.
+It can be decoded using `TermConverter` util class.
+ ```javascript
+const payload = new GetQueryPayload()
+     .setQuery('describe <<<http://www.wikidata.org/entity/Q472> <http://www.wikidata.org/prop/direct/P1889> <http://www.wikidata.org/entity/Q202904>>>')
+     .setQueryType(QueryType.DESCRIBE)
+     .setResponseType(RDFMimeType.RDF_XML)
+     .setLimit(100);
+
+repository.registerParser(new RDFXmlParser());
+return repository.query(payload).then((stream) => {
+     stream.on('data', (data) => {
+        console.log(data.subject.value);
+       	// urn:rdf4j:triple:PDw8aHR0cDovL3d3dy53aWtpZGF0YS5vcmcvZW50aXR5L1E0NzI-IDxodHRwOi8vd3d3Lndpa2lkYXRhLm9yZy9wcm9wL2RpcmVjdC9QMTg4OT4gPGh0dHA6Ly93d3cud2lraWRhdGEub3JnL2VudGl0eS9RMjAyOTA0Pj4-
+
+        console.log(TermConverter.fromBase64RdfStarTriple(data.subject.value));
+        // <<<http://www.wikidata.org/entity/Q472> <http://www.wikidata.org/prop/direct/P1889> <http://www.wikidata.org/entity/Q202904>>>
+     });
+});
+```
+
 ### License
 [LICENSE](LICENSE)

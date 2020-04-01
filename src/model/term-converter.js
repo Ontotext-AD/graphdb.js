@@ -2,6 +2,8 @@ const N3 = require('n3');
 const {DataFactory} = N3;
 const {namedNode, literal, quad, blankNode, variable} = DataFactory;
 const StringUtils = require('../util/string-utils');
+const base64url = require('base64url');
+const ENCODED_RDFSTAR_TRIPLE_PREFIX = 'urn:rdf4j:triple:';
 
 /**
  * Utility class for converting strings to terms, terms to quads and
@@ -10,6 +12,7 @@ const StringUtils = require('../util/string-utils');
  * @class
  * @author Mihail Radkov
  * @author Svilen Velikov
+ * @author Teodossi Dossev
  */
 class TermConverter {
   /**
@@ -326,6 +329,35 @@ class TermConverter {
    */
   static getWriter() {
     return new N3.Writer();
+  }
+
+  /**
+   * Decodes from Base64 encoded RDFStar triple.
+   *
+   * @param {string} encodedTriple to be decoded from base64 url string
+   * @return {string} decoded RDFStar triple, returns unchanged if the provided
+   * triple is not in the expected format
+   */
+  static fromBase64RdfStarTriple(encodedTriple) {
+    if (encodedTriple.startsWith(ENCODED_RDFSTAR_TRIPLE_PREFIX)) {
+      return base64url
+        .decode(encodedTriple.slice(ENCODED_RDFSTAR_TRIPLE_PREFIX.length));
+    }
+    return encodedTriple;
+  }
+
+  /**
+   * Encodes RDFStarTriple to Base64 string.
+   *
+   * @param {string} triple to be encoded as base64 url string
+   * @return {string} encoded RDFStart triple, returns unchanged if the provided
+   * triple is not in the expected format
+   */
+  static toBase64RdfStarTriple(triple) {
+    if (triple.startsWith('<<') && triple.endsWith('>>')) {
+      return ENCODED_RDFSTAR_TRIPLE_PREFIX + base64url.encode(triple);
+    }
+    return triple;
   }
 }
 
