@@ -8,7 +8,9 @@ const SELECT_QUERY_RESULT_TYPES = [
   RDFMimeType.SPARQL_RESULTS_XML,
   RDFMimeType.SPARQL_RESULTS_JSON,
   RDFMimeType.BINARY_RDF_RESULTS_TABLE,
-  RDFMimeType.BOOLEAN_RESULT
+  RDFMimeType.BOOLEAN_RESULT,
+  RDFMimeType.SPARQL_STAR_RESULTS_JSON,
+  RDFMimeType.SPARQL_STAR_RESULTS_TSV
 ];
 
 const ASK_QUERY_RESULT_TYPES = [
@@ -27,7 +29,9 @@ const RDF_FORMATS = [
   RDFMimeType.RDF_JSON,
   RDFMimeType.TRIX,
   RDFMimeType.TRIG,
-  RDFMimeType.BINARY_RDF
+  RDFMimeType.BINARY_RDF,
+  RDFMimeType.TURTLE_STAR,
+  RDFMimeType.TRIG_STAR
 ];
 
 const QUERY_OPERATION_TYPES = [
@@ -188,7 +192,7 @@ class GetQueryPayload extends QueryPayload {
       QUERY_TO_RESPONSE_TYPE_FORMATS_MAPPING[this.getQueryType()];
 
     if (!this.isResponseTypeSupported(responseType, allowedFormats)) {
-      throw new Error(`Invalid responseType=${responseType} 
+      throw new Error(`Invalid responseType=${responseType}
       for ${this.getQueryType()} query! Must be one of ${allowedFormats}`);
     }
 
