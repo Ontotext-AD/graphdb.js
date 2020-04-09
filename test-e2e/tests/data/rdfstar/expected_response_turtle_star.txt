@@ -1,0 +1,4 @@
+@prefix pr: <http://www.wikidata.org/prop/reference/> .
+@prefix wd: <http://www.wikidata.org/entity/> .
+
+<<wd:Q472 <http://www.wikidata.org/prop/direct/P1889> wd:Q202904>> pr:P3452 wd:Q202904 .

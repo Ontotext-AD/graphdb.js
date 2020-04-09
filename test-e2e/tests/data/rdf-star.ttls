@@ -1,0 +1,134 @@
+@prefix schema: <http://schema.org/> .
+@prefix pq:    <http://www.wikidata.org/prop/qualifier/> .
+@prefix pr:    <http://www.wikidata.org/prop/reference/> .
+@prefix bd:    <http://www.bigdata.com/rdf#> .
+@prefix ps:    <http://www.wikidata.org/prop/statement/> .
+@prefix geof:  <http://www.opengis.net/def/geosparql/function/> .
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix wdt:   <http://www.wikidata.org/prop/direct/> .
+@prefix wds:   <http://www.wikidata.org/entity/statement/> .
+@prefix mwapi: <https://www.mediawiki.org/ontology#API/> .
+@prefix wdv:   <http://www.wikidata.org/value/> .
+@prefix fn:    <http://www.w3.org/2005/xpath-functions#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix skos:  <http://www.w3.org/2004/02/skos/core#> .
+@prefix psn:   <http://www.wikidata.org/prop/statement/value-normalized/> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix pqn:   <http://www.wikidata.org/prop/qualifier/value-normalized/> .
+@prefix wd:    <http://www.wikidata.org/entity/> .
+@prefix geo:   <http://www.opengis.net/ont/geosparql#> .
+@prefix psv:   <http://www.wikidata.org/prop/statement/value/> .
+@prefix dct:   <http://purl.org/dc/terms/> .
+@prefix pqv:   <http://www.wikidata.org/prop/qualifier/value/> .
+@prefix gas:   <http://www.bigdata.com/rdf/gas#> .
+@prefix ontolex: <http://www.w3.org/ns/lemon/ontolex#> .
+@prefix wdref: <http://www.wikidata.org/reference/> .
+@prefix wdata: <http://www.wikidata.org/wiki/Special:EntityData/> .
+@prefix prov:  <http://www.w3.org/ns/prov#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix wikibase: <http://wikiba.se/ontology#> .
+@prefix prn:   <http://www.wikidata.org/prop/reference/value-normalized/> .
+@prefix mediawiki: <https://www.mediawiki.org/ontology#> .
+@prefix p:     <http://www.wikidata.org/prop/> .
+@prefix wdtn:  <http://www.wikidata.org/prop/direct-normalized/> .
+@prefix bds:   <http://www.bigdata.com/rdf/search#> .
+@prefix prv:   <http://www.wikidata.org/prop/reference/value/> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix hint:  <http://www.bigdata.com/queryHints#> .
+@prefix wdno:  <http://www.wikidata.org/prop/novalue/> .
+@prefix sesame: <http://www.openrdf.org/schema/sesame#> .
+@prefix dc:    <http://purl.org/dc/elements/1.1/> .
+wd:Q472 wdt:P6 wd:Q444718 . 
+<<wd:Q472 wdt:P6 wd:Q444718>> pr:P143 wd:Q328 . 
+wd:Q472 wdt:P150 wd:Q6710571 . 
+<<wd:Q472 wdt:P150 wd:Q6710571>> pr:P143 wd:Q11913 . 
+wd:Q472 wdt:P150 wd:Q8014749 . 
+<<wd:Q472 wdt:P150 wd:Q8014749>> pr:P143 wd:Q11913 . 
+wd:Q472 wdt:P150 wd:Q11834092 . 
+<<wd:Q472 wdt:P150 wd:Q11834092>> pr:P143 wd:Q11913 . 
+wd:Q472 wdt:P150 wd:Q7937207 . 
+<<wd:Q472 wdt:P150 wd:Q7937207>> pr:P143 wd:Q11913 . 
+wd:Q472 wdt:P150 wd:Q9305797 . 
+<<wd:Q472 wdt:P150 wd:Q9305797>> pr:P143 wd:Q11913 . 
+wd:Q472 wdt:P150 wd:Q368259 . 
+<<wd:Q472 wdt:P150 wd:Q368259>> pr:P143 wd:Q11913 . 
+wd:Q472 wdt:P150 wd:Q7113283 . 
+<<wd:Q472 wdt:P150 wd:Q7113283>> pr:P143 wd:Q11913 . 
+wd:Q472 wdt:P94 <http://commons.wikimedia.org/wiki/Special:FilePath/BG%20Sofia%20coa.svg> . 
+<<wd:Q472 wdt:P94 <http://commons.wikimedia.org/wiki/Special:FilePath/BG%20Sofia%20coa.svg>>> pr:P143 wd:Q328 . 
+wd:Q472 wdt:P1376 wd:Q219 . 
+<<wd:Q472 wdt:P17 wd:Q219>> pr:P248 wd:Q265049 . 
+wd:Q472 wdt:P41 <http://commons.wikimedia.org/wiki/Special:FilePath/BG%20Sofia%20flag.svg> . 
+<<wd:Q472 wdt:P41 <http://commons.wikimedia.org/wiki/Special:FilePath/BG%20Sofia%20flag.svg>>> pr:P143 wd:Q328 . 
+wd:Q472 wdt:P150 wd:Q9305799 . 
+<<wd:Q472 wdt:P150 wd:Q9305799>> pr:P143 wd:Q11913 . 
+wd:Q472 wdt:P17 wd:Q219 ;
+        wdtn:P227 <http://d-nb.info/gnd/4077502-1> . 
+<<wd:Q472 wdt:P227 "4077502-1">> pr:P143 wd:Q48183 . 
+wd:Q472 wdt:P242 <http://commons.wikimedia.org/wiki/Special:FilePath/Sofiya%20location%20in%20Bulgaria.png> . 
+<<wd:Q472 wdt:P242 <http://commons.wikimedia.org/wiki/Special:FilePath/Sofiya%20location%20in%20Bulgaria.png>>> pr:P143 wd:Q328 . 
+wd:Q472 wdt:P214 "130177211" . 
+<<wd:Q472 wdtn:P214 <http://viaf.org/viaf/130177211>>> pr:P143 wd:Q48183 . 
+wd:Q472 wdt:P227 "4077502-1" ;
+        wdt:P206 wd:Q3657979 . 
+<<wd:Q472 wdt:P206 wd:Q3657979>> pr:P3452 wd:Q1138538 . 
+wd:Q472 wdtn:P214 <http://viaf.org/viaf/130177211> . 
+<<wd:Q472 wdt:P281 "1000">> pr:P143 wd:Q11913 . 
+wd:Q472 wdt:P281 "1000" ;
+        wdt:P395 "C" . 
+<<wd:Q472 wdt:P395 "C">> pr:P143 wd:Q11913 . 
+wd:Q472 wdt:P361 wd:Q14208675 . 
+<<wd:Q472 wdt:P361 wd:Q14208675>> pr:P143 wd:Q19826574 . 
+wd:Q472 wdt:P473 "02" . 
+<<wd:Q472 wdt:P473 "02">> pr:P143 wd:Q328 . 
+wd:Q472 wdt:P901 "BU42" . 
+<<wd:Q472 wdt:P901 "BU42">> pr:P248 wd:Q55740216 . 
+wd:Q472 wdt:P1082 1286383.0 . 
+<<wd:Q472 wdt:P1082 1286383.0>> pr:P248 wd:Q12279344 ;
+                                pr:P143 wd:Q11913 . 
+wd:Q472 wdtn:P982 <http://musicbrainz.org/area/0641d55d-9fcb-48be-92c7-0a5273ab58bc> . 
+<<wd:Q472 wdt:P982 "0641d55d-9fcb-48be-92c7-0a5273ab58bc">> pr:P248 wd:Q14005 . 
+wd:Q472 wdt:P982 "0641d55d-9fcb-48be-92c7-0a5273ab58bc" ;
+        rdfs:label "София"@bg . 
+<<wd:Q472 wdt:P1448 "София"@bg>> pr:P143 wd:Q206855 . 
+wd:Q472 wdt:P131 wd:Q4442915 . 
+<<wd:Q472 wdt:P1889 wd:Q4442915>> pr:P3452 wd:Q4442915 . 
+wd:Q472 wdt:P1464 wd:Q15080543 . 
+<<wd:Q472 wdt:P1464 wd:Q15080543>> pr:P143 wd:Q206855 . 
+wd:Q472 wdt:P625 "Point(23.32415 42.69751)"^^geo:wktLiteral . 
+<<wd:Q472 wdt:P625 "Point(23.32415 42.69751)"^^geo:wktLiteral>> pr:P143 wd:Q837615 . 
+wd:Q472 wdt:P856 <http://www.sofia.bg/en/index_en.asp> . 
+<<wd:Q472 wdt:P856 <http://www.sofia.bg/en/index_en.asp>>> pr:P143 wd:Q328 . 
+wd:Q472 wdtn:P646 <http://g.co/kg/m/0ftjx> . 
+<<wd:Q472 wdt:P646 "/m/0ftjx">> pr:P248 wd:Q15241312 . 
+wd:Q472 wdt:P646 "/m/0ftjx" ;
+        wdt:P949 "000977360" . 
+<<wd:Q472 wdt:P949 "000977360">> pr:P248 wd:Q54919 . 
+wd:Q472 wdt:P1448 "София"@bg ;
+        wdt:P1281 "839722" . 
+<<wd:Q472 wdt:P1281 "839722">> pr:P248 wd:Q24010939 . 
+wd:Q472 wdt:P1465 wd:Q10023782 . 
+<<wd:Q472 wdt:P1465 wd:Q10023782>> pr:P143 wd:Q206855 . 
+wd:Q472 wdtn:P1566 <http://sws.geonames.org/727011> . 
+<<wd:Q472 wdt:P1566 "727011">> pr:P143 wd:Q837615 . 
+wd:Q472 wdt:P1566 "727011" ;
+        wdt:P1889 wd:Q4442915 ;
+        wdt:P1792 wd:Q7118957 . 
+<<wd:Q472 wdt:P1792 wd:Q7118957>> pr:P143 wd:Q206855 . 
+wd:Q472 wdtn:P1667 <http://vocab.getty.edu/tgn/7009977> . 
+<<wd:Q472 wdt:P1667 "7009977">> pr:P248 wd:Q1520117 . 
+wd:Q472 wdt:P1667 "7009977" ;
+        wdt:P1889 wd:Q202904 . 
+<<wd:Q472 wdt:P1889 wd:Q202904>> pr:P3452 wd:Q202904 . 
+wd:Q472 wdt:P2046 492.0 . 
+<<wd:Q472 wdt:P2046 492.0>> pr:P143 wd:Q465 . 
+wd:Q472 wdt:P2044 595.0 . 
+<<wd:Q472 wdt:P2044 595.0>> pr:P143 wd:Q48183 . 
+wd:Q472 wdt:P3219 "sofia" . 
+<<wd:Q472 wdt:P3365 "sofia">> pr:P143 wd:Q11920 . 
+wd:Q472 wdt:P3365 "sofia" ;
+        wdt:P2581 "00013759n" . 
+<<wd:Q472 wdtn:P2581 <http://babelnet.org/rdf/s00013759n>>> pr:P248 wd:Q4837690 . 
+wd:Q472 wdtn:P2581 <http://babelnet.org/rdf/s00013759n> ;
+        wdt:P5573 "4486" . 
+<<wd:Q472 wdt:P5573 "4486">> pr:P248 wd:Q265049 .

@@ -1,0 +1,30 @@
+{
+  "head" : {
+    "vars" : [
+      "s"
+    ]
+  },
+  "results" : {
+    "bindings" : [
+      {
+        "s" : {
+          "type" : "triple",
+          "value" : {
+            "s" : {
+              "type" : "uri",
+              "value" : "http://www.wikidata.org/entity/Q472"
+            },
+            "p" : {
+              "type" : "uri",
+              "value" : "http://www.wikidata.org/prop/direct/P1889"
+            },
+            "o" : {
+              "type" : "uri",
+              "value" : "http://www.wikidata.org/entity/Q202904"
+            }
+          }
+        }
+      }
+    ]
+  }
+}
