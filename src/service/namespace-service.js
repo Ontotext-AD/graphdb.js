@@ -9,7 +9,7 @@ const Namespace = require('../model/namespace');
 const LoggingUtils = require('../logging/logging-utils');
 const StringUtils = require('../util/string-utils');
 
-const DataFactory = require('n3').DataFactory;
+const DataFactory = require('service/data-factory');
 const NamedNode = DataFactory.internal.NamedNode;
 
 /**

@@ -11,8 +11,7 @@ const TriGParser = require('parser/trig-parser');
 const HttpRequestBuilder = require('http/http-request-builder');
 const JsonLDParser = require('parser/jsonld-parser');
 const RDFXmlParser = require('parser/rdfxml-parser');
-
-const DataFactory = require('n3').DataFactory;
+const DataFactory = require('service/data-factory');
 const namedNode = DataFactory.namedNode;
 const literal = DataFactory.literal;
 const defaultGraph = DataFactory.defaultGraph;

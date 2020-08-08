@@ -1,7 +1,7 @@
 const ContentParser = require('../parser/content-parser');
 const RDFMimeType = require('../http/rdf-mime-type');
 const QueryType = require('../query/query-type');
-const DataFactory = require('n3').DataFactory;
+const DataFactory = require('service/data-factory');
 import {SparqlJsonParser} from 'sparqljson-parse';
 
 /**

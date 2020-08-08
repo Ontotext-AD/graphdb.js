@@ -8,7 +8,7 @@ const RDFMimeType = require('http/rdf-mime-type');
 const {ObjectReadableMock} = require('stream-mock');
 const SparqlJsonResultParser = require('parser/sparql-json-result-parser');
 const SparqlXmlResultParser = require('parser/sparql-xml-result-parser');
-const DataFactory = require('n3').DataFactory;
+const DataFactory = require('service/data-factory');
 const namedNode = DataFactory.namedNode;
 const HttpRequestBuilder = require('http/http-request-builder');
 
