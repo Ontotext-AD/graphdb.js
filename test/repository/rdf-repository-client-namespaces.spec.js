@@ -3,7 +3,6 @@ const RepositoryClientConfig = require('repository/repository-client-config');
 const RDFRepositoryClient = require('repository/rdf-repository-client');
 const RDFMimeType = require('http/rdf-mime-type');
 const DataFactory = require('n3').DataFactory;
-const NamedNode = DataFactory.internal.NamedNode;
 const Namespace = require('model/namespace');
 const HttpRequestBuilder = require('http/http-request-builder');
 const httpClientStub = require('../http/http-client.stub');
@@ -40,7 +39,7 @@ describe('RDFRepositoryClient - Namespace management', () => {
         namespaces.forEach(namespace => {
           expect(namespace).toBeInstanceOf(Namespace);
           expect(namespace.getPrefix()).toBeDefined();
-          expect(namespace.getNamespace()).toBeInstanceOf(NamedNode);
+          expect(namespace.getNamespace().termType).toEqual('NamedNode');
         });
 
         expect(httpRequest).toHaveBeenCalledTimes(1);
@@ -59,7 +58,7 @@ describe('RDFRepositoryClient - Namespace management', () => {
   describe('getNamespace(prefix)', () => {
     test('should retrieve specific namespace', () => {
       return rdfRepositoryClient.getNamespace('rdfs').then(namespace => {
-        expect(namespace).toBeInstanceOf(NamedNode);
+        expect(namespace.termType).toEqual('NamedNode');
         expect(namespace.value).toEqual('http://www.w3.org/2000/01/rdf-schema#');
 
         expect(httpRequest).toHaveBeenCalledTimes(1);

@@ -7,11 +7,6 @@ describe('SparqlXmlResultParser', () => {
     expect(new SparqlXmlResultParser().parser).toBeDefined();
   });
 
-  test('should be configured with the N3 DataFactory by default', () => {
-    // N3 DataFactory exposed its internal API as well, not only the functions
-    expect(new SparqlXmlResultParser().parser.dataFactory.internal).toBeDefined();
-  });
-
   test('should store provided with the constructor configuration', () => {
     let parserInstance = new SparqlXmlResultParser();
     expect(parserInstance.getConfig()).toEqual({});

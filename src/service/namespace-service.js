@@ -10,7 +10,6 @@ const LoggingUtils = require('../logging/logging-utils');
 const StringUtils = require('../util/string-utils');
 
 const DataFactory = require('n3').DataFactory;
-const NamedNode = DataFactory.internal.NamedNode;
 
 /**
  * Service for namespace management.
@@ -109,7 +108,7 @@ class NamespaceService extends Service {
     }
 
     let payload = namespace;
-    if (namespace instanceof NamedNode) {
+    if (namespace.termType && namespace.termType === 'NamedNode') {
       payload = namespace.value;
     } else if (StringUtils.isBlank(namespace)) {
       throw new Error('Parameter namespace is required!');
