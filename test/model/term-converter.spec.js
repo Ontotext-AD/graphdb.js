@@ -1,9 +1,5 @@
 const TermConverter = require('model/term-converter');
 
-const N3 = require('n3');
-const {DataFactory} = N3;
-const {NamedNode, Variable} = DataFactory.internal;
-
 describe('TermConverter', () => {
   describe('getQuads()', () => {
     test('should support variables', () => {
@@ -12,15 +8,15 @@ describe('TermConverter', () => {
 
       let quad = quads[0];
       let subjectTerm = quad.subject;
-      expect(subjectTerm).toBeInstanceOf(NamedNode);
+      expect(subjectTerm.termType).toEqual('NamedNode');
       expect(subjectTerm.value).toEqual('subject');
 
       let predicateTerm = quad.predicate;
-      expect(predicateTerm).toBeInstanceOf(Variable);
+      expect(predicateTerm.termType).toEqual('Variable');
       expect(predicateTerm.value).toEqual('p');
 
       let objectTerm = quad.object;
-      expect(objectTerm).toBeInstanceOf(Variable);
+      expect(objectTerm.termType).toEqual('Variable');
       expect(objectTerm.value).toEqual('o');
     });
   });
