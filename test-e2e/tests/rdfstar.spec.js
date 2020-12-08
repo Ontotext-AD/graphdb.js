@@ -35,9 +35,8 @@ describe('Should test RDFStar', () => {
 
     rdfClient.registerParser((new RDFXmlParser()));
     return rdfClient.query(payload).then((resp) => {
-      resp.on('data', data => {
-        expect(data.toString()).toEqual(expected);
-      });
+      resp.on('data', onData);
+      resp.off('data', onData);
     });
   });
 
@@ -54,7 +53,7 @@ describe('Should test RDFStar', () => {
 
     rdfClient.registerParser((new N3Parser()));
     return rdfClient.get(payload).then((resp) => {
-      expect(resp).toEqual((expected));
+      expect(resp).toEqual(expected);
     });
   });
 
@@ -92,9 +91,8 @@ describe('Should test RDFStar', () => {
       .setLimit(100);
 
     return rdfClient.query(payload).then((resp) => {
-      resp.on('data', data => {
-        expect(data.toString().trim()).toEqual(expected.trim());
-      });
+      resp.on('data', onData);
+      resp.off('data', onData);
     });
   });
 
@@ -111,9 +109,12 @@ describe('Should test RDFStar', () => {
       .setLimit(100);
 
     return rdfClient.query(payload).then((resp) => {
-      resp.on('data', data => {
-        expect(data.toString().trim()).toEqual(expected.trim());
-      });
+      resp.on('data', onData);
+      resp.off('data', onData)
     });
   });
 });
+
+function onData(data) {
+  expect(data.toString().trim()).toEqual(expected.trim());
+}
