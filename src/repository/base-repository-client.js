@@ -6,6 +6,7 @@ const RepositoryClientConfig =
 const Iterable = require('../util/iterable');
 const HttpResponse = require('../http/http-response');
 const LoggingUtils = require('../logging/logging-utils');
+const AuthenticationService = require('../service/authentication-service');
 
 /**
  * Set of HTTP status codes for which requests could be re-attempted.
@@ -37,6 +38,8 @@ class BaseRepositoryClient {
   constructor(repositoryClientConfig) {
     BaseRepositoryClient.validateConfig(repositoryClientConfig);
     this.repositoryClientConfig = repositoryClientConfig;
+
+    this.authenticationService = new AuthenticationService();
 
     this.initParsers();
     this.initLogger();
@@ -158,34 +161,64 @@ class BaseRepositoryClient {
    * @param {Iterable} httpClients iterable collection of http clients
    * @param {HttpRequestBuilder} requestBuilder the http request data to be
    * passed to a http client
+   * @param {HttpClient} [currentHttpClient] current client is passed only if
+   * the retry is invoked directly in result of some error handler which may try
+   * to re-execute the request to the same server.
    * @return {Promise<HttpResponse|Error>} a promise which resolves to response
    * wrapper or rejects with error if thrown during execution.
    */
-  retryExecution(httpClients, requestBuilder) {
-    const httpClient = httpClients.next();
-    return httpClient.request(requestBuilder).then((response) => {
-      return new HttpResponse(response, httpClient);
-    }).catch((error) => {
-      const canRetry = BaseRepositoryClient.canRetryExecution(error);
-      const hasNext = httpClients.hasNext();
+  retryExecution(httpClients, requestBuilder, currentHttpClient) {
+    const httpClient = currentHttpClient || httpClients.next();
+    const username = this.repositoryClientConfig.getUsername();
+    const pass = this.repositoryClientConfig.getPass();
+    return this.authenticationService.setHttpClient(httpClient)
+      .login(username, pass)
+      .then(() => {
+        this.decorateRequestConfig(requestBuilder);
+        return httpClient.request(requestBuilder).then((response) => {
+          return new HttpResponse(response, httpClient);
+        }).catch((error) => {
+          const status = error.response ? error.response.status : null;
+          const isUnauthorized = status && status === 401;
+          if (isUnauthorized && this.repositoryClientConfig.getKeepAlive()) {
+            // re-execute will try to re-login the user and update it
+            return this.retryExecution(httpClients, requestBuilder, httpClient);
+          }
 
-      const loggerPayload = {repositoryUrl: httpClient.getBaseURL()};
+          const canRetry = BaseRepositoryClient.canRetryExecution(error);
+          const hasNext = httpClients.hasNext();
 
-      // Try the next repo http client (if any)
-      if (canRetry && hasNext) {
-        this.logger.warn(loggerPayload, 'Retrying execution');
-        return this.retryExecution(httpClients, requestBuilder);
-      }
+          const loggerPayload = {repositoryUrl: httpClient.getBaseURL()};
 
-      if (!canRetry) {
-        this.logger.error(loggerPayload, 'Cannot retry execution');
-      } else {
-        this.logger.error(loggerPayload, 'No more retries');
-      }
+          // Try the next repo http client (if any)
+          if (canRetry && hasNext) {
+            this.logger.warn(loggerPayload, 'Retrying execution');
+            return this.retryExecution(httpClients, requestBuilder);
+          }
 
-      // Not retriable
-      return Promise.reject(error);
-    });
+          if (!canRetry) {
+            this.logger.error(loggerPayload, 'Cannot retry execution');
+          } else {
+            this.logger.error(loggerPayload, 'No more retries');
+          }
+
+          // Not retriable
+          return Promise.reject(error);
+        });
+      });
+  }
+
+  /**
+   * Allow request config to be altered before sending.
+   *
+   * @private
+   * @param {HttpRequestBuilder} requestBuilder
+   */
+  decorateRequestConfig(requestBuilder) {
+    const token = this.authenticationService.getAuthentication();
+    if (token) {
+      requestBuilder.addAuthorizationHeader(token);
+    }
   }
 
   /**

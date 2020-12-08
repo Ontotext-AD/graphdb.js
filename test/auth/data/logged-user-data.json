@@ -1,0 +1,17 @@
+{
+  "username": "testuser",
+  "authorities": [
+    "ROLE_USER",
+    "ROLE_ADMIN",
+    "ROLE_MONITORING",
+    "ROLE_REPO_MANAGER",
+    "ROLE_CLUSTER"
+  ],
+  "appSettings": {
+    "DEFAULT_INFERENCE": true,
+    "DEFAULT_SAMEAS": true,
+    "IGNORE_SHARED_QUERIES": false,
+    "EXECUTE_COUNT": true
+  },
+  "external": false
+}

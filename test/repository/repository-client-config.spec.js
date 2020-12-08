@@ -16,12 +16,15 @@ describe('RepositoryClientConfig', () => {
   const writeTimeout = 2000;
 
   test('should instantiate with the provided configuration parameters', () => {
-    const config = new RepositoryClientConfig(endpoints, headers, defaultRDFMimeType, readTimeout, writeTimeout);
+    const config = new RepositoryClientConfig(endpoints, headers, defaultRDFMimeType, readTimeout, writeTimeout, 'testuser', 'P@ssw0rd', false);
     expect(config.getEndpoints()).toEqual(endpoints);
     expect(config.getHeaders()).toEqual(headers);
     expect(config.getDefaultRDFMimeType()).toEqual(defaultRDFMimeType);
     expect(config.getReadTimeout()).toEqual(readTimeout);
     expect(config.getWriteTimeout()).toEqual(writeTimeout);
+    expect(config.getUsername()).toEqual('testuser');
+    expect(config.getPass()).toEqual('P@ssw0rd');
+    expect(config.getKeepAlive()).toBeFalsy();
   });
 
   test('should support initialization via fluent API', () => {
@@ -30,17 +33,23 @@ describe('RepositoryClientConfig', () => {
       .setHeaders(headers)
       .setDefaultRDFMimeType(defaultRDFMimeType)
       .setReadTimeout(readTimeout)
-      .setWriteTimeout(writeTimeout);
+      .setWriteTimeout(writeTimeout)
+      .setUsername('testuser')
+      .setPass('P@ssw0rd')
+      .setKeepAlive(false);
     expect(config.getEndpoints()).toEqual(endpoints);
     expect(config.getHeaders()).toEqual(headers);
     expect(config.getDefaultRDFMimeType()).toEqual(defaultRDFMimeType);
     expect(config.getReadTimeout()).toEqual(readTimeout);
     expect(config.getWriteTimeout()).toEqual(writeTimeout);
+    expect(config.getUsername()).toEqual('testuser');
+    expect(config.getPass()).toEqual('P@ssw0rd');
+    expect(config.getKeepAlive()).toBeFalsy();
   });
 
   test('should allow addition of repository endpoints', () => {
     const config = new RepositoryClientConfig();
-    endpoints.forEach(endpoint => config.addEndpoint(endpoint));
+    endpoints.forEach((endpoint) => config.addEndpoint(endpoint));
     expect(config.getEndpoints()).toEqual(endpoints);
   });
 });

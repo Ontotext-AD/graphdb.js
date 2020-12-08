@@ -436,10 +436,31 @@ Repository operations like create, edit, delete, shutdown are not supported by t
 
 ### Authorization
 
-*This is a Work In Progress feature (See [this](https://github.com/Ontotext-AD/graphdb.js/pull/28) pull request)*
-
 If the library is going to be used agains a secured server, then all API calls must be authenticated by sending an http authorization header with a token which is obtained after a call to `rest/login/user_name` with a password provided as a specific header.
+
 In case the server requires that requests should be authenticated, then in the `ServerClientConfig` and `RepositoryClientConfig` must be configured the `username` and `password` which to be used for the authentication. If those are provided, then the client assumes that authentication is mandatory and the login with the provided credentials is performed authomatically before the first API call. After a successful login, user details which are received and the auth token are stored in the `AuthenticationService`. From that moment on, with every API call is sent also an `authorization` header with the token as value.
+```javascript
+ const headers = {'Accept': 'text/plain'};
+ const config = new ServerClientConfig('/endpoint', 1000, headers, 'testuser', 'P@sw0rd');
+```
+```javascript
+const endpoints = ['http://host/repositories/repo1'];
+const headers = {};
+const contentType = '';
+const readTimeout = 1000;
+const writeTimeout = 1000;
+
+const config = new RepositoryClientConfig()
+  .setEndpoints(endpoints)
+  .setHeaders(headers)
+  .setDefaultRDFMimeType(contentType)
+  .setReadTimeout(readTimeout)
+  .setWriteTimeout(writeTimeout)
+  .setUsername('testuser')
+  .setPass('pass123');
+const repository = new RDFRepositoryClient(config);
+const httpRequest = repository.httpClients[0].request;
+````
 If the token expires, then the first API call will be rejected with an http error with status `401`. The client handles this automatically by re-login the user with the same credentials, updates the stored token and retries the API call. This behavior is the default and can be changed if the `ServerClientConfig` or `RepositoryClientConfig` are configured with `keepAlive=false`.
 
 ### Response Parsers

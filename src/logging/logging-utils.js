@@ -11,7 +11,6 @@ class LoggingUtils {
    * Any additional key-value entries from <code>params</code> will be assigned
    * in the created payload object.
    *
-   * @protected
    * @param {HttpResponse} response the HTTP response.
    * Used to get the execution time and the base URL
    * @param {object} [params] additional parameters to be appended
