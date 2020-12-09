@@ -32,7 +32,7 @@ describe('Should test download method', () => {
     }).then((stream) => {
       return Utils.readStream(stream);
     }).then((stream) => {
-      expect(stream.length).toBe(146);
+      expect(stream.length).toBe(409);
       expect(stream).toContain('<http://domain/resource/resource-1>');
       expect(stream).toContain('<http://domain/property/relation-1>');
       expect(stream).toContain('"Title"@en');
