@@ -36,6 +36,7 @@ describe('Should test RDFStar', () => {
     return rdfClient.query(payload).then((resp) => {
       expected = '@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .\n' +
         '@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .\n' +
+        '@prefix rdf4j: <http://rdf4j.org/schema/rdf4j#> .\n' +
         '@prefix sesame: <http://www.openrdf.org/schema/sesame#> .\n' +
         '@prefix owl: <http://www.w3.org/2002/07/owl#> .\n' +
         '@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .\n' +
