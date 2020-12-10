@@ -11,6 +11,8 @@ const {namedNode, quad, defaultGraph} = DataFactory;
 
 describe('Should test RDFStar', () => {
   let rdfClient = new RDFRepositoryClient(Config.restApiConfig);
+  let expected;
+  let response;
 
   beforeAll(() => {
     return Utils.createRepo(Config.testRepoPath).then(() => {
@@ -24,9 +26,6 @@ describe('Should test RDFStar', () => {
   });
 
   test('Should get RDFStar triples as string when no appropriate parser', () => {
-    const expected = '\n<<<http://www.wikidata.org/entity/Q472> <http://www.wikidata.org/prop/direct/P1889> <http://www.wikidata.org/entity/Q202904>>>\n' +
-      '  <http://www.wikidata.org/prop/reference/P3452> <http://www.wikidata.org/entity/Q202904> .\n';
-
     let payload = new GetQueryPayload()
       .setQuery('describe <<<http://www.wikidata.org/entity/Q472> <http://www.wikidata.org/prop/direct/P1889> <http://www.wikidata.org/entity/Q202904>>>')
       .setQueryType(QueryType.DESCRIBE)
@@ -35,9 +34,17 @@ describe('Should test RDFStar', () => {
 
     rdfClient.registerParser((new RDFXmlParser()));
     return rdfClient.query(payload).then((resp) => {
-      resp.on('data', data => {
-        expect(data.toString()).toEqual(expected);
-      });
+      expected = '@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .\n' +
+        '@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .\n' +
+        '@prefix sesame: <http://www.openrdf.org/schema/sesame#> .\n' +
+        '@prefix owl: <http://www.w3.org/2002/07/owl#> .\n' +
+        '@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .\n' +
+        '@prefix fn: <http://www.w3.org/2005/xpath-functions#> .\n' +
+        '\n<<<http://www.wikidata.org/entity/Q472> <http://www.wikidata.org/prop/direct/P1889> <http://www.wikidata.org/entity/Q202904>>>\n' +
+        '  <http://www.wikidata.org/prop/reference/P3452> <http://www.wikidata.org/entity/Q202904> .\n';
+
+      response = resp;
+      response.on('data', onData);
     });
   });
 
@@ -54,7 +61,7 @@ describe('Should test RDFStar', () => {
 
     rdfClient.registerParser((new N3Parser()));
     return rdfClient.get(payload).then((resp) => {
-      expect(resp).toEqual((expected));
+      expect(resp).toEqual(expected);
     });
   });
 
@@ -80,8 +87,6 @@ describe('Should test RDFStar', () => {
   });
 
   test('Should get RDFStar triples as JSON string when querying', () => {
-    const expected = Utils.loadFile('./data/rdfstar/expected_response_sparql_star.txt');
-
     let payload = new GetQueryPayload()
       .setQuery('select ?s where { \n' +
         '\t?s ?p ?o .\n' +
@@ -92,15 +97,13 @@ describe('Should test RDFStar', () => {
       .setLimit(100);
 
     return rdfClient.query(payload).then((resp) => {
-      resp.on('data', data => {
-        expect(data.toString().trim()).toEqual(expected.trim());
-      });
+      expected = Utils.loadFile('./data/rdfstar/expected_response_sparql_star.txt');
+      response = resp;
+      response.on('data', onData);
     });
   });
 
   test('Should get RDFStar triples as TSV string when querying', () => {
-    const expected = Utils.loadFile('./data/rdfstar/expected_response_sparql_tsv_star.txt');
-
     let payload = new GetQueryPayload()
       .setQuery('select ?s where { \n' +
         '\t?s ?p ?o .\n' +
@@ -111,9 +114,19 @@ describe('Should test RDFStar', () => {
       .setLimit(100);
 
     return rdfClient.query(payload).then((resp) => {
-      resp.on('data', data => {
-        expect(data.toString().trim()).toEqual(expected.trim());
-      });
+      expected = Utils.loadFile('./data/rdfstar/expected_response_sparql_tsv_star.txt');
+      response = resp;
+      response.on('data', onData);
     });
   });
+
+  function onData(data) {
+    expect(data.toString().trim()).toEqual(expected.trim());
+    unsubscribe();
+  }
+
+  function unsubscribe() {
+    response.removeListener('data', onData);
+  }
 });
+
