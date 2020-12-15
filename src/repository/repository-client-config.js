@@ -1,3 +1,5 @@
+const ClientConfig = require('../http/client-config');
+
 /**
  * Configuration wrapper used for initialization of {@link BaseRepositoryClient}
  * implementations.
@@ -6,7 +8,7 @@
  * @author Mihail Radkov
  * @author Svilen Velikov
  */
-class RepositoryClientConfig {
+class RepositoryClientConfig extends ClientConfig {
   /**
    * @param {string[]} [endpoints] is an array with repository endpoints
    * @param {Object} [headers] is a key:value mapping of http headers and values
@@ -21,14 +23,11 @@ class RepositoryClientConfig {
    */
   constructor(endpoints, headers, defaultRDFMimeType, readTimeout,
       writeTimeout, username, pass, keepAlive) {
+    super(headers, username, pass, keepAlive);
     this.endpoints = endpoints;
-    this.headers = headers;
     this.defaultRDFMimeType = defaultRDFMimeType;
     this.readTimeout = readTimeout;
     this.writeTimeout = writeTimeout;
-    this.username = username;
-    this.pass = pass;
-    this.keepAlive = keepAlive !== undefined ? keepAlive : true;
   }
 
   /**
@@ -65,27 +64,6 @@ class RepositoryClientConfig {
    */
   getEndpoints() {
     return this.endpoints;
-  }
-
-  /**
-   * Sets the default headers map for each HTTP request.
-   *
-   * @param {Object<string, string>} headers the map of default headers
-   *
-   * @return {RepositoryClientConfig} current config for method chaining
-   */
-  setHeaders(headers) {
-    this.headers = headers;
-    return this;
-  }
-
-  /**
-   * Returns the default headers map for each HTTP request.
-   *
-   * @return {Object<string, string>}
-   */
-  getHeaders() {
-    return this.headers;
   }
 
   /**
@@ -149,54 +127,6 @@ class RepositoryClientConfig {
    */
   getWriteTimeout() {
     return this.writeTimeout;
-  }
-
-  /**
-   * @return {string} the username
-   */
-  getUsername() {
-    return this.username;
-  }
-
-  /**
-   * @param {string} username
-   * @return {RepositoryClientConfig} the current config for method chaining
-   */
-  setUsername(username) {
-    this.username = username;
-    return this;
-  }
-
-  /**
-   * @return {string} the user password
-   */
-  getPass() {
-    return this.pass;
-  }
-
-  /**
-   * @param {string} pass
-   * @return {RepositoryClientConfig} the current config for method chaining
-   */
-  setPass(pass) {
-    this.pass = pass;
-    return this;
-  }
-
-  /**
-   * @return {boolean} if the user should be re-logged in after token expires
-   */
-  getKeepAlive() {
-    return this.keepAlive;
-  }
-
-  /**
-   * @param {boolean} keepAlive
-   * @return {ServerClientConfig} the current config for method chaining
-   */
-  setKeepAlive(keepAlive) {
-    this.keepAlive = keepAlive;
-    return this;
   }
 }
 

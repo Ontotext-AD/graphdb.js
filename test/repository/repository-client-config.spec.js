@@ -25,6 +25,10 @@ describe('RepositoryClientConfig', () => {
     expect(config.getUsername()).toEqual('testuser');
     expect(config.getPass()).toEqual('P@ssw0rd');
     expect(config.getKeepAlive()).toBeFalsy();
+
+    const securedHeaders = { 'Accept': 'application/json', 'Authorization': 'Basic YWRtaW46cm9vdA=='};
+    config.setBasicAuthentication('admin:root');
+    expect(config.getHeaders()).toEqual(securedHeaders);
   });
 
   test('should support initialization via fluent API', () => {

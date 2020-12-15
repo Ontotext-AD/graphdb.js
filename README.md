@@ -436,13 +436,17 @@ Repository operations like create, edit, delete, shutdown are not supported by t
 
 ### Authorization
 
+#### JWT
+
 If the library is going to be used agains a secured server, then all API calls must be authenticated by sending an http authorization header with a token which is obtained after a call to `rest/login/user_name` with a password provided as a specific header.
 
-In case the server requires that requests should be authenticated, then in the `ServerClientConfig` and `RepositoryClientConfig` must be configured the `username` and `password` which to be used for the authentication. If those are provided, then the client assumes that authentication is mandatory and the login with the provided credentials is performed authomatically before the first API call. After a successful login, user details which are received and the auth token are stored in the `AuthenticationService`. From that moment on, with every API call is sent also an `authorization` header with the token as value.
+In case the server requires that requests should be authenticated, then in the `ServerClientConfig` and `RepositoryClientConfig` must be configured the `username` and `password` which to be used for the authentication. If those are provided, then the client assumes that authentication is mandatory and the login with the provided credentials is performed authomatically before the first API call. After a successful login, user details which are received and the JWT auth token are stored in the `AuthenticationService`. From that moment on, with every API call is sent also an `authorization` header with the JWT token as value.
+##### ServerClient
 ```javascript
  const headers = {'Accept': 'text/plain'};
  const config = new ServerClientConfig('/endpoint', 1000, headers, 'testuser', 'P@sw0rd');
 ```
+##### RepositoryClient
 ```javascript
 const endpoints = ['http://host/repositories/repo1'];
 const headers = {};
@@ -461,7 +465,19 @@ const config = new RepositoryClientConfig()
 const repository = new RDFRepositoryClient(config);
 const httpRequest = repository.httpClients[0].request;
 ````
-If the token expires, then the first API call will be rejected with an http error with status `401`. The client handles this automatically by re-login the user with the same credentials, updates the stored token and retries the API call. This behavior is the default and can be changed if the `ServerClientConfig` or `RepositoryClientConfig` are configured with `keepAlive=false`.
+If the JWT token expires, then the first API call will be rejected with an http error with status `401`. The client handles this automatically by re-login the user with the same credentials, updates the stored token and retries the API call. This behavior is the default and can be changed if the `ServerClientConfig` or `RepositoryClientConfig` are configured with `keepAlive=false`.
+##### Note:
+JWT is serialized as “Authorization: GDB <token>” header in every request, so it is vulnerable to a man-in-the-middle attack. Everyone who intercepts the JWT can reuse the session. To prevent this, we recommend to always enable encryption in transit.
+
+#### Basic Authentication¶
+Instead of using JWT, users can access secured GraphDB by passing valid base-64 encoded username:password combinations as a header.
+In case Basic authentication will be used, then the headers in the `ServerClientConfig` and `RepositoryClientConfig` must be configured to send the `username` and `password` which to be used for the authentication. From this moment on, with every API call is sent also an `authorization` header with the encoded credentials as value.
+```javascript
+config.setBasicAuthentication('admin:root');
+```
+
+##### Note:
+Basic Authentication is even more vulnerable to man-in-the-middle attacks than JWT! Anyone who intercepts your requests will be able to reuse your credentials indefinitely until you change them. Since the credentials are merely base-64 encoded, they will also get your username and password. This is why it is very important to always use encryption in transit.
 
 ### Response Parsers
 
