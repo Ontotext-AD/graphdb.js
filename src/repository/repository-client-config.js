@@ -5,6 +5,7 @@ const ClientConfig = require('../http/client-config');
  * implementations.
  *
  * @class
+ * @extends ClientConfig
  * @author Mihail Radkov
  * @author Svilen Velikov
  */
@@ -35,7 +36,7 @@ class RepositoryClientConfig extends ClientConfig {
    *
    * @param {string[]} endpoints the endpoint URLs
    *
-   * @return {RepositoryClientConfig} current config for method chaining
+   * @return {this} current config for method chaining
    */
   setEndpoints(endpoints) {
     this.endpoints = endpoints;
@@ -47,7 +48,7 @@ class RepositoryClientConfig extends ClientConfig {
    *
    * @param {string} endpoint repository endpoint URL
    *
-   * @return {RepositoryClientConfig} current config for method chaining
+   * @return {this} current config for method chaining
    */
   addEndpoint(endpoint) {
     if (!this.endpoints) {
@@ -71,7 +72,7 @@ class RepositoryClientConfig extends ClientConfig {
    *
    * @param {string} defaultRDFMimeType
    *
-   * @return {RepositoryClientConfig} current config for method chaining
+   * @return {this} current config for method chaining
    */
   setDefaultRDFMimeType(defaultRDFMimeType) {
     this.defaultRDFMimeType = defaultRDFMimeType;
@@ -92,7 +93,7 @@ class RepositoryClientConfig extends ClientConfig {
    *
    * @param {number} readTimeout the timeout in milliseconds
    *
-   * @return {RepositoryClientConfig} current config for method chaining
+   * @return {this} current config for method chaining
    */
   setReadTimeout(readTimeout) {
     this.readTimeout = readTimeout;
@@ -113,7 +114,7 @@ class RepositoryClientConfig extends ClientConfig {
    *
    * @param {number} writeTimeout the timeout in milliseconds
    *
-   * @return {RepositoryClientConfig} current config for method chaining
+   * @return {this} current config for method chaining
    */
   setWriteTimeout(writeTimeout) {
     this.writeTimeout = writeTimeout;

@@ -64,7 +64,7 @@ describe('Should test namespaces in secured environment', () => {
     });
   });
 
-  test('Should list namespces', () => {
+  test('Should list namespaces', () => {
     rdfSecuredClient.getNamespaces().then(() => {
       return rdfSecuredClient.getSize();
     }).then((response) => {

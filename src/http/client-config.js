@@ -28,8 +28,7 @@ class ClientConfig {
    * Sets the server's endpoint URL.
    *
    * @param {string} endpoint the endpoint URL
-   *
-   * @return {ServerClientConfig} the current config for method chaining
+   * @return {this} the concrete configuration config for method chaining
    */
   setEndpoint(endpoint) {
     this.endpoint = endpoint;
@@ -49,8 +48,7 @@ class ClientConfig {
    * Sets the default headers map for each HTTP request.
    *
    * @param {Object<string, string>} headers the default headers
-   *
-   * @return {ServerClientConfig} the current config for method chaining
+   * @return {this} the concrete configuration config for method chaining
    */
   setHeaders(headers) {
     this.headers = headers;
@@ -70,8 +68,7 @@ class ClientConfig {
    * Sets the timeout for HTTP requests.
    *
    * @param {number} timeout the timeout in milliseconds
-   *
-   * @return {ServerClientConfig} the current config for method chaining
+   * @return {this} the concrete configuration config for method chaining
    */
   setTimeout(timeout) {
     this.timeout = timeout;
@@ -96,7 +93,7 @@ class ClientConfig {
 
   /**
    * @param {string} username
-   * @return {ServerClientConfig} the current config for method chaining
+   * @return {this} the concrete configuration config for method chaining
    */
   setUsername(username) {
     this.username = username;
@@ -112,7 +109,7 @@ class ClientConfig {
 
   /**
    * @param {string} pass
-   * @return {ServerClientConfig} the current config for method chaining
+   * @return {this} the concrete configuration config for method chaining
    */
   setPass(pass) {
     this.pass = pass;
@@ -128,7 +125,7 @@ class ClientConfig {
 
   /**
    * @param {boolean} keepAlive
-   * @return {ServerClientConfig} the current config for method chaining
+   * @return {this} the concrete configuration config for method chaining
    */
   setKeepAlive(keepAlive) {
     this.keepAlive = keepAlive;
@@ -139,7 +136,7 @@ class ClientConfig {
    * @param {string} credentials in form of the combination of
    * username:password. The credentials will be encoded to base64
    * and set as authorization header to allow Basic Authentication.
-   * @return {ServerClientConfig} the current config for method chaining
+   * @return {this} the concrete configuration config for method chaining
    */
   setBasicAuthentication(credentials) {
     this.headers['Authorization'] = `Basic ${btoa(credentials)}`;
