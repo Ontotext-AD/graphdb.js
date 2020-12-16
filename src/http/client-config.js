@@ -1,8 +1,9 @@
 /**
- * Configuration wrapper used for initialization of {@link ServerClient}
- * instances.
+ * Abstract configuration wrapper used for initialization of concrete
+ * Client instances. Concrete client configuration wrappers must extend
+ * this class and override it's methods if necessary.
  *
- * @class
+ * @abstract
  * @author Mihail Radkov
  * @author Svilen Velikov
  * @author Teodossi Dossev

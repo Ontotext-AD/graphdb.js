@@ -56,7 +56,7 @@ function createRepo(path) {
 
 function createSecuredRepo(path) {
   const data = new FormData();
-  data.append("config", fs.createReadStream(path));
+  data.append('config', fs.createReadStream(path));
 
   const headers = data.getHeaders();
   headers['Authorization'] = 'Basic YWRtaW46cm9vdA==';
@@ -79,8 +79,8 @@ function deleteRepo(name) {
 function toggleSecurity(enable) {
     return axios({
       method: 'post',
-      headers: { "Content-Type": "application/json", "Connection": "keep-alive", "Accept": "*/*"},
-      url: `http://localhost:7200/rest/security?useSecurity=${enable}`,
+      headers: { 'Content-Type': 'application/json', 'Connection': 'keep-alive', 'Accept': '*/*'},
+      url: `${Config.serverAddress}/rest/security?useSecurity=${enable}`,
       data: `${enable}`,
       timeout: 5000,
       auth: {

@@ -466,8 +466,10 @@ const repository = new RDFRepositoryClient(config);
 const httpRequest = repository.httpClients[0].request;
 ````
 If the JWT token expires, then the first API call will be rejected with an http error with status `401`. The client handles this automatically by re-login the user with the same credentials, updates the stored token and retries the API call. This behavior is the default and can be changed if the `ServerClientConfig` or `RepositoryClientConfig` are configured with `keepAlive=false`.
-##### Note:
-JWT is serialized as “Authorization: GDB <token>” header in every request, so it is vulnerable to a man-in-the-middle attack. Everyone who intercepts the JWT can reuse the session. To prevent this, we recommend to always enable encryption in transit.
+
+
+> **Note:**  
+> JWT is serialized as “Authorization: GDB” header in every request, so it is vulnerable to a man-in-the-middle attack. Everyone who intercepts the JWT can reuse the session. To prevent this, we recommend to always enable encryption in transit.
 
 #### Basic Authentication¶
 Instead of using JWT, users can access secured GraphDB by passing valid base-64 encoded username:password combinations as a header.
@@ -476,8 +478,8 @@ In case Basic authentication will be used, then the headers in the `ServerClient
 config.setBasicAuthentication('admin:root');
 ```
 
-##### Note:
-Basic Authentication is even more vulnerable to man-in-the-middle attacks than JWT! Anyone who intercepts your requests will be able to reuse your credentials indefinitely until you change them. Since the credentials are merely base-64 encoded, they will also get your username and password. This is why it is very important to always use encryption in transit.
+> **Note:**  
+> Basic Authentication is even more vulnerable to man-in-the-middle attacks than JWT! Anyone who intercepts your requests will be able to reuse your credentials indefinitely until you change them. Since the credentials are merely base-64 encoded, they will also get your username and password. This is why it is very important to always use encryption in transit.
 
 ### Response Parsers
 
