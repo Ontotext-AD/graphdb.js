@@ -26,6 +26,14 @@ describe('Should test auth', () => {
     });
   });
 
+  test('Should delete all statements', () => {
+    return rdfClient.deleteAllStatements().then(() => {
+      return rdfClient.getSize();
+    }).then((response) => {
+      expect(response).toBe(0);
+    });
+  });
+
   test('Should delete secured repo via server client', () => {
     Utils.createSecuredRepo(Config.testRepo2Path);
     const serverClient = new ServerClient(Config.serverBasicAuthConfig);

@@ -49,12 +49,11 @@ describe('Should test namespaces in secured environment', () => {
     Utils.createRepo(Config.testRepoPath).then(() => {
       const wineRdf = path.resolve(__dirname, './data/wine.rdf');
       return rdfSecuredClient
-        .addFile(wineRdf, RDFMimeType.RDF_XML, null, null)
-        .then(() => {
-          return Utils.toggleSecurity(true);
-        }).then(() => {
-          done();
-        });
+        .addFile(wineRdf, RDFMimeType.RDF_XML, null, null);
+    }).then(() => {
+      return Utils.toggleSecurity(true);
+    }).then(() => {
+      done();
     });
   });
 
@@ -69,14 +68,6 @@ describe('Should test namespaces in secured environment', () => {
       return rdfSecuredClient.getSize();
     }).then((response) => {
       expect(response).toBe(1839);
-    });
-  });
-
-  test('Should delete all statements', () => {
-    return rdfSecuredClient.deleteAllStatements().then(() => {
-      return rdfSecuredClient.getSize();
-    }).then((response) => {
-      expect(response).toBe(0);
     });
   });
 
