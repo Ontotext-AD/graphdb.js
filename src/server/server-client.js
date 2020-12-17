@@ -138,7 +138,7 @@ class ServerClient {
 
   /**
    * Executes http request wrapped in provided request builder.
-   * If the server config provides username and password, then a loggin attempt
+   * If the server config provides username and password, then a logging attempt
    * is made. Upon successful login the auth data is stored for later requests.
    *
    * @private

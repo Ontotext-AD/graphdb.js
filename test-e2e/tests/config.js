@@ -1,5 +1,6 @@
 const {RepositoryClientConfig} = require('graphdb').repository;
 const {RDFMimeType} = require('graphdb').http;
+const {ServerClientConfig} = require('graphdb').server;
 
 // Variables used in tests
 const serverAddress = 'http://localhost:7200';
@@ -13,4 +14,20 @@ const restApiConfig = new RepositoryClientConfig(
   },
   '', 10000, 10000);
 
-module.exports = {restApiConfig, serverAddress, testRepoPath, testRepo2Path};
+const restApiBasicAuthConfig = new RepositoryClientConfig(
+  [`${serverAddress}/repositories/Test_repo`], {
+    'Accept': RDFMimeType.SPARQL_RESULTS_XML,
+    'Authorization': 'Basic YWRtaW46cm9vdA=='
+  },
+  '', 10000, 10000);
+
+const serverBasicAuthConfig = new ServerClientConfig(
+  serverAddress,
+  10000,
+  {
+    'Accept': RDFMimeType.SPARQL_RESULTS_JSON,
+    'Authorization': 'Basic YWRtaW46cm9vdA=='
+});
+
+
+module.exports = {restApiConfig, serverAddress, testRepoPath, testRepo2Path, restApiBasicAuthConfig, serverBasicAuthConfig};

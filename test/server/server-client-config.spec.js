@@ -16,7 +16,7 @@ describe('ServerClientConfig', () => {
   });
 
   test('should support initialization via fluent API ', () => {
-    const headers = {'Accept': 'text/plain'};
+    let headers = {'Accept': 'text/plain'};
     const config = new ServerClientConfig()
       .setEndpoint('/endpoint')
       .setTimeout(1000)
@@ -32,5 +32,9 @@ describe('ServerClientConfig', () => {
 
     config.setKeepAlive(false);
     expect(config.getKeepAlive()).toBeFalsy();
+
+    headers = {'Accept': 'text/plain', 'Authorization': 'Basic YWRtaW46cm9vdA=='};
+    config.setBasicAuthentication('admin:root');
+    expect(config.getHeaders()).toEqual(headers);
   });
 });

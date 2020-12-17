@@ -5,12 +5,11 @@ const Utils = require('utils');
 const Config = require('config');
 
 describe('Should test namespaces', () => {
-
-  let rdfClient = new RDFRepositoryClient(Config.restApiConfig);
+  const rdfClient = new RDFRepositoryClient(Config.restApiConfig);
 
   beforeAll(() => {
     return Utils.createRepo(Config.testRepoPath).then(() => {
-      let wineRdf = path.resolve(__dirname, './data/wine.rdf');
+      const wineRdf = path.resolve(__dirname, './data/wine.rdf');
       return rdfClient.addFile(wineRdf, RDFMimeType.RDF_XML, null, null);
     });
   });
@@ -38,6 +37,45 @@ describe('Should test namespaces', () => {
       return rdfClient.getNamespaces();
     }).then((namespaces) => {
       expect(namespaces.length).toEqual(9);
+    });
+  });
+});
+
+describe('Should test namespaces in secured environment', () => {
+  const rdfSecuredClient =
+    new RDFRepositoryClient(Config.restApiBasicAuthConfig);
+
+  beforeAll((done) => {
+    Utils.createRepo(Config.testRepoPath).then(() => {
+      const wineRdf = path.resolve(__dirname, './data/wine.rdf');
+      return rdfSecuredClient
+        .addFile(wineRdf, RDFMimeType.RDF_XML, null, null);
+    }).then(() => {
+      return Utils.toggleSecurity(true);
+    }).then(() => {
+      done();
+    });
+  });
+
+  afterAll(() => {
+    return Utils.toggleSecurity(false).then(() => {
+      return Utils.deleteRepo('Test_repo');
+    });
+  });
+
+  test('Should list namespaces', () => {
+    rdfSecuredClient.getNamespaces().then(() => {
+      return rdfSecuredClient.getSize();
+    }).then((response) => {
+      expect(response).toBe(1839);
+    });
+  });
+
+  test('Should delete all namespaces', () => {
+    return rdfSecuredClient.deleteNamespaces().then(() => {
+      return rdfSecuredClient.getNamespaces();
+    }).then((resp) => {
+      expect(resp.length).toBe(0);
     });
   });
 });

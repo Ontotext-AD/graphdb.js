@@ -53,6 +53,22 @@ function createRepo(path) {
   });
 }
 
+
+function createSecuredRepo(path) {
+  const data = new FormData();
+  data.append('config', fs.createReadStream(path));
+
+  const headers = data.getHeaders();
+  headers['Authorization'] = 'Basic YWRtaW46cm9vdA==';
+  return axios({
+    method: 'post',
+    url: `${Config.serverAddress}/rest/repositories?local=true`,
+    data: data,
+    timeout: 5000,
+    headers
+  });
+}
+
 function deleteRepo(name) {
   return axios({
     method: 'delete',
@@ -60,4 +76,18 @@ function deleteRepo(name) {
   });
 }
 
-module.exports = {loadFile, readStream, getReadStream, createRepo, deleteRepo};
+function toggleSecurity(enable) {
+    return axios({
+      method: 'post',
+      headers: { 'Content-Type': 'application/json', 'Connection': 'keep-alive', 'Accept': '*/*'},
+      url: `${Config.serverAddress}/rest/security?useSecurity=${enable}`,
+      data: `${enable}`,
+      timeout: 5000,
+      auth: {
+        username: 'admin',
+        password: 'root'
+      }
+    });
+}
+
+module.exports = {loadFile, readStream, getReadStream, createRepo, deleteRepo, toggleSecurity, createSecuredRepo};
