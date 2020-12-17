@@ -11,12 +11,11 @@ describe('Should test auth', () => {
   beforeAll((done) => {
     Utils.createRepo(Config.testRepoPath).then(() => {
       const wineRdf = path.resolve(__dirname, './data/wine.rdf');
-      return rdfClient.addFile(wineRdf, RDFMimeType.RDF_XML, null, null)
-        .then(() => {
-          return Utils.toggleSecurity(true);
-        }).then(() => {
-          done();
-        });
+      return rdfClient.addFile(wineRdf, RDFMimeType.RDF_XML, null, null);
+    }).then(() => {
+      return Utils.toggleSecurity(true);
+    }).then(() => {
+      done();
     });
   });
 
