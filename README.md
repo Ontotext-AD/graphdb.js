@@ -278,7 +278,7 @@ return repository.query(payload).then((data) => {
 const contentType = RDFMimeType.TURTLE;
 const turtleFile = __dirname + '/statements.ttl';
 fs.readFile(turtleFile, (err, stream) => {
-    repository.upload(stream, null, null, contentType).catch((e) => console.log(e));
+    repository.upload(stream, contentType).catch((e) => console.log(e));
 });
 ```
 
@@ -288,7 +288,7 @@ fs.readFile(turtleFile, (err, stream) => {
 const contentType = RDFMimeType.TURTLE;
 const file = __dirname + '/statements-overwrite.ttl';
 fs.readFile(file, (err, stream) => {
-    repository.overwrite(stream, null, null, contentType).catch((e) => console.log(e));
+    repository.overwrite(stream, contentType).catch((e) => console.log(e));
 });
 ```
 
