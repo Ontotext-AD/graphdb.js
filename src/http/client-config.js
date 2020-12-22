@@ -16,32 +16,14 @@ class ClientConfig {
    * @param {boolean} [keepAlive=true] if the logged in user should be
    * reauthenticated after auth token expire. This config has meaning when the
    * server is secured and username and passwords are provided.
+   * @param {boolean} [useBasicAuth] if use Basic Auth when authenticating
    */
-  constructor(headers, username, pass, keepAlive) {
+  constructor(headers, username, pass, keepAlive, useBasicAuth) {
     this.headers = headers;
     this.username = username;
     this.pass = pass;
     this.keepAlive = keepAlive !== undefined ? keepAlive : true;
-  }
-
-  /**
-   * Sets the server's endpoint URL.
-   *
-   * @param {string} endpoint the endpoint URL
-   * @return {this} the concrete configuration config for method chaining
-   */
-  setEndpoint(endpoint) {
-    this.endpoint = endpoint;
-    return this;
-  }
-
-  /**
-   * Returns the server's endpoint URL.
-   *
-   * @return {string} the endpoint URL
-   */
-  getEndpoint() {
-    return this.endpoint;
+    this.setBasicAuthentication(useBasicAuth);
   }
 
   /**
@@ -62,26 +44,6 @@ class ClientConfig {
    */
   getHeaders() {
     return this.headers;
-  }
-
-  /**
-   * Sets the timeout for HTTP requests.
-   *
-   * @param {number} timeout the timeout in milliseconds
-   * @return {this} the concrete configuration config for method chaining
-   */
-  setTimeout(timeout) {
-    this.timeout = timeout;
-    return this;
-  }
-
-  /**
-   * Returns the HTTP requests's timeout.
-   *
-   * @return {number} the timeout in milliseconds
-   */
-  getTimeout() {
-    return this.timeout;
   }
 
   /**
@@ -133,14 +95,23 @@ class ClientConfig {
   }
 
   /**
-   * @param {string} credentials in form of the combination of
-   * username:password. The credentials will be encoded to base64
-   * and set as authorization header to allow Basic Authentication.
+   * @param {boolean} [basicAuth] if use Basic Auth when authenticating
    * @return {this} the concrete configuration config for method chaining
    */
-  setBasicAuthentication(credentials) {
-    this.headers['Authorization'] = `Basic ${btoa(credentials)}`;
+  setBasicAuthentication(basicAuth) {
+    this.basicAuth = basicAuth;
+    this.useBasicAuthentication();
     return this;
+  }
+
+  /**
+   * @private
+   */
+  useBasicAuthentication() {
+    if (this.basicAuth) {
+      const credentials = `${this.username}:${this.pass}`;
+      this.headers['Authorization'] = `Basic ${btoa(credentials)}`;
+    }
   }
 }
 

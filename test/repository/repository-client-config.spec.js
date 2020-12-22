@@ -2,7 +2,6 @@ const RepositoryClientConfig = require('repository/repository-client-config');
 const RDFMimeType = require('http/rdf-mime-type');
 
 describe('RepositoryClientConfig', () => {
-
   const endpoints = [
     'http://localhost:8081/repositories/test1',
     'http://localhost:8082/repositories/test2',
@@ -16,7 +15,9 @@ describe('RepositoryClientConfig', () => {
   const writeTimeout = 2000;
 
   test('should instantiate with the provided configuration parameters', () => {
-    const config = new RepositoryClientConfig(endpoints, headers, defaultRDFMimeType, readTimeout, writeTimeout, 'testuser', 'P@ssw0rd', false);
+    const config = new RepositoryClientConfig(endpoints, headers,
+      defaultRDFMimeType, readTimeout, writeTimeout, 'testuser', 'P@ssw0rd',
+      false);
     expect(config.getEndpoints()).toEqual(endpoints);
     expect(config.getHeaders()).toEqual(headers);
     expect(config.getDefaultRDFMimeType()).toEqual(defaultRDFMimeType);
@@ -26,8 +27,9 @@ describe('RepositoryClientConfig', () => {
     expect(config.getPass()).toEqual('P@ssw0rd');
     expect(config.getKeepAlive()).toBeFalsy();
 
-    const securedHeaders = { 'Accept': 'application/json', 'Authorization': 'Basic YWRtaW46cm9vdA=='};
-    config.setBasicAuthentication('admin:root');
+    const securedHeaders = {'Accept': 'application/json',
+      'Authorization': 'Basic dGVzdHVzZXI6UEBzc3cwcmQ='};
+    config.setBasicAuthentication(true);
     expect(config.getHeaders()).toEqual(securedHeaders);
   });
 

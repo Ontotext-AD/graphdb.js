@@ -475,7 +475,7 @@ If the JWT token expires, then the first API call will be rejected with an http 
 Instead of using JWT, users can access secured GraphDB by passing valid base-64 encoded username:password combinations as a header.
 In case Basic authentication will be used, then the headers in the `ServerClientConfig` and `RepositoryClientConfig` must be configured to send the `username` and `password` which to be used for the authentication. From this moment on, with every API call is sent also an `authorization` header with the encoded credentials as value.
 ```javascript
-config.setBasicAuthentication('admin:root');
+config.setBasicAuthentication(true);
 ```
 
 > **Note:**  
