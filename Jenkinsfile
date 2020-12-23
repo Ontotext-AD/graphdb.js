@@ -19,6 +19,7 @@ pipeline {
 
     stage('Test') {
       steps {
+        //
         sh "npm run lint"
         sh "npm run lint:test"
         sh "npm run test:report"
