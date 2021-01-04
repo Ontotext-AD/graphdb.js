@@ -66,31 +66,31 @@
     "install:local": "npm pack && npm install -g ./$npm_package_name-$npm_package_version.tgz"
   },
   "devDependencies": {
-    "@babel/core": "^7.6.0",
-    "@babel/preset-env": "^7.6.0",
-    "babel-loader": "^8.0.6",
-    "coveralls": "^3.0.9",
+    "@babel/core": "^7.12.10",
+    "@babel/preset-env": "^7.12.11",
+    "babel-loader": "^8.2.2",
+    "coveralls": "^3.1.0",
     "cross-env": "^5.2.1",
     "eslint": "^5.16.0",
-    "eslint-plugin-no-only-tests": "^2.3.1",
+    "eslint-plugin-no-only-tests": "^2.4.0",
     "jest": "^24.9.0",
-    "jsdoc": "^3.6.3",
+    "jsdoc": "^3.6.6",
     "stream-mock": "^2.0.5",
-    "tsd-jsdoc": "^2.4.0",
-    "webpack": "^4.41.3",
-    "webpack-cli": "^3.3.10"
+    "tsd-jsdoc": "^2.5.0",
+    "webpack": "^4.44.2",
+    "webpack-cli": "^3.3.12"
   },
   "dependencies": {
-    "axios": "^0.19.0",
+    "axios": "^0.19.2",
     "base64url": "^3.0.1",
     "eslint-config-google": "^0.13.0",
     "jsonld-streaming-parser": "^2.2.0",
-    "n3": "^1.6.3",
-    "pino": "^5.13.3",
-    "qs": "^6.8.0",
-    "rdfxml-streaming-parser": "^1.3.1",
-    "sparqljson-parse": "^1.5.1",
-    "sparqlxml-parse": "^1.2.2",
-    "uuid": "^3.3.3"
+    "n3": "^1.6.4",
+    "pino": "^5.17.0",
+    "qs": "^6.9.4",
+    "rdfxml-streaming-parser": "^1.4.0",
+    "sparqljson-parse": "^1.6.0",
+    "sparqlxml-parse": "^1.4.0",
+    "uuid": "^3.4.0"
   }
 }
