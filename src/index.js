@@ -9,7 +9,9 @@ module.exports = {
 
   server: {
     ServerClient: require('./server/server-client'),
-    ServerClientConfig: require('./server/server-client-config')
+    ServerClientConfig: require('./server/server-client-config'),
+    GraphDBServerClient: require('./server/graphdb-server-client'),
+    AppSettings: require('./server/app-settings')
   },
 
   repository: {
@@ -18,7 +20,9 @@ module.exports = {
     RDFRepositoryClient: require('./repository/rdf-repository-client'),
     StatementPayload: require('./repository/statement-payload'),
     AddStatementPayload: require('./repository/add-statement-payload'),
-    GetStatementsPayload: require('./repository/get-statements-payload')
+    GetStatementsPayload: require('./repository/get-statements-payload'),
+    RepositoryType: require('./repository/repository-type'),
+    RepositoryConfig: require('./repository/repository-config')
   },
 
   transaction: {

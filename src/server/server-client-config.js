@@ -20,10 +20,11 @@ class ServerClientConfig extends ClientConfig {
    * @param {boolean} [keepAlive=true] if the logged in user should be
    * reauthenticated after auth token expire. This config has meaning when the
    * server is secured and username and passwords are provided.
+   * @param {boolean} [useBasicAuth] if use Basic Auth when authenticating
    */
   constructor(endpoint, timeout, headers, username, pass,
-      keepAlive) {
-    super(headers, username, pass, keepAlive);
+      keepAlive, useBasicAuth) {
+    super(headers, username, pass, keepAlive, useBasicAuth);
     this.endpoint = endpoint;
     this.timeout = timeout;
   }
@@ -47,6 +48,26 @@ class ServerClientConfig extends ClientConfig {
    */
   getEndpoint() {
     return this.endpoint;
+  }
+
+  /**
+    * Sets the timeout for HTTP requests.
+    *
+    * @param {number} timeout the timeout in milliseconds
+    * @return {this} the concrete configuration config for method chaining
+    */
+  setTimeout(timeout) {
+    this.timeout = timeout;
+    return this;
+  }
+
+  /**
+   * Returns the HTTP requests's timeout.
+   *
+   * @return {number} the timeout in milliseconds
+   */
+  getTimeout() {
+    return this.timeout;
   }
 }
 

@@ -27,7 +27,15 @@ const serverBasicAuthConfig = new ServerClientConfig(
   {
     'Accept': RDFMimeType.SPARQL_RESULTS_JSON,
     'Authorization': 'Basic YWRtaW46cm9vdA=='
-});
+  });
+
+const serverConfig = new ServerClientConfig(
+  serverAddress,
+  10000,
+  {
+    'Accept': RDFMimeType.SPARQL_RESULTS_JSON
+  });
 
 
-module.exports = {restApiConfig, serverAddress, testRepoPath, testRepo2Path, restApiBasicAuthConfig, serverBasicAuthConfig};
+module.exports = {restApiConfig, serverAddress, testRepoPath, testRepo2Path,
+  restApiBasicAuthConfig, serverBasicAuthConfig, serverConfig};

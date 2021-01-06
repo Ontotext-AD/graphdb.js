@@ -16,13 +16,13 @@ const SERVICE_URL = '/repositories';
  *
  * If the server against which this client will be used has security enabled,
  * then it should be configured with the username and password in the
- * {#link ServerClientConfig}. In this case a login attempt is made before any
+ * {@link ServerClientConfig}. In this case a login attempt is made before any
  * API method to be executed. Upon successful login an {@link User} which holds
  * the credentials and the authorization token in the context of the client is
  * created. In all consecutive API calls the authorization token is sent as a
  * http header.
  *
- * By default {#link ServerClientConfig} is configured with
+ * By default {@link ServerClientConfig} is configured with
  * <code>keepAlive = true</code> which means that upon authorization token
  * expiration current logged in user would be re-logged automatically before
  * next API call. This configuration can be changed within the configuration.
@@ -141,7 +141,7 @@ class ServerClient {
    * If the server config provides username and password, then a logging attempt
    * is made. Upon successful login the auth data is stored for later requests.
    *
-   * @private
+   * @public
    *
    * @param {HttpRequestBuilder} requestBuilder
    *

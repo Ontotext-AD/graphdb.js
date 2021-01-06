@@ -50,6 +50,17 @@ class HttpRequestBuilder {
   }
 
   /**
+   * Prepares new builder for HTTP PATCH request against the provided URL.
+   *
+   * @static
+   * @param {string} url
+   * @return {HttpRequestBuilder}
+   */
+  static httpPatch(url) {
+    return new HttpRequestBuilder().setMethod('patch').setUrl(url);
+  }
+
+  /**
    * Prepares new builder for HTTP DELETE request against the provided URL.
    *
    * @static

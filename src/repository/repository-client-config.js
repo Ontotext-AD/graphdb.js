@@ -12,7 +12,8 @@ const ClientConfig = require('../http/client-config');
 class RepositoryClientConfig extends ClientConfig {
   /**
    * @param {string[]} [endpoints] is an array with repository endpoints
-   * @param {Object} [headers] is a key:value mapping of http headers and values
+   * @param {Map<string, string>} [headers] is a key:value mapping of http
+   * headers and values
    * @param {string} [defaultRDFMimeType] one of {@link RDFMimeType} values
    * @param {number} [readTimeout]
    * @param {number} [writeTimeout]
@@ -21,10 +22,11 @@ class RepositoryClientConfig extends ClientConfig {
    * @param {boolean} [keepAlive] if the logged in user should be
    * reauthenticated after auth token expire. This config has meaning when the
    * server is secured and username and passwords are provided.
+   * @param {boolean} [useBasicAuth] if use Basic Auth when authenticating
    */
   constructor(endpoints, headers, defaultRDFMimeType, readTimeout,
-      writeTimeout, username, pass, keepAlive) {
-    super(headers, username, pass, keepAlive);
+      writeTimeout, username, pass, keepAlive, useBasicAuth) {
+    super(headers, username, pass, keepAlive, useBasicAuth);
     this.endpoints = endpoints;
     this.defaultRDFMimeType = defaultRDFMimeType;
     this.readTimeout = readTimeout;
