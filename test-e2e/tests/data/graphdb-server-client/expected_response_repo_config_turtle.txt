@@ -14,16 +14,16 @@
         rep:repositoryType "graphdb:FreeSailRepository" ;
         sr:sailImpl [
             sail:sailType "graphdb:FreeSail" ;
-
+            
             owlim:base-URL "http://example.org/graphdb#" ;
             owlim:defaultNS "" ;
             owlim:entity-index-size "10000000" ;
             owlim:entity-id-size  "32" ;
             owlim:imports "" ;
-            owlim:repository-type "file-repository" ;
+        	owlim:repository-type "file-repository" ;
             owlim:ruleset "rdfsplus-optimized" ;
             owlim:storage-folder "storage" ;
-
+ 
             owlim:enable-context-index "false" ;
 
             owlim:enablePredicateList "true" ;
@@ -39,4 +39,3 @@
             owlim:read-only "false" ;
         ]
     ].
-

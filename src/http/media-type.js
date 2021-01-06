@@ -8,7 +8,7 @@
 const MediaType = {
   TEXT_PLAIN: 'text/plain',
   APPLICATION_JSON: 'application/json',
-  TURTLE: 'text/turtle'
+  TEXT_TURTLE: 'text/turtle'
 };
 
 module.exports = MediaType;

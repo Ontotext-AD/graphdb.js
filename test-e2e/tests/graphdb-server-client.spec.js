@@ -1,4 +1,4 @@
-const {RDFRepositoryClient, RepositoryType} = require('graphdb').repository;
+const {RDFRepositoryClient, RepositoryType, RepositoryConfig} = require('graphdb').repository;
 const {RDFMimeType} = require('graphdb').http;
 const {
   GraphDBServerClient, ServerClientConfig,
@@ -58,22 +58,23 @@ describe('Should test graphDB server client', () => {
   });
 
   test('Should get repo config as turtle', () => {
-    const expectedResponse = Utils.loadFile('./data/graphdb-server-client/' +
+    let expected;
+    const sampleRdf = path.resolve(__dirname, './data/graphdb-server-client/' +
       'expected_response_repo_config_turtle.txt');
+    Utils.getReadStream(sampleRdf).on('data', (data) => expected = data);
+
     return serverClient.downloadRepositoryConfig(TEST_REPO)
-      .then((response) => {
-        expect(response.replace(/\s+/g, ''))
-          .toStrictEqual(expectedResponse.replace(/\s+/g, ''));
+      .then((stream) => {
+        stream.on('data', (data) => {
+          expect(data).toEqual(expected);
+        });
       });
   });
 
   test('Should create and delete repo', () => {
-    const config = {
-      id: NEW_REPO,
-      params: {},
-      title: '',
-      type: RepositoryType.FREE
-    };
+    const config = new RepositoryConfig(NEW_REPO, '',
+      new Map(), '', 'Repo title', RepositoryType.FREE);
+
     return serverClient.getRepositoryIDs()
       .then((response) => {
         const expected = [TEST_REPO];

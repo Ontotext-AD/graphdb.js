@@ -21,7 +21,8 @@ module.exports = {
     StatementPayload: require('./repository/statement-payload'),
     AddStatementPayload: require('./repository/add-statement-payload'),
     GetStatementsPayload: require('./repository/get-statements-payload'),
-    RepositoryType: require('./repository/repository-type')
+    RepositoryType: require('./repository/repository-type'),
+    RepositoryConfig: require('./repository/repository-config')
   },
 
   transaction: {

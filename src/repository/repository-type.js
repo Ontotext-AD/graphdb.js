@@ -1,3 +1,11 @@
+/**
+ * Supported repository types
+ *
+ * @readonly
+ * @enum {string}
+ * @author Teodossi Dossev
+ */
+
 const RepositoryType = {
   SE: 'se',
   MASTER: 'master',

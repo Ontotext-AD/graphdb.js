@@ -1,6 +1,6 @@
 const {RDFRepositoryClient} = require('graphdb').repository;
 const {RDFMimeType} = require('graphdb').http;
-const {ServerClient} = require('graphdb').server;
+const {ServerClient, ServerClientConfig} = require('graphdb').server;
 const path = require('path');
 const Utils = require('utils');
 const Config = require('config');
@@ -29,17 +29,23 @@ describe('Should test auth', () => {
     return rdfClient.deleteAllStatements().then(() => {
       return rdfClient.getSize();
     }).then((response) => {
-      expect(response).toBe(0);
+      return expect(response).toBe(0);
+    }).catch((e) => {
+      throw new Error(e);
     });
   });
 
   test('Should delete secured repo via server client', () => {
     Utils.createSecuredRepo(Config.testRepo2Path);
-    const serverClient = new ServerClient(Config.serverBasicAuthConfig);
+    const serverConfig = new ServerClientConfig(Config.serverAddress, 10000,
+      new Map(), 'admin', 'root', true, true);
+    const serverClient = new ServerClient(serverConfig);
     serverClient.deleteRepository('Test_repo_2').then(() => {
       return serverClient.hasRepository('Test_repo_2');
     }).then((resp) => {
-      expect(resp).toBeFalsy();
+      return expect(resp).toBeFalsy();
+    }).catch((e) => {
+      throw new Error(e);
     });
   });
 });

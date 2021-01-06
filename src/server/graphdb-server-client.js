@@ -79,25 +79,14 @@ class GraphDBServerClient extends ServerClient {
   downloadRepositoryConfig(repositoryId, location) {
     const requestBuilder = HttpRequestBuilder
       .httpGet(`${REPOSITORY_SERVICE_URL}/${repositoryId}/download`)
-      .addContentTypeHeader(MediaType.TURTLE);
+      .addContentTypeHeader(MediaType.TEXT_TURTLE)
+      .setResponseType('stream');
     return this.execute(requestBuilder).then((response) => {
       this.logger.debug(LoggingUtils.getLogPayload(response,
         requestBuilder.getParams()), 'Downloaded data');
       return response.getData();
     });
   }
-
-  /**
-   * @typedef {Object} RepositoryConfig
-   * @property {string} [id] Repository ID
-   * @property {string} [location] Repository location
-   * @property {Object} [params] Map of repository configuration parameters.
-   * See {@link https://graphdb.ontotext.com/documentation/standard/configuring-a-repository.html#configuring-a-repository-configuration-parameters
-   * GraphDB Documentation}
-   * @property {string} [sesameType] Repository type as sesame rdf type
-   * @property {string} [title] Repository title
-   * @property {string} [type] Repository type as {@link RepositoryType}
-   */
 
   /**
    * Create repository according to the provided configuration
@@ -108,7 +97,7 @@ class GraphDBServerClient extends ServerClient {
   createRepository(repositoryConfig) {
     const requestBuilder = HttpRequestBuilder
       .httpPut(`${REPOSITORY_SERVICE_URL}/${repositoryConfig.id}`)
-      .setData(repositoryConfig)
+      .setData(this.getObjectToString(repositoryConfig))
       .addContentTypeHeader(MediaType.APPLICATION_JSON)
       .addAcceptHeader(MediaType.TEXT_PLAIN);
     return this.execute(requestBuilder);
@@ -186,7 +175,7 @@ class GraphDBServerClient extends ServerClient {
         .addContentTypeHeader(MediaType.APPLICATION_JSON)
         .addAcceptHeader(MediaType.TEXT_PLAIN)
         .setData({
-          appSettings: appSettings && appSettings.toString() || {},
+          appSettings: this.getObjectToString(appSettings),
           authorities,
           enabled
         });
@@ -229,7 +218,7 @@ class GraphDBServerClient extends ServerClient {
           username,
           password,
           grantedAuthorities,
-          appSettings: appSettings && appSettings.toString() || {}
+          appSettings: this.getObjectToString(appSettings)
         });
     return this.execute(requestBuilder);
   }
@@ -260,7 +249,7 @@ class GraphDBServerClient extends ServerClient {
           username,
           password,
           grantedAuthorities,
-          appSettings: appSettings && appSettings.toString() || {}
+          appSettings: this.getObjectToString(appSettings)
         });
     return this.execute(requestBuilder);
   }
@@ -286,7 +275,7 @@ class GraphDBServerClient extends ServerClient {
         .setData({
           username,
           password,
-          appSettings: appSettings && appSettings.toString() || {}
+          appSettings: this.getObjectToString(appSettings)
         });
     return this.execute(requestBuilder);
   }
@@ -317,6 +306,16 @@ class GraphDBServerClient extends ServerClient {
         .httpDelete(`${SECURITY_SERVICE_URL}/user/${username}`)
         .addAcceptHeader(MediaType.TEXT_PLAIN);
     return this.execute(requestBuilder);
+  }
+
+  /**
+   * @private
+   * @param {Object} object to get text from
+   * @return {string | {}} text representation of object
+   * or empty object if undefined
+   */
+  getObjectToString(object) {
+    return object && object.toString() || {};
   }
 }
 

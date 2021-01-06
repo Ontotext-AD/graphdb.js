@@ -47,9 +47,11 @@ export class AppSettings {
    * DefaultSameas setter.
    * @param {boolean} defaultSameas <code>true</code> if is enabled and
    * <code>false</code> otherwise.
+   * @return {AppSettings}
    */
   setDefaultSameas(defaultSameas) {
     this.defaultSameas = defaultSameas;
+    return this;
   }
 
   /**

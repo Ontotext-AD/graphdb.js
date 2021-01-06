@@ -178,9 +178,13 @@ Used to automate the security user management API: add, edit, or remove users.  
 
 * Setup client
 ```javascript
- const serverConfig = new ServerClientConfig('http://rdf4j-compliant-server/', 10000,
+// Import all classes needed for work
+const {GraphDBServerClient, ServerClientConfig} = require('graphdb').server; 
+// Instance the server configuration
+const serverConfig = new ServerClientConfig('http://rdf4j-compliant-server/', 10000,
     new Map(), 'admin', 'root', true, true);
- const serverClient = new GraphDBServerClient(serverConfig);
+// Instance the server client
+const serverClient = new GraphDBServerClient(serverConfig);
 ```
 
 * Create, read, update, delete user
@@ -196,10 +200,13 @@ Used to automate the security user management API: add, edit, or remove users.  
 ```
 * Update user application settings data
 ```javascript
+ // Import application settings class
+  const {AppSettings} = require('graphdb').server;
  // Use with extreme caution, as the changes that are made to the
  // application settings may possibly change the behavior of the
  // GraphDB Workbench for the logged-in user or for all users
  // if logged in as admin.
+  const newAppSettings = new AppSettings(true, true, true, false);
   return serverClient.updateUserData('test_user', '111222', newAppSettings);
 ```
 
@@ -217,24 +224,26 @@ Used to automate the security user management API: add, edit, or remove users.  
  });
 ```
 
-* Get concrete repo configuration in turtle format
+* Get concrete repo configuration as stream in turtle format.
 ```javascript
- serverClient.downloadRepositoryConfig('Test_repo').then((response) => {
-    console.log(response);
+ serverClient.downloadRepositoryConfig('Test_repo').then((stream) => {
+   stream.on('data', (data) => {
+       	// data contains requested configuration in turtle format
+     });
+    
  });
 ```
 
 * Create repository
 ```javascript
-  const config = {
-      id: 'new_repo',
-      params: {},
-      title: 'New repository',
-      type: RepositoryType.FREE
-    };
+  // Import repository configuration class
+  const {RepositoryConfig} = require('graphdb').repository;  
+    // Create repository configuration
+  const config = new RepositoryConfig('repo_id', '', new Map(), '',  'Repo title', RepositoryType.FREE);
+  // Use the configuration to create new repository
   serverClient.createRepository(config)
-        .then(() => {
-          // do work
+      .then(() => {
+        // do work
   });
 ```
 * Delete repository
@@ -271,12 +280,7 @@ Use with extreme caution, as the changes that are made to the application settin
       'WRITE_REPO_Test_repo',
       'READ_REPO_Test_repo'
     ];
- const appSettings = {
-      'DEFAULT_INFERENCE': true,
-      'DEFAULT_SAMEAS': true,
-      'IGNORE_SHARED_QUERIES': false,
-      'EXECUTE_COUNT': true
-    };
+ const appSettings = new AppSettings(true, true, false, true);
  
  serverClient.updateFreeAccess(true, authorities, appSettings);
 ```
