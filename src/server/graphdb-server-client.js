@@ -1,7 +1,6 @@
 const ServerClient = require('./server-client');
-const RepositoryConfigType = require('../repository/repository-config-type');
 const LoggingUtils = require('../logging/logging-utils');
-const HeaderType = require('../http/header-type');
+const MediaType = require('../http/media-type');
 const HttpRequestBuilder = require('../http/http-request-builder');
 
 const REPOSITORY_SERVICE_URL = '/rest/repositories';
@@ -44,7 +43,7 @@ class GraphDBServerClient extends ServerClient {
     const requestBuilder = HttpRequestBuilder
       .httpGet(
         `${REPOSITORY_SERVICE_URL}/defaultConfig/${repositoryType}`)
-      .addAcceptHeader(HeaderType.APPLICATION_JSON);
+      .addAcceptHeader(MediaType.APPLICATION_JSON);
     return this.execute(requestBuilder);
   }
 
@@ -52,40 +51,35 @@ class GraphDBServerClient extends ServerClient {
    * Get the repository configuration
    *
    * @param {string} repositoryId the repository id
-   * @param {RepositoryConfigType} [configType] optional
-   * determines the type of configuration obtained.
-   * Is optional, by default <code>application/json</code> type is set.
    * @param {string} [location] optional repository location
    * @return {Promise<HttpResponse|string|Error>} a promise which resolves
    * to response wrapper or rejects with error if thrown during execution.
    */
-  getRepositoryConfig(repositoryId, configType, location) {
+  getRepositoryConfig(repositoryId, location) {
     if (!repositoryId) {
       throw new Error('Repository id is required parameter!');
-    }
-
-    if (configType && configType === RepositoryConfigType.TURTLE) {
-      return this.downloadRepositoryConfig(repositoryId);
     }
 
     const repositoryLocation = location ? `?location=${location}` : '';
     const requestBuilder = HttpRequestBuilder
       .httpGet(
-        `${REPOSITORY_SERVICE_URL}/${repositoryId}${repositoryLocation}`);
+        `${REPOSITORY_SERVICE_URL}/${repositoryId}${repositoryLocation}`)
+      .addContentTypeHeader(MediaType.APPLICATION_JSON);
     return this.execute(requestBuilder);
   }
 
   /**
-   * Download the repository configuration
-   * @private
+   * Download the repository configuration in turtle format
    * @param {string} repositoryId the repository id
+   * @param {string} [location] optional repository location
    * @return {Promise<string | any>} a service request that will resolve to a
    * readable stream to which the client can subscribe and consume the emitted
-   * strings as soon as they are available.
+   * strings as soon as they are available. Resolves to turtle format.
    */
-  downloadRepositoryConfig(repositoryId) {
+  downloadRepositoryConfig(repositoryId, location) {
     const requestBuilder = HttpRequestBuilder
-      .httpGet(`${REPOSITORY_SERVICE_URL}/${repositoryId}/download`);
+      .httpGet(`${REPOSITORY_SERVICE_URL}/${repositoryId}/download`)
+      .addContentTypeHeader(MediaType.TURTLE);
     return this.execute(requestBuilder).then((response) => {
       this.logger.debug(LoggingUtils.getLogPayload(response,
         requestBuilder.getParams()), 'Downloaded data');
@@ -97,7 +91,7 @@ class GraphDBServerClient extends ServerClient {
    * @typedef {Object} RepositoryConfig
    * @property {string} [id] Repository ID
    * @property {string} [location] Repository location
-   * @property {Object} [params] List of repository configuration parameters.
+   * @property {Object} [params] Map of repository configuration parameters.
    * See {@link https://graphdb.ontotext.com/documentation/standard/configuring-a-repository.html#configuring-a-repository-configuration-parameters
    * GraphDB Documentation}
    * @property {string} [sesameType] Repository type as sesame rdf type
@@ -115,8 +109,8 @@ class GraphDBServerClient extends ServerClient {
     const requestBuilder = HttpRequestBuilder
       .httpPut(`${REPOSITORY_SERVICE_URL}/${repositoryConfig.id}`)
       .setData(repositoryConfig)
-      .addContentTypeHeader(HeaderType.APPLICATION_JSON)
-      .addAcceptHeader(HeaderType.TEXT_PLAIN);
+      .addContentTypeHeader(MediaType.APPLICATION_JSON)
+      .addAcceptHeader(MediaType.TEXT_PLAIN);
     return this.execute(requestBuilder);
   }
 
@@ -146,7 +140,7 @@ class GraphDBServerClient extends ServerClient {
   isSecurityEnabled() {
     const requestBuilder =
       HttpRequestBuilder.httpGet(SECURITY_SERVICE_URL)
-        .addAcceptHeader(HeaderType.APPLICATION_JSON);
+        .addAcceptHeader(MediaType.APPLICATION_JSON);
     return this.execute(requestBuilder);
   }
 
@@ -161,7 +155,7 @@ class GraphDBServerClient extends ServerClient {
     const requestBuilder =
       HttpRequestBuilder
         .httpPost(`${SECURITY_SERVICE_URL}?useSecurity=${enabled}`)
-        .addContentTypeHeader(HeaderType.APPLICATION_JSON)
+        .addContentTypeHeader(MediaType.APPLICATION_JSON)
         .setData(`${enabled}`);
     return this.execute(requestBuilder);
   }
@@ -170,13 +164,18 @@ class GraphDBServerClient extends ServerClient {
    * Enable or disable access to a predefined set of functionalities
    * without having to log in.
    * To use free access, you must have security enabled.
+   * Use with extreme caution, as the changes that are made to the
+   * application settings may possibly change the behavior of the
+   * GraphDB Workbench for the logged-in user or for all users
+   * if logged in as admin.
    * @param {boolean} enabled <code>true</code> if free access is enabled and
    * <code>false</code> otherwise.
    * @param {string[]} authorities Array of read and/or write access rights
    * described in the following template:
    * <code>READ_REPO_{repository ID}</code> to grant repository read rights
    * <code>WRITE_REPO_{repository ID}</code> to grant repository write rights
-   * @param {AppSettings} appSettings
+   * @param {AppSettings} appSettings configure the default behavior
+   * of the GraphDB Workbench
    * @return {Promise<HttpResponse|Error>} a promise which resolves
    * to response wrapper or rejects with error if thrown during execution.
    */
@@ -184,10 +183,10 @@ class GraphDBServerClient extends ServerClient {
     const requestBuilder =
       HttpRequestBuilder
         .httpPost(`${SECURITY_SERVICE_URL}/freeaccess`)
-        .addContentTypeHeader(HeaderType.APPLICATION_JSON)
-        .addAcceptHeader(HeaderType.TEXT_PLAIN)
+        .addContentTypeHeader(MediaType.APPLICATION_JSON)
+        .addAcceptHeader(MediaType.TEXT_PLAIN)
         .setData({
-          appSettings,
+          appSettings: appSettings && appSettings.toString() || {},
           authorities,
           enabled
         });
@@ -203,7 +202,7 @@ class GraphDBServerClient extends ServerClient {
     const requestBuilder =
       HttpRequestBuilder
         .httpGet(`${SECURITY_SERVICE_URL}/freeaccess`)
-        .addContentTypeHeader(HeaderType.APPLICATION_JSON);
+        .addContentTypeHeader(MediaType.APPLICATION_JSON);
     return this.execute(requestBuilder);
   }
 
@@ -211,61 +210,70 @@ class GraphDBServerClient extends ServerClient {
    * Create a user
    * @param {string} username User name
    * @param {string} password User password
-   * @param {string[]} authorities Array of read and/or write access rights
-   * described in the following template:
+   * @param {string[]} [grantedAuthorities] Array of read and/or write access
+   * rights described in the following template:
    * <code>READ_REPO_{repository ID}</code> to grant repository read rights
    * <code>WRITE_REPO_{repository ID}</code> to grant repository write rights
-   * @param {AppSettings} appSettings
+   * @param {AppSettings} [appSettings] configure the default behavior
+   * of the GraphDB Workbench
    * @return {Promise<HttpResponse|Error>} a promise which resolves
    * to response wrapper or rejects with error if thrown during execution.
    */
-  createUser(username, password, authorities, appSettings) {
+  createUser(username, password, grantedAuthorities, appSettings) {
     const requestBuilder =
       HttpRequestBuilder
         .httpPost(`${SECURITY_SERVICE_URL}/user/${username}`)
-        .addContentTypeHeader(HeaderType.APPLICATION_JSON)
-        .addAcceptHeader(HeaderType.TEXT_PLAIN)
+        .addContentTypeHeader(MediaType.APPLICATION_JSON)
+        .addAcceptHeader(MediaType.TEXT_PLAIN)
         .setData({
           username,
           password,
-          authorities,
-          appSettings
+          grantedAuthorities,
+          appSettings: appSettings && appSettings.toString() || {}
         });
     return this.execute(requestBuilder);
   }
 
   /**
    * Edit user.
+   * Use with extreme caution, as the changes that are made to the
+   * application settings may possibly change the behavior of the
+   * GraphDB Workbench for the user.
    * @param {string} username User name
-   * @param {string} password User password
-   * @param {string[]} authorities Array of read and/or write access rights
-   * described in the following template:
+   * @param {string} [password] User password
+   * @param {string[]} [grantedAuthorities] Array of read and/or write access
+   * rights described in the following template:
    * <code>READ_REPO_{repository ID}</code> to grant repository read rights
    * <code>WRITE_REPO_{repository ID}</code> to grant repository write rights
-   * @param {AppSettings} appSettings
+   * @param {AppSettings} [appSettings] configure the default behavior
+   * of the GraphDB Workbench
    * @return {Promise<HttpResponse|Error>} a promise which resolves
    * to response wrapper or rejects with error if thrown during execution.
    */
-  updateUser(username, password, authorities, appSettings) {
+  updateUser(username, password, grantedAuthorities, appSettings) {
     const requestBuilder =
       HttpRequestBuilder
         .httpPut(`${SECURITY_SERVICE_URL}/user/${username}`)
-        .addContentTypeHeader(HeaderType.APPLICATION_JSON)
-        .addAcceptHeader(HeaderType.TEXT_PLAIN)
+        .addContentTypeHeader(MediaType.APPLICATION_JSON)
+        .addAcceptHeader(MediaType.TEXT_PLAIN)
         .setData({
           username,
           password,
-          authorities,
-          appSettings
+          grantedAuthorities,
+          appSettings: appSettings && appSettings.toString() || {}
         });
     return this.execute(requestBuilder);
   }
 
   /**
    * Change setting for a logged user.
+   * Use with extreme caution, as the changes that are made to the
+   * application settings may possibly change the behavior of the
+   * GraphDB Workbench for the user.
    * @param {string} username User name
    * @param {string} [password] User password
-   * @param {AppSettings} [appSettings]
+   * @param {AppSettings} [appSettings] configure the default behavior
+   * of the GraphDB Workbench
    * @return {Promise<HttpResponse|Error>} a promise which resolves
    * to response wrapper or rejects with error if thrown during execution.
    */
@@ -273,12 +281,12 @@ class GraphDBServerClient extends ServerClient {
     const requestBuilder =
       HttpRequestBuilder
         .httpPatch(`${SECURITY_SERVICE_URL}/user/${username}`)
-        .addContentTypeHeader(HeaderType.APPLICATION_JSON)
-        .addAcceptHeader(HeaderType.TEXT_PLAIN)
+        .addContentTypeHeader(MediaType.APPLICATION_JSON)
+        .addAcceptHeader(MediaType.TEXT_PLAIN)
         .setData({
           username,
           password,
-          appSettings
+          appSettings: appSettings && appSettings.toString() || {}
         });
     return this.execute(requestBuilder);
   }
@@ -293,7 +301,7 @@ class GraphDBServerClient extends ServerClient {
     const requestBuilder =
       HttpRequestBuilder
         .httpGet(`${SECURITY_SERVICE_URL}/user/${username}`)
-        .addContentTypeHeader(HeaderType.APPLICATION_JSON);
+        .addContentTypeHeader(MediaType.APPLICATION_JSON);
     return this.execute(requestBuilder);
   }
 
@@ -307,7 +315,7 @@ class GraphDBServerClient extends ServerClient {
     const requestBuilder =
       HttpRequestBuilder
         .httpDelete(`${SECURITY_SERVICE_URL}/user/${username}`)
-        .addAcceptHeader(HeaderType.TEXT_PLAIN);
+        .addAcceptHeader(MediaType.TEXT_PLAIN);
     return this.execute(requestBuilder);
   }
 }

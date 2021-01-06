@@ -66,6 +66,17 @@ test suite
 npm run test:watch
 ```
 
+### Running e2e test locally
+This will pack the project locally, install it and run all e2e test against it.
+```
+npm run e2e:run
+```
+
+or run a single e2e spec file
+```
+npm run e2e:run -t '{test_file_name.spec.js}'
+```
+
 ### Checking the codestyle
 
 The library uses Google [style](https://google.github.io/styleguide/jsguide.html) 
@@ -159,6 +170,116 @@ server.getRepository('repository-name').then(repository => {
     // repository is a configured RDFRepositoryClient instance
 }).catch(err => console.log(err));
 ``` 
+
+### GraphDBServerClient
+Implementation of the GraphDB server operations. Extends the `ServerClient` class.
+
+Used to automate the security user management API: add, edit, or remove users.  Also used to add, edit, or remove a repository to/from any attached location.
+
+* Setup client
+```javascript
+ const serverConfig = new ServerClientConfig('http://rdf4j-compliant-server/', 10000,
+    new Map(), 'admin', 'root', true, true);
+ const serverClient = new GraphDBServerClient(serverConfig);
+```
+
+* Create, read, update, delete user
+```javascript
+ // create 
+ serverClient.createUser('test_user', '123456');
+ // update
+ serverClient.updateUser('test_user', '111222');
+ // read
+ serverClient.getUser('test_user');
+ //delete user
+ serverClient.deleteUser('test_user'); 
+```
+* Update user application settings data
+```javascript
+ // Use with extreme caution, as the changes that are made to the
+ // application settings may possibly change the behavior of the
+ // GraphDB Workbench for the logged-in user or for all users
+ // if logged in as admin.
+  return serverClient.updateUserData('test_user', '111222', newAppSettings);
+```
+
+* Get repo type default config
+```javascript
+ serverClient.getDefaultConfig(RepositoryType.FREE).then((response) => {
+    console.log(response);
+ });
+```
+
+* Get concrete repo configuration
+```javascript
+ serverClient.getRepositoryConfig('Test_repo').then((response) => {
+    console.log(response);
+ });
+```
+
+* Get concrete repo configuration in turtle format
+```javascript
+ serverClient.downloadRepositoryConfig('Test_repo').then((response) => {
+    console.log(response);
+ });
+```
+
+* Create repository
+```javascript
+  const config = {
+      id: 'new_repo',
+      params: {},
+      title: 'New repository',
+      type: RepositoryType.FREE
+    };
+  serverClient.createRepository(config)
+        .then(() => {
+          // do work
+  });
+```
+* Delete repository
+```javascript
+  serverClient.deleteRepository('new_repo').then(() => {
+    // do work  
+  });
+```
+
+* Checks if GraphDB security is enabled
+```javascript
+ serverClient.isSecurityEnabled().then((response) => {
+   console.log(response.response.data)
+ });
+```
+
+* Toggle GraphDB security
+```javascript
+ // turn security off
+ serverClient.toggleSecurity(false);
+```
+
+* Check free access state
+```javascript
+ serverClient.getFreeAccess().then((response) => {
+         console.log(response.response.data.enabled);
+ });
+```
+
+* Update free access.
+Use with extreme caution, as the changes that are made to the application settings may possibly change the behavior of the GraphDB Workbench for all users.
+```javascript
+ const authorities = [
+      'WRITE_REPO_Test_repo',
+      'READ_REPO_Test_repo'
+    ];
+ const appSettings = {
+      'DEFAULT_INFERENCE': true,
+      'DEFAULT_SAMEAS': true,
+      'IGNORE_SHARED_QUERIES': false,
+      'EXECUTE_COUNT': true
+    };
+ 
+ serverClient.updateFreeAccess(true, authorities, appSettings);
+```
 
 ### RDFRepositoryClient
 
@@ -434,13 +555,13 @@ return repository.deleteNamespaces();
 
 Repository operations like create, edit, delete, shutdown are not supported by the library at the moment. Supporting these is planned for next versions. Follow the [issue](https://github.com/Ontotext-AD/graphdb.js/issues/25).
 
-### Authorization
+### Authentication
 
-#### JWT
+#### GDB token
 
 If the library is going to be used agains a secured server, then all API calls must be authenticated by sending an http authorization header with a token which is obtained after a call to `rest/login/user_name` with a password provided as a specific header.
 
-In case the server requires that requests should be authenticated, then in the `ServerClientConfig` and `RepositoryClientConfig` must be configured the `username` and `password` which to be used for the authentication. If those are provided, then the client assumes that authentication is mandatory and the login with the provided credentials is performed authomatically before the first API call. After a successful login, user details which are received and the JWT auth token are stored in the `AuthenticationService`. From that moment on, with every API call is sent also an `authorization` header with the JWT token as value.
+In case the server requires that requests should be authenticated, then in the `ServerClientConfig` and `RepositoryClientConfig` must be configured the `username` and `password` which to be used for the authentication. If those are provided, then the client assumes that authentication is mandatory and the login with the provided credentials is performed authomatically before the first API call. After a successful login, user details which are received and the JWT auth token are stored in the `AuthenticationService`. From that moment on, with every API call is sent also an `authorization` header with the GDB token as value.
 ##### ServerClient
 ```javascript
  const headers = {'Accept': 'text/plain'};
@@ -465,21 +586,21 @@ const config = new RepositoryClientConfig()
 const repository = new RDFRepositoryClient(config);
 const httpRequest = repository.httpClients[0].request;
 ````
-If the JWT token expires, then the first API call will be rejected with an http error with status `401`. The client handles this automatically by re-login the user with the same credentials, updates the stored token and retries the API call. This behavior is the default and can be changed if the `ServerClientConfig` or `RepositoryClientConfig` are configured with `keepAlive=false`.
+If the GDB token expires, then the first API call will be rejected with an http error with status `401`. The client handles this automatically by re-login the user with the same credentials, updates the stored token and retries the API call. This behavior is the default and can be changed if the `ServerClientConfig` or `RepositoryClientConfig` are configured with `keepAlive=false`.
 
 
 > **Note:**  
-> JWT is serialized as “Authorization: GDB” header in every request, so it is vulnerable to a man-in-the-middle attack. Everyone who intercepts the JWT can reuse the session. To prevent this, we recommend to always enable encryption in transit.
+> GDB token is serialized as “Authorization: GDB” header in every request, so it is vulnerable to a man-in-the-middle attack. Everyone who intercepts the GDB token can reuse the session. To prevent this, we recommend to always enable encryption in transit.
 
 #### Basic Authentication¶
-Instead of using JWT, users can access secured GraphDB by passing valid base-64 encoded username:password combinations as a header.
+Instead of using GDB token, users can access secured GraphDB by passing valid base-64 encoded username:password combinations as a header.
 In case Basic authentication will be used, then the headers in the `ServerClientConfig` and `RepositoryClientConfig` must be configured to send the `username` and `password` which to be used for the authentication. From this moment on, with every API call is sent also an `authorization` header with the encoded credentials as value.
 ```javascript
 config.setBasicAuthentication(true);
 ```
 
 > **Note:**  
-> Basic Authentication is even more vulnerable to man-in-the-middle attacks than JWT! Anyone who intercepts your requests will be able to reuse your credentials indefinitely until you change them. Since the credentials are merely base-64 encoded, they will also get your username and password. This is why it is very important to always use encryption in transit.
+> Basic Authentication is even more vulnerable to man-in-the-middle attacks than GDB token! Anyone who intercepts your requests will be able to reuse your credentials indefinitely until you change them. Since the credentials are merely base-64 encoded, they will also get your username and password. This is why it is very important to always use encryption in transit.
 
 ### Response Parsers
 

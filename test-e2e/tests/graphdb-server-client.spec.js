@@ -1,9 +1,15 @@
 const {RDFRepositoryClient, RepositoryType} = require('graphdb').repository;
 const {RDFMimeType} = require('graphdb').http;
-const {GraphDBServerClient, ServerClientConfig} = require('graphdb').server;
+const {
+  GraphDBServerClient, ServerClientConfig,
+  AppSettings
+} = require('graphdb').server;
 const path = require('path');
 const Utils = require('utils');
 const Config = require('config');
+
+const TEST_REPO = 'Test_repo';
+const NEW_REPO = 'New_repo';
 
 describe('Should test graphDB server client', () => {
   const rdfClient = new RDFRepositoryClient(Config.restApiConfig);
@@ -22,10 +28,13 @@ describe('Should test graphDB server client', () => {
     });
   });
 
-  afterAll(() => {
-    return Utils.toggleSecurity(false).then(() => {
-      return Utils.deleteRepo('Test_repo');
-    });
+  afterAll((done) => {
+    return Utils.toggleSecurity(false)
+      .then(() => {
+        return Utils.deleteRepo(TEST_REPO);
+      }).then(() => {
+        done();
+      });
   });
 
   test('Should get repo type default config', () => {
@@ -41,7 +50,7 @@ describe('Should test graphDB server client', () => {
   test('Should get repo config', () => {
     const expectedResponse = Utils.loadFile('./data/graphdb-server-client/' +
       'expected_response_repo_config.txt');
-    return serverClient.getRepositoryConfig('Test_repo')
+    return serverClient.getRepositoryConfig(TEST_REPO)
       .then((response) => {
         expect(response.response.data)
           .toStrictEqual(JSON.parse(expectedResponse));
@@ -51,7 +60,7 @@ describe('Should test graphDB server client', () => {
   test('Should get repo config as turtle', () => {
     const expectedResponse = Utils.loadFile('./data/graphdb-server-client/' +
       'expected_response_repo_config_turtle.txt');
-    return serverClient.getRepositoryConfig('Test_repo', 'text/turtle')
+    return serverClient.downloadRepositoryConfig(TEST_REPO)
       .then((response) => {
         expect(response.replace(/\s+/g, ''))
           .toStrictEqual(expectedResponse.replace(/\s+/g, ''));
@@ -60,28 +69,33 @@ describe('Should test graphDB server client', () => {
 
   test('Should create and delete repo', () => {
     const config = {
-      id: 'TEST_CREATE',
+      id: NEW_REPO,
       params: {},
       title: '',
       type: RepositoryType.FREE
     };
-    return serverClient.createRepository(config)
-      .then(() => {
+    return serverClient.getRepositoryIDs()
+      .then((response) => {
+        const expected = [TEST_REPO];
+        expect(response.sort()).toEqual(expected);
+      }).then(() => {
+        return serverClient.createRepository(config);
+      }).then(() => {
         return serverClient.getRepositoryIDs();
       }).then((response) => {
-        const expected = ['TEST_CREATE', 'Test_repo'];
+        const expected = [NEW_REPO, TEST_REPO];
         expect(response.sort()).toEqual(expected);
       }).then(() => {
         return serverClient.deleteRepository(config.id);
       }).then(() => {
         return serverClient.getRepositoryIDs();
       }).then((response) => {
-        const expected = ['Test_repo'];
+        const expected = [TEST_REPO];
         expect(response).toEqual(expected);
       });
   });
 
-  test('Should check ang toggle security repo', () => {
+  test('Should check and toggle security repo', () => {
     return serverClient.isSecurityEnabled()
       .then((response) => {
         return expect(response.response.data).toBe(true);
@@ -105,12 +119,8 @@ describe('Should test graphDB server client', () => {
       'WRITE_REPO_Test_repo',
       'READ_REPO_Test_repo'
     ];
-    const appSettings = {
-      'DEFAULT_INFERENCE': true,
-      'DEFAULT_SAMEAS': true,
-      'IGNORE_SHARED_QUERIES': false,
-      'EXECUTE_COUNT': true
-    };
+    const appSettings = new AppSettings(true,
+      true, false, true);
 
     return serverClient.getFreeAccess()
       .then((response) => {
@@ -135,24 +145,15 @@ describe('Should test graphDB server client', () => {
   });
 
   test('Should create, read, update and delete users', () => {
-    const expextedAppSettings = {
-      'DEFAULT_INFERENCE': true,
-      'DEFAULT_SAMEAS': true,
-      'EXECUTE_COUNT': true,
-      'IGNORE_SHARED_QUERIES': false
-    };
+    const expextedAppSettings = new AppSettings(true, true, true, false);
+    const newAppSettings = new AppSettings(false, false, false, true);
 
-    const newAppSettings = {
-      'DEFAULT_INFERENCE': false,
-      'DEFAULT_SAMEAS': false,
-      'EXECUTE_COUNT': false,
-      'IGNORE_SHARED_QUERIES': true
-    };
     return serverClient.createUser('test_user', '123456')
       .then((response) => {
         return expect(response.response.status).toBe(201);
       }).then(() => {
-        return serverClient.updateUser('test_user', '111222');
+        return serverClient.updateUser('test_user', '111222',
+          [], new AppSettings(true, true, true, false));
       }).then((response) => {
         return expect(JSON.parse(response.response.config.data).password)
           .toBe('111222');
@@ -160,7 +161,7 @@ describe('Should test graphDB server client', () => {
         return serverClient.getUser('test_user');
       }).then((response) => {
         return expect(response.response.data.appSettings)
-          .toStrictEqual(expextedAppSettings);
+          .toStrictEqual(expextedAppSettings.toString());
       }).then(() => {
         return serverClient.updateUserData('test_user',
           '111222', newAppSettings);
@@ -168,7 +169,7 @@ describe('Should test graphDB server client', () => {
         return serverClient.getUser('test_user');
       }).then((response) => {
         return expect(response.response.data.appSettings)
-          .toStrictEqual(newAppSettings);
+          .toStrictEqual(newAppSettings.toString());
       }).then(() => {
         return serverClient.deleteUser('test_user');
       }).then((response) => {

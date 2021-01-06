@@ -10,7 +10,8 @@ module.exports = {
   server: {
     ServerClient: require('./server/server-client'),
     ServerClientConfig: require('./server/server-client-config'),
-    GraphDBServerClient: require('./server/graphdb-server-client')
+    GraphDBServerClient: require('./server/graphdb-server-client'),
+    AppSettings: require('./server/app-settings')
   },
 
   repository: {

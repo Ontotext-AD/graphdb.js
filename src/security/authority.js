@@ -1,4 +1,11 @@
-const AuthorityType = {
+/**
+ * Authority roles.
+ *
+ * @readonly
+ * @enum {string}
+ * @author Teodossi Dossev
+ */
+const Authority = {
   ADMIN: 'Admin',
   REPO_MANAGER: 'RepoManager',
   USER: 'User',
@@ -6,4 +13,4 @@ const AuthorityType = {
   WRITE_REPO_PREFIX: 'Write_REPO_'
 };
 
-module.exports = AuthorityType;
+module.exports = Authority;

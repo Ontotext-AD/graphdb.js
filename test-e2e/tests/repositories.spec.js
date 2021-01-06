@@ -16,7 +16,7 @@ describe('Should test repositories', () => {
   });
 
   test('Should verify repositories', () => {
-    let config = new ServerClientConfig(Config.serverAddress, 0, {});
+    let config = new ServerClientConfig(Config.serverAddress, 10000, {});
     let client = new ServerClient(config);
     let repositoryClientConfig = new RepositoryClientConfig([`${Config.serverAddress}/repositories/`], {}, '', 3001, 3001);
 

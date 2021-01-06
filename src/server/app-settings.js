@@ -1,6 +1,10 @@
 /**
  * Application settings help you to configure the default behavior
  * of the GraphDB Workbench.
+ * Use with extreme caution, as the changes that are made to the
+ * application settings may possibly change the behavior of the
+ * GraphDB Workbench for the logged-in user or for all users
+ * if logged in as admin.
  *
  *  @class
  *  @author Teodossi Dossev
@@ -83,3 +87,5 @@ export class AppSettings {
     };
   }
 }
+
+module.exports = AppSettings;
