@@ -1,4 +1,5 @@
-const {RDFRepositoryClient, RepositoryType, RepositoryConfig} = require('graphdb').repository;
+const {RDFRepositoryClient, RepositoryType,
+  RepositoryConfig} = require('graphdb').repository;
 const {RDFMimeType} = require('graphdb').http;
 const {
   GraphDBServerClient, ServerClientConfig,
@@ -162,7 +163,7 @@ describe('Should test graphDB server client', () => {
         return serverClient.getUser('test_user');
       }).then((response) => {
         return expect(response.response.data.appSettings)
-          .toStrictEqual(expextedAppSettings.toString());
+          .toStrictEqual(expextedAppSettings.toJson());
       }).then(() => {
         return serverClient.updateUserData('test_user',
           '111222', newAppSettings);
@@ -170,7 +171,7 @@ describe('Should test graphDB server client', () => {
         return serverClient.getUser('test_user');
       }).then((response) => {
         return expect(response.response.data.appSettings)
-          .toStrictEqual(newAppSettings.toString());
+          .toStrictEqual(newAppSettings.toJson());
       }).then(() => {
         return serverClient.deleteUser('test_user');
       }).then((response) => {

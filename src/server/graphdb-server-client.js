@@ -97,7 +97,7 @@ class GraphDBServerClient extends ServerClient {
   createRepository(repositoryConfig) {
     const requestBuilder = HttpRequestBuilder
       .httpPut(`${REPOSITORY_SERVICE_URL}/${repositoryConfig.id}`)
-      .setData(this.getObjectToString(repositoryConfig))
+      .setData(this.objectToJson(repositoryConfig))
       .addContentTypeHeader(MediaType.APPLICATION_JSON)
       .addAcceptHeader(MediaType.TEXT_PLAIN);
     return this.execute(requestBuilder);
@@ -175,7 +175,7 @@ class GraphDBServerClient extends ServerClient {
         .addContentTypeHeader(MediaType.APPLICATION_JSON)
         .addAcceptHeader(MediaType.TEXT_PLAIN)
         .setData({
-          appSettings: this.getObjectToString(appSettings),
+          appSettings: this.objectToJson(appSettings),
           authorities,
           enabled
         });
@@ -218,7 +218,7 @@ class GraphDBServerClient extends ServerClient {
           username,
           password,
           grantedAuthorities,
-          appSettings: this.getObjectToString(appSettings)
+          appSettings: this.objectToJson(appSettings)
         });
     return this.execute(requestBuilder);
   }
@@ -249,7 +249,7 @@ class GraphDBServerClient extends ServerClient {
           username,
           password,
           grantedAuthorities,
-          appSettings: this.getObjectToString(appSettings)
+          appSettings: this.objectToJson(appSettings)
         });
     return this.execute(requestBuilder);
   }
@@ -275,7 +275,7 @@ class GraphDBServerClient extends ServerClient {
         .setData({
           username,
           password,
-          appSettings: this.getObjectToString(appSettings)
+          appSettings: this.objectToJson(appSettings)
         });
     return this.execute(requestBuilder);
   }
@@ -310,12 +310,12 @@ class GraphDBServerClient extends ServerClient {
 
   /**
    * @private
-   * @param {Object} object to get text from
-   * @return {string | {}} text representation of object
+   * @param {Object} object to get json from
+   * @return {string | {}} json representation of object
    * or empty object if undefined
    */
-  getObjectToString(object) {
-    return object && object.toString() || {};
+  objectToJson(object) {
+    return object && object.toJson() || {};
   }
 }
 

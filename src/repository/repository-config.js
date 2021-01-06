@@ -33,10 +33,10 @@ export class RepositoryConfig {
   }
 
   /**
-   * @override
+   * Repository configuration to json getter
    * @return {Object} Repository configuration as key value pairs object
    */
-  toString() {
+  toJson() {
     return {
       id: this.id,
       location: this.location,

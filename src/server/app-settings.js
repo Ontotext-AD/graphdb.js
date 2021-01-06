@@ -77,10 +77,10 @@ export class AppSettings {
   }
 
   /**
-   * @override
+   * AppSettings to json getter
    * @return {Object} Application settings as key value pairs object
    */
-  toString() {
+  toJson() {
     return {
       DEFAULT_INFERENCE: this.defaultInference,
       DEFAULT_SAMEAS: this.defaultSameas,
