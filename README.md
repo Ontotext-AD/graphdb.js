@@ -1,8 +1,7 @@
 # graphdb.js
 
 [![Build Status](https://travis-ci.com/Ontotext-AD/graphdb.js.svg?branch=master)](https://travis-ci.com/Ontotext-AD/graphdb.js)
-[![Coverage Status](https://coveralls.io/repos/github/Ontotext-AD/graphdb.js/badge.svg?branch=master)](https://coveralls.io/github/Ontotext-AD/graphdb.js?branch=master)
-<a href="https://codeclimate.com/github/Ontotext-AD/graphdb.js/maintainability"><img src="https://api.codeclimate.com/v1/badges/6fffed099d25a540d504/maintainability" /></a>
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=Ontotext-AD_graphdb.js&metric=coverage)](https://sonarcloud.io/dashboard?id=Ontotext-AD_graphdb.js)
 [![install size](https://packagephobia.now.sh/badge?p=graphdb)](https://packagephobia.now.sh/result?p=graphdb)
 [![npm version](https://badge.fury.io/js/graphdb.svg)](https://badge.fury.io/js/graphdb)
 

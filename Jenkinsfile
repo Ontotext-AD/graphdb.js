@@ -38,6 +38,14 @@ pipeline {
         sh "(cd test-e2e/ && npm install && npm link graphdb && npm run test)"
       }
     }
+
+    stage('Sonar') {
+      steps {
+        withSonarQubeEnv('SonarCloud') {
+          sh "node sonar-project.js --branch='${env.ghprbSourceBranch}' --target-branch='${env.ghprbTargetBranch}' --pull-request-id='${env.ghprbPullId}'"
+        }
+      }
+    }
   }
 
   post {
