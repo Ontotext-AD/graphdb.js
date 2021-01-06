@@ -12,7 +12,7 @@
     "debug": "node --inspect-brk node_modules/.bin/jest --runInBand --config=jest-e2e.config.js"
   },
   "devDependencies": {
-    "axios": "^0.18.1",
+    "axios": "^0.21.1",
     "express": "^4.17.1",
     "form-data": "^2.3.3",
     "graphdb": "^1.5.0",
