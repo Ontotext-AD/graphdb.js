@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Home</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Home</h1>
+
+    
+
+
+
+    
+
+
+    <h3> </h3>
+
+
+
+
+
+
+
+
+
+
+    
+
+
+
+
+    <section>
+        <article><h1>graphdb.js</h1>
+<p><a href="https://travis-ci.com/Ontotext-AD/graphdb.js"><img src="https://travis-ci.com/Ontotext-AD/graphdb.js.svg?branch=master" alt="Build Status"></a>
+<a href="https://coveralls.io/github/Ontotext-AD/graphdb.js?branch=master"><img src="https://coveralls.io/repos/github/Ontotext-AD/graphdb.js/badge.svg?branch=master" alt="Coverage Status"></a>
+<a href="https://codeclimate.com/github/Ontotext-AD/graphdb.js/maintainability"><img src="https://api.codeclimate.com/v1/badges/6fffed099d25a540d504/maintainability" /></a>
+<a href="https://packagephobia.now.sh/result?p=graphdb"><img src="https://packagephobia.now.sh/badge?p=graphdb" alt="install size"></a>
+<a href="https://badge.fury.io/js/graphdb"><img src="https://badge.fury.io/js/graphdb.svg" alt="npm version"></a></p>
+<p>A GraphDB and RDF4J data access library written in JavaScript to be used in Node.js.</p>
+<h2>Installation</h2>
+<h3>Prerequisites</h3>
+<ul>
+<li>Node &gt;= 8</li>
+<li>NPM (<a href="https://npmjs.org/">npm</a>)</li>
+</ul>
+<pre class="prettyprint source"><code>npm install graphdb
+</code></pre>
+<h2>Development</h2>
+<p><em>Library documentation</em> can be found <a href="https://ontotext-ad.github.io/graphdb.js/">here</a></p>
+<p>The library is written in ES2016. During the build process source files <code>src/</code>
+are transpiled to ES2015 and copied to <code>lib/</code> directory.</p>
+<p>A typescript definition file <code>types.d.ts</code> is generated in the <code>lib/</code> as well.</p>
+<p>Documentation is generated in <code>docs/</code> from the JSDoc annotations in the source
+code.</p>
+<h3>Project Structure</h3>
+<ul>
+<li><code>src</code> : The source code of the library.</li>
+<li><code>test</code> : Unit and component level tests written with Jest.</li>
+<li><code>lib</code> : Transpiled but files are built here when the library is published to npm.</li>
+<li><code>docs</code> : Documentation generated with JSDoc when the library is published to npm.</li>
+<li><code>src/index.js</code> : The library external API exporting main functional classes. This is also present in <code>lib</code>.</li>
+<li><code>lib/types.d.ts</code> : The typescript definitions generated when the library is published to npm.</li>
+<li><code>scripts</code> : Service scripts related to building, publishing and so on.</li>
+</ul>
+<h3>Setup Environment</h3>
+<ul>
+<li>Checkout or clone the project.</li>
+<li>Make sure prerequisites are covered: node js and npm must be present and versions
+should be supported.</li>
+<li>Enter the project directory and execute</li>
+</ul>
+<pre class="prettyprint source"><code>npm install
+</code></pre>
+<h3>Running Tests</h3>
+<p>After any change the tests should be run and check if any existing functionality
+is not broken in result.</p>
+<pre class="prettyprint source"><code>npm run test
+</code></pre>
+<p>or constantly watching for changes in source files and tests and re-execute the
+test suite</p>
+<pre class="prettyprint source"><code>npm run test:watch
+</code></pre>
+<h3>Running e2e test locally</h3>
+<p>This will pack the project locally, install it and run all e2e test against it.</p>
+<pre class="prettyprint source"><code>npm run e2e:run
+</code></pre>
+<p>or run a single e2e spec file</p>
+<pre class="prettyprint source"><code>npm run e2e:run -t '{test_file_name.spec.js}'
+</code></pre>
+<h3>Checking the codestyle</h3>
+<p>The library uses Google <a href="https://google.github.io/styleguide/jsguide.html">style</a>
+in conjunction with ESLint's recommended ruleset.</p>
+<pre class="prettyprint source"><code>npm run lint
+</code></pre>
+<h3>Testing the packaging</h3>
+<p>Library is managed by NPM package manager. During publishing npm consults the
+<code>.gitignore</code>, <code>.npmignore</code> and <code>package.json#files</code> property in order to decide
+which resources should be published. If any change in the project structure,
+<code>.gitignore</code> or <code>.npmignore</code> is made, then publishing must be verified in order
+to be guaranteed that needed sources will be properly published.
+The packaging could be verified using the <code>npm pack</code> command which generates
+a <code>*.tgz</code> archive in the project root. The archive should contain only the needed
+resources.
+Furture the archive could be used as a source for <code>npm install</code> where the path
+pointing the archive is provided.</p>
+<h3>Publishing</h3>
+<ul>
+<li>Increase the package version.</li>
+</ul>
+<pre class="prettyprint source"><code>npm version patch|minor|major
+</code></pre>
+<ul>
+<li>Login in npm.</li>
+</ul>
+<pre class="prettyprint source"><code>npm login
+</code></pre>
+<ul>
+<li>Publish package in npm.</li>
+</ul>
+<pre class="prettyprint source"><code>npm publish
+</code></pre>
+<h2>Usage</h2>
+<h3>ServerClient</h3>
+<p>The <code>ServerClient</code> deals with operations on server level like obtaining a list
+with available repositories, concrete repository or deleting repositories. In
+order to work with the <code>ServerClient</code> it should be configured <code>ServerClientConfig</code>
+first.</p>
+<ul>
+<li>Configure <code>ServerClient</code></li>
+</ul>
+<pre class="prettyprint source lang-javascript"><code>const {ServerClient, ServerClientConfig} = require('graphdb').server;
+const {RDFMimeType} = require('graphdb').http;
+
+const serverConfig = new ServerClientConfig('http://rdf4j-compliant-server/', 0, {
+    'Accept': RDFMimeType.SPARQL_RESULTS_JSON
+});
+const server = new ServerClient(serverConfig);
+</code></pre>
+<ul>
+<li>Fetch repository ids</li>
+</ul>
+<pre class="prettyprint source lang-javascript"><code>server.getRepositoryIDs().then(ids => {
+    // work with ids
+}).catch(err => console.log(err));
+</code></pre>
+<ul>
+<li>Check if repository with given name exists</li>
+</ul>
+<pre class="prettyprint source lang-javascript"><code>server.hasRepository('repository-name').then(exists => {
+    if (exists) {
+        // repository exists -> delete it for example
+    }
+}).catch(err => console.log(err));
+</code></pre>
+<ul>
+<li>Delete repository with given name</li>
+</ul>
+<pre class="prettyprint source lang-javascript"><code>server.deleteRepository('repository-name').then(() => {
+    // successfully deleted
+}).catch(err => console.log(err));
+</code></pre>
+<ul>
+<li>Although a repository instance can be created using a constructor which can be
+seen in the examples below a client could obtain an instance of <code>RDFRepositoryClient</code>
+through the server client</li>
+</ul>
+<pre class="prettyprint source lang-javascript"><code>server.getRepository('repository-name').then(repository => {
+    // repository is a configured RDFRepositoryClient instance
+}).catch(err => console.log(err));
+</code></pre>
+<h3>GraphDBServerClient</h3>
+<p>Implementation of the GraphDB server operations. Extends the <code>ServerClient</code> class.</p>
+<p>Used to automate the security user management API: add, edit, or remove users.  Also used to add, edit, or remove a repository to/from any attached location.</p>
+<ul>
+<li>Setup client</li>
+</ul>
+<pre class="prettyprint source lang-javascript"><code>// Import all classes needed for work
+const {GraphDBServerClient, ServerClientConfig} = require('graphdb').server; 
+// Instance the server configuration
+const serverConfig = new ServerClientConfig('http://rdf4j-compliant-server/', 10000,
+    new Map(), 'admin', 'root', true, true);
+// Instance the server client
+const serverClient = new GraphDBServerClient(serverConfig);
+</code></pre>
+<ul>
+<li>Create, read, update, delete user</li>
+</ul>
+<pre class="prettyprint source lang-javascript"><code> // create 
+ serverClient.createUser('test_user', '123456');
+ // update
+ serverClient.updateUser('test_user', '111222');
+ // read
+ serverClient.getUser('test_user');
+ //delete user
+ serverClient.deleteUser('test_user'); 
+</code></pre>
+<ul>
+<li>Update user application settings data</li>
+</ul>
+<pre class="prettyprint source lang-javascript"><code> // Import application settings class
+  const {AppSettings} = require('graphdb').server;
+ // Use with extreme caution, as the changes that are made to the
+ // application settings may possibly change the behavior of the
+ // GraphDB Workbench for the logged-in user or for all users
+ // if logged in as admin.
+  const newAppSettings = new AppSettings(true, true, true, false);
+  return serverClient.updateUserData('test_user', '111222', newAppSettings);
+</code></pre>
+<ul>
+<li>Get repo type default config</li>
+</ul>
+<pre class="prettyprint source lang-javascript"><code> serverClient.getDefaultConfig(RepositoryType.FREE).then((response) => {
+    console.log(response);
+ });
+</code></pre>
+<ul>
+<li>Get concrete repo configuration</li>
+</ul>
+<pre class="prettyprint source lang-javascript"><code> serverClient.getRepositoryConfig('Test_repo').then((response) => {
+    console.log(response);
+ });
+</code></pre>
+<ul>
+<li>Get concrete repo configuration as stream in turtle format.</li>
+</ul>
+<pre class="prettyprint source lang-javascript"><code> serverClient.downloadRepositoryConfig('Test_repo').then((stream) => {
+   stream.on('data', (data) => {
+       	// data contains requested configuration in turtle format
+     });
+    
+ });
+</code></pre>
+<ul>
+<li>Create repository</li>
+</ul>
+<pre class="prettyprint source lang-javascript"><code>  // Import repository configuration class
+  const {RepositoryConfig} = require('graphdb').repository;  
+    // Create repository configuration
+  const config = new RepositoryConfig('repo_id', '', new Map(), '',  'Repo title', RepositoryType.FREE);
+  // Use the configuration to create new repository
+  serverClient.createRepository(config)
+      .then(() => {
+        // do work
+  });
+</code></pre>
+<ul>
+<li>Delete repository</li>
+</ul>
+<pre class="prettyprint source lang-javascript"><code>  serverClient.deleteRepository('new_repo').then(() => {
+    // do work  
+  });
+</code></pre>
+<ul>
+<li>Checks if GraphDB security is enabled</li>
+</ul>
+<pre class="prettyprint source lang-javascript"><code> serverClient.isSecurityEnabled().then((response) => {
+   console.log(response.response.data)
+ });
+</code></pre>
+<ul>
+<li>Toggle GraphDB security</li>
+</ul>
+<pre class="prettyprint source lang-javascript"><code> // turn security off
+ serverClient.toggleSecurity(false);
+</code></pre>
+<ul>
+<li>Check free access state</li>
+</ul>
+<pre class="prettyprint source lang-javascript"><code> serverClient.getFreeAccess().then((response) => {
+         console.log(response.response.data.enabled);
+ });
+</code></pre>
+<ul>
+<li>Update free access.
+Use with extreme caution, as the changes that are made to the application settings may possibly change the behavior of the GraphDB Workbench for all users.</li>
+</ul>
+<pre class="prettyprint source lang-javascript"><code> const authorities = [
+      'WRITE_REPO_Test_repo',
+      'READ_REPO_Test_repo'
+    ];
+ const appSettings = new AppSettings(true, true, false, true);
+ 
+ serverClient.updateFreeAccess(true, authorities, appSettings);
+</code></pre>
+<h3>RDFRepositoryClient</h3>
+<ul>
+<li>Instantiating repository client</li>
+</ul>
+<pre class="prettyprint source lang-javascript"><code>const readTimeout = 30000;
+const writeTimeout = 30000;
+const config = new RepositoryClientConfig(['http://GDB/repositories/my-repo'], {
+  'Accept': RDFMimeType.TURTLE
+}, '', readTimeout, writeTimeout);
+const repository = new RDFRepositoryClient(config);
+</code></pre>
+<ul>
+<li>Obtaining repository client instance through a ServerClient</li>
+</ul>
+<pre class="prettyprint source lang-javascript"><code>const {ServerClient, ServerClientConfig} = require('graphdb').server;
+const {RepositoryClientConfig} = require('graphdb').repository;
+
+const config = new ServerClientConfig('http://GDB', 0, {});
+const server = new ServerClient(config);
+
+const readTimeout = 30000;
+const writeTimeout = 30000;
+const repositoryClientConfig = new RepositoryClientConfig(['http://GDB/repositories/my-repo'], {}, '', readTimeout, writeTimeout);
+return server.getRepository('automotive', repositoryClientConfig).then((rdfRepositoryClient) => {
+// rdfRepositoryClient is a configured instance of RDFRepositoryClient
+});
+</code></pre>
+<h4>Reading</h4>
+<p>Statements could be fetched using the <code>RDFRepositoryClient.get</code>, <code>RDFRepositoryClient.query</code>,
+<code>RDFRepositoryClient.download</code>.</p>
+<p>Every reading method can get the response parsed to data objects according to
+<a href="http://rdf.js.org/data-model-spec/">RDFJS</a> data model specification (see <a href="#response-parsers">Response Parsers</a>).</p>
+<ul>
+<li>Reading statements</li>
+</ul>
+<pre class="prettyprint source lang-javascript"><code>const payload = new GetStatementsPayload()
+	.setResponseType(RDFMimeType.RDF_JSON)
+	.setSubject('&lt;http://eunis.eea.europa.eu/countries/AZ>')
+	.setPredicate('&lt;http://eunis.eea.europa.eu/rdf/schema.rdf#population>')
+	.setObject('&quot;7931000&quot;^^http://www.w3.org/2001/XMLSchema#integer')
+	.setContext('&lt;http://example.org/graph3>')
+	.setInference(true);
+
+return repository.get(payload).then((data) => {
+	// data contains requested staments in rdf json format
+});
+</code></pre>
+<ul>
+<li>Downloading data from repository by consuming a WritableStream</li>
+</ul>
+<pre class="prettyprint source lang-javascript"><code>const dest = __dirname + '/statements.ttl';
+const output = fs.createWriteStream(dest);
+const payload = new GetStatementsPayload()
+    .setResponseType(RDFMimeType.TURTLE)
+    .get();
+repository.download(payload).then((response) => {
+    response.on('data', (chunk) => {
+        output.write(new Buffer(chunk));
+    });
+    response.on('end', () => {
+        output.end();
+    });
+});
+</code></pre>
+<ul>
+<li>
+<p>Query evaluation against a sparql endpoint</p>
+</li>
+<li>
+<p>SELECT query returning data objects</p>
+</li>
+</ul>
+<pre class="prettyprint source lang-javascript"><code>repository.registerParser(new SparqlXmlResultParser());
+
+const payload = new GetQueryPayload()
+  .setQuery('select * where {?s ?p ?o}')
+  .setQueryType(QueryType.SELECT)
+  .setResponseType(RDFMimeType.SPARQL_RESULTS_XML)
+  .setLimit(100);
+
+return repository.query(payload).then((stream) => {
+  stream.on('data', (bindings) => {
+    // the bindings stream converted to data objects with the registered parser
+  });
+  stream.on('end', () => {
+    // handle end of the stream
+  });
+});
+</code></pre>
+<ul>
+<li>ASK query returning a boolean result</li>
+</ul>
+<pre class="prettyprint source lang-javascript"><code>const payload = new GetQueryPayload()
+  .setQuery('ask {?s ?p ?o}')
+  .setQueryType(QueryType.ASK)
+  .setResponseType(RDFMimeType.BOOLEAN_RESULT);
+
+repository.registerParser(new SparqlJsonResultParser());
+
+return repository.query(payload).then((data) => {
+  // data => true|false
+});
+</code></pre>
+<h4>Writing</h4>
+<ul>
+<li>Uploading data in repository (POST) using ReadStream</li>
+</ul>
+<pre class="prettyprint source lang-javascript"><code>const contentType = RDFMimeType.TURTLE;
+const turtleFile = __dirname + '/statements.ttl';
+fs.readFile(turtleFile, (err, stream) => {
+    repository.upload(stream, contentType).catch((e) => console.log(e));
+});
+</code></pre>
+<ul>
+<li>Overwriting data in repository (PUT) using ReadStream</li>
+</ul>
+<pre class="prettyprint source lang-javascript"><code>const contentType = RDFMimeType.TURTLE;
+const file = __dirname + '/statements-overwrite.ttl';
+fs.readFile(file, (err, stream) => {
+    repository.overwrite(stream, contentType).catch((e) => console.log(e));
+});
+</code></pre>
+<ul>
+<li>Executing a sparql update query</li>
+</ul>
+<pre class="prettyprint source lang-javascript"><code>const payload = new UpdateQueryPayload()
+  .setQuery('INSERT {?s ?p ?o} WHERE {?s ?p ?o}')
+  .setContentType(QueryContentType.X_WWW_FORM_URLENCODED)
+  .setInference(true)
+  .setTimeout(5);
+
+return repository.update(payload).then(() => {
+    // repository should have been updated at this point
+});
+</code></pre>
+<h4>Deleting</h4>
+<ul>
+<li>Delete statement from given context</li>
+</ul>
+<pre class="prettyprint source lang-javascript"><code>repository.deleteStatements(subj, pred, obj, contexts).then(() => {
+
+});
+</code></pre>
+<h3>Transactions</h3>
+<p>Repository operations can be executed in transaction. In order to work with
+transactions the <code>TransactionalRepositoryClient</code> is used.</p>
+<h4>Starting a transaction</h4>
+<p><code>RDFRepositoryClient</code> can initiate a transaction via <code>beginTransaction()</code> which
+produces an instance of <code>TransactionalRepositoryClient</code>.</p>
+<p>Each started transaction allows to be committed or rolled back by using
+respectively <code>commit()</code> and <code>rollback()</code></p>
+<p>The following is a short use example of a transaction:</p>
+<pre class="prettyprint source lang-javascript"><code>const turtlePath = __dirname + '/statements.ttl';
+
+let transactionClient;
+return repository.beginTransaction().then((transaction) => {
+  transactionClient = transaction;
+  return transactionClient.addFile(turtlePath);
+}).then(() => {
+  // File upload was successful, commit the changes
+  return transactionClient.commit();
+}).catch((e) => {
+  console.log(e);
+  if (transactionClient) {
+    // Couldn't upload the file, abort the transaction
+    return transactionClient.rollback();
+  }
+  return Promise.reject(e);
+});
+</code></pre>
+<p>For specific isolation level use <code>TransactionIsolationLevel</code></p>
+<pre class="prettyprint source lang-javascript"><code>return repository.beginTransaction(TransactionIsolationLevel.READ_UNCOMMITTED);
+</code></pre>
+<p>The default isolation level is specific for each store implementation.</p>
+<p><strong>Important:</strong> After commit or rollback, a transaction cannot be reused, any
+attempts will result in an error. If you are not sure what is the state of the
+transaction, you can use <code>transaction.isActive()</code></p>
+<h4>Working with a transaction</h4>
+<p>Almost all of the transaction methods for reading &amp; modifying data have the same
+syntax and parameters as those in <code>RDFRepositoryClient</code>.</p>
+<h5>Reading</h5>
+<p><code>TransactionalRepositoryClient</code> supports the following methods for reading data,
+including any changes that are not yet committed:</p>
+<ul>
+<li><code>getSize()</code></li>
+<li><code>get()</code></li>
+<li><code>download()</code></li>
+<li><code>query()</code></li>
+</ul>
+<h5>Writing</h5>
+<ul>
+<li><code>add()</code></li>
+<li><code>addQuads()</code></li>
+<li><code>upload()</code></li>
+<li><code>addFile()</code></li>
+</ul>
+<h4>Deleting</h4>
+<p>Deleting data during a transaction is different than the one in
+<code>RDFRepositoryClient</code>, it expects RDF data document instead of statements
+filter parameters.</p>
+<p>Currently it supports only Turtle or TriG formatted RDF data:</p>
+<pre class="prettyprint source lang-javascript"><code>const turtlePath = __dirname + '/statements.ttl';
+const turtleData = fs.readFileSync(turtlePath, 'utf8');
+return transaction.deleteData(turtleData);
+</code></pre>
+<h3>Namespaces</h3>
+<ul>
+<li>Retrieving all available namespace declarations. The resolved value is an
+array of <code>Namespace</code> instances.</li>
+</ul>
+<pre class="prettyprint source lang-javascript"><code>return repository.getNamespaces().then((namespaces) => {
+  namespaces.forEach((namespace) => {
+    console.log(namespace.getPrefix() + ' -> ' + namespace.getNamespace());
+   });
+})
+</code></pre>
+<ul>
+<li>Retrieving specific namespace declaration</li>
+</ul>
+<pre class="prettyprint source lang-javascript"><code>return repository.getNamespace('rdf').then((namespace) => {
+  console.log(namespace);
+})
+</code></pre>
+<ul>
+<li>Setting the namespace declaration. This can act as create or update:</li>
+</ul>
+<pre class="prettyprint source lang-javascript"><code>return repository.saveNamespace('rdf', 'http://www.w3.org/1999/02/22-rdf-syntax-ns#');
+</code></pre>
+<ul>
+<li>Deleting specific namespace declaration</li>
+</ul>
+<pre class="prettyprint source lang-javascript"><code>return repository.deleteNamespace('rdf');
+</code></pre>
+<ul>
+<li>Deleting all namespaces declarations</li>
+</ul>
+<pre class="prettyprint source lang-javascript"><code>return repository.deleteNamespaces();
+</code></pre>
+<h3>Repository management</h3>
+<p>Repository operations like create, edit, delete, shutdown are not supported by the library at the moment. Supporting these is planned for next versions. Follow the <a href="https://github.com/Ontotext-AD/graphdb.js/issues/25">issue</a>.</p>
+<h3>Authentication</h3>
+<h4>GDB token</h4>
+<p>If the library is going to be used agains a secured server, then all API calls must be authenticated by sending an http authorization header with a token which is obtained after a call to <code>rest/login/user_name</code> with a password provided as a specific header.</p>
+<p>In case the server requires that requests should be authenticated, then in the <code>ServerClientConfig</code> and <code>RepositoryClientConfig</code> must be configured the <code>username</code> and <code>password</code> which to be used for the authentication. If those are provided, then the client assumes that authentication is mandatory and the login with the provided credentials is performed authomatically before the first API call. After a successful login, user details which are received and the JWT auth token are stored in the <code>AuthenticationService</code>. From that moment on, with every API call is sent also an <code>authorization</code> header with the GDB token as value.</p>
+<h5>ServerClient</h5>
+<pre class="prettyprint source lang-javascript"><code> const headers = {'Accept': 'text/plain'};
+ const config = new ServerClientConfig('/endpoint', 1000, headers, 'testuser', 'P@sw0rd');
+</code></pre>
+<h5>RepositoryClient</h5>
+<pre class="prettyprint source lang-javascript"><code>const endpoints = ['http://host/repositories/repo1'];
+const headers = {};
+const contentType = '';
+const readTimeout = 1000;
+const writeTimeout = 1000;
+
+const config = new RepositoryClientConfig()
+  .setEndpoints(endpoints)
+  .setHeaders(headers)
+  .setDefaultRDFMimeType(contentType)
+  .setReadTimeout(readTimeout)
+  .setWriteTimeout(writeTimeout)
+  .setUsername('testuser')
+  .setPass('pass123');
+const repository = new RDFRepositoryClient(config);
+const httpRequest = repository.httpClients[0].request;
+</code></pre>
+<p>If the GDB token expires, then the first API call will be rejected with an http error with status <code>401</code>. The client handles this automatically by re-login the user with the same credentials, updates the stored token and retries the API call. This behavior is the default and can be changed if the <code>ServerClientConfig</code> or <code>RepositoryClientConfig</code> are configured with <code>keepAlive=false</code>.</p>
+<blockquote>
+<p><strong>Note:</strong><br>
+GDB token is serialized as “Authorization: GDB” header in every request, so it is vulnerable to a man-in-the-middle attack. Everyone who intercepts the GDB token can reuse the session. To prevent this, we recommend to always enable encryption in transit.</p>
+</blockquote>
+<h4>Basic Authentication¶</h4>
+<p>Instead of using GDB token, users can access secured GraphDB by passing valid base-64 encoded username:password combinations as a header.
+In case Basic authentication will be used, then the headers in the <code>ServerClientConfig</code> and <code>RepositoryClientConfig</code> must be configured to send the <code>username</code> and <code>password</code> which to be used for the authentication. From this moment on, with every API call is sent also an <code>authorization</code> header with the encoded credentials as value.</p>
+<pre class="prettyprint source lang-javascript"><code>config.setBasicAuthentication(true);
+</code></pre>
+<blockquote>
+<p><strong>Note:</strong><br>
+Basic Authentication is even more vulnerable to man-in-the-middle attacks than GDB token! Anyone who intercepts your requests will be able to reuse your credentials indefinitely until you change them. Since the credentials are merely base-64 encoded, they will also get your username and password. This is why it is very important to always use encryption in transit.</p>
+</blockquote>
+<h3>Response Parsers</h3>
+<p>Read responses of different content types might be parsed to data objects with
+parsers registered in the repository instance.</p>
+<p>The library provides a way parsers to be implemented and registered with given
+repository instance which in turn will use them to parse the response before
+returning it to the client.</p>
+<h4>Implementing a custom parser</h4>
+<p>A parser could be implemented by extending the <code>ContentParser</code> and implementing
+the <code>parse</code> and <code>getSupportedType</code> methods.</p>
+<pre class="prettyprint source lang-javascript"><code>class RdfAsJsonParser extends ContentParser {
+  getSupportedType() {
+    return 'application/rdf+json';
+  }
+
+  parse(content) {
+    // parse and return the content
+    return parsedContent;
+  }
+}
+</code></pre>
+<p>The <code>getSupportedType</code> method must return one of the supported RDF and SPARQL
+MIME types this way defining that the parser is responsible for converting from
+that type.</p>
+<h4>Registering parser in the repository</h4>
+<p>Parsers should be registered in the repository before executing any request.</p>
+<pre class="prettyprint source lang-javascript"><code>// Import any of the predefined parsers
+const {NTriplesParser} = require('graphdb').parser;
+// And register it in the repository
+repository.registerParser(new NTriplesParser());
+</code></pre>
+<p>Multiple parsers could be registered for different response types.</p>
+<p><code>Registering a second parser for same content type results in overriding the previously registerted parser!</code></p>
+<h4>Predefined parsers</h4>
+<p>The library provides convenient parser wrappers for the rdf formats using third party libraries:</p>
+<ul>
+<li><code>text/turtle</code>: TurtleParser (<a href="https://github.com/rdfjs/N3.js">N3</a>)</li>
+<li><code>text/rdf+n3</code>: N3parser (<a href="https://github.com/rdfjs/N3.js">N3</a>)</li>
+<li><code>text/x-nquads</code>: NQuadsParser (<a href="https://github.com/rdfjs/N3.js">N3</a>)</li>
+<li><code>text/plain</code> (<code>N-Triples</code>): NTriplesParser (<a href="https://github.com/rdfjs/N3.js">N3</a>)</li>
+<li><code>application/x-trig</code>: TrigParser (<a href="https://github.com/rdfjs/N3.js">N3</a>)</li>
+<li><code>application/ld-json</code>: JsonLDParser (<a href="https://github.com/rubensworks/jsonld-streaming-parser.js">jsonld-streaming-parser</a>)</li>
+<li><code>application/rdf+xml</code>: RDFXmlParser (<a href="https://github.com/rdfjs/rdfxml-streaming-parser.js">rdfxml-streaming-parser</a>)</li>
+</ul>
+<p>For SELECT query results in <code>json</code> and <code>xml</code> formats as well as boolean results from ASK queries following parsers are wrapped and exposed:</p>
+<ul>
+<li><code>application/sparql-results+xml</code>, <code>text/boolean</code>: SparqlXmlResultParser (<a href="https://github.com/rubensworks/sparqlxml-parse.js">sparqlxml-parse</a>)</li>
+<li><code>application/sparql-results+json</code>, <code>text/boolean</code>: SparqlJsonResultParser (<a href="https://github.com/rubensworks/sparqljson-parse.js">sparqljson-parse</a>)</li>
+</ul>
+<h3>rdf*/sparql*</h3>
+<p>The library provides basic support of extend RDF with a notion of nested triples, also known as <a href="https://www.w3.org/TR/rdf-mt/#Reif">reification</a>.
+Parsers for RDFStar triples are planned for next versions.</p>
+<p>When used against server with RDFStar support, for SELECT queries the following Mime-Types are used:</p>
+<ul>
+<li><code>application/x-sparqlstar-results+json</code></li>
+<li><code>application/x-sparqlstar-results+tsv</code></li>
+</ul>
+<p>For DESCRIBE and CONSTRUCT queries, the following Mime-Types can be used:</p>
+<ul>
+<li><code>application/x-turtlestar</code></li>
+<li><code>application/x-trigstar</code></li>
+</ul>
+<pre class="prettyprint source lang-javascript"><code>const payload = new GetQueryPayload()
+    .setQuery('describe &lt;&lt;&lt;http://www.wikidata.org/entity/Q472> &lt;http://www.wikidata.org/prop/direct/P1889> &lt;http://www.wikidata.org/entity/Q202904>>>')
+    .setQueryType(QueryType.DESCRIBE)
+    .setResponseType(RDFMimeType.TRIG_STAR)
+    .setLimit(100);
+
+return repository.query(payload).then((stream) => {
+    stream.on('data', (data) => {
+      	// data contains requested statements in trig star format
+    });
+});
+</code></pre>
+<p>When RDFStart triple is requested with non supportive Mime-Types, it resolves to an encoded Base64url string.
+It can be decoded using <code>TermConverter</code> util class.</p>
+<pre class="prettyprint source lang-javascript"><code>const payload = new GetQueryPayload()
+    .setQuery('describe &lt;&lt;&lt;http://www.wikidata.org/entity/Q472> &lt;http://www.wikidata.org/prop/direct/P1889> &lt;http://www.wikidata.org/entity/Q202904>>>')
+    .setQueryType(QueryType.DESCRIBE)
+    .setResponseType(RDFMimeType.RDF_XML)
+    .setLimit(100);
+
+repository.registerParser(new RDFXmlParser());
+return repository.query(payload).then((stream) => {
+    stream.on('data', (data) => {
+       console.log(data.subject.value);
+      	// urn:rdf4j:triple:PDw8aHR0cDovL3d3dy53aWtpZGF0YS5vcmcvZW50aXR5L1E0NzI-IDxodHRwOi8vd3d3Lndpa2lkYXRhLm9yZy9wcm9wL2RpcmVjdC9QMTg4OT4gPGh0dHA6Ly93d3cud2lraWRhdGEub3JnL2VudGl0eS9RMjAyOTA0Pj4-
+
+       console.log(TermConverter.fromBase64RdfStarTriple(data.subject.value));
+       // &lt;&lt;&lt;http://www.wikidata.org/entity/Q472> &lt;http://www.wikidata.org/prop/direct/P1889> &lt;http://www.wikidata.org/entity/Q202904>>>
+    });
+});
+</code></pre>
+<h3>License</h3>
+<p><a href="LICENSE">LICENSE</a></p></article>
+    </section>
+
+
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="AddStatementPayload.html">AddStatementPayload</a></li><li><a href="AppSettings.html">AppSettings</a></li><li><a href="AuthenticationService.html">AuthenticationService</a></li><li><a href="BaseRepositoryClient.html">BaseRepositoryClient</a></li><li><a href="ClientConfig.html">ClientConfig</a></li><li><a href="CommonUtils.html">CommonUtils</a></li><li><a href="ConsoleLogger.html">ConsoleLogger</a></li><li><a href="ContentParser.html">ContentParser</a></li><li><a href="DownloadService.html">DownloadService</a></li><li><a href="FileUtils.html">FileUtils</a></li><li><a href="GetQueryPayload.html">GetQueryPayload</a></li><li><a href="GetStatementsPayload.html">GetStatementsPayload</a></li><li><a href="GraphDBServerClient.html">GraphDBServerClient</a></li><li><a href="HttpClient.html">HttpClient</a></li><li><a href="HttpRequestBuilder.html">HttpRequestBuilder</a></li><li><a href="HttpResponse.html">HttpResponse</a></li><li><a href="Iterable.html">Iterable</a></li><li><a href="JsonLDParser.html">JsonLDParser</a></li><li><a href="LoggingUtils.html">LoggingUtils</a></li><li><a href="N3Parser.html">N3Parser</a></li><li><a href="Namespace.html">Namespace</a></li><li><a href="NamespaceService.html">NamespaceService</a></li><li><a href="NQuadsParser.html">NQuadsParser</a></li><li><a href="NTriplesParser.html">NTriplesParser</a></li><li><a href="PagedResponse.html">PagedResponse</a></li><li><a href="ParserRegistry.html">ParserRegistry</a></li><li><a href="QueryPayload.html">QueryPayload</a></li><li><a href="QueryService.html">QueryService</a></li><li><a href="RDFRepositoryClient.html">RDFRepositoryClient</a></li><li><a href="RDFXmlParser.html">RDFXmlParser</a></li><li><a href="RepositoryClientConfig.html">RepositoryClientConfig</a></li><li><a href="RepositoryConfig.html">RepositoryConfig</a></li><li><a href="RepositoryService.html">RepositoryService</a></li><li><a href="ResponseIterator.html">ResponseIterator</a></li><li><a href="ServerClient.html">ServerClient</a></li><li><a href="ServerClientConfig.html">ServerClientConfig</a></li><li><a href="Service.html">Service</a></li><li><a href="ServiceRequest.html">ServiceRequest</a></li><li><a href="SparqlJsonResultParser.html">SparqlJsonResultParser</a></li><li><a href="SparqlXmlResultParser.html">SparqlXmlResultParser</a></li><li><a href="StatementPayload.html">StatementPayload</a></li><li><a href="StatementsService.html">StatementsService</a></li><li><a href="StringUtils.html">StringUtils</a></li><li><a href="TermConverter.html">TermConverter</a></li><li><a href="TransactionalRepositoryClient.html">TransactionalRepositoryClient</a></li><li><a href="TransactionService.html">TransactionService</a></li><li><a href="TriGParser.html">TriGParser</a></li><li><a href="TurtleParser.html">TurtleParser</a></li><li><a href="UpdateQueryPayload.html">UpdateQueryPayload</a></li><li><a href="UploadService.html">UploadService</a></li><li><a href="User.html">User</a></li></ul><h3>Interfaces</h3><ul><li><a href="Logger.html">Logger</a></li></ul><h3>Global</h3><ul><li><a href="global.html#Authority">Authority</a></li><li><a href="global.html#MediaType">MediaType</a></li><li><a href="global.html#PATH_NAMESPACES">PATH_NAMESPACES</a></li><li><a href="global.html#PATH_SIZE">PATH_SIZE</a></li><li><a href="global.html#PATH_STATEMENTS">PATH_STATEMENTS</a></li><li><a href="global.html#PATH_TRANSACTIONS">PATH_TRANSACTIONS</a></li><li><a href="global.html#QueryContentType">QueryContentType</a></li><li><a href="global.html#QueryLanguage">QueryLanguage</a></li><li><a href="global.html#QueryType">QueryType</a></li><li><a href="global.html#RDFMimeType">RDFMimeType</a></li><li><a href="global.html#RepositoryType">RepositoryType</a></li><li><a href="global.html#RETRIABLE_STATUSES">RETRIABLE_STATUSES</a></li><li><a href="global.html#TransactionIsolationLevel">TransactionIsolationLevel</a></li><li><a href="global.html#XSD">XSD</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.6</a> on Thu Jan 07 2021 14:48:24 GMT+0000 (Coordinated Universal Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
