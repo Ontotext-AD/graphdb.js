@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: model/term-converter.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: model/term-converter.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>const N3 = require('n3');
+const {DataFactory} = N3;
+const {namedNode, literal, quad, blankNode, variable} = DataFactory;
+const StringUtils = require('../util/string-utils');
+const base64url = require('base64url');
+const ENCODED_RDFSTAR_TRIPLE_PREFIX = 'urn:rdf4j:triple:';
+
+/**
+ * Utility class for converting strings to terms, terms to quads and
+ * quads to string according to the {@link https://rdf.js.org} specification.
+ *
+ * @class
+ * @author Mihail Radkov
+ * @author Svilen Velikov
+ * @author Teodossi Dossev
+ */
+class TermConverter {
+  /**
+   * Convert the supplied params to a collection of quads.
+   *
+   * The produced quads size depends on the supplied amount of context.
+   *
+   * @public
+   * @static
+   * @param {string} subject the quad's subject
+   * @param {string} predicate the quad's predicate
+   * @param {string} object the quad's object
+   * @param {(string|string[])} [contexts] the quad's context
+   * @return {Quad[]} a collection of quads constructed from the provided params
+   */
+  static getQuads(subject, predicate, object, contexts) {
+    const objectTerm = TermConverter.toObject(object);
+    return TermConverter.toQuads(subject, predicate, objectTerm, contexts);
+  }
+
+  /**
+   * Convert the supplied params to a collection of quads.
+   *
+   * The quads object term will be a literal with a data type or a language.
+   *
+   * The produced quads size depends on the supplied amount of context.
+   *
+   * @public
+   * @static
+   * @param {string} subject the quad's subject
+   * @param {string} predicate the quad's predicate
+   * @param {string} object the quad's object
+   * @param {(string|string[])} [contexts] the quad's context
+   * @param {string} type the quad's data type
+   * @param {string} language the quad's literal language
+   * @return {Quad[]} a collection of quads constructed from the provided params
+   */
+  static getLiteralQuads(subject, predicate, object, contexts, type, language) {
+    let objectTerm;
+    if (language) {
+      objectTerm = TermConverter.toObjectWithLanguage(object, language);
+    } else {
+      objectTerm = TermConverter.toObjectWithDataType(object, type);
+    }
+    return TermConverter.toQuads(subject, predicate, objectTerm, contexts);
+  }
+
+  /**
+   * Convert the supplied params to terms and then to a collection of quads.
+   * The supplied object should already be converted to a term.
+   *
+   * The produced quads size depends on the supplied amount of context.
+   *
+   * @private
+   * @static
+   * @param {string} subject the quad's subject
+   * @param {string} predicate the quad's predicate
+   * @param {Term} objectTerm the quads object already converted to a Term
+   * @param {(string|string[])} contexts the quad's context
+   * @return {Quad[]} collection of quads constructed from the provided params
+   */
+  static toQuads(subject, predicate, objectTerm, contexts) {
+    const subjectTerm = TermConverter.toSubject(subject);
+    const predicateTerm = TermConverter.toPredicate(predicate);
+    const contextTerms = TermConverter.toGraphs(contexts);
+
+    if (contextTerms &amp;&amp; contextTerms.length) {
+      return contextTerms.map((graph) => quad(subjectTerm, predicateTerm,
+        objectTerm, graph));
+    }
+    return [quad(subjectTerm, predicateTerm, objectTerm)];
+  }
+
+  /**
+   * Serializes the provided collection of quads to Turtle format or Trig in
+   * case any of the quads have context.
+   *
+   * @public
+   * @static
+   * @param {Quad[]} quads the collection of quads to serialize to Turtle
+   * @return {string} a promise that will be resolved to Turtle or Trig
+   * text or rejected if the quads cannot be serialized
+   */
+  static toString(quads) {
+    const writer = TermConverter.getWriter();
+    writer.addQuads(quads);
+
+    let converted = '';
+    writer.end((error, result) => {
+      if (error) {
+        throw new Error(error);
+      } else {
+        converted = result.trim();
+      }
+    });
+    return converted;
+  }
+
+  /**
+   * Converts the provided value to N-Triple encoded value in case it is not
+   * already one or a literal value.
+   *
+   * For example:
+   * &lt;ul>
+   *   &lt;li>&lt;i>http://resource&lt;/i> encodes to &lt;i>&lt;http://resource>&lt;/i>&lt;/li>
+   *   &lt;li>&lt;i>"Literal title"@en&lt;/i> will not be encoded&lt;/li>
+   *   &lt;li>&lt;i>&lt;http://resource>&lt;/i> encodes to the same value&lt;/li>
+   * &lt;/ul>
+   *
+   * Empty or null values are ignored.
+   *
+   * @public
+   * @static
+   * @param {string} value the value for converting
+   * @return {string} the converted value to N-Triple
+   */
+  static toNTripleValue(value) {
+    if (StringUtils.isNotBlank(value)) {
+      if (value.startsWith('"')) {
+        // Do not convert literals
+        return value;
+      }
+      if (value.startsWith('&lt;')) {
+        // Value is probably already encoded as N-Triple
+        return value;
+      }
+      return `&lt;${value}>`;
+    }
+  }
+
+  /**
+   * Converts the provided values to N-Triple encoded values in case they are
+   * not already one or literal values.
+   *
+   * Empty or null values are ignored.
+   *
+   * @see {@link #toNTripleValue}
+
+   * @public
+   * @static
+   * @param {string|string[]} values the values for converting
+   * @return {string|string[]} the converted value or values to N-Triple
+   */
+  static toNTripleValues(values) {
+    if (values instanceof Array) {
+      return values
+        .filter((value) => StringUtils.isNotBlank(value))
+        .map((value) => TermConverter.toNTripleValue(value));
+    }
+    return TermConverter.toNTripleValue(values);
+  }
+
+  /**
+   * Converts the provided subject string to a specific Term based on the value.
+   *
+   * @private
+   * @param {string} value the subject to convert
+   * @return {BlankNode|Variable|NamedNode} the provided subject as Term
+   */
+  static toSubject(value) {
+    return TermConverter.toTerm(value);
+  }
+
+  /**
+   * Converts the provided predicate string to a specific Term based on the
+   * value.
+   *
+   * @private
+   * @param {string} value the predicate to convert
+   * @return {Variable|NamedNode} the provided predicate as Term
+   */
+  static toPredicate(value) {
+    if (TermConverter.isVariable(value)) {
+      return TermConverter.toVariable(value);
+    }
+    return namedNode(value);
+  }
+
+  /**
+   * Converts the provided object string to a specific Term based on the value.
+   *
+   * This is not handling literal strings. For that use
+   * {@link TermConverter#toObjectWithLanguage} or
+   * {@link TermConverter#toObjectWithDataType}
+   *
+   * @private
+   * @param {string} value the object to convert
+   * @return {BlankNode|Variable|NamedNode} the provided object as Term
+   */
+  static toObject(value) {
+    // Same as subject (when it is not literal)
+    return TermConverter.toSubject(value);
+  }
+
+  /**
+   * Converts the provided object and language to a Literal term.
+   *
+   * @private
+   * @param {string} object the value to convert
+   * @param {string} language the object's language
+   * @return {Literal} the provided object as Literal
+   */
+  static toObjectWithLanguage(object, language) {
+    return literal(object, language);
+  }
+
+  /**
+   * Converts the provided object and data type to a Literal term.
+   *
+   * @private
+   * @param {string} object the value to convert
+   * @param {string} dataType the object's type
+   * @return {Literal} the provided object as Literal
+   */
+  static toObjectWithDataType(object, dataType) {
+    return literal(object, namedNode(dataType));
+  }
+
+  /**
+   * Converts the provided context to a collection of Term.
+   *
+   * The produced terms size depends on the supplied amount of context.
+   *
+   * @private
+   * @param {string|string[]} [contexts] the contexts to convert
+   * @return {Term[]} the provided contexts as Terms
+   */
+  static toGraphs(contexts) {
+    if (!contexts || (contexts.length &amp;&amp; contexts.length &lt; 1)) {
+      return [];
+    }
+    // Convert to array
+    if (!(contexts instanceof Array)) {
+      contexts = [contexts];
+    }
+    // Convert to terms
+    return contexts.map((context) => TermConverter.toTerm(context));
+  }
+
+  /**
+   * Converts the provided string to a specific Term based on the value.
+   *
+   * &lt;ul>
+   *  &lt;li>If the string begins with &lt;code>_:&lt;/code> it will be converted to a
+   *  blank node term.&lt;/li>
+   *  &lt;li>If the string begins with &lt;code>?&lt;/code> it will be converted to a
+   *  variable term.&lt;/li>
+   *  &lt;li>Otherwise it will be converted a simple named node term.&lt;/li>
+   * &lt;/ul>
+   *
+   * @private
+   * @param {string} value the string to convert
+   * @return {BlankNode|Variable|NamedNode} the provided value as Term
+   */
+  static toTerm(value) {
+    if (TermConverter.isBlankNode(value)) {
+      // Trim leading _:
+      return blankNode(value.substring(2));
+    }
+    if (TermConverter.isVariable(value)) {
+      return TermConverter.toVariable(value);
+    }
+    return namedNode(value);
+  }
+
+  /**
+   * Returns a variable term from the provided value without leading ?
+   *
+   * @private
+   * @param {string} value the value to convert to variable
+   * @return {Variable} the produced variable
+   */
+  static toVariable(value) {
+    // Trim leading ?
+    return variable(value.substring(1));
+  }
+
+  /**
+   * Checks if the provided value is a blank node.
+   *
+   * Blank nodes are such values that start with &lt;code>_:&lt;/code> prefix
+   *
+   * @private
+   * @param {string} value the value to check
+   * @return {boolean} &lt;code>true&lt;/code> if the value is a blank node
+   *                    or &lt;code>false&lt;/code> otherwise
+   */
+  static isBlankNode(value) {
+    return value.startsWith('_:');
+  }
+
+  /**
+   * Checks if the provided value is a variable.
+   *
+   * Variables are such values that start with &lt;code>?&lt;/code> prefix
+   *
+   * @private
+   * @param {string} value the value to check
+   * @return {boolean} &lt;code>true&lt;/code> if the value is a variable
+   *                    or &lt;code>false&lt;/code> otherwise
+   */
+  static isVariable(value) {
+    return value.startsWith('?');
+  }
+
+  /**
+   * Instantiates new N3 writer for quads.
+   *
+   * This writer is not reusable, after invoking &lt;code>end()&lt;/code> it won't
+   * allow further quads insertions.
+   *
+   * @private
+   * @return {N3.Writer} new writer for quads
+   */
+  static getWriter() {
+    return new N3.Writer();
+  }
+
+  /**
+   * Decodes from Base64 encoded RDFStar triple.
+   *
+   * @param {string} encodedTriple to be decoded from base64 url string
+   * @return {string} decoded RDFStar triple, returns unchanged if the provided
+   * triple is not in the expected format
+   */
+  static fromBase64RdfStarTriple(encodedTriple) {
+    if (encodedTriple.startsWith(ENCODED_RDFSTAR_TRIPLE_PREFIX)) {
+      return base64url
+        .decode(encodedTriple.slice(ENCODED_RDFSTAR_TRIPLE_PREFIX.length));
+    }
+    return encodedTriple;
+  }
+
+  /**
+   * Encodes RDFStarTriple to Base64 string.
+   *
+   * @param {string} triple to be encoded as base64 url string
+   * @return {string} encoded RDFStart triple, returns unchanged if the provided
+   * triple is not in the expected format
+   */
+  static toBase64RdfStarTriple(triple) {
+    if (triple.startsWith('&lt;&lt;') &amp;&amp; triple.endsWith('>>')) {
+      return ENCODED_RDFSTAR_TRIPLE_PREFIX + base64url.encode(triple);
+    }
+    return triple;
+  }
+}
+
+module.exports = TermConverter;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="AddStatementPayload.html">AddStatementPayload</a></li><li><a href="AppSettings.html">AppSettings</a></li><li><a href="AuthenticationService.html">AuthenticationService</a></li><li><a href="BaseRepositoryClient.html">BaseRepositoryClient</a></li><li><a href="ClientConfig.html">ClientConfig</a></li><li><a href="CommonUtils.html">CommonUtils</a></li><li><a href="ConsoleLogger.html">ConsoleLogger</a></li><li><a href="ContentParser.html">ContentParser</a></li><li><a href="DownloadService.html">DownloadService</a></li><li><a href="FileUtils.html">FileUtils</a></li><li><a href="GetQueryPayload.html">GetQueryPayload</a></li><li><a href="GetStatementsPayload.html">GetStatementsPayload</a></li><li><a href="GraphDBServerClient.html">GraphDBServerClient</a></li><li><a href="HttpClient.html">HttpClient</a></li><li><a href="HttpRequestBuilder.html">HttpRequestBuilder</a></li><li><a href="HttpResponse.html">HttpResponse</a></li><li><a href="Iterable.html">Iterable</a></li><li><a href="JsonLDParser.html">JsonLDParser</a></li><li><a href="LoggingUtils.html">LoggingUtils</a></li><li><a href="N3Parser.html">N3Parser</a></li><li><a href="Namespace.html">Namespace</a></li><li><a href="NamespaceService.html">NamespaceService</a></li><li><a href="NQuadsParser.html">NQuadsParser</a></li><li><a href="NTriplesParser.html">NTriplesParser</a></li><li><a href="PagedResponse.html">PagedResponse</a></li><li><a href="ParserRegistry.html">ParserRegistry</a></li><li><a href="QueryPayload.html">QueryPayload</a></li><li><a href="QueryService.html">QueryService</a></li><li><a href="RDFRepositoryClient.html">RDFRepositoryClient</a></li><li><a href="RDFXmlParser.html">RDFXmlParser</a></li><li><a href="RepositoryClientConfig.html">RepositoryClientConfig</a></li><li><a href="RepositoryConfig.html">RepositoryConfig</a></li><li><a href="RepositoryService.html">RepositoryService</a></li><li><a href="ResponseIterator.html">ResponseIterator</a></li><li><a href="ServerClient.html">ServerClient</a></li><li><a href="ServerClientConfig.html">ServerClientConfig</a></li><li><a href="Service.html">Service</a></li><li><a href="ServiceRequest.html">ServiceRequest</a></li><li><a href="SparqlJsonResultParser.html">SparqlJsonResultParser</a></li><li><a href="SparqlXmlResultParser.html">SparqlXmlResultParser</a></li><li><a href="StatementPayload.html">StatementPayload</a></li><li><a href="StatementsService.html">StatementsService</a></li><li><a href="StringUtils.html">StringUtils</a></li><li><a href="TermConverter.html">TermConverter</a></li><li><a href="TransactionalRepositoryClient.html">TransactionalRepositoryClient</a></li><li><a href="TransactionService.html">TransactionService</a></li><li><a href="TriGParser.html">TriGParser</a></li><li><a href="TurtleParser.html">TurtleParser</a></li><li><a href="UpdateQueryPayload.html">UpdateQueryPayload</a></li><li><a href="UploadService.html">UploadService</a></li><li><a href="User.html">User</a></li></ul><h3>Interfaces</h3><ul><li><a href="Logger.html">Logger</a></li></ul><h3>Global</h3><ul><li><a href="global.html#Authority">Authority</a></li><li><a href="global.html#MediaType">MediaType</a></li><li><a href="global.html#PATH_NAMESPACES">PATH_NAMESPACES</a></li><li><a href="global.html#PATH_SIZE">PATH_SIZE</a></li><li><a href="global.html#PATH_STATEMENTS">PATH_STATEMENTS</a></li><li><a href="global.html#PATH_TRANSACTIONS">PATH_TRANSACTIONS</a></li><li><a href="global.html#QueryContentType">QueryContentType</a></li><li><a href="global.html#QueryLanguage">QueryLanguage</a></li><li><a href="global.html#QueryType">QueryType</a></li><li><a href="global.html#RDFMimeType">RDFMimeType</a></li><li><a href="global.html#RepositoryType">RepositoryType</a></li><li><a href="global.html#RETRIABLE_STATUSES">RETRIABLE_STATUSES</a></li><li><a href="global.html#TransactionIsolationLevel">TransactionIsolationLevel</a></li><li><a href="global.html#XSD">XSD</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.6</a> on Fri Jan 08 2021 17:42:28 GMT+0200 (Eastern European Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
