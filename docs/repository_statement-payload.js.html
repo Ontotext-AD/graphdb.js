@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: repository/statement-payload.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: repository/statement-payload.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * Abstract class for constructing a statement payload consisted of:
+ * &lt;ul>
+ *  &lt;li>subject&lt;/li>
+ *  &lt;li>predicate&lt;/li>
+ *  &lt;li>object&lt;/li>
+ *  &lt;li>context or contexts&lt;/li>
+ * &lt;/ul>
+ *
+ * @class
+ * @abstract
+ * @author Mihail Radkov
+ * @author Svilen Velikov
+ */
+class StatementPayload {
+  /**
+   * Instantiates new statement payload.
+   */
+  constructor() {
+    this.payload = {};
+  }
+
+  /**
+   * @param {string} [subject]
+   * @return {StatementPayload}
+   */
+  setSubject(subject) {
+    this.payload.subject = subject;
+    return this;
+  }
+
+  /**
+   * @return {string} subject
+   */
+  getSubject() {
+    return this.payload.subject;
+  }
+
+  /**
+   * @param {string} [predicate]
+   * @return {StatementPayload}
+   */
+  setPredicate(predicate) {
+    this.payload.predicate = predicate;
+    return this;
+  }
+
+  /**
+   * @return {string} predicate
+   */
+  getPredicate() {
+    return this.payload.predicate;
+  }
+
+  /**
+   * @param {string} [object]
+   * @return {StatementPayload}
+   */
+  setObject(object) {
+    this.payload.object = object;
+    return this;
+  }
+
+  /**
+   * @return {string} object
+   */
+  getObject() {
+    return this.payload.object;
+  }
+
+  /**
+   * @param {(string|string[])} [context]
+   * @return {StatementPayload}
+   */
+  setContext(context) {
+    this.payload.context = context;
+    return this;
+  }
+
+  /**
+   * @return {string} context
+   */
+  getContext() {
+    return this.payload.context;
+  }
+
+  /**
+   * Get the payload object.
+   * @return {Object}
+   */
+  get() {
+    return this.payload;
+  }
+}
+
+module.exports = StatementPayload;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="AddStatementPayload.html">AddStatementPayload</a></li><li><a href="AppSettings.html">AppSettings</a></li><li><a href="AuthenticationService.html">AuthenticationService</a></li><li><a href="BaseRepositoryClient.html">BaseRepositoryClient</a></li><li><a href="ClientConfig.html">ClientConfig</a></li><li><a href="CommonUtils.html">CommonUtils</a></li><li><a href="ConsoleLogger.html">ConsoleLogger</a></li><li><a href="ContentParser.html">ContentParser</a></li><li><a href="DownloadService.html">DownloadService</a></li><li><a href="FileUtils.html">FileUtils</a></li><li><a href="GetQueryPayload.html">GetQueryPayload</a></li><li><a href="GetStatementsPayload.html">GetStatementsPayload</a></li><li><a href="GraphDBServerClient.html">GraphDBServerClient</a></li><li><a href="HttpClient.html">HttpClient</a></li><li><a href="HttpRequestBuilder.html">HttpRequestBuilder</a></li><li><a href="HttpResponse.html">HttpResponse</a></li><li><a href="Iterable.html">Iterable</a></li><li><a href="JsonLDParser.html">JsonLDParser</a></li><li><a href="LoggingUtils.html">LoggingUtils</a></li><li><a href="N3Parser.html">N3Parser</a></li><li><a href="Namespace.html">Namespace</a></li><li><a href="NamespaceService.html">NamespaceService</a></li><li><a href="NQuadsParser.html">NQuadsParser</a></li><li><a href="NTriplesParser.html">NTriplesParser</a></li><li><a href="PagedResponse.html">PagedResponse</a></li><li><a href="ParserRegistry.html">ParserRegistry</a></li><li><a href="QueryPayload.html">QueryPayload</a></li><li><a href="QueryService.html">QueryService</a></li><li><a href="RDFRepositoryClient.html">RDFRepositoryClient</a></li><li><a href="RDFXmlParser.html">RDFXmlParser</a></li><li><a href="RepositoryClientConfig.html">RepositoryClientConfig</a></li><li><a href="RepositoryConfig.html">RepositoryConfig</a></li><li><a href="RepositoryService.html">RepositoryService</a></li><li><a href="ResponseIterator.html">ResponseIterator</a></li><li><a href="ServerClient.html">ServerClient</a></li><li><a href="ServerClientConfig.html">ServerClientConfig</a></li><li><a href="Service.html">Service</a></li><li><a href="ServiceRequest.html">ServiceRequest</a></li><li><a href="SparqlJsonResultParser.html">SparqlJsonResultParser</a></li><li><a href="SparqlXmlResultParser.html">SparqlXmlResultParser</a></li><li><a href="StatementPayload.html">StatementPayload</a></li><li><a href="StatementsService.html">StatementsService</a></li><li><a href="StringUtils.html">StringUtils</a></li><li><a href="TermConverter.html">TermConverter</a></li><li><a href="TransactionalRepositoryClient.html">TransactionalRepositoryClient</a></li><li><a href="TransactionService.html">TransactionService</a></li><li><a href="TriGParser.html">TriGParser</a></li><li><a href="TurtleParser.html">TurtleParser</a></li><li><a href="UpdateQueryPayload.html">UpdateQueryPayload</a></li><li><a href="UploadService.html">UploadService</a></li><li><a href="User.html">User</a></li></ul><h3>Interfaces</h3><ul><li><a href="Logger.html">Logger</a></li></ul><h3>Global</h3><ul><li><a href="global.html#Authority">Authority</a></li><li><a href="global.html#MediaType">MediaType</a></li><li><a href="global.html#PATH_NAMESPACES">PATH_NAMESPACES</a></li><li><a href="global.html#PATH_SIZE">PATH_SIZE</a></li><li><a href="global.html#PATH_STATEMENTS">PATH_STATEMENTS</a></li><li><a href="global.html#PATH_TRANSACTIONS">PATH_TRANSACTIONS</a></li><li><a href="global.html#QueryContentType">QueryContentType</a></li><li><a href="global.html#QueryLanguage">QueryLanguage</a></li><li><a href="global.html#QueryType">QueryType</a></li><li><a href="global.html#RDFMimeType">RDFMimeType</a></li><li><a href="global.html#RepositoryType">RepositoryType</a></li><li><a href="global.html#RETRIABLE_STATUSES">RETRIABLE_STATUSES</a></li><li><a href="global.html#TransactionIsolationLevel">TransactionIsolationLevel</a></li><li><a href="global.html#XSD">XSD</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.6</a> on Fri Jan 08 2021 17:28:15 GMT+0200 (Eastern European Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

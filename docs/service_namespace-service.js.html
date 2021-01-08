@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: service/namespace-service.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: service/namespace-service.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>const Service = require('./service');
+const HttpRequestBuilder = require('../http/http-request-builder');
+const ServiceRequest = require('./service-request');
+const PATH_NAMESPACES = require('./service-paths').PATH_NAMESPACES;
+
+const RDFMimeType = require('../http/rdf-mime-type');
+const Namespace = require('../model/namespace');
+
+const LoggingUtils = require('../logging/logging-utils');
+const StringUtils = require('../util/string-utils');
+
+const DataFactory = require('n3').DataFactory;
+
+/**
+ * Service for namespace management.
+ *
+ * @author Mihail Radkov
+ * @author Svilen Velikov
+ */
+class NamespaceService extends Service {
+  /**
+   * Retrieves all present namespaces as a collection of {@link Namespace}.
+   *
+   * @return {ServiceRequest} a service request resolving to a collection of
+   * {@link Namespace}
+   */
+  getNamespaces() {
+    const requestBuilder = HttpRequestBuilder.httpGet(PATH_NAMESPACES)
+      .addAcceptHeader(RDFMimeType.SPARQL_RESULTS_JSON);
+
+    return new ServiceRequest(requestBuilder, () => {
+      return this.httpRequestExecutor(requestBuilder).then((response) => {
+        this.logger.debug(LoggingUtils.getLogPayload(response),
+          'Fetched namespaces');
+        return this.mapNamespaceResponse(response.getData());
+      });
+    });
+  }
+
+  /**
+   * Maps the response data from the namespaces request into {@link Namespace}.
+   *
+   * @private
+   *
+   * @param {object} responseData the data to map
+   *
+   * @return {Namespace[]} the mapped namespaces
+   */
+  mapNamespaceResponse(responseData) {
+    return responseData.results.bindings.map((binding) => {
+      const prefix = binding.prefix.value;
+      const namespace = DataFactory.namedNode(binding.namespace.value);
+      return new Namespace(prefix, namespace);
+    });
+  }
+
+  /**
+   * Retrieves the namespace for the given prefix as {@link NamedNode}.
+   *
+   * For example if &lt;code>rdfs&lt;/code> is provided as prefix that would result in
+   * a {@link NamedNode} corresponding to following namespace:
+   * &lt;code>http://www.w3.org/2000/01/rdf-schema#&lt;/code>
+   *
+   * Note: This method should be invoked only with prefixes. Anything else would
+   * result in an error from the server.
+   *
+   * @param {string} prefix prefix of the namespace to be retrieved
+   *
+   * @return {ServiceRequest} service request resolving to {@link NamedNode}
+   *
+   * @throws {Error} if the prefix parameter is not supplied
+   */
+  getNamespace(prefix) {
+    if (StringUtils.isBlank(prefix)) {
+      throw new Error('Parameter prefix is required!');
+    }
+
+    const namespaceUrl = `${PATH_NAMESPACES}/${prefix}`;
+    const requestBuilder = HttpRequestBuilder.httpGet(namespaceUrl);
+
+    return new ServiceRequest(requestBuilder, () => {
+      return this.httpRequestExecutor(requestBuilder).then((response) => {
+        this.logger.debug(LoggingUtils.getLogPayload(response, {prefix}),
+          'Fetched namespace');
+
+        return DataFactory.namedNode(response.getData());
+      });
+    });
+  }
+
+  /**
+   * Creates or updates the namespace for the given prefix.
+   *
+   * If the provided prefix or namespace parameter is not a string or
+   * {@link NamedNode} then the method will throw an error.
+   *
+   * @param {string} prefix prefix of the namespace to be created/updated
+   * @param {string|NamedNode} namespace the namespace to be created/updated
+   *
+   * @return {ServiceRequest} service request that will be resolved if the
+   * create/update request is successful
+   *
+   * @throws {Error} if the prefix or namespace parameter are not provided
+   */
+  saveNamespace(prefix, namespace) {
+    if (StringUtils.isBlank(prefix)) {
+      throw new Error('Parameter prefix is required!');
+    }
+
+    let payload = namespace;
+    if (namespace.termType &amp;&amp; namespace.termType === 'NamedNode') {
+      payload = namespace.value;
+    } else if (StringUtils.isBlank(namespace)) {
+      throw new Error('Parameter namespace is required!');
+    }
+
+    const requestBuilder = HttpRequestBuilder
+      .httpPut(`${PATH_NAMESPACES}/${prefix}`)
+      .setData(payload);
+
+    return new ServiceRequest(requestBuilder, () => {
+      return this.httpRequestExecutor(requestBuilder).then((response) => {
+        this.logger.debug(LoggingUtils.getLogPayload(response,
+          {prefix, namespace}), 'Saved namespace');
+      });
+    });
+  }
+
+  /**
+   * Deletes a namespace that corresponds to the given prefix.
+   *
+   * For example if &lt;code>rdfs&lt;/code> is provided as prefix that would delete
+   * the following namespace: &lt;code>http://www.w3.org/2000/01/rdf-schema#&lt;/code>
+   *
+   * Note: This method should be invoked only with prefixes. Anything else would
+   * result in an error from the server.
+   *
+   * @param {string} prefix prefix of the namespace to be deleted
+   *
+   * @return {Promise&lt;void>} promise that will be resolved if the deletion is
+   * successful
+   *
+   * @throws {Error} if the prefix parameter is not provided
+   */
+  deleteNamespace(prefix) {
+    if (StringUtils.isBlank(prefix)) {
+      throw new Error('Parameter prefix is required!');
+    }
+
+    const requestBuilder = HttpRequestBuilder
+      .httpDelete(`${PATH_NAMESPACES}/${prefix}`);
+
+    return new ServiceRequest(requestBuilder, () => {
+      return this.httpRequestExecutor(requestBuilder).then((response) => {
+        this.logger.debug(LoggingUtils.getLogPayload(response, {prefix}),
+          'Deleted namespace');
+      });
+    });
+  }
+
+  /**
+   * Deletes all namespace declarations in the repository.
+   *
+   * @return {Promise&lt;void>} promise that will be resolved after
+   * successful deletion
+   */
+  deleteNamespaces() {
+    const requestBuilder = HttpRequestBuilder.httpDelete(PATH_NAMESPACES);
+
+    return new ServiceRequest(requestBuilder, () => {
+      return this.httpRequestExecutor(requestBuilder).then((response) => {
+        this.logger.debug(LoggingUtils.getLogPayload(response),
+          'Deleted all namespaces');
+      });
+    });
+  }
+
+  /**
+   * @inheritDoc
+   */
+  getServiceName() {
+    return 'NamespaceService';
+  }
+}
+
+module.exports = NamespaceService;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="AddStatementPayload.html">AddStatementPayload</a></li><li><a href="AppSettings.html">AppSettings</a></li><li><a href="AuthenticationService.html">AuthenticationService</a></li><li><a href="BaseRepositoryClient.html">BaseRepositoryClient</a></li><li><a href="ClientConfig.html">ClientConfig</a></li><li><a href="CommonUtils.html">CommonUtils</a></li><li><a href="ConsoleLogger.html">ConsoleLogger</a></li><li><a href="ContentParser.html">ContentParser</a></li><li><a href="DownloadService.html">DownloadService</a></li><li><a href="FileUtils.html">FileUtils</a></li><li><a href="GetQueryPayload.html">GetQueryPayload</a></li><li><a href="GetStatementsPayload.html">GetStatementsPayload</a></li><li><a href="GraphDBServerClient.html">GraphDBServerClient</a></li><li><a href="HttpClient.html">HttpClient</a></li><li><a href="HttpRequestBuilder.html">HttpRequestBuilder</a></li><li><a href="HttpResponse.html">HttpResponse</a></li><li><a href="Iterable.html">Iterable</a></li><li><a href="JsonLDParser.html">JsonLDParser</a></li><li><a href="LoggingUtils.html">LoggingUtils</a></li><li><a href="N3Parser.html">N3Parser</a></li><li><a href="Namespace.html">Namespace</a></li><li><a href="NamespaceService.html">NamespaceService</a></li><li><a href="NQuadsParser.html">NQuadsParser</a></li><li><a href="NTriplesParser.html">NTriplesParser</a></li><li><a href="PagedResponse.html">PagedResponse</a></li><li><a href="ParserRegistry.html">ParserRegistry</a></li><li><a href="QueryPayload.html">QueryPayload</a></li><li><a href="QueryService.html">QueryService</a></li><li><a href="RDFRepositoryClient.html">RDFRepositoryClient</a></li><li><a href="RDFXmlParser.html">RDFXmlParser</a></li><li><a href="RepositoryClientConfig.html">RepositoryClientConfig</a></li><li><a href="RepositoryConfig.html">RepositoryConfig</a></li><li><a href="RepositoryService.html">RepositoryService</a></li><li><a href="ResponseIterator.html">ResponseIterator</a></li><li><a href="ServerClient.html">ServerClient</a></li><li><a href="ServerClientConfig.html">ServerClientConfig</a></li><li><a href="Service.html">Service</a></li><li><a href="ServiceRequest.html">ServiceRequest</a></li><li><a href="SparqlJsonResultParser.html">SparqlJsonResultParser</a></li><li><a href="SparqlXmlResultParser.html">SparqlXmlResultParser</a></li><li><a href="StatementPayload.html">StatementPayload</a></li><li><a href="StatementsService.html">StatementsService</a></li><li><a href="StringUtils.html">StringUtils</a></li><li><a href="TermConverter.html">TermConverter</a></li><li><a href="TransactionalRepositoryClient.html">TransactionalRepositoryClient</a></li><li><a href="TransactionService.html">TransactionService</a></li><li><a href="TriGParser.html">TriGParser</a></li><li><a href="TurtleParser.html">TurtleParser</a></li><li><a href="UpdateQueryPayload.html">UpdateQueryPayload</a></li><li><a href="UploadService.html">UploadService</a></li><li><a href="User.html">User</a></li></ul><h3>Interfaces</h3><ul><li><a href="Logger.html">Logger</a></li></ul><h3>Global</h3><ul><li><a href="global.html#Authority">Authority</a></li><li><a href="global.html#MediaType">MediaType</a></li><li><a href="global.html#PATH_NAMESPACES">PATH_NAMESPACES</a></li><li><a href="global.html#PATH_SIZE">PATH_SIZE</a></li><li><a href="global.html#PATH_STATEMENTS">PATH_STATEMENTS</a></li><li><a href="global.html#PATH_TRANSACTIONS">PATH_TRANSACTIONS</a></li><li><a href="global.html#QueryContentType">QueryContentType</a></li><li><a href="global.html#QueryLanguage">QueryLanguage</a></li><li><a href="global.html#QueryType">QueryType</a></li><li><a href="global.html#RDFMimeType">RDFMimeType</a></li><li><a href="global.html#RepositoryType">RepositoryType</a></li><li><a href="global.html#RETRIABLE_STATUSES">RETRIABLE_STATUSES</a></li><li><a href="global.html#TransactionIsolationLevel">TransactionIsolationLevel</a></li><li><a href="global.html#XSD">XSD</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.6</a> on Fri Jan 08 2021 17:28:15 GMT+0200 (Eastern European Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
