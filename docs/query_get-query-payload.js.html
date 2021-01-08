@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: query/get-query-payload.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: query/get-query-payload.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>const QueryPayload = require('../query/query-payload');
+const QueryType = require('../query/query-type');
+const QueryLanguage = require('../query/query-language');
+const RDFMimeType = require('../http/rdf-mime-type');
+const QueryContentType = require('../http/query-content-type');
+
+const SELECT_QUERY_RESULT_TYPES = [
+  RDFMimeType.SPARQL_RESULTS_XML,
+  RDFMimeType.SPARQL_RESULTS_JSON,
+  RDFMimeType.BINARY_RDF_RESULTS_TABLE,
+  RDFMimeType.BOOLEAN_RESULT,
+  RDFMimeType.SPARQL_STAR_RESULTS_JSON,
+  RDFMimeType.SPARQL_STAR_RESULTS_TSV
+];
+
+const ASK_QUERY_RESULT_TYPES = [
+  RDFMimeType.SPARQL_RESULTS_XML,
+  RDFMimeType.SPARQL_RESULTS_JSON,
+  RDFMimeType.BOOLEAN_RESULT
+];
+
+const RDF_FORMATS = [
+  RDFMimeType.RDF_XML,
+  RDFMimeType.N_TRIPLES,
+  RDFMimeType.TURTLE,
+  RDFMimeType.N3,
+  RDFMimeType.N_QUADS,
+  RDFMimeType.JSON_LD,
+  RDFMimeType.RDF_JSON,
+  RDFMimeType.TRIX,
+  RDFMimeType.TRIG,
+  RDFMimeType.BINARY_RDF,
+  RDFMimeType.TURTLE_STAR,
+  RDFMimeType.TRIG_STAR
+];
+
+const QUERY_OPERATION_TYPES = [
+  QueryContentType.X_WWW_FORM_URLENCODED,
+  QueryContentType.SPARQL_QUERY
+];
+
+const QUERY_TO_RESPONSE_TYPE_FORMATS_MAPPING = {
+  SELECT: SELECT_QUERY_RESULT_TYPES,
+  DESCRIBE: RDF_FORMATS,
+  CONSTRUCT: RDF_FORMATS,
+  ASK: ASK_QUERY_RESULT_TYPES
+};
+
+/**
+ * Payload object holding common request parameters applicable for the query
+ * endpoint.
+ *
+ * Mandatory parameters are: query, queryType and responseType. Validation on
+ * parameters is executed when &lt;code>QueryPayload.getParams()&lt;/code> is invoked.
+ *
+ * Content type parameter which is used for setting the Content-Type http header
+ * is optional and by default
+ * &lt;code>application/x-www-form-urlencoded&lt;/code> type is set.
+ *
+ * @class
+ * @author Mihail Radkov
+ * @author Svilen Velikov
+ */
+class GetQueryPayload extends QueryPayload {
+  /**
+   * Does basic initialization.
+   */
+  constructor() {
+    super();
+    this.contentType = QueryContentType.X_WWW_FORM_URLENCODED;
+  }
+
+  /**
+   * @param {string} query The query as string to be evaluated.
+   * @return {UpdateQueryPayload}
+   * @throws {Error} if the query is not a string
+   */
+  setQuery(query) {
+    if (typeof query !== 'string') {
+      throw new Error('Query must be a string!');
+    }
+
+    this.payload.query = query;
+    return this;
+  }
+
+  /**
+   * @return {string} a query which was populated in the payload.
+   */
+  getQuery() {
+    return this.payload.query;
+  }
+
+  /**
+   * @param {string} [queryLn] the query language that is used for the query.
+   * @return {GetQueryPayload}
+   * @throws {Error} if the query language is not one of {@link QueryLanguage}
+   */
+  setQueryLn(queryLn) {
+    const supportedLanguages = Object.values(QueryLanguage);
+    if (typeof queryLn !== 'string' ||
+      supportedLanguages.indexOf(queryLn) === -1) {
+      throw new Error(`Query language must be one of ${supportedLanguages}!`);
+    }
+
+    this.payload.queryLn = queryLn;
+    return this;
+  }
+
+  /**
+   * Populates an optional $key:value binding in the payload. Existing bindings
+   * will be overridden.
+   *
+   * @param {string} [binding] A variable binding name which may appear in the
+   *                 query and can be bound to a specific value provided outside
+   *                 of the actual query.
+   * @param {string} [value] A variable's binding value. See the binding comment
+   * @return {GetQueryPayload}
+   * @throws {Error} if the binding or the value is not a string
+   */
+  addBinding(binding, value) {
+    if (typeof binding !== 'string' || typeof value !== 'string') {
+      throw new Error('Binding and value must be strings!');
+    }
+
+    this.payload[binding] = value;
+    return this;
+  }
+
+  /**
+   * @param {boolean} [distinct] Specifies if only distinct query solutions
+   *                  should be returned.
+   * @return {GetQueryPayload}
+   * @throws {Error} if the parameter is not a boolean
+   */
+  setDistinct(distinct) {
+    if (typeof distinct !== 'boolean') {
+      throw new Error('Distinct must be a boolean!');
+    }
+
+    this.payload.distinct = distinct;
+    return this;
+  }
+
+  /**
+   * @param {number} limit specifies the maximum number of query solutions to
+   *                 return.
+   * @return {GetQueryPayload}
+   * @throws {Error} if the limit is not a non negative number
+   */
+  setLimit(limit) {
+    if (typeof limit !== 'number' || limit &lt; 0) {
+      throw new Error('Limit must be a non negative number!');
+    }
+
+    this.payload.limit = limit;
+    return this;
+  }
+
+  /**
+   * @param {number} [offset] Specifies the number of query solutions to skip.
+   * @return {GetQueryPayload}
+   * @throws {Error} if the offset is not a non negative number
+   */
+  setOffset(offset) {
+    if (typeof offset !== 'number' || offset &lt; 0) {
+      throw new Error('Offset must be a non negative number!');
+    }
+
+    this.payload.offset = offset;
+    return this;
+  }
+
+  /**
+   * @inheritDoc
+   * @throws {Error} if the validation does not pass
+   */
+  validateParams() {
+    if (!this.payload.query) {
+      throw new Error('Parameter query is mandatory!');
+    }
+    if (!this.getQueryType()) {
+      throw new Error('Parameter queryType is mandatory!');
+    }
+    if (!this.getResponseType()) {
+      throw new Error('Parameter responseType is mandatory!');
+    }
+
+    const responseType = this.getResponseType();
+
+    const allowedFormats =
+      QUERY_TO_RESPONSE_TYPE_FORMATS_MAPPING[this.getQueryType()];
+
+    if (!this.isResponseTypeSupported(responseType, allowedFormats)) {
+      throw new Error(`Invalid responseType=${responseType}
+      for ${this.getQueryType()} query! Must be one of ${allowedFormats}`);
+    }
+
+    return true;
+  }
+
+  /**
+   * Verifies that responseType is one of the expected types.
+   *
+   * @private
+   * @param {string} responseType
+   * @param {Array&lt;string>} formats
+   * @return {boolean} true if responseType is one of the expected types and
+   * false otherwise.
+   */
+  isResponseTypeSupported(responseType, formats) {
+    return formats.indexOf(responseType) !== -1;
+  }
+
+  // -----------------------------------------------------
+  // Configuration properties get/set methods follow below
+  // -----------------------------------------------------
+
+  /**
+   * A mandatory parameter which is used for resolving the Accept http header
+   * required by the RDF store.
+   *
+   * @param {string} responseType
+   * @return {GetQueryPayload}
+   * @throws {Error} if the response type is not one of {@link RDFMimeType}
+   */
+  setResponseType(responseType) {
+    const supportedTypes = Object.values(RDFMimeType);
+    if (typeof responseType !== 'string' ||
+      supportedTypes.indexOf(responseType) === -1) {
+      throw new Error(`Response type must be one of ${supportedTypes}!`);
+    }
+
+    this.responseType = responseType;
+    return this;
+  }
+
+  /**
+   * @return {string} response type which was populated in this payload.
+   */
+  getResponseType() {
+    return this.responseType;
+  }
+
+  /**
+   * A mandatory parameter used for resolving request headers and resolving
+   * the response parsers.
+   *
+   * @param {QueryType} queryType
+   * @return {GetQueryPayload}
+   * @throws {Error} if the query type is not one of {@link QueryType}
+   */
+  setQueryType(queryType) {
+    const supportedTypes = Object.values(QueryType);
+    if (typeof queryType !== 'string' ||
+      supportedTypes.indexOf(queryType) === -1) {
+      throw new Error(`Query type must be one of ${supportedTypes}!`);
+    }
+
+    this.queryType = queryType;
+    return this;
+  }
+
+  /**
+   * @return {string} query type which was populated in this payload. The value
+   * is one of the {@link QueryType} enum values.
+   */
+  getQueryType() {
+    return this.queryType;
+  }
+
+  /**
+   * @inheritDoc
+   */
+  getSupportedContentTypes() {
+    return QUERY_OPERATION_TYPES;
+  }
+}
+
+module.exports = GetQueryPayload;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="AddStatementPayload.html">AddStatementPayload</a></li><li><a href="AppSettings.html">AppSettings</a></li><li><a href="AuthenticationService.html">AuthenticationService</a></li><li><a href="BaseRepositoryClient.html">BaseRepositoryClient</a></li><li><a href="ClientConfig.html">ClientConfig</a></li><li><a href="CommonUtils.html">CommonUtils</a></li><li><a href="ConsoleLogger.html">ConsoleLogger</a></li><li><a href="ContentParser.html">ContentParser</a></li><li><a href="DownloadService.html">DownloadService</a></li><li><a href="FileUtils.html">FileUtils</a></li><li><a href="GetQueryPayload.html">GetQueryPayload</a></li><li><a href="GetStatementsPayload.html">GetStatementsPayload</a></li><li><a href="GraphDBServerClient.html">GraphDBServerClient</a></li><li><a href="HttpClient.html">HttpClient</a></li><li><a href="HttpRequestBuilder.html">HttpRequestBuilder</a></li><li><a href="HttpResponse.html">HttpResponse</a></li><li><a href="Iterable.html">Iterable</a></li><li><a href="JsonLDParser.html">JsonLDParser</a></li><li><a href="LoggingUtils.html">LoggingUtils</a></li><li><a href="N3Parser.html">N3Parser</a></li><li><a href="Namespace.html">Namespace</a></li><li><a href="NamespaceService.html">NamespaceService</a></li><li><a href="NQuadsParser.html">NQuadsParser</a></li><li><a href="NTriplesParser.html">NTriplesParser</a></li><li><a href="PagedResponse.html">PagedResponse</a></li><li><a href="ParserRegistry.html">ParserRegistry</a></li><li><a href="QueryPayload.html">QueryPayload</a></li><li><a href="QueryService.html">QueryService</a></li><li><a href="RDFRepositoryClient.html">RDFRepositoryClient</a></li><li><a href="RDFXmlParser.html">RDFXmlParser</a></li><li><a href="RepositoryClientConfig.html">RepositoryClientConfig</a></li><li><a href="RepositoryConfig.html">RepositoryConfig</a></li><li><a href="RepositoryService.html">RepositoryService</a></li><li><a href="ResponseIterator.html">ResponseIterator</a></li><li><a href="ServerClient.html">ServerClient</a></li><li><a href="ServerClientConfig.html">ServerClientConfig</a></li><li><a href="Service.html">Service</a></li><li><a href="ServiceRequest.html">ServiceRequest</a></li><li><a href="SparqlJsonResultParser.html">SparqlJsonResultParser</a></li><li><a href="SparqlXmlResultParser.html">SparqlXmlResultParser</a></li><li><a href="StatementPayload.html">StatementPayload</a></li><li><a href="StatementsService.html">StatementsService</a></li><li><a href="StringUtils.html">StringUtils</a></li><li><a href="TermConverter.html">TermConverter</a></li><li><a href="TransactionalRepositoryClient.html">TransactionalRepositoryClient</a></li><li><a href="TransactionService.html">TransactionService</a></li><li><a href="TriGParser.html">TriGParser</a></li><li><a href="TurtleParser.html">TurtleParser</a></li><li><a href="UpdateQueryPayload.html">UpdateQueryPayload</a></li><li><a href="UploadService.html">UploadService</a></li><li><a href="User.html">User</a></li></ul><h3>Interfaces</h3><ul><li><a href="Logger.html">Logger</a></li></ul><h3>Global</h3><ul><li><a href="global.html#Authority">Authority</a></li><li><a href="global.html#MediaType">MediaType</a></li><li><a href="global.html#PATH_NAMESPACES">PATH_NAMESPACES</a></li><li><a href="global.html#PATH_SIZE">PATH_SIZE</a></li><li><a href="global.html#PATH_STATEMENTS">PATH_STATEMENTS</a></li><li><a href="global.html#PATH_TRANSACTIONS">PATH_TRANSACTIONS</a></li><li><a href="global.html#QueryContentType">QueryContentType</a></li><li><a href="global.html#QueryLanguage">QueryLanguage</a></li><li><a href="global.html#QueryType">QueryType</a></li><li><a href="global.html#RDFMimeType">RDFMimeType</a></li><li><a href="global.html#RepositoryType">RepositoryType</a></li><li><a href="global.html#RETRIABLE_STATUSES">RETRIABLE_STATUSES</a></li><li><a href="global.html#TransactionIsolationLevel">TransactionIsolationLevel</a></li><li><a href="global.html#XSD">XSD</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.6</a> on Fri Jan 08 2021 17:28:15 GMT+0200 (Eastern European Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

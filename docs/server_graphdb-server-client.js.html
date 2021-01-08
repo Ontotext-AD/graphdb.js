@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: server/graphdb-server-client.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: server/graphdb-server-client.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>const ServerClient = require('./server-client');
+const LoggingUtils = require('../logging/logging-utils');
+const MediaType = require('../http/media-type');
+const HttpRequestBuilder = require('../http/http-request-builder');
+
+const REPOSITORY_SERVICE_URL = '/rest/repositories';
+const SECURITY_SERVICE_URL = '/rest/security';
+
+/**
+ * Implementation of the graphDB server operations.
+ *
+ *  Used to automate the security user management API:
+ *  add, edit, or remove users.  Also used to add, edit,
+ *  or remove a repository to/from any attached location.
+ *  You can work with multiple remote locations from a
+ *  single access point.
+ *
+ *  @class
+ *  @author Teodossi Dossev
+ *
+ */
+class GraphDBServerClient extends ServerClient {
+  /**
+   * @param {ServerClientConfig} config for the server client.
+   **/
+  constructor(config) {
+    super(config);
+  }
+
+  /**
+   * Get the default repository configuration for the repository type
+   *
+   * @param {RepositoryType|String} repositoryType the type for which a
+   * default configuration is required
+   * @return {Promise&lt;HttpResponse|Error>} a promise which resolves to response
+   * wrapper or rejects with error if thrown during execution.
+   */
+  getDefaultConfig(repositoryType) {
+    if (!repositoryType) {
+      throw new Error('Repository type is required parameter!');
+    }
+
+    const requestBuilder = HttpRequestBuilder
+      .httpGet(
+        `${REPOSITORY_SERVICE_URL}/defaultConfig/${repositoryType}`)
+      .addAcceptHeader(MediaType.APPLICATION_JSON);
+    return this.execute(requestBuilder);
+  }
+
+  /**
+   * Get the repository configuration
+   *
+   * @param {string} repositoryId the repository id
+   * @param {string} [location] optional repository location
+   * @return {Promise&lt;HttpResponse|string|Error>} a promise which resolves
+   * to response wrapper or rejects with error if thrown during execution.
+   */
+  getRepositoryConfig(repositoryId, location) {
+    if (!repositoryId) {
+      throw new Error('Repository id is required parameter!');
+    }
+
+    const repositoryLocation = location ? `?location=${location}` : '';
+    const requestBuilder = HttpRequestBuilder
+      .httpGet(
+        `${REPOSITORY_SERVICE_URL}/${repositoryId}${repositoryLocation}`)
+      .addContentTypeHeader(MediaType.APPLICATION_JSON);
+    return this.execute(requestBuilder);
+  }
+
+  /**
+   * Download the repository configuration in turtle format
+   * @param {string} repositoryId the repository id
+   * @param {string} [location] optional repository location
+   * @return {Promise&lt;string | any>} a service request that will resolve to a
+   * readable stream to which the client can subscribe and consume the emitted
+   * strings as soon as they are available. Resolves to turtle format.
+   */
+  downloadRepositoryConfig(repositoryId, location) {
+    const requestBuilder = HttpRequestBuilder
+      .httpGet(`${REPOSITORY_SERVICE_URL}/${repositoryId}/download`)
+      .addContentTypeHeader(MediaType.TEXT_TURTLE)
+      .setResponseType('stream');
+    return this.execute(requestBuilder).then((response) => {
+      this.logger.debug(LoggingUtils.getLogPayload(response,
+        requestBuilder.getParams()), 'Downloaded data');
+      return response.getData();
+    });
+  }
+
+  /**
+   * Create repository according to the provided configuration
+   * @param {RepositoryConfig} repositoryConfig
+   * @return {Promise&lt;HttpResponse|Error>} a promise which resolves
+   * to response wrapper or rejects with error if thrown during execution.
+   */
+  createRepository(repositoryConfig) {
+    const requestBuilder = HttpRequestBuilder
+      .httpPut(`${REPOSITORY_SERVICE_URL}/${repositoryConfig.id}`)
+      .setData(this.objectToJson(repositoryConfig))
+      .addContentTypeHeader(MediaType.APPLICATION_JSON)
+      .addAcceptHeader(MediaType.TEXT_PLAIN);
+    return this.execute(requestBuilder);
+  }
+
+  /**
+   * Delete repository with the provided id.
+   * @override
+   * @param {string} id of the repository which should be deleted.
+   * @return {Promise&lt;any>} promise which resolves with the delete result.
+   */
+  deleteRepository(id) {
+    if (!id) {
+      throw new Error('Repository id is required parameter!');
+    }
+    const requestBuilder =
+      HttpRequestBuilder.httpDelete(`${REPOSITORY_SERVICE_URL}/${id}`);
+    return this.execute(requestBuilder).then((response) => {
+      this.logger.info(LoggingUtils.getLogPayload(response, {repoId: id}),
+        'Deleted repository');
+    });
+  }
+
+  /**
+   * Checks if GraphDB security is enabled.
+   * @return {Promise&lt;HttpResponse|Error>} a promise which resolves
+   * to response wrapper or rejects with error if thrown during execution.
+   */
+  isSecurityEnabled() {
+    const requestBuilder =
+      HttpRequestBuilder.httpGet(SECURITY_SERVICE_URL)
+        .addAcceptHeader(MediaType.APPLICATION_JSON);
+    return this.execute(requestBuilder);
+  }
+
+  /**
+   * Enable or disable GraphDB security.
+   * @param {boolean} enabled &lt;code>true&lt;/code> if security is enabled and
+   * &lt;code>false&lt;/code> otherwise.
+   * @return {Promise&lt;HttpResponse|Error>} a promise which resolves
+   * to response wrapper or rejects with error if thrown during execution.
+   */
+  toggleSecurity(enabled) {
+    const requestBuilder =
+      HttpRequestBuilder
+        .httpPost(`${SECURITY_SERVICE_URL}?useSecurity=${enabled}`)
+        .addContentTypeHeader(MediaType.APPLICATION_JSON)
+        .setData(`${enabled}`);
+    return this.execute(requestBuilder);
+  }
+
+  /**
+   * Enable or disable access to a predefined set of functionalities
+   * without having to log in.
+   * To use free access, you must have security enabled.
+   * Use with extreme caution, as the changes that are made to the
+   * application settings may possibly change the behavior of the
+   * GraphDB Workbench for the logged-in user or for all users
+   * if logged in as admin.
+   * @param {boolean} enabled &lt;code>true&lt;/code> if free access is enabled and
+   * &lt;code>false&lt;/code> otherwise.
+   * @param {string[]} authorities Array of read and/or write access rights
+   * described in the following template:
+   * &lt;code>READ_REPO_{repository ID}&lt;/code> to grant repository read rights
+   * &lt;code>WRITE_REPO_{repository ID}&lt;/code> to grant repository write rights
+   * @param {AppSettings} appSettings configure the default behavior
+   * of the GraphDB Workbench
+   * @return {Promise&lt;HttpResponse|Error>} a promise which resolves
+   * to response wrapper or rejects with error if thrown during execution.
+   */
+  updateFreeAccess(enabled, authorities, appSettings) {
+    const requestBuilder =
+      HttpRequestBuilder
+        .httpPost(`${SECURITY_SERVICE_URL}/freeaccess`)
+        .addContentTypeHeader(MediaType.APPLICATION_JSON)
+        .addAcceptHeader(MediaType.TEXT_PLAIN)
+        .setData({
+          appSettings: this.objectToJson(appSettings),
+          authorities,
+          enabled
+        });
+    return this.execute(requestBuilder);
+  }
+
+  /**
+   * Check if free access is enabled
+   * @return {Promise&lt;HttpResponse|Error>} a promise which resolves
+   * to response wrapper or rejects with error if thrown during execution.
+   */
+  getFreeAccess() {
+    const requestBuilder =
+      HttpRequestBuilder
+        .httpGet(`${SECURITY_SERVICE_URL}/freeaccess`)
+        .addContentTypeHeader(MediaType.APPLICATION_JSON);
+    return this.execute(requestBuilder);
+  }
+
+  /**
+   * Create a user
+   * @param {string} username User name
+   * @param {string} password User password
+   * @param {string[]} [grantedAuthorities] Array of read and/or write access
+   * rights described in the following template:
+   * &lt;code>READ_REPO_{repository ID}&lt;/code> to grant repository read rights
+   * &lt;code>WRITE_REPO_{repository ID}&lt;/code> to grant repository write rights
+   * @param {AppSettings} [appSettings] configure the default behavior
+   * of the GraphDB Workbench
+   * @return {Promise&lt;HttpResponse|Error>} a promise which resolves
+   * to response wrapper or rejects with error if thrown during execution.
+   */
+  createUser(username, password, grantedAuthorities, appSettings) {
+    const requestBuilder =
+      HttpRequestBuilder
+        .httpPost(`${SECURITY_SERVICE_URL}/user/${username}`)
+        .addContentTypeHeader(MediaType.APPLICATION_JSON)
+        .addAcceptHeader(MediaType.TEXT_PLAIN)
+        .setData({
+          username,
+          password,
+          grantedAuthorities,
+          appSettings: this.objectToJson(appSettings)
+        });
+    return this.execute(requestBuilder);
+  }
+
+  /**
+   * Edit user.
+   * Use with extreme caution, as the changes that are made to the
+   * application settings may possibly change the behavior of the
+   * GraphDB Workbench for the user.
+   * @param {string} username User name
+   * @param {string} [password] User password
+   * @param {string[]} [grantedAuthorities] Array of read and/or write access
+   * rights described in the following template:
+   * &lt;code>READ_REPO_{repository ID}&lt;/code> to grant repository read rights
+   * &lt;code>WRITE_REPO_{repository ID}&lt;/code> to grant repository write rights
+   * @param {AppSettings} [appSettings] configure the default behavior
+   * of the GraphDB Workbench
+   * @return {Promise&lt;HttpResponse|Error>} a promise which resolves
+   * to response wrapper or rejects with error if thrown during execution.
+   */
+  updateUser(username, password, grantedAuthorities, appSettings) {
+    const requestBuilder =
+      HttpRequestBuilder
+        .httpPut(`${SECURITY_SERVICE_URL}/user/${username}`)
+        .addContentTypeHeader(MediaType.APPLICATION_JSON)
+        .addAcceptHeader(MediaType.TEXT_PLAIN)
+        .setData({
+          username,
+          password,
+          grantedAuthorities,
+          appSettings: this.objectToJson(appSettings)
+        });
+    return this.execute(requestBuilder);
+  }
+
+  /**
+   * Change setting for a logged user.
+   * Use with extreme caution, as the changes that are made to the
+   * application settings may possibly change the behavior of the
+   * GraphDB Workbench for the user.
+   * @param {string} username User name
+   * @param {string} [password] User password
+   * @param {AppSettings} [appSettings] configure the default behavior
+   * of the GraphDB Workbench
+   * @return {Promise&lt;HttpResponse|Error>} a promise which resolves
+   * to response wrapper or rejects with error if thrown during execution.
+   */
+  updateUserData(username, password, appSettings) {
+    const requestBuilder =
+      HttpRequestBuilder
+        .httpPatch(`${SECURITY_SERVICE_URL}/user/${username}`)
+        .addContentTypeHeader(MediaType.APPLICATION_JSON)
+        .addAcceptHeader(MediaType.TEXT_PLAIN)
+        .setData({
+          username,
+          password,
+          appSettings: this.objectToJson(appSettings)
+        });
+    return this.execute(requestBuilder);
+  }
+
+  /**
+   * Get a user
+   * @param {string} username User name
+   * @return {Promise&lt;HttpResponse|Error>} a promise which resolves
+   * to response wrapper or rejects with error if thrown during execution.
+   */
+  getUser(username) {
+    const requestBuilder =
+      HttpRequestBuilder
+        .httpGet(`${SECURITY_SERVICE_URL}/user/${username}`)
+        .addContentTypeHeader(MediaType.APPLICATION_JSON);
+    return this.execute(requestBuilder);
+  }
+
+  /**
+   * Deletes a user
+   * @param {string} username User name
+   * @return {Promise&lt;HttpResponse|Error>} a promise which resolves
+   * to response wrapper or rejects with error if thrown during execution.
+   */
+  deleteUser(username) {
+    const requestBuilder =
+      HttpRequestBuilder
+        .httpDelete(`${SECURITY_SERVICE_URL}/user/${username}`)
+        .addAcceptHeader(MediaType.TEXT_PLAIN);
+    return this.execute(requestBuilder);
+  }
+
+  /**
+   * @private
+   * @param {Object} object to get json from
+   * @return {string | {}} json representation of object
+   * or empty object if undefined
+   */
+  objectToJson(object) {
+    return object &amp;&amp; object.toJson() || {};
+  }
+}
+
+module.exports = GraphDBServerClient;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="AddStatementPayload.html">AddStatementPayload</a></li><li><a href="AppSettings.html">AppSettings</a></li><li><a href="AuthenticationService.html">AuthenticationService</a></li><li><a href="BaseRepositoryClient.html">BaseRepositoryClient</a></li><li><a href="ClientConfig.html">ClientConfig</a></li><li><a href="CommonUtils.html">CommonUtils</a></li><li><a href="ConsoleLogger.html">ConsoleLogger</a></li><li><a href="ContentParser.html">ContentParser</a></li><li><a href="DownloadService.html">DownloadService</a></li><li><a href="FileUtils.html">FileUtils</a></li><li><a href="GetQueryPayload.html">GetQueryPayload</a></li><li><a href="GetStatementsPayload.html">GetStatementsPayload</a></li><li><a href="GraphDBServerClient.html">GraphDBServerClient</a></li><li><a href="HttpClient.html">HttpClient</a></li><li><a href="HttpRequestBuilder.html">HttpRequestBuilder</a></li><li><a href="HttpResponse.html">HttpResponse</a></li><li><a href="Iterable.html">Iterable</a></li><li><a href="JsonLDParser.html">JsonLDParser</a></li><li><a href="LoggingUtils.html">LoggingUtils</a></li><li><a href="N3Parser.html">N3Parser</a></li><li><a href="Namespace.html">Namespace</a></li><li><a href="NamespaceService.html">NamespaceService</a></li><li><a href="NQuadsParser.html">NQuadsParser</a></li><li><a href="NTriplesParser.html">NTriplesParser</a></li><li><a href="PagedResponse.html">PagedResponse</a></li><li><a href="ParserRegistry.html">ParserRegistry</a></li><li><a href="QueryPayload.html">QueryPayload</a></li><li><a href="QueryService.html">QueryService</a></li><li><a href="RDFRepositoryClient.html">RDFRepositoryClient</a></li><li><a href="RDFXmlParser.html">RDFXmlParser</a></li><li><a href="RepositoryClientConfig.html">RepositoryClientConfig</a></li><li><a href="RepositoryConfig.html">RepositoryConfig</a></li><li><a href="RepositoryService.html">RepositoryService</a></li><li><a href="ResponseIterator.html">ResponseIterator</a></li><li><a href="ServerClient.html">ServerClient</a></li><li><a href="ServerClientConfig.html">ServerClientConfig</a></li><li><a href="Service.html">Service</a></li><li><a href="ServiceRequest.html">ServiceRequest</a></li><li><a href="SparqlJsonResultParser.html">SparqlJsonResultParser</a></li><li><a href="SparqlXmlResultParser.html">SparqlXmlResultParser</a></li><li><a href="StatementPayload.html">StatementPayload</a></li><li><a href="StatementsService.html">StatementsService</a></li><li><a href="StringUtils.html">StringUtils</a></li><li><a href="TermConverter.html">TermConverter</a></li><li><a href="TransactionalRepositoryClient.html">TransactionalRepositoryClient</a></li><li><a href="TransactionService.html">TransactionService</a></li><li><a href="TriGParser.html">TriGParser</a></li><li><a href="TurtleParser.html">TurtleParser</a></li><li><a href="UpdateQueryPayload.html">UpdateQueryPayload</a></li><li><a href="UploadService.html">UploadService</a></li><li><a href="User.html">User</a></li></ul><h3>Interfaces</h3><ul><li><a href="Logger.html">Logger</a></li></ul><h3>Global</h3><ul><li><a href="global.html#Authority">Authority</a></li><li><a href="global.html#MediaType">MediaType</a></li><li><a href="global.html#PATH_NAMESPACES">PATH_NAMESPACES</a></li><li><a href="global.html#PATH_SIZE">PATH_SIZE</a></li><li><a href="global.html#PATH_STATEMENTS">PATH_STATEMENTS</a></li><li><a href="global.html#PATH_TRANSACTIONS">PATH_TRANSACTIONS</a></li><li><a href="global.html#QueryContentType">QueryContentType</a></li><li><a href="global.html#QueryLanguage">QueryLanguage</a></li><li><a href="global.html#QueryType">QueryType</a></li><li><a href="global.html#RDFMimeType">RDFMimeType</a></li><li><a href="global.html#RepositoryType">RepositoryType</a></li><li><a href="global.html#RETRIABLE_STATUSES">RETRIABLE_STATUSES</a></li><li><a href="global.html#TransactionIsolationLevel">TransactionIsolationLevel</a></li><li><a href="global.html#XSD">XSD</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.6</a> on Fri Jan 08 2021 17:28:15 GMT+0200 (Eastern European Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
