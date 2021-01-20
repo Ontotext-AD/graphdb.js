@@ -39,7 +39,9 @@ class BaseRepositoryClient {
     BaseRepositoryClient.validateConfig(repositoryClientConfig);
     this.repositoryClientConfig = repositoryClientConfig;
 
-    this.authenticationService = new AuthenticationService();
+    this.httpClient = new HttpClient(
+      this.repositoryClientConfig.getEndpoint());
+    this.authenticationService = new AuthenticationService(this.httpClient);
 
     this.initParsers();
     this.initLogger();
@@ -171,7 +173,7 @@ class BaseRepositoryClient {
     const httpClient = currentHttpClient || httpClients.next();
     const username = this.repositoryClientConfig.getUsername();
     const pass = this.repositoryClientConfig.getPass();
-    return this.authenticationService.setHttpClient(httpClient)
+    return this.authenticationService
       .login(username, pass)
       .then(() => {
         this.decorateRequestConfig(requestBuilder);

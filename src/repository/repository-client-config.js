@@ -23,14 +23,18 @@ class RepositoryClientConfig extends ClientConfig {
    * reauthenticated after auth token expire. This config has meaning when the
    * server is secured and username and passwords are provided.
    * @param {boolean} [useBasicAuth] if use Basic Auth when authenticating
+   * @param {string} endpoint server base URL that will be prepend
+   * to all server requests
    */
   constructor(endpoints, headers, defaultRDFMimeType, readTimeout,
-      writeTimeout, username, pass, keepAlive, useBasicAuth) {
-    super(headers, username, pass, keepAlive, useBasicAuth);
+      writeTimeout, username, pass, keepAlive, useBasicAuth, endpoint) {
+    super(headers, username, pass, keepAlive, useBasicAuth, endpoint);
     this.endpoints = endpoints;
     this.defaultRDFMimeType = defaultRDFMimeType;
     this.readTimeout = readTimeout;
     this.writeTimeout = writeTimeout;
+    // TODO refactor to reduce constructor params
+    //  related to https://github.com/Ontotext-AD/graphdb.js/issues/124
   }
 
   /**
