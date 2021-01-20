@@ -22,7 +22,7 @@ pipeline {
            description: 'This is a pre-release. Will not publish to npm if selected ',
            defaultValue: false
 
-    string name: 'AUTH',
+    string name: 'auth',
            description: 'Jenkins credential ID'
   }
 
@@ -40,6 +40,7 @@ pipeline {
     CI = "true"
     NPM_TOKEN = credentials('npm-token')
     API_URL = "https://api.github.com/repos/Ontotext-AD/graphdb.js"
+    AUTH = credentials(${auth})
   }
 
   stages {
