@@ -40,7 +40,7 @@ pipeline {
     CI = "true"
     NPM_TOKEN = credentials('npm-token')
     API_URL = "https://api.github.com/repos/Ontotext-AD/graphdb.js"
-    AUTH = credentials(${auth})
+    AUTH = credentials("${auth}")
   }
 
   stages {
