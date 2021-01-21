@@ -24,30 +24,10 @@ class ServerClientConfig extends ClientConfig {
    */
   constructor(endpoint, timeout, headers, username, pass,
       keepAlive, useBasicAuth) {
-    super(headers, username, pass, keepAlive, useBasicAuth);
-    this.endpoint = endpoint;
+    super(headers, username, pass, keepAlive, useBasicAuth, endpoint);
     this.timeout = timeout;
-  }
-
-  /**
-   * Sets the server's endpoint URL.
-   *
-   * @param {string} endpoint the endpoint URL
-   *
-   * @return {this} the current config for method chaining
-   */
-  setEndpoint(endpoint) {
-    this.endpoint = endpoint;
-    return this;
-  }
-
-  /**
-   * Returns the server's endpoint URL.
-   *
-   * @return {string} the endpoint URL
-   */
-  getEndpoint() {
-    return this.endpoint;
+    // TODO refactor to reduce constructor params
+    //  related to https://github.com/Ontotext-AD/graphdb.js/issues/124
   }
 
   /**

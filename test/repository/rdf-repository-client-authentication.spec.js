@@ -13,10 +13,10 @@ import data from './data/read-statements';
 import userdata from '../auth/data/logged-user-data';
 
 describe('RDFRepositoryClient - authentication', () => {
-
   let config;
   let repository;
   let httpRequest;
+  let httpLoginRequest;
 
   beforeEach(() => {
     HttpClient.mockImplementation(() => httpClientStub());
@@ -26,6 +26,7 @@ describe('RDFRepositoryClient - authentication', () => {
     const contentType = '';
     const readTimeout = 1000;
     const writeTimeout = 1000;
+    const endpoint = 'http://localhost:7200';
 
     config = new RepositoryClientConfig()
       .setEndpoints(endpoints)
@@ -34,12 +35,19 @@ describe('RDFRepositoryClient - authentication', () => {
       .setReadTimeout(readTimeout)
       .setWriteTimeout(writeTimeout)
       .setUsername('testuser')
-      .setPass('pass123');
+      .setPass('pass123')
+      .setEndpoint(endpoint);
     repository = new RDFRepositoryClient(config);
-    httpRequest = repository.httpClients[0].request;
+    httpRequest = repository.httpClient.request;
 
     httpRequest.mockResolvedValue({
-      data: data.repositories.repo1.statements.GET['single_application/rdf+xml'],
+      headers: {}
+    });
+
+    httpLoginRequest = repository.httpClients[0].request;
+    httpLoginRequest.mockResolvedValue({
+      data: data.repositories.repo1.statements
+        .GET['single_application/rdf+xml'],
       headers: {}
     });
   });
@@ -56,15 +64,18 @@ describe('RDFRepositoryClient - authentication', () => {
       expect(response).toEqual(expectedResponse);
 
       // verify that exact requests have been made
+      const loginMock = repository.httpClient.request;
       const requestMock = repository.httpClients[0].request;
 
       // expect 2 invocations: first login, second getRepositoryIDs
-      expect(requestMock).toHaveBeenCalledTimes(2);
+      expect(loginMock).toHaveBeenCalledTimes(1);
+      expect(requestMock).toHaveBeenCalledTimes(1);
 
       // first request was a login with expected parameters
-      const expectedLoginRequest = HttpRequestBuilder.httpPost('/rest/login/testuser')
+      const expectedLoginRequest = HttpRequestBuilder
+        .httpPost('/rest/login/testuser')
         .addGraphDBPasswordHeader('pass123');
-      expect(requestMock).toHaveBeenNthCalledWith(1, expectedLoginRequest);
+      expect(loginMock).toHaveBeenNthCalledWith(1, expectedLoginRequest);
 
       // second request was the API call with expected parameters
       const expectedAPIRequest = HttpRequestBuilder.httpGet('/statements')
@@ -73,7 +84,7 @@ describe('RDFRepositoryClient - authentication', () => {
           pred: '<http://eunis.eea.europa.eu/rdf/schema.rdf#population>'
         })
         .addAcceptHeader(payload.getResponseType());
-      expect(requestMock).toHaveBeenNthCalledWith(2, expectedAPIRequest);
+      expect(requestMock).toHaveBeenNthCalledWith(1, expectedAPIRequest);
     });
   });
 
@@ -84,44 +95,50 @@ describe('RDFRepositoryClient - authentication', () => {
       return repository.get(payload);
     }).then((response) => {
       // verify that exact requests have been made
+      const loginMock = repository.httpClient.request;
       const requestMock = repository.httpClients[0].request;
 
-      // expect 2 invocations: first login, second getRepositoryIDs
+      // expect 2 invocations:
+      // first login
+      // second getRepositoryIDs
       // expecting 5 invocations:
       // login
       // first API call
       // second API call which fails with 401 unauthorized
       // re-login
       // third API call
-      expect(requestMock).toHaveBeenCalledTimes(5);
+      expect(loginMock).toHaveBeenCalledTimes(3);
+      expect(requestMock).toHaveBeenCalledTimes(3);
     });
 
     function mockClient() {
       let calls = 0;
 
-      repository.httpClients[0].request = jest.fn().mockImplementation((request) => {
-        if (request.getMethod() === 'get') {
-          calls++;
-          if (repository.authenticationService.getLoggedUser() && calls === 2) {
+      repository.httpClients[0].request =
+        jest.fn().mockImplementation((request) => {
+          if (request.getMethod() === 'get') {
+            calls++;
+            if (repository.authenticationService.getLoggedUser()
+              && calls === 2) {
             // emulate token expiration
-            repository.authenticationService.getLoggedUser().clearToken();
-            return Promise.reject({
-              response: {
-                status: 401
-              }
+              repository.authenticationService.getLoggedUser().clearToken();
+              return Promise.reject({
+                response: {
+                  status: 401
+                }
+              });
+            }
+            return Promise.resolve({data: data.repositories.GET});
+          } else if (request.getMethod() === 'post') {
+            return Promise.resolve({
+              headers: {
+                authorization: 'token123'
+              },
+              data: userdata
             });
           }
-          return Promise.resolve({data: data.repositories.GET});
-        } else if (request.getMethod() === 'post') {
-          return Promise.resolve({
-            headers: {
-              authorization: 'token123'
-            },
-            data: userdata
-          });
-        }
-        return Promise.reject();
-      });
+          return Promise.reject();
+        });
     }
   });
 });

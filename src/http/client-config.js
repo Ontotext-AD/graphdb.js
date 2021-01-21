@@ -17,9 +17,12 @@ class ClientConfig {
    * reauthenticated after auth token expire. This config has meaning when the
    * server is secured and username and passwords are provided.
    * @param {boolean} [useBasicAuth] if use Basic Auth when authenticating
+   * @param {string} endpoint server base URL that will be prepend
+   * to all server requests
    */
-  constructor(headers, username, pass, keepAlive, useBasicAuth) {
+  constructor(headers, username, pass, keepAlive, useBasicAuth, endpoint) {
     this.headers = headers;
+    this.endpoint = endpoint;
     this.username = username;
     this.pass = pass;
     this.keepAlive = keepAlive !== undefined ? keepAlive : true;
@@ -112,6 +115,27 @@ class ClientConfig {
       const credentials = `${this.username}:${this.pass}`;
       this.headers['Authorization'] = `Basic ${btoa(credentials)}`;
     }
+  }
+
+  /**
+   * Sets the server's endpoint URL.
+   *
+   * @param {string} endpoint the endpoint URL
+   *
+   * @return {this} the current config for method chaining
+   */
+  setEndpoint(endpoint) {
+    this.endpoint = endpoint;
+    return this;
+  }
+
+  /**
+   * Returns the server's endpoint URL.
+   *
+   * @return {string} the endpoint URL
+   */
+  getEndpoint() {
+    return this.endpoint;
   }
 }
 
