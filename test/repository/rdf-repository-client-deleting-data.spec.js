@@ -1,5 +1,6 @@
+/* eslint-disable max-len */
 const HttpClient = require('http/http-client');
-const RepositoryClientConfig = require('repository/repository-client-config');
+const ClientConfigBuilder = require('http/client-config-builder');
 const RDFRepositoryClient = require('repository/rdf-repository-client');
 const HttpRequestBuilder = require('http/http-request-builder');
 const httpClientStub = require('../http/http-client.stub');
@@ -10,7 +11,6 @@ jest.mock('http/http-client');
  * Tests statements deletion via RDFRepositoryClient
  */
 describe('RDFRepositoryClient - Deleting statements', () => {
-
   const subj = '<http://domain/resource/1>';
   const pred = '<http://domain/property/1>';
   const obj = '<http://domain/value/1>';
@@ -21,8 +21,8 @@ describe('RDFRepositoryClient - Deleting statements', () => {
   let httpRequest;
 
   beforeEach(() => {
-    repoClientConfig = new RepositoryClientConfig()
-      .addEndpoint('http://localhost:8080/repositories/test')
+    repoClientConfig = ClientConfigBuilder.repositoryConfig('http://localhost:8080')
+      .setEndpoints(['http://localhost:8080/repositories/test'])
       .setReadTimeout(100)
       .setWriteTimeout(200);
 
@@ -52,7 +52,7 @@ describe('RDFRepositoryClient - Deleting statements', () => {
     });
 
     test('should allow to delete specific statements in specific graphs', () => {
-      let contexts = [context, '<http://domain/graph/2>'];
+      const contexts = [context, '<http://domain/graph/2>'];
       return rdfRepositoryClient.deleteStatements(subj, pred, obj, contexts).then(() => {
         expect(httpRequest).toHaveBeenCalledTimes(1);
         expect(httpRequest).toHaveBeenCalledWith(HttpRequestBuilder.httpDelete('/statements').setParams({
@@ -110,5 +110,4 @@ describe('RDFRepositoryClient - Deleting statements', () => {
       return expect(rdfRepositoryClient.deleteAllStatements()).resolves.toEqual();
     });
   });
-
 });

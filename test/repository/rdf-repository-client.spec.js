@@ -1,4 +1,5 @@
-const RepositoryClientConfig = require('repository/repository-client-config');
+/* eslint-disable max-len */
+const ClientConfigBuilder = require('http/client-config-builder');
 const RDFRepositoryClient = require('repository/rdf-repository-client');
 const ServerClientConfig = require('server/server-client-config');
 const HttpClient = require('http/http-client');
@@ -11,15 +12,14 @@ jest.mock('http/http-client');
  * Tests the initialization logic in RDFRepositoryClient
  */
 describe('RDFRepositoryClient', () => {
-
   HttpClient.mockImplementation(() => httpClientStub());
 
-  let defaultHeaders = {
+  const defaultHeaders = {
     'Accept': 'application/json'
   };
 
   test('should initialize according the provided client configuration', () => {
-    let repoClientConfig = new RepositoryClientConfig()
+    const repoClientConfig = ClientConfigBuilder.repositoryConfig('http://localhost:8080')
       .setEndpoints([
         'http://localhost:8080/repositories/test'
       ])
@@ -28,7 +28,7 @@ describe('RDFRepositoryClient', () => {
       .setReadTimeout(100)
       .setWriteTimeout(200);
 
-    let rdfRepositoryClient = new RDFRepositoryClient(repoClientConfig);
+    const rdfRepositoryClient = new RDFRepositoryClient(repoClientConfig);
 
     expect(rdfRepositoryClient.repositoryClientConfig).toBeDefined();
     expect(rdfRepositoryClient.repositoryClientConfig).toEqual(repoClientConfig);
@@ -41,7 +41,7 @@ describe('RDFRepositoryClient', () => {
   });
 
   test('should initialize with multiple endpoints from the client configuration', () => {
-    let repoClientConfig = new RepositoryClientConfig()
+    const repoClientConfig = ClientConfigBuilder.repositoryConfig('http://localhost:8080')
       .setEndpoints([
         'http://localhost:8081/repositories/test1',
         'http://localhost:8082/repositories/test2',
@@ -52,7 +52,7 @@ describe('RDFRepositoryClient', () => {
       .setReadTimeout(100)
       .setWriteTimeout(200);
 
-    let rdfRepositoryClient = new RDFRepositoryClient(repoClientConfig);
+    const rdfRepositoryClient = new RDFRepositoryClient(repoClientConfig);
 
     expect(rdfRepositoryClient.httpClients).toBeDefined();
     expect(rdfRepositoryClient.httpClients.length).toEqual(3);
@@ -66,17 +66,16 @@ describe('RDFRepositoryClient', () => {
     expect(() => new RDFRepositoryClient()).toThrow(Error);
     expect(() => new RDFRepositoryClient({})).toThrow(Error);
     expect(() => new RDFRepositoryClient(new ServerClientConfig('', 1, {}))).toThrow(Error);
-    expect(() => new RDFRepositoryClient(new RepositoryClientConfig([]))).toThrow(Error);
+    expect(() => new RDFRepositoryClient(ClientConfigBuilder.repositoryConfig([]))).toThrow(Error);
   });
 
   describe('getSize()', () => {
-
     let rdfRepositoryClient;
     let httpRequest;
 
     beforeEach(() => {
-      const repoClientConfig = new RepositoryClientConfig()
-        .addEndpoint('http://localhost:8080/repositories/test')
+      const repoClientConfig = ClientConfigBuilder.repositoryConfig('http://localhost:8080')
+        .setEndpoints(['http://localhost:8080/repositories/test'])
         .setHeaders(defaultHeaders)
         .setDefaultRDFMimeType('application/json')
         .setReadTimeout(100)
@@ -112,5 +111,4 @@ describe('RDFRepositoryClient', () => {
       return expect(rdfRepositoryClient.getSize()).rejects.toEqual('get-size-error');
     });
   });
-
 });

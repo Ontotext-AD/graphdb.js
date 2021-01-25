@@ -10,23 +10,17 @@
  */
 class ClientConfig {
   /**
-   * @param {Map<string, string>} [headers] An http headers map.
-   * @param {string} [username] username which should be authenticated
-   * @param {string} [pass] the password to be used
-   * @param {boolean} [keepAlive=true] if the logged in user should be
-   * reauthenticated after auth token expire. This config has meaning when the
-   * server is secured and username and passwords are provided.
-   * @param {boolean} [useBasicAuth] if use Basic Auth when authenticating
+   * Client configuration constructor.
+   * Initializes [headers]{@link ClientConfig#headers} and
+   * sets configuration default values to
+   * [keepAlive]{@link ClientConfig#keepAlive} and
+   * [basicAuth]{@link ClientConfig#basicAuth}
+   *
    * @param {string} endpoint server base URL that will be prepend
    * to all server requests
    */
-  constructor(headers, username, pass, keepAlive, useBasicAuth, endpoint) {
-    this.headers = headers;
-    this.endpoint = endpoint;
-    this.username = username;
-    this.pass = pass;
-    this.keepAlive = keepAlive !== undefined ? keepAlive : true;
-    this.setBasicAuthentication(useBasicAuth);
+  constructor(endpoint) {
+    this.setEndpoint(endpoint);
   }
 
   /**
@@ -62,6 +56,7 @@ class ClientConfig {
    */
   setUsername(username) {
     this.username = username;
+    this.useBasicAuthentication();
     return this;
   }
 
@@ -78,6 +73,7 @@ class ClientConfig {
    */
   setPass(pass) {
     this.pass = pass;
+    this.useBasicAuthentication();
     return this;
   }
 
@@ -95,6 +91,13 @@ class ClientConfig {
   setKeepAlive(keepAlive) {
     this.keepAlive = keepAlive;
     return this;
+  }
+
+  /**
+   * @return {boolean} [basicAuth] if use Basic Auth
+   */
+  getBasicAuthentication() {
+    return this.basicAuth;
   }
 
   /**
@@ -125,8 +128,13 @@ class ClientConfig {
    * @return {this} the current config for method chaining
    */
   setEndpoint(endpoint) {
-    this.endpoint = endpoint;
-    return this;
+    if (endpoint &&
+      (typeof endpoint === 'string' || endpoint instanceof String)) {
+      this.endpoint = endpoint;
+      return this;
+    } else {
+      throw new Error('Invalid Endpoint parameter!');
+    }
   }
 
   /**

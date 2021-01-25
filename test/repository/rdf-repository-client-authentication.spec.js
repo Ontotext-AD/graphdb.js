@@ -1,6 +1,9 @@
+/* eslint-disable max-len */
+/* eslint "require-jsdoc": off*/
+/* eslint prefer-promise-reject-errors: "off"*/
 const HttpClient = require('http/http-client');
 const RDFRepositoryClient = require('repository/rdf-repository-client');
-const RepositoryClientConfig = require('repository/repository-client-config');
+const ClientConfigBuilder = require('http/client-config-builder');
 const GetStatementsPayload = require('repository/get-statements-payload');
 const RDFMimeType = require('http/rdf-mime-type');
 const HttpRequestBuilder = require('http/http-request-builder');
@@ -28,15 +31,14 @@ describe('RDFRepositoryClient - authentication', () => {
     const writeTimeout = 1000;
     const endpoint = 'http://localhost:7200';
 
-    config = new RepositoryClientConfig()
+    config = ClientConfigBuilder.repositoryConfig(endpoint)
       .setEndpoints(endpoints)
       .setHeaders(headers)
       .setDefaultRDFMimeType(contentType)
       .setReadTimeout(readTimeout)
       .setWriteTimeout(writeTimeout)
       .setUsername('testuser')
-      .setPass('pass123')
-      .setEndpoint(endpoint);
+      .setPass('pass123');
     repository = new RDFRepositoryClient(config);
     httpRequest = repository.httpClient.request;
 
@@ -91,9 +93,9 @@ describe('RDFRepositoryClient - authentication', () => {
   test('should try relogin after token gets expired', () => {
     mockClient();
 
-    return repository.get(payload).then((response) => {
+    return repository.get(payload).then(() => {
       return repository.get(payload);
-    }).then((response) => {
+    }).then(() => {
       // verify that exact requests have been made
       const loginMock = repository.httpClient.request;
       const requestMock = repository.httpClients[0].request;

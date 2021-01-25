@@ -1,5 +1,7 @@
+/* eslint-disable max-len */
+/* eslint "require-jsdoc": off*/
 const HttpClient = require('http/http-client');
-const RepositoryClientConfig = require('repository/repository-client-config');
+const ClientConfigBuilder = require('http/client-config-builder');
 const RdfRepositoryClient = require('repository/rdf-repository-client');
 const RDFMimeType = require('http/rdf-mime-type');
 const HttpRequestBuilder = require('http/http-request-builder');
@@ -23,7 +25,7 @@ describe('RdfRepositoryClient - streaming data', () => {
 
     HttpClient.mockImplementation(() => httpClientStub());
 
-    repoClientConfig = new RepositoryClientConfig()
+    repoClientConfig = ClientConfigBuilder.repositoryConfig('http://host')
       .setEndpoints(endpoints)
       .setHeaders(headers)
       .setDefaultRDFMimeType(contentType)

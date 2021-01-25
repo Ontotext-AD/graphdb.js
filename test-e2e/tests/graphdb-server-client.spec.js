@@ -1,10 +1,7 @@
-const {RDFRepositoryClient, RepositoryType,
-  RepositoryConfig} = require('graphdb').repository;
-const {RDFMimeType} = require('graphdb').http;
-const {
-  GraphDBServerClient, ServerClientConfig,
-  AppSettings
-} = require('graphdb').server;
+/* eslint-disable max-len */
+const {RDFRepositoryClient, RepositoryType, RepositoryConfig} = require('graphdb').repository;
+const {RDFMimeType, ClientConfigBuilder} = require('graphdb').http;
+const {GraphDBServerClient, AppSettings} = require('graphdb').server;
 const path = require('path');
 const Utils = require('utils');
 const Config = require('config');
@@ -14,8 +11,10 @@ const NEW_REPO = 'New_repo';
 
 describe('Should test graphDB server client', () => {
   const rdfClient = new RDFRepositoryClient(Config.restApiConfig);
-  const serverConfig = new ServerClientConfig(Config.serverAddress, 10000,
-    new Map(), 'admin', 'root', true, true);
+  const serverConfig = ClientConfigBuilder.serverConfig(Config.serverAddress)
+    .setUsername('admin')
+    .setPass('root')
+    .setBasicAuthentication(true);
   const serverClient = new GraphDBServerClient(serverConfig);
 
   beforeAll((done) => {

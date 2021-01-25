@@ -1,13 +1,16 @@
+/* eslint "require-jsdoc": off*/
 const {RepositoryConfig, RepositoryType} = require('graphdb').repository;
-const {GraphDBServerClient, ServerClientConfig} = require('graphdb').server;
+const {GraphDBServerClient} = require('graphdb').server;
+const {ClientConfigBuilder} = require('graphdb').http;
 const Utils = require('utils');
 const Config = require('config');
 
 const NEW_REPO = 'New_repo';
 
 describe('Should test server client auth', () => {
-  const config = new ServerClientConfig(Config.serverAddress, 10000,
-    new Map(), 'admin', 'root', true, true);
+  const config = ClientConfigBuilder.serverConfig(Config.serverAddress)
+    .setUsername('admin')
+    .setPass('root');
 
   beforeAll((done) => {
     Utils.toggleSecurity(true).then(() => {

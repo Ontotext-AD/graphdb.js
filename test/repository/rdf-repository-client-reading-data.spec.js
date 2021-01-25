@@ -1,6 +1,8 @@
+/* eslint-disable max-len */
+/* eslint "require-jsdoc": off*/
 const HttpClient = require('http/http-client');
 const RDFRepositoryClient = require('repository/rdf-repository-client');
-const RepositoryClientConfig = require('repository/repository-client-config');
+const ClientConfigBuilder = require('http/client-config-builder');
 const GetStatementsPayload = require('repository/get-statements-payload');
 const RDFMimeType = require('http/rdf-mime-type');
 const TurtleParser = require('parser/turtle-parser');
@@ -34,7 +36,6 @@ const jsonldDataFile = path.resolve(__dirname, './data/read-statements-jsonld.tx
 const rdfxmlDataFile = path.resolve(__dirname, './data/read-statements-rdfxml.txt');
 
 describe('RDFRepositoryClient - reading statements', () => {
-
   let config;
   let repository;
   let httpRequest;
@@ -48,7 +49,7 @@ describe('RDFRepositoryClient - reading statements', () => {
     const readTimeout = 1000;
     const writeTimeout = 1000;
 
-    config = new RepositoryClientConfig()
+    config = ClientConfigBuilder.repositoryConfig('http://host')
       .setEndpoints(endpoints)
       .setHeaders(headers)
       .setDefaultRDFMimeType(contentType)

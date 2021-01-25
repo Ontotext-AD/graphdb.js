@@ -1,6 +1,8 @@
+/* eslint-disable max-len */
+/* eslint "require-jsdoc": off*/
 const HttpClient = require('http/http-client');
 const RDFRepositoryClient = require('repository/rdf-repository-client');
-const RepositoryClientConfig = require('repository/repository-client-config');
+const ClientConfigBuilder = require('http/client-config-builder');
 const TransactionalRepositoryClient = require('transaction/transactional-repository-client');
 const TransactionIsolationLevel = require('transaction/transaction-isolation-level');
 const GetStatementsPayload = require('repository/get-statements-payload');
@@ -23,7 +25,6 @@ const path = require('path');
 jest.mock('http/http-client');
 
 describe('RDFRepositoryClient - transactions', () => {
-
   let repoClientConfig;
   let rdfRepositoryClient;
   let httpRequest;
@@ -39,7 +40,7 @@ describe('RDFRepositoryClient - transactions', () => {
   const testFilePath = path.resolve(__dirname, './data/add-statements-complex.txt');
 
   beforeEach(() => {
-    repoClientConfig = new RepositoryClientConfig()
+    repoClientConfig = ClientConfigBuilder.repositoryConfig('http://localhost:8080')
       .setEndpoints([
         'http://localhost:8080/repositories/test',
         'http://localhost:8081/repositories/test'
@@ -63,7 +64,7 @@ describe('RDFRepositoryClient - transactions', () => {
 
   describe('beginTransaction()', () => {
     test('should start a transaction and produce transactional client', () => {
-      return rdfRepositoryClient.beginTransaction().then(transactionalClient => {
+      return rdfRepositoryClient.beginTransaction().then((transactionalClient) => {
         expect(transactionalClient).toBeInstanceOf(TransactionalRepositoryClient);
 
         const transactionalConfig = transactionalClient.repositoryClientConfig;
@@ -88,7 +89,7 @@ describe('RDFRepositoryClient - transactions', () => {
     });
 
     test('should start a transaction with specified isolation level', () => {
-      return rdfRepositoryClient.beginTransaction(TransactionIsolationLevel.READ_UNCOMMITTED).then(transactionalClient => {
+      return rdfRepositoryClient.beginTransaction(TransactionIsolationLevel.READ_UNCOMMITTED).then((transactionalClient) => {
         expect(transactionalClient).toBeInstanceOf(TransactionalRepositoryClient);
 
         const expectedRequest = HttpRequestBuilder.httpPost('/transactions')
@@ -102,7 +103,7 @@ describe('RDFRepositoryClient - transactions', () => {
 
     test('should start a transaction that can be committed', () => {
       let transactionalClient;
-      return rdfRepositoryClient.beginTransaction().then(client => {
+      return rdfRepositoryClient.beginTransaction().then((client) => {
         transactionalClient = client;
         return transactionalClient.commit();
       }).then(() => {
@@ -118,7 +119,7 @@ describe('RDFRepositoryClient - transactions', () => {
 
     test('should start a transaction that can be rollbacked', () => {
       let transactionalClient;
-      return rdfRepositoryClient.beginTransaction().then(client => {
+      return rdfRepositoryClient.beginTransaction().then((client) => {
         transactionalClient = client;
         return transactionalClient.rollback();
       }).then(() => {
@@ -137,7 +138,7 @@ describe('RDFRepositoryClient - transactions', () => {
 
     test('should disallow using inactive transaction after commit', () => {
       let transactionalClient;
-      return rdfRepositoryClient.beginTransaction().then(client => {
+      return rdfRepositoryClient.beginTransaction().then((client) => {
         transactionalClient = client;
         return transactionalClient.commit();
       }).then(() => {
@@ -150,7 +151,7 @@ describe('RDFRepositoryClient - transactions', () => {
     test('should reject if the transactional client cannot commit in case of server error', () => {
       const err = new Error('cannot commit');
       let transactionalClient;
-      return rdfRepositoryClient.beginTransaction().then(client => {
+      return rdfRepositoryClient.beginTransaction().then((client) => {
         transactionalClient = client;
         transactionalClient.httpClients[0].request.mockRejectedValue(err);
         return expect(transactionalClient.commit()).rejects.toEqual(err);
@@ -160,7 +161,7 @@ describe('RDFRepositoryClient - transactions', () => {
     test('should disallow using inactive transaction after commit failure', () => {
       const err = new Error('cannot commit');
       let transactionalClient;
-      return rdfRepositoryClient.beginTransaction().then(client => {
+      return rdfRepositoryClient.beginTransaction().then((client) => {
         transactionalClient = client;
         transactionalClient.httpClients[0].request.mockRejectedValue(err);
         return transactionalClient.commit();
@@ -173,7 +174,7 @@ describe('RDFRepositoryClient - transactions', () => {
 
     test('should disallow using inactive transaction after rollback', () => {
       let transactionalClient;
-      return rdfRepositoryClient.beginTransaction().then(client => {
+      return rdfRepositoryClient.beginTransaction().then((client) => {
         transactionalClient = client;
         return transactionalClient.rollback();
       }).then(() => {
@@ -186,7 +187,7 @@ describe('RDFRepositoryClient - transactions', () => {
     test('should reject if the transactional client cannot rollback in case of server error', () => {
       const err = new Error('cannot rollback');
       let transactionalClient;
-      return rdfRepositoryClient.beginTransaction().then(client => {
+      return rdfRepositoryClient.beginTransaction().then((client) => {
         transactionalClient = client;
         transactionalClient.httpClients[0].request.mockRejectedValue(err);
         return expect(transactionalClient.rollback()).rejects.toEqual(err);
@@ -196,7 +197,7 @@ describe('RDFRepositoryClient - transactions', () => {
     test('should disallow using inactive transaction after rollback failure', () => {
       const err = new Error('cannot rollback');
       let transactionalClient;
-      return rdfRepositoryClient.beginTransaction().then(client => {
+      return rdfRepositoryClient.beginTransaction().then((client) => {
         transactionalClient = client;
         transactionalClient.httpClients[0].request.mockRejectedValue(err);
         return transactionalClient.rollback();
@@ -216,14 +217,13 @@ describe('RDFRepositoryClient - transactions', () => {
   });
 
   describe('Having started transaction', () => {
-
     let transaction;
     let transactionHttpRequest;
 
     const data = '<http://domain/resource/resource-1> <http://domain/property/relation-1> "Title"@en.';
 
     beforeEach(() => {
-      return rdfRepositoryClient.beginTransaction().then(tr => {
+      return rdfRepositoryClient.beginTransaction().then((tr) => {
         transaction = tr;
         transactionHttpRequest = transaction.httpClients[0].request;
       });
@@ -232,7 +232,7 @@ describe('RDFRepositoryClient - transactions', () => {
     describe('getSize()', () => {
       test('should retrieve the repository size', () => {
         transactionHttpRequest.mockResolvedValue({data: 123});
-        return transaction.getSize().then(size => {
+        return transaction.getSize().then((size) => {
           expect(size).toEqual(123);
 
           const expectedRequest = HttpRequestBuilder.httpPut('').setParams({
@@ -246,7 +246,7 @@ describe('RDFRepositoryClient - transactions', () => {
 
       test('should retrieve the repository size in specific context', () => {
         transactionHttpRequest.mockResolvedValue({data: 123});
-        return transaction.getSize('<http://domain/context>').then(size => {
+        return transaction.getSize('<http://domain/context>').then((size) => {
           expect(size).toEqual(123);
 
           const expectedRequest = HttpRequestBuilder.httpPut('').setParams({
@@ -655,5 +655,4 @@ describe('RDFRepositoryClient - transactions', () => {
         .setInference(true);
     }
   });
-
 });

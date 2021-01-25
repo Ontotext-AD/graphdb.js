@@ -1,4 +1,7 @@
 const ClientConfig = require('../http/client-config');
+const RDFMimeType = require('../http/rdf-mime-type');
+
+const defaultTimeout = 10000;
 
 /**
  * Configuration wrapper used for initialization of {@link BaseRepositoryClient}
@@ -8,33 +11,26 @@ const ClientConfig = require('../http/client-config');
  * @extends ClientConfig
  * @author Mihail Radkov
  * @author Svilen Velikov
+ * @author Teodossi Dossev
  */
 class RepositoryClientConfig extends ClientConfig {
   /**
-   * @param {string[]} [endpoints] is an array with repository endpoints
-   * @param {Map<string, string>} [headers] is a key:value mapping of http
-   * headers and values
-   * @param {string} [defaultRDFMimeType] one of {@link RDFMimeType} values
-   * @param {number} [readTimeout]
-   * @param {number} [writeTimeout]
-   * @param {string} [username] username which should be authenticated
-   * @param {string} [pass] the password to be used
-   * @param {boolean} [keepAlive] if the logged in user should be
-   * reauthenticated after auth token expire. This config has meaning when the
-   * server is secured and username and passwords are provided.
-   * @param {boolean} [useBasicAuth] if use Basic Auth when authenticating
+   * Repository client configuration constructor.
+   * Initializes [endpoints]{@link RepositoryClientConfig#endpoints} and
+   * sets configuration default values to
+   * [defaultRDFMimeType]{@link RepositoryClientConfig#defaultRDFMimeType},
+   * [readTimeout]{@link RepositoryClientConfig#readTimeout} and
+   * [writeTimeout]{@link RepositoryClientConfig#writeTimeout}
+   *
    * @param {string} endpoint server base URL that will be prepend
    * to all server requests
    */
-  constructor(endpoints, headers, defaultRDFMimeType, readTimeout,
-      writeTimeout, username, pass, keepAlive, useBasicAuth, endpoint) {
-    super(headers, username, pass, keepAlive, useBasicAuth, endpoint);
-    this.endpoints = endpoints;
-    this.defaultRDFMimeType = defaultRDFMimeType;
-    this.readTimeout = readTimeout;
-    this.writeTimeout = writeTimeout;
-    // TODO refactor to reduce constructor params
-    //  related to https://github.com/Ontotext-AD/graphdb.js/issues/124
+  constructor(endpoint) {
+    super(endpoint);
+    this.setEndpoints([]);
+    this.setDefaultRDFMimeType(RDFMimeType.SPARQL_RESULTS_JSON);
+    this.setReadTimeout(defaultTimeout);
+    this.setWriteTimeout(defaultTimeout);
   }
 
   /**

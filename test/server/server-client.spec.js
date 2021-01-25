@@ -1,7 +1,9 @@
+/* eslint-disable max-len */
+/* eslint "require-jsdoc": off*/
+/* eslint prefer-promise-reject-errors: "off"*/
 const ServerClient = require('server/server-client');
-const ServerClientConfig = require('server/server-client-config');
+const ClientConfigBuilder = require('http/client-config-builder');
 const RDFRepositoryClient = require('repository/rdf-repository-client');
-const RepositoryClientConfig = require('repository/repository-client-config');
 const HttpRequestBuilder = require('http/http-request-builder');
 const RDFMimeType = require('http/rdf-mime-type');
 const User = require('auth/user');
@@ -24,7 +26,7 @@ describe('ServerClient', () => {
 
     test('should initialize with the provided server client configuration', () => {
       expect(server.config).toEqual(config);
-      expect(server.config.getEndpoint()).toEqual('server/url');
+      expect(server.config.getEndpoint()).toEqual('http://server/url');
     });
   });
 
@@ -32,7 +34,7 @@ describe('ServerClient', () => {
     test('should login and then execute request with auth token', () => {
       createSecuredClient();
 
-      return server.getRepositoryIDs().then((ids) => {
+      return server.getRepositoryIDs().then(() => {
         const requestMock = server.httpClient.request;
         // expect 2 invocations: first login, second getRepositoryIDs
         expect(requestMock).toHaveBeenCalledTimes(2);
@@ -54,7 +56,7 @@ describe('ServerClient', () => {
       return server.getRepositoryIDs()
         .then(() => {
           return server.getRepositoryIDs();
-        }).then((ids) => {
+        }).then(() => {
           const requestMock = server.httpClient.request;
           // expecting 5 invocations:
           // login
@@ -67,7 +69,7 @@ describe('ServerClient', () => {
     });
 
     test('should not pass auth token if there is no authenticated user', () => {
-      return server.getRepositoryIDs().then((ids) => {
+      return server.getRepositoryIDs().then(() => {
         const expectedRequest = HttpRequestBuilder.httpGet('/repositories')
           .addAcceptHeader(RDFMimeType.SPARQL_RESULTS_JSON);
         const requestMock = server.httpClient.request;
@@ -78,14 +80,14 @@ describe('ServerClient', () => {
     test('should maintain logged in User after successful login', () => {
       createSecuredClient();
 
-      return server.getRepositoryIDs().then((ids) => {
+      return server.getRepositoryIDs().then(() => {
         const expectedUser = new User('token123', 'pass123', userdata);
         expect(server.authenticationService.getLoggedUser()).toEqual(expectedUser);
       });
     });
 
     test('should not perform login if username and password are not provided', () => {
-      return server.getRepositoryIDs().then((ids) => {
+      return server.getRepositoryIDs().then(() => {
         expect(server.loggedUser).toBeUndefined();
         const requestMock = server.httpClient.request;
         // expect 1 invocation for the getRepositoryIDs API call but not for the login
@@ -97,7 +99,7 @@ describe('ServerClient', () => {
       createSecuredClient();
 
       return server.getRepositoryIDs()
-        .then((ids) => server.logout())
+        .then(() => server.logout())
         .then(() => {
           expect(server.authenticationService.getLoggedUser().getToken()).toBeUndefined();
         });
@@ -171,12 +173,12 @@ describe('ServerClient', () => {
     });
 
     test('should reject with error if repository with provided id does not exists', () => {
-      const repositoryClientConfig = new RepositoryClientConfig(['endpoint'], {}, '', 3000, 3000);
+      const repositoryClientConfig = ClientConfigBuilder.repositoryConfig('http://server/url').setEndpoints(['endpoint']);
       return expect(server.getRepository('non_existing', repositoryClientConfig)).rejects.toEqual(Error('Repository with id non_existing does not exists.'));
     });
 
     test('should resolve with a RDFRepositoryClient instance if repository with provided id exists', () => {
-      const repositoryClientConfig = new RepositoryClientConfig().setEndpoints(['endpoint']);
+      const repositoryClientConfig = ClientConfigBuilder.repositoryConfig('http://server/url').setEndpoints(['endpoint']);
       const expected = new RDFRepositoryClient(repositoryClientConfig);
       return server.getRepository('automotive', repositoryClientConfig).then((actual) => {
         expect(actual.repositoryClientConfig).toEqual(expected.repositoryClientConfig);
@@ -208,8 +210,7 @@ describe('ServerClient', () => {
   });
 
   function createUnsecuredClient() {
-    config = new TestServerConfig()
-      .setEndpoint('server/url')
+    config = ClientConfigBuilder.serverConfig('http://server/url')
       .setTimeout(0)
       .setHeaders({});
     server = new ServerClient(config);
@@ -217,8 +218,7 @@ describe('ServerClient', () => {
   }
 
   function createSecuredClient() {
-    config = new TestServerConfig()
-      .setEndpoint('server/url')
+    config = ClientConfigBuilder.serverConfig('http://server/url')
       .setTimeout(0)
       .setHeaders({})
       .setUsername('testuser')
@@ -257,9 +257,3 @@ describe('ServerClient', () => {
     });
   }
 });
-
-/**
- * Test implementation for the {@link ServerClientConfig}
- */
-class TestServerConfig extends ServerClientConfig {
-}

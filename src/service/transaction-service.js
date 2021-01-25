@@ -5,8 +5,8 @@ const PATH_TRANSACTIONS = require('./service-paths').PATH_TRANSACTIONS;
 const LoggingUtils = require('../logging/logging-utils');
 const StringUtils = require('../util/string-utils');
 
-const RepositoryClientConfig =
-  require('../repository/repository-client-config');
+const ClientConfigBuilder =
+  require('../http/client-config-builder');
 const TransactionalRepositoryClient =
   require('../transaction/transactional-repository-client');
 
@@ -15,10 +15,11 @@ const TransactionalRepositoryClient =
  *
  * @author Mihail Radkov
  * @author Svilen Velikov
+ * @author Teodossi Dossev
  */
 class TransactionService extends Service {
   /**
-   * Instantiates the transaction service wioth the supplied executor and
+   * Instantiates the transaction service with the supplied executor and
    * repository client config.
    *
    * @param {Function} httpRequestExecutor used to execute HTTP requests
@@ -78,7 +79,7 @@ class TransactionService extends Service {
    */
   getTransactionalClientConfig(locationUrl) {
     const config = this.repositoryClientConfig;
-    return new RepositoryClientConfig()
+    return ClientConfigBuilder.repositoryConfig(config.getEndpoint())
       .setEndpoints([locationUrl])
       .setHeaders(config.getHeaders())
       .setDefaultRDFMimeType(config.getDefaultRDFMimeType())

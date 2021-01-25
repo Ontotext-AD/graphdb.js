@@ -1,5 +1,7 @@
+/* eslint-disable max-len */
+/* eslint "require-jsdoc": off*/
 const HttpClient = require('http/http-client');
-const RepositoryClientConfig = require('repository/repository-client-config');
+const ClientConfigBuilder = require('http/client-config-builder');
 const RDFRepositoryClient = require('repository/rdf-repository-client');
 const RDFMimeType = require('http/rdf-mime-type');
 const AddStatementPayload = require('repository/add-statement-payload');
@@ -19,13 +21,12 @@ jest.mock('http/http-client');
  * Tests statements insertion via RDFRepositoryClient
  */
 describe('RDFRepositoryClient - adding data', () => {
-
   let repoClientConfig;
   let rdfRepositoryClient;
 
   beforeEach(() => {
-    repoClientConfig = new RepositoryClientConfig()
-      .addEndpoint('http://localhost:8080/repositories/test')
+    repoClientConfig = ClientConfigBuilder.repositoryConfig('http://localhost:8080')
+      .setEndpoints(['http://localhost:8080/repositories/test'])
       .setReadTimeout(100)
       .setWriteTimeout(200);
 
@@ -161,7 +162,7 @@ describe('RDFRepositoryClient - adding data', () => {
         .setObject(obj('uri-1'));
 
       const expected = testUtils.loadFile('repository/data/add-statements-triple.txt').trim();
-      return rdfRepositoryClient.add(payload).then(() => verifyAddPayload(expected, undefined, 'http://base/uri'))
+      return rdfRepositoryClient.add(payload).then(() => verifyAddPayload(expected, undefined, 'http://base/uri'));
     });
 
     test('should resolve to empty response (HTTP 204)', () => {
@@ -313,7 +314,7 @@ describe('RDFRepositoryClient - adding data', () => {
       getQuadLiteral('resource-2', 'title', 'Title', 'en', 'data-graph-2'),
       getQuadLiteral('resource-2', 'title', 'Titel', 'de', 'data-graph-2'),
 
-      getQuad('resource-3', 'relation-1', 'uri-4', 'data-graph-1'),
+      getQuad('resource-3', 'relation-1', 'uri-4', 'data-graph-1')
     ];
   }
 
