@@ -1,5 +1,3 @@
-/* eslint-disable max-len */
-/* eslint "require-jsdoc": off*/
 const HttpClient = require('http/http-client');
 const ClientConfigBuilder = require('http/client-config-builder');
 const RdfRepositoryClient = require('repository/rdf-repository-client');
@@ -25,7 +23,7 @@ describe('RdfRepositoryClient - streaming data', () => {
 
     HttpClient.mockImplementation(() => httpClientStub());
 
-    repoClientConfig = ClientConfigBuilder.repositoryConfig('http://host')
+    repoClientConfig = new ClientConfigBuilder().repositoryConfig('http://host')
       .setEndpoints(endpoints)
       .setHeaders(headers)
       .setDefaultRDFMimeType(contentType)
@@ -54,17 +52,22 @@ describe('RdfRepositoryClient - streaming data', () => {
         });
     });
 
-    test('should make a POST request with proper parameters and headers', () => {
-      return rdfRepositoryClient.upload({}, contentType, context, baseURI).then(() => {
-        verifyUploadRequest();
-      });
+    test('should make a POST request with proper parameters ' +
+      'and headers', () => {
+      return rdfRepositoryClient.upload({}, contentType, context, baseURI)
+        .then(() => {
+          verifyUploadRequest();
+        });
     });
 
-    test('should make a POST request with properly encoded context parameter', () => {
+    test('should make a POST request with properly encoded context ' +
+      'parameter', () => {
       // Not encoded as N-Triple
-      return rdfRepositoryClient.upload({}, contentType, 'urn:x-local:graph1', baseURI).then(() => {
-        verifyUploadRequest();
-      });
+      return rdfRepositoryClient
+        .upload({}, contentType, 'urn:x-local:graph1', baseURI)
+        .then(() => {
+          verifyUploadRequest();
+        });
     });
 
     function verifyUploadRequest() {
@@ -87,12 +90,14 @@ describe('RdfRepositoryClient - streaming data', () => {
     const baseURI = '<urn:x-local:graph1>';
     const contentType = RDFMimeType.TURTLE;
 
-    test('should overwrite statements using provided data as a stream', (done) => {
+    test('should overwrite statements using provided data as ' +
+      'a stream', (done) => {
       const source = streamSource();
       const stream = new ObjectReadableMock(source);
       const expectedIt = source[Symbol.iterator]();
 
-      return rdfRepositoryClient.overwrite(stream, contentType, context, baseURI)
+      return rdfRepositoryClient
+        .overwrite(stream, contentType, context, baseURI)
         .then(() => {
           stream.on('data', (chunk) => {
             expect(chunk).toEqual(expectedIt.next().value);
@@ -102,16 +107,21 @@ describe('RdfRepositoryClient - streaming data', () => {
     });
 
     test('should make a PUT request with proper parameters and headers', () => {
-      return rdfRepositoryClient.overwrite({}, contentType, context, baseURI).then(() => {
-        verifyOverwriteRequest();
-      });
+      return rdfRepositoryClient
+        .overwrite({}, contentType, context, baseURI)
+        .then(() => {
+          verifyOverwriteRequest();
+        });
     });
 
-    test('should make a PUT request with properly encoded context parameter', () => {
+    test('should make a PUT request with properly encoded ' +
+      'context parameter', () => {
       // Not encoded as N-Triple
-      return rdfRepositoryClient.overwrite({}, contentType, 'urn:x-local:graph1', baseURI).then(() => {
-        verifyOverwriteRequest();
-      });
+      return rdfRepositoryClient
+        .overwrite({}, contentType, 'urn:x-local:graph1', baseURI)
+        .then(() => {
+          verifyOverwriteRequest();
+        });
     });
 
     function verifyOverwriteRequest() {

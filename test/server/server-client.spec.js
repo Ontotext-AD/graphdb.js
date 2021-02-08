@@ -82,7 +82,7 @@ describe('ServerClient', () => {
 
       return server.getRepositoryIDs().then(() => {
         const expectedUser = new User('token123', 'pass123', userdata);
-        expect(server.authenticationService.getLoggedUser()).toEqual(expectedUser);
+        expect(server.user).toEqual(expectedUser);
       });
     });
 
@@ -101,7 +101,7 @@ describe('ServerClient', () => {
       return server.getRepositoryIDs()
         .then(() => server.logout())
         .then(() => {
-          expect(server.authenticationService.getLoggedUser().getToken()).toBeUndefined();
+          expect(server.getLoggedUser().getToken()).toBeUndefined();
         });
     });
   });
@@ -173,12 +173,12 @@ describe('ServerClient', () => {
     });
 
     test('should reject with error if repository with provided id does not exists', () => {
-      const repositoryClientConfig = ClientConfigBuilder.repositoryConfig('http://server/url').setEndpoints(['endpoint']);
+      const repositoryClientConfig = new ClientConfigBuilder().repositoryConfig('http://server/url').setEndpoints(['endpoint']);
       return expect(server.getRepository('non_existing', repositoryClientConfig)).rejects.toEqual(Error('Repository with id non_existing does not exists.'));
     });
 
     test('should resolve with a RDFRepositoryClient instance if repository with provided id exists', () => {
-      const repositoryClientConfig = ClientConfigBuilder.repositoryConfig('http://server/url').setEndpoints(['endpoint']);
+      const repositoryClientConfig = new ClientConfigBuilder().repositoryConfig('http://server/url').setEndpoints(['endpoint']);
       const expected = new RDFRepositoryClient(repositoryClientConfig);
       return server.getRepository('automotive', repositoryClientConfig).then((actual) => {
         expect(actual.repositoryClientConfig).toEqual(expected.repositoryClientConfig);
@@ -210,7 +210,7 @@ describe('ServerClient', () => {
   });
 
   function createUnsecuredClient() {
-    config = ClientConfigBuilder.serverConfig('http://server/url')
+    config = new ClientConfigBuilder().serverConfig('http://server/url')
       .setTimeout(0)
       .setHeaders({});
     server = new ServerClient(config);
@@ -218,11 +218,10 @@ describe('ServerClient', () => {
   }
 
   function createSecuredClient() {
-    config = ClientConfigBuilder.serverConfig('http://server/url')
+    config = new ClientConfigBuilder().serverConfig('http://server/url')
       .setTimeout(0)
       .setHeaders({})
-      .setUsername('testuser')
-      .setPass('pass123');
+      .useGdbTokenAuthentication('testuser', 'pass123');
     server = new ServerClient(config);
     mockClient();
   }
@@ -233,9 +232,9 @@ describe('ServerClient', () => {
     server.httpClient.request = jest.fn().mockImplementation((request) => {
       if (request.getMethod() === 'get') {
         calls++;
-        if (server.authenticationService.getLoggedUser() && calls === 2) {
+        if (server.user && calls === 2) {
           // emulate token expiration
-          server.authenticationService.getLoggedUser().clearToken();
+          server.logout();
           return Promise.reject({
             response: {
               status: 401

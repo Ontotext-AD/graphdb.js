@@ -1,5 +1,3 @@
-/* eslint-disable max-len */
-/* eslint "require-jsdoc": off*/
 const HttpClient = require('http/http-client');
 const ClientConfigBuilder = require('http/client-config-builder');
 const RdfRepositoryClient = require('repository/rdf-repository-client');
@@ -20,7 +18,8 @@ describe('RdfRepositoryClient - uploading files', () => {
 
   const context = '<urn:x-local:graph1>';
   const baseURI = '<urn:x-local:graph1>';
-  const testFilePath = path.resolve(__dirname, './data/add-statements-complex.txt');
+  const testFilePath = path
+    .resolve(__dirname, './data/add-statements-complex.txt');
 
   beforeEach(() => {
     const endpoints = ['http://host/repositories/repo1'];
@@ -30,7 +29,7 @@ describe('RdfRepositoryClient - uploading files', () => {
 
     const writeTimeout = 1000;
     HttpClient.mockImplementation(() => httpClientStub());
-    repoClientConfig = ClientConfigBuilder.repositoryConfig('http://host')
+    repoClientConfig = new ClientConfigBuilder().repositoryConfig('http://host')
       .setEndpoints(endpoints)
       .setHeaders(headers)
       .setDefaultRDFMimeType(contentType)
@@ -41,66 +40,91 @@ describe('RdfRepositoryClient - uploading files', () => {
   });
 
   describe('addFile(file)', () => {
-    test('should open a readable stream of the file and send it to the server', () => {
-      return rdfRepositoryClient.addFile(testFilePath, RDFMimeType.TRIG, context, baseURI).then(() => {
-        expect(httpRequest).toHaveBeenCalledTimes(1);
-        const requestBuilder = httpRequest.mock.calls[0][0];
-        verifyUploadRequestBuilder(requestBuilder, 'post');
-        return testUtils.readStream(requestBuilder.getData());
-      }).then((streamData) => {
-        const expectedData = testUtils.loadFile(testFilePath).trim();
-        expect(streamData).toEqual(expectedData);
-      });
+    test('should open a readable stream of the file and send it ' +
+      'to the server', () => {
+      return rdfRepositoryClient
+        .addFile(testFilePath, RDFMimeType.TRIG, context, baseURI)
+        .then(() => {
+          expect(httpRequest).toHaveBeenCalledTimes(1);
+          const requestBuilder = httpRequest.mock.calls[0][0];
+          verifyUploadRequestBuilder(requestBuilder, 'post');
+          return testUtils.readStream(requestBuilder.getData());
+        }).then((streamData) => {
+          const expectedData = testUtils.loadFile(testFilePath).trim();
+          expect(streamData).toEqual(expectedData);
+        });
     });
 
     test('should reject if the server cannot consume the request', () => {
       const error = new Error('cannot-upload-file');
       httpRequest.mockRejectedValue(error);
 
-      const promise = rdfRepositoryClient.addFile(testFilePath, RDFMimeType.TRIG, context, baseURI);
+      const promise = rdfRepositoryClient
+        .addFile(testFilePath, RDFMimeType.TRIG, context, baseURI);
       return expect(promise).rejects.toEqual(error);
     });
 
     test('should disallow uploading missing files', () => {
-      expect(() => rdfRepositoryClient.addFile(null, RDFMimeType.TRIG, context, baseURI)).toThrow(Error);
-      expect(() => rdfRepositoryClient.addFile('', RDFMimeType.TRIG, context, baseURI)).toThrow(Error);
-      expect(() => rdfRepositoryClient.addFile('missing-file-123', RDFMimeType.TRIG, context, baseURI)).toThrow(Error);
+      expect(() => rdfRepositoryClient
+        .addFile(null, RDFMimeType.TRIG, context, baseURI))
+        .toThrow(Error);
+      expect(() => rdfRepositoryClient
+        .addFile('', RDFMimeType.TRIG, context, baseURI))
+        .toThrow(Error);
+      expect(() => rdfRepositoryClient
+        .addFile('missing-file-123', RDFMimeType.TRIG, context, baseURI))
+        .toThrow(Error);
     });
 
     test('should resolve to empty response (HTTP 204)', () => {
-      return expect(rdfRepositoryClient.addFile(testFilePath, RDFMimeType.TRIG, context, baseURI)).resolves.toEqual();
+      return expect(rdfRepositoryClient
+        .addFile(testFilePath, RDFMimeType.TRIG, context, baseURI)).resolves
+        .toEqual();
     });
   });
 
   describe('putFile(file)', () => {
-    test('should open a readable stream of the file and send it to the server to overwrite the data', () => {
-      return rdfRepositoryClient.putFile(testFilePath, RDFMimeType.TRIG, context, baseURI).then(() => {
-        expect(httpRequest).toHaveBeenCalledTimes(1);
-        const requestBuilder = httpRequest.mock.calls[0][0];
-        verifyUploadRequestBuilder(requestBuilder, 'put');
-        return testUtils.readStream(requestBuilder.getData());
-      }).then((streamData) => {
-        const expectedData = testUtils.loadFile(testFilePath).trim();
-        expect(streamData).toEqual(expectedData);
-      });
+    test('should open a readable stream of the file and send it to ' +
+      'the server to overwrite the data', () => {
+      return rdfRepositoryClient
+        .putFile(testFilePath, RDFMimeType.TRIG, context, baseURI)
+        .then(() => {
+          expect(httpRequest).toHaveBeenCalledTimes(1);
+          const requestBuilder = httpRequest.mock.calls[0][0];
+          verifyUploadRequestBuilder(requestBuilder, 'put');
+          return testUtils.readStream(requestBuilder.getData());
+        }).then((streamData) => {
+          const expectedData = testUtils.loadFile(testFilePath).trim();
+          expect(streamData).toEqual(expectedData);
+        });
     });
 
-    test('should reject if the server cannot consume the overwrite request', () => {
+    test('should reject if the server cannot consume the ' +
+      'overwrite request', () => {
       const error = new Error('cannot-upload-file');
       httpRequest.mockRejectedValue(error);
 
-      const promise = rdfRepositoryClient.putFile(testFilePath, RDFMimeType.TRIG, context, baseURI);
+      const promise = rdfRepositoryClient
+        .putFile(testFilePath, RDFMimeType.TRIG, context, baseURI);
       return expect(promise).rejects.toEqual(error);
     });
 
     test('should disallow overwriting with missing files', () => {
-      expect(() => rdfRepositoryClient.putFile(null, RDFMimeType.TRIG, context, baseURI)).toThrow(Error);
-      expect(() => rdfRepositoryClient.putFile('', RDFMimeType.TRIG, context, baseURI)).toThrow(Error);
-      expect(() => rdfRepositoryClient.putFile('missing-file-123', RDFMimeType.TRIG, context, baseURI)).toThrow(Error);
+      expect(() => rdfRepositoryClient
+        .putFile(null, RDFMimeType.TRIG, context, baseURI))
+        .toThrow(Error);
+      expect(() => rdfRepositoryClient
+        .putFile('', RDFMimeType.TRIG, context, baseURI))
+        .toThrow(Error);
+      expect(() => rdfRepositoryClient
+        .putFile('missing-file-123', RDFMimeType.TRIG, context, baseURI))
+        .toThrow(Error);
     });
 
     test('should resolve to empty response (HTTP 204)', () => {
-      return expect(rdfRepositoryClient.putFile(testFilePath, RDFMimeType.TRIG, context, baseURI)).resolves.toEqual();
+      return expect(rdfRepositoryClient
+        .putFile(testFilePath, RDFMimeType.TRIG, context, baseURI)).resolves
+        .toEqual();
     });
   });
 

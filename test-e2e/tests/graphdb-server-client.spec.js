@@ -1,5 +1,5 @@
-/* eslint-disable max-len */
-const {RDFRepositoryClient, RepositoryType, RepositoryConfig} = require('graphdb').repository;
+const {RDFRepositoryClient,
+  RepositoryType, RepositoryConfig} = require('graphdb').repository;
 const {RDFMimeType, ClientConfigBuilder} = require('graphdb').http;
 const {GraphDBServerClient, AppSettings} = require('graphdb').server;
 const path = require('path');
@@ -11,10 +11,9 @@ const NEW_REPO = 'New_repo';
 
 describe('Should test graphDB server client', () => {
   const rdfClient = new RDFRepositoryClient(Config.restApiConfig);
-  const serverConfig = ClientConfigBuilder.serverConfig(Config.serverAddress)
-    .setUsername('admin')
-    .setPass('root')
-    .setBasicAuthentication(true);
+  const serverConfig = new ClientConfigBuilder()
+    .serverConfig(Config.serverAddress)
+    .useGdbTokenAuthentication('admin', 'root');
   const serverClient = new GraphDBServerClient(serverConfig);
 
   beforeAll((done) => {
@@ -25,6 +24,8 @@ describe('Should test graphDB server client', () => {
       return Utils.toggleSecurity(true);
     }).then(() => {
       done();
+    }).catch((e) => {
+      throw new Error(e);
     });
   });
 
@@ -34,30 +35,42 @@ describe('Should test graphDB server client', () => {
         return Utils.deleteRepo(TEST_REPO);
       }).then(() => {
         done();
+      }).catch((e) => {
+        throw new Error(e);
       });
   });
 
-  test('Should get repo type default config', () => {
+  afterEach(() => {
+    serverClient.logout(serverConfig);
+  });
+
+  test('Should get repo type default config', (done) => {
     const expectedResponse = Utils.loadFile('./data/graphdb-server-client/' +
       'expected_response_default_config_free_repo.txt');
     return serverClient.getDefaultConfig(RepositoryType.FREE)
       .then((response) => {
         expect(response.response.data)
           .toStrictEqual(JSON.parse(expectedResponse));
+        done();
+      }).catch((e) => {
+        throw new Error(e);
       });
   });
 
-  test('Should get repo config', () => {
+  test('Should get repo config', (done) => {
     const expectedResponse = Utils.loadFile('./data/graphdb-server-client/' +
       'expected_response_repo_config.txt');
     return serverClient.getRepositoryConfig(TEST_REPO)
       .then((response) => {
         expect(response.response.data)
           .toStrictEqual(JSON.parse(expectedResponse));
+        done();
+      }).catch((e) => {
+        throw new Error(e);
       });
   });
 
-  test('Should get repo config as turtle', () => {
+  test('Should get repo config as turtle', (done) => {
     let expected;
     const sampleRdf = path.resolve(__dirname, './data/graphdb-server-client/' +
       'expected_response_repo_config_turtle.txt');
@@ -67,11 +80,12 @@ describe('Should test graphDB server client', () => {
       .then((stream) => {
         stream.on('data', (data) => {
           expect(data).toEqual(expected);
+          done();
         });
       });
   });
 
-  test('Should create and delete repo', () => {
+  test('Should create and delete repo', (done) => {
     const config = new RepositoryConfig(NEW_REPO, '',
       new Map(), '', 'Repo title', RepositoryType.FREE);
 
@@ -93,10 +107,13 @@ describe('Should test graphDB server client', () => {
       }).then((response) => {
         const expected = [TEST_REPO];
         expect(response).toEqual(expected);
+        done();
+      }).catch((e) => {
+        throw new Error(e);
       });
   });
 
-  test('Should check and toggle security repo', () => {
+  test('Should check and toggle security repo', (done) => {
     return serverClient.isSecurityEnabled()
       .then((response) => {
         return expect(response.response.data).toBe(true);
@@ -111,11 +128,14 @@ describe('Should test graphDB server client', () => {
       }).then(() => {
         return serverClient.isSecurityEnabled();
       }).then((response) => {
-        return expect(response.response.data).toBe(true);
+        expect(response.response.data).toBe(true);
+        done();
+      }).catch((e) => {
+        throw new Error(e);
       });
   });
 
-  test('Should update free access', () => {
+  test('Should update free access', (done) => {
     const authorities = [
       'WRITE_REPO_Test_repo',
       'READ_REPO_Test_repo'
@@ -141,11 +161,14 @@ describe('Should test graphDB server client', () => {
       }).then(() => {
         return serverClient.getFreeAccess();
       }).then((response) => {
-        return expect(response.response.data.enabled).toStrictEqual(false);
+        expect(response.response.data.enabled).toStrictEqual(false);
+        done();
+      }).catch((e) => {
+        throw new Error(e);
       });
   });
 
-  test('Should create, read, update and delete users', () => {
+  test('Should create, read, update and delete users', (done) => {
     const expextedAppSettings = new AppSettings(true, true, true, false);
     const newAppSettings = new AppSettings(false, false, false, true);
 
@@ -174,7 +197,8 @@ describe('Should test graphDB server client', () => {
       }).then(() => {
         return serverClient.deleteUser('test_user');
       }).then((response) => {
-        return expect(response.response.status).toBe(204);
+        expect(response.response.status).toBe(204);
+        done();
       }).catch((e) => {
         serverClient.deleteUser('test_user');
         throw new Error(e);

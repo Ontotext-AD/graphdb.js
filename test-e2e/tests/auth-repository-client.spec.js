@@ -5,15 +5,11 @@ const Utils = require('utils');
 const Config = require('config');
 
 describe('Should test repository client auth', () => {
-  const authConfig = Config.restApiConfig;
-  authConfig.setUsername('admin');
-  authConfig.setPass('root');
-  authConfig.setEndpoint('http://localhost:7200');
-  authConfig.setBasicAuthentication(true);
+  const authConfig = Config.restApiBasicAuthConfig;
   const rdfBasicAuthClient = new RDFRepositoryClient(authConfig);
 
-  authConfig.setBasicAuthentication(false);
-  const rdfTokenAuthClient = new RDFRepositoryClient(authConfig);
+  const authTokenConfig = Config.restApiTokenAuthConfig;
+  const rdfTokenAuthClient = new RDFRepositoryClient(authTokenConfig);
 
 
   beforeAll((done) => {

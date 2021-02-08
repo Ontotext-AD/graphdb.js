@@ -1,4 +1,3 @@
-/* eslint-disable max-len */
 const ClientConfigBuilder = require('http/client-config-builder');
 const RDFRepositoryClient = require('repository/rdf-repository-client');
 const ServerClientConfig = require('server/server-client-config');
@@ -19,7 +18,8 @@ describe('RDFRepositoryClient', () => {
   };
 
   test('should initialize according the provided client configuration', () => {
-    const repoClientConfig = ClientConfigBuilder.repositoryConfig('http://localhost:8080')
+    const repoClientConfig = new ClientConfigBuilder()
+      .repositoryConfig('http://localhost:8080')
       .setEndpoints([
         'http://localhost:8080/repositories/test'
       ])
@@ -31,17 +31,22 @@ describe('RDFRepositoryClient', () => {
     const rdfRepositoryClient = new RDFRepositoryClient(repoClientConfig);
 
     expect(rdfRepositoryClient.repositoryClientConfig).toBeDefined();
-    expect(rdfRepositoryClient.repositoryClientConfig).toEqual(repoClientConfig);
+    expect(rdfRepositoryClient.repositoryClientConfig)
+      .toEqual(repoClientConfig);
 
     expect(rdfRepositoryClient.httpClients).toBeDefined();
     expect(rdfRepositoryClient.httpClients.length).toEqual(1);
-    expect(rdfRepositoryClient.httpClients[0].setDefaultHeaders).toHaveBeenCalledWith(defaultHeaders);
-    expect(rdfRepositoryClient.httpClients[0].setDefaultReadTimeout).toHaveBeenCalledWith(100);
-    expect(rdfRepositoryClient.httpClients[0].setDefaultWriteTimeout).toHaveBeenCalledWith(200);
+    expect(rdfRepositoryClient.httpClients[0].setDefaultHeaders)
+      .toHaveBeenCalledWith(defaultHeaders);
+    expect(rdfRepositoryClient.httpClients[0].setDefaultReadTimeout)
+      .toHaveBeenCalledWith(100);
+    expect(rdfRepositoryClient.httpClients[0].setDefaultWriteTimeout)
+      .toHaveBeenCalledWith(200);
   });
 
-  test('should initialize with multiple endpoints from the client configuration', () => {
-    const repoClientConfig = ClientConfigBuilder.repositoryConfig('http://localhost:8080')
+  test('should initialize with multiple endpoints from the client ' +
+    'configuration', () => {
+    const repoClientConfig = new ClientConfigBuilder().repositoryConfig('http://localhost:8080')
       .setEndpoints([
         'http://localhost:8081/repositories/test1',
         'http://localhost:8082/repositories/test2',
@@ -62,11 +67,14 @@ describe('RDFRepositoryClient', () => {
     });
   });
 
-  test('should not allow to be instantiated with improper configuration', () => {
+  test('should not allow to be instantiated with improper ' +
+    'configuration', () => {
     expect(() => new RDFRepositoryClient()).toThrow(Error);
     expect(() => new RDFRepositoryClient({})).toThrow(Error);
-    expect(() => new RDFRepositoryClient(new ServerClientConfig('', 1, {}))).toThrow(Error);
-    expect(() => new RDFRepositoryClient(ClientConfigBuilder.repositoryConfig([]))).toThrow(Error);
+    expect(() => new RDFRepositoryClient(
+      new ServerClientConfig('', 1, {}))).toThrow(Error);
+    expect(() => new RDFRepositoryClient(
+      new ClientConfigBuilder().repositoryConfig([]))).toThrow(Error);
   });
 
   describe('getSize()', () => {
@@ -74,7 +82,7 @@ describe('RDFRepositoryClient', () => {
     let httpRequest;
 
     beforeEach(() => {
-      const repoClientConfig = ClientConfigBuilder.repositoryConfig('http://localhost:8080')
+      const repoClientConfig = new ClientConfigBuilder().repositoryConfig('http://localhost:8080')
         .setEndpoints(['http://localhost:8080/repositories/test'])
         .setHeaders(defaultHeaders)
         .setDefaultRDFMimeType('application/json')
@@ -90,7 +98,8 @@ describe('RDFRepositoryClient', () => {
       return expect(rdfRepositoryClient.getSize()).resolves.toEqual(123);
     });
 
-    test('should properly request the number of statements in the repository', () => {
+    test('should properly request the number of statements ' +
+      'in the repository', () => {
       return rdfRepositoryClient.getSize().then(() => {
         const expected = HttpRequestBuilder.httpGet('/size');
         expect(httpRequest).toHaveBeenCalledTimes(1);
@@ -98,17 +107,21 @@ describe('RDFRepositoryClient', () => {
       });
     });
 
-    test('should properly request the number of statements in the repository for the specified contexts', () => {
+    test('should properly request the number of statements ' +
+      'in the repository for the specified contexts', () => {
       return rdfRepositoryClient.getSize(['context-1']).then(() => {
-        const expected = HttpRequestBuilder.httpGet('/size').addParam('context', ['<context-1>']);
+        const expected = HttpRequestBuilder.httpGet('/size')
+          .addParam('context', ['<context-1>']);
         expect(httpRequest).toHaveBeenCalledTimes(1);
         expect(httpRequest).toHaveBeenCalledWith(expected);
       });
     });
 
-    test('should reject size retrieving when the server request is unsuccessful', () => {
+    test('should reject size retrieving when the server request ' +
+      'is unsuccessful', () => {
       httpRequest.mockRejectedValue('get-size-error');
-      return expect(rdfRepositoryClient.getSize()).rejects.toEqual('get-size-error');
+      return expect(rdfRepositoryClient.getSize()).rejects
+        .toEqual('get-size-error');
     });
   });
 });

@@ -150,10 +150,9 @@ class ServerClient {
    */
   execute(requestBuilder) {
     const startTime = Date.now();
-    const username = this.config.getUsername();
-    const pass = this.config.getPass();
-    return this.authenticationService.login(username, pass)
+    return this.authenticationService.login(this.config, this.getLoggedUser())
       .then((user) => {
+        this.setLoggedUser(user);
         this.decorateRequestConfig(requestBuilder);
         return this.httpClient.request(requestBuilder);
       })
@@ -189,7 +188,7 @@ class ServerClient {
    * @return {Promise} returns a promise which resolves with undefined.
    */
   logout() {
-    return this.authenticationService.logout();
+    return this.authenticationService.logout(this.getLoggedUser());
   }
 
   /**
@@ -199,10 +198,30 @@ class ServerClient {
    * @param {HttpRequestBuilder} requestBuilder
    */
   decorateRequestConfig(requestBuilder) {
-    const token = this.authenticationService.getAuthentication();
+    const token = this.authenticationService
+      .getAuthenticationToken(this.getLoggedUser());
     if (token) {
       requestBuilder.addAuthorizationHeader(token);
     }
+  }
+
+  /**
+   * Logged user getter.
+   * @return {User} user
+   */
+  getLoggedUser() {
+    return this.user;
+  }
+
+  /**
+   * User setter
+   * @param {User} user
+   *
+   * @return {ServerClient}
+   */
+  setLoggedUser(user) {
+    this.user = user;
+    return this;
   }
 }
 

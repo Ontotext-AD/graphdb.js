@@ -1,10 +1,10 @@
-/* eslint-disable max-len */
-/* eslint "require-jsdoc": off*/
 const HttpClient = require('http/http-client');
 const RDFRepositoryClient = require('repository/rdf-repository-client');
 const ClientConfigBuilder = require('http/client-config-builder');
-const TransactionalRepositoryClient = require('transaction/transactional-repository-client');
-const TransactionIsolationLevel = require('transaction/transaction-isolation-level');
+const TransactionalRepositoryClient =
+  require('transaction/transactional-repository-client');
+const TransactionIsolationLevel =
+  require('transaction/transaction-isolation-level');
 const GetStatementsPayload = require('repository/get-statements-payload');
 const RDFMimeType = require('http/rdf-mime-type');
 const FileUtils = require('util/file-utils');
@@ -37,10 +37,11 @@ describe('RDFRepositoryClient - transactions', () => {
   const context = '<urn:x-local:graph1>';
   const baseURI = '<urn:x-local:graph2>';
 
-  const testFilePath = path.resolve(__dirname, './data/add-statements-complex.txt');
+  const testFilePath = path.resolve(__dirname,
+    './data/add-statements-complex.txt');
 
   beforeEach(() => {
-    repoClientConfig = ClientConfigBuilder.repositoryConfig('http://localhost:8080')
+    repoClientConfig = new ClientConfigBuilder().repositoryConfig('http://localhost:8080')
       .setEndpoints([
         'http://localhost:8080/repositories/test',
         'http://localhost:8081/repositories/test'
@@ -64,41 +65,53 @@ describe('RDFRepositoryClient - transactions', () => {
 
   describe('beginTransaction()', () => {
     test('should start a transaction and produce transactional client', () => {
-      return rdfRepositoryClient.beginTransaction().then((transactionalClient) => {
-        expect(transactionalClient).toBeInstanceOf(TransactionalRepositoryClient);
+      return rdfRepositoryClient.beginTransaction()
+        .then((transactionalClient) => {
+          expect(transactionalClient).
+            toBeInstanceOf(TransactionalRepositoryClient);
 
-        const transactionalConfig = transactionalClient.repositoryClientConfig;
-        expect(transactionalConfig).toBeDefined();
-        expect(transactionalConfig.endpoints).toEqual([transactionUrl]);
-        expect(transactionalConfig.defaultRDFContentType).toEqual(repoClientConfig.defaultRDFContentType);
-        expect(transactionalConfig.headers).toEqual(repoClientConfig.headers);
-        expect(transactionalConfig.readTimeout).toEqual(repoClientConfig.readTimeout);
-        expect(transactionalConfig.writeTimeout).toEqual(repoClientConfig.writeTimeout);
+          const transactionalConfig = transactionalClient
+            .repositoryClientConfig;
+          expect(transactionalConfig).toBeDefined();
+          expect(transactionalConfig.endpoints).toEqual([transactionUrl]);
+          expect(transactionalConfig.defaultRDFContentType)
+            .toEqual(repoClientConfig.defaultRDFContentType);
+          expect(transactionalConfig.headers).toEqual(repoClientConfig.headers);
+          expect(transactionalConfig.readTimeout)
+            .toEqual(repoClientConfig.readTimeout);
+          expect(transactionalConfig.writeTimeout)
+            .toEqual(repoClientConfig.writeTimeout);
 
-        // Transactions must be executed against single endpoint
-        expect(transactionalClient.httpClients).toBeDefined();
-        expect(transactionalClient.httpClients.length).toEqual(1);
-        expect(transactionalClient.httpClients[0].baseUrl).toEqual(transactionUrl);
-        expect(transactionalClient.httpClients[0].setDefaultHeaders).toHaveBeenCalledWith(defaultHeaders);
+          // Transactions must be executed against single endpoint
+          expect(transactionalClient.httpClients).toBeDefined();
+          expect(transactionalClient.httpClients.length).toEqual(1);
+          expect(transactionalClient.httpClients[0].baseUrl)
+            .toEqual(transactionUrl);
+          expect(transactionalClient.httpClients[0].setDefaultHeaders)
+            .toHaveBeenCalledWith(defaultHeaders);
 
-        expect(transactionalClient.isActive()).toEqual(true);
+          expect(transactionalClient.isActive()).toEqual(true);
 
-        expect(httpRequest).toHaveBeenCalledTimes(1);
-        expect(httpRequest).toHaveBeenCalledWith(HttpRequestBuilder.httpPost('/transactions'));
-      });
+          expect(httpRequest).toHaveBeenCalledTimes(1);
+          expect(httpRequest)
+            .toHaveBeenCalledWith(HttpRequestBuilder.httpPost('/transactions'));
+        });
     });
 
     test('should start a transaction with specified isolation level', () => {
-      return rdfRepositoryClient.beginTransaction(TransactionIsolationLevel.READ_UNCOMMITTED).then((transactionalClient) => {
-        expect(transactionalClient).toBeInstanceOf(TransactionalRepositoryClient);
+      return rdfRepositoryClient
+        .beginTransaction(TransactionIsolationLevel.READ_UNCOMMITTED)
+        .then((transactionalClient) => {
+          expect(transactionalClient)
+            .toBeInstanceOf(TransactionalRepositoryClient);
 
-        const expectedRequest = HttpRequestBuilder.httpPost('/transactions')
-          .setParams({
-            'isolation-level': TransactionIsolationLevel.READ_UNCOMMITTED
-          });
-        expect(httpRequest).toHaveBeenCalledTimes(1);
-        expect(httpRequest).toHaveBeenCalledWith(expectedRequest);
-      });
+          const expectedRequest = HttpRequestBuilder.httpPost('/transactions')
+            .setParams({
+              'isolation-level': TransactionIsolationLevel.READ_UNCOMMITTED
+            });
+          expect(httpRequest).toHaveBeenCalledTimes(1);
+          expect(httpRequest).toHaveBeenCalledWith(expectedRequest);
+        });
     });
 
     test('should start a transaction that can be committed', () => {
@@ -110,7 +123,8 @@ describe('RDFRepositoryClient - transactions', () => {
         const expectedRequest = HttpRequestBuilder.httpPut('').setParams({
           action: 'COMMIT'
         });
-        const transactionalHttpRequest = transactionalClient.httpClients[0].request;
+        const transactionalHttpRequest =
+          transactionalClient.httpClients[0].request;
         expect(transactionalHttpRequest).toHaveBeenCalledTimes(1);
         expect(transactionalHttpRequest).toHaveBeenCalledWith(expectedRequest);
         expect(transactionalClient.isActive()).toEqual(false);
@@ -123,9 +137,11 @@ describe('RDFRepositoryClient - transactions', () => {
         transactionalClient = client;
         return transactionalClient.rollback();
       }).then(() => {
-        const transactionalHttpRequest = transactionalClient.httpClients[0].request;
+        const transactionalHttpRequest =
+          transactionalClient.httpClients[0].request;
         expect(transactionalHttpRequest).toHaveBeenCalledTimes(1);
-        expect(transactionalHttpRequest).toHaveBeenCalledWith(HttpRequestBuilder.httpDelete(''));
+        expect(transactionalHttpRequest)
+          .toHaveBeenCalledWith(HttpRequestBuilder.httpDelete(''));
         expect(transactionalClient.isActive()).toEqual(false);
       });
     });
@@ -133,7 +149,8 @@ describe('RDFRepositoryClient - transactions', () => {
     test('should reject if it cannot start a transaction', () => {
       const err = new Error('Cannot begin transaction');
       httpRequest.mockRejectedValue(err);
-      return expect(rdfRepositoryClient.beginTransaction()).rejects.toEqual(err);
+      return expect(rdfRepositoryClient.beginTransaction())
+        .rejects.toEqual(err);
     });
 
     test('should disallow using inactive transaction after commit', () => {
@@ -148,7 +165,8 @@ describe('RDFRepositoryClient - transactions', () => {
       });
     });
 
-    test('should reject if the transactional client cannot commit in case of server error', () => {
+    test('should reject if the transactional client cannot commit ' +
+      'in case of server error', () => {
       const err = new Error('cannot commit');
       let transactionalClient;
       return rdfRepositoryClient.beginTransaction().then((client) => {
@@ -158,7 +176,8 @@ describe('RDFRepositoryClient - transactions', () => {
       });
     });
 
-    test('should disallow using inactive transaction after commit failure', () => {
+    test('should disallow using inactive transaction after ' +
+      'commit failure', () => {
       const err = new Error('cannot commit');
       let transactionalClient;
       return rdfRepositoryClient.beginTransaction().then((client) => {
@@ -184,7 +203,8 @@ describe('RDFRepositoryClient - transactions', () => {
       });
     });
 
-    test('should reject if the transactional client cannot rollback in case of server error', () => {
+    test('should reject if the transactional client cannot rollback ' +
+      'in case of server error', () => {
       const err = new Error('cannot rollback');
       let transactionalClient;
       return rdfRepositoryClient.beginTransaction().then((client) => {
@@ -194,7 +214,8 @@ describe('RDFRepositoryClient - transactions', () => {
       });
     });
 
-    test('should disallow using inactive transaction after rollback failure', () => {
+    test('should disallow using inactive transaction after ' +
+      'rollback failure', () => {
       const err = new Error('cannot rollback');
       let transactionalClient;
       return rdfRepositoryClient.beginTransaction().then((client) => {
@@ -212,7 +233,8 @@ describe('RDFRepositoryClient - transactions', () => {
       // Reset headers
       const response = {headers: {}};
       httpRequest.mockResolvedValue(response);
-      return expect(rdfRepositoryClient.beginTransaction()).rejects.toEqual(Error('Couldn\'t obtain transaction ID'));
+      return expect(rdfRepositoryClient.beginTransaction()).rejects
+        .toEqual(Error('Couldn\'t obtain transaction ID'));
     });
   });
 
@@ -258,9 +280,11 @@ describe('RDFRepositoryClient - transactions', () => {
         });
       });
 
-      test('should reject if the transaction cannot retrieve the repository size', () => {
+      test('should reject if the transaction cannot retrieve ' +
+        'the repository size', () => {
         transactionHttpRequest.mockRejectedValue('Error during size retrieve');
-        return expect(transaction.getSize()).rejects.toEqual('Error during size retrieve');
+        return expect(transaction.getSize()).rejects
+          .toEqual('Error during size retrieve');
       });
     });
 
@@ -292,9 +316,11 @@ describe('RDFRepositoryClient - transactions', () => {
         });
       });
 
-      test('should reject if the transaction cannot retrieve statements', () => {
+      test('should reject if the transaction cannot ' +
+        'retrieve statements', () => {
         transactionHttpRequest.mockRejectedValue('Error during retrieve');
-        return expect(transaction.get(getStatementPayload())).rejects.toEqual('Error during retrieve');
+        return expect(transaction.get(getStatementPayload())).rejects
+          .toEqual('Error during retrieve');
       });
     });
 
@@ -331,7 +357,8 @@ describe('RDFRepositoryClient - transactions', () => {
         });
       });
 
-      test('should reject if the transaction cannot perform a query request', () => {
+      test('should reject if the transaction cannot perform ' +
+        'a query request', () => {
         const err = new Error('Cannot query');
         transactionHttpRequest.mockRejectedValue(err);
         return expect(transaction.query(payload)).rejects.toEqual(err);
@@ -358,7 +385,8 @@ describe('RDFRepositoryClient - transactions', () => {
         });
       });
 
-      test('should reject if the transaction cannot perform an update request', () => {
+      test('should reject if the transaction cannot perform ' +
+        'an update request', () => {
         const err = new Error('Cannot update');
         transactionHttpRequest.mockRejectedValue(err);
         return expect(transaction.update(updatePayload)).rejects.toEqual(err);
@@ -377,14 +405,17 @@ describe('RDFRepositoryClient - transactions', () => {
         .setContext('http://domain/graph/data-graph-1')
         .setBaseURI(baseURI);
 
-      test('should convert the payload to proper Turtle and send it to the server', () => {
-        const expectedData = testUtils.loadFile('repository/data/add-statements-context.txt').trim();
+      test('should convert the payload to proper Turtle and ' +
+        'send it to the server', () => {
+        const expectedData = testUtils
+          .loadFile('repository/data/add-statements-context.txt').trim();
         return transaction.add(payload).then(() => {
           expectInsertedData(expectedData, '<http://domain/graph/data-graph-1>', baseURI);
         });
       });
 
-      test('should convert the literal payload to proper Turtle and send it to the server', () => {
+      test('should convert the literal payload to proper Turtle and ' +
+        'send it to the server', () => {
         payload = new AddStatementPayload()
           .setSubject('http://domain/resource/resource-1')
           .setPredicate('http://domain/property/property-1')
@@ -393,14 +424,17 @@ describe('RDFRepositoryClient - transactions', () => {
           .setContext('http://domain/graph/data-graph-1')
           .setBaseURI(baseURI);
 
-        const expectedData = testUtils.loadFile('repository/data/add-statements-context-literal.txt').trim();
+        const expectedData = testUtils
+          .loadFile('repository/data/add-statements-context-literal.txt')
+          .trim();
         return transaction.add(payload).then(() => {
           expectInsertedData(expectedData, '<http://domain/graph/data-graph-1>', baseURI);
         });
       });
 
       test('should throw error when a payload is not provided', () => {
-        expect(() => transaction.add()).toThrow(Error('Cannot add statement without payload'));
+        expect(() => transaction.add())
+          .toThrow(Error('Cannot add statement without payload'));
         expectNoInsertedData();
       });
 
@@ -410,7 +444,8 @@ describe('RDFRepositoryClient - transactions', () => {
         expectNoInsertedData();
       });
 
-      test('should reject adding the payload if it lacks required terms', () => {
+      test('should reject adding the payload if it lacks ' +
+        'required terms', () => {
         const payload = new AddStatementPayload()
           .setSubject('http://domain/resource/resource-1')
           .setPredicate('http://domain/property/property-1');
@@ -420,7 +455,8 @@ describe('RDFRepositoryClient - transactions', () => {
 
       test('should reject if the transaction cannot insert statements', () => {
         transactionHttpRequest.mockRejectedValue('Error during add');
-        return expect(transaction.add(payload)).rejects.toEqual('Error during add');
+        return expect(transaction.add(payload)).rejects
+          .toEqual('Error during add');
       });
 
       test('should resolve to empty response (HTTP 204)', () => {
@@ -440,7 +476,8 @@ describe('RDFRepositoryClient - transactions', () => {
         });
       });
 
-      test('should support adding quads in given context and base URI for resolving', () => {
+      test('should support adding quads in given context and base URI ' +
+        'for resolving', () => {
         const q = quad(
           namedNode('http://domain/resource/resource-1'),
           namedNode('http://domain/property/relation-1'),
@@ -458,7 +495,8 @@ describe('RDFRepositoryClient - transactions', () => {
           literal('Title', 'en'));
 
         transactionHttpRequest.mockRejectedValue('Error during quads add');
-        return expect(transaction.addQuads([q])).rejects.toEqual('Error during quads add');
+        return expect(transaction.addQuads([q])).rejects
+          .toEqual('Error during quads add');
       });
 
       test('should resolve to empty response (HTTP 204)', () => {
@@ -470,7 +508,8 @@ describe('RDFRepositoryClient - transactions', () => {
       });
     });
 
-    function expectInsertedData(expectedData, expectedContext, expectedBaseURI) {
+    function expectInsertedData(expectedData, expectedContext,
+      expectedBaseURI) {
       const expectedRequest = HttpRequestBuilder.httpPut('')
         .setData(expectedData)
         .setHeaders({
@@ -514,7 +553,8 @@ describe('RDFRepositoryClient - transactions', () => {
 
       test('should reject if the transaction cannot delete data', () => {
         transactionHttpRequest.mockRejectedValue('Error during delete');
-        return expect(transaction.deleteData(data)).rejects.toEqual('Error during delete');
+        return expect(transaction.deleteData(data)).rejects
+          .toEqual('Error during delete');
       });
 
       test('should resolve to empty response (HTTP 204)', () => {
@@ -527,12 +567,13 @@ describe('RDFRepositoryClient - transactions', () => {
         transactionHttpRequest.mockResolvedValue({
           data: FileUtils.getReadStream(testFilePath)
         });
-        return transaction.download(getStatementPayload()).then((dataStream) => {
-          return testUtils.readStream(dataStream);
-        }).then((data) => {
-          const turtleData = testUtils.loadFile(testFilePath).trim();
-          expect(data).toEqual(turtleData);
-        });
+        return transaction.download(getStatementPayload())
+          .then((dataStream) => {
+            return testUtils.readStream(dataStream);
+          }).then((data) => {
+            const turtleData = testUtils.loadFile(testFilePath).trim();
+            expect(data).toEqual(turtleData);
+          });
       });
 
       test('should properly request to download data', () => {
@@ -561,7 +602,8 @@ describe('RDFRepositoryClient - transactions', () => {
       test('should reject if the transaction cannot download data', () => {
         const err = new Error('Cannot download data');
         transactionHttpRequest.mockRejectedValue(err);
-        return expect(transaction.download(getStatementPayload())).rejects.toEqual(err);
+        return expect(transaction.download(getStatementPayload())).rejects
+          .toEqual(err);
       });
     });
 
@@ -569,63 +611,83 @@ describe('RDFRepositoryClient - transactions', () => {
       test('should upload data stream in given context and base URI', () => {
         const turtleStream = FileUtils.getReadStream(testFilePath);
 
-        return transaction.upload(turtleStream, RDFMimeType.TRIG, context, baseURI).then(() => {
-          expect(transactionHttpRequest).toHaveBeenCalledTimes(1);
-          const requestBuilder = transactionHttpRequest.mock.calls[0][0];
-          verifyUploadRequestBuilder(requestBuilder);
-          return testUtils.readStream(requestBuilder.getData());
-        }).then((streamData) => {
-          const turtleData = testUtils.loadFile(testFilePath).trim();
-          expect(streamData).toEqual(turtleData);
-        });
+        return transaction
+          .upload(turtleStream, RDFMimeType.TRIG, context, baseURI)
+          .then(() => {
+            expect(transactionHttpRequest).toHaveBeenCalledTimes(1);
+            const requestBuilder = transactionHttpRequest.mock.calls[0][0];
+            verifyUploadRequestBuilder(requestBuilder);
+            return testUtils.readStream(requestBuilder.getData());
+          }).then((streamData) => {
+            const turtleData = testUtils.loadFile(testFilePath).trim();
+            expect(streamData).toEqual(turtleData);
+          });
       });
 
-      test('should reject if the server cannot consume the upload request', () => {
+      test('should reject if the server cannot consume ' +
+        'the upload request', () => {
         const error = new Error('cannot-upload');
         transactionHttpRequest.mockRejectedValue(error);
 
         const turtleStream = FileUtils.getReadStream(testFilePath);
-        const promise = transaction.upload(turtleStream, RDFMimeType.TRIG, context, null);
+        const promise = transaction
+          .upload(turtleStream, RDFMimeType.TRIG, context, null);
         return expect(promise).rejects.toEqual(error);
       });
 
       test('should resolve to empty response (HTTP 204)', () => {
         const turtleStream = FileUtils.getReadStream(testFilePath);
-        return expect(transaction.upload(turtleStream, RDFMimeType.TRIG, context, baseURI)).resolves.toEqual();
+        return expect(transaction
+          .upload(turtleStream, RDFMimeType.TRIG, context, baseURI)).resolves
+          .toEqual();
       });
     });
 
     describe('addFile()', () => {
-      const testFilePath = path.resolve(__dirname, './data/add-statements-complex.txt');
+      const testFilePath = path
+        .resolve(__dirname, './data/add-statements-complex.txt');
 
-      test('should upload file with data as stream in given context and base URI', () => {
-        return transaction.addFile(testFilePath, RDFMimeType.TRIG, context, baseURI).then(() => {
-          expect(transactionHttpRequest).toHaveBeenCalledTimes(1);
-          const requestBuilder = transactionHttpRequest.mock.calls[0][0];
-          verifyUploadRequestBuilder(requestBuilder);
-          return testUtils.readStream(requestBuilder.getData());
-        }).then((streamData) => {
-          const turtleData = testUtils.loadFile(testFilePath).trim();
-          expect(streamData).toEqual(turtleData);
-        });
+      test('should upload file with data as stream in given context ' +
+        'and base URI', () => {
+        return transaction
+          .addFile(testFilePath, RDFMimeType.TRIG, context, baseURI)
+          .then(() => {
+            expect(transactionHttpRequest).toHaveBeenCalledTimes(1);
+            const requestBuilder = transactionHttpRequest.mock.calls[0][0];
+            verifyUploadRequestBuilder(requestBuilder);
+            return testUtils.readStream(requestBuilder.getData());
+          }).then((streamData) => {
+            const turtleData = testUtils.loadFile(testFilePath).trim();
+            expect(streamData).toEqual(turtleData);
+          });
       });
 
-      test('should reject if the server cannot consume the file upload request', () => {
+      test('should reject if the server cannot consume the file ' +
+        'upload request', () => {
         const error = new Error('cannot-upload');
         transactionHttpRequest.mockRejectedValue(error);
 
-        const promise = transaction.addFile(testFilePath, RDFMimeType.TRIG, context, null);
+        const promise = transaction
+          .addFile(testFilePath, RDFMimeType.TRIG, context, null);
         return expect(promise).rejects.toEqual(error);
       });
 
       test('should disallow uploading missing files', () => {
-        expect(() => transaction.addFile(null, RDFMimeType.TRIG, context, baseURI)).toThrow(Error);
-        expect(() => transaction.addFile('', RDFMimeType.TRIG, context, baseURI)).toThrow(Error);
-        expect(() => transaction.addFile('missing-file-123', RDFMimeType.TRIG, context, baseURI)).toThrow(Error);
+        expect(() => transaction
+          .addFile(null, RDFMimeType.TRIG, context, baseURI))
+          .toThrow(Error);
+        expect(() => transaction
+          .addFile('', RDFMimeType.TRIG, context, baseURI))
+          .toThrow(Error);
+        expect(() => transaction
+          .addFile('missing-file-123', RDFMimeType.TRIG, context, baseURI))
+          .toThrow(Error);
       });
 
       test('should resolve to empty response (HTTP 204)', () => {
-        return expect(transaction.addFile(testFilePath, RDFMimeType.TRIG, context, baseURI)).resolves.toEqual();
+        return expect(transaction
+          .addFile(testFilePath, RDFMimeType.TRIG, context, baseURI)).resolves
+          .toEqual();
       });
     });
 

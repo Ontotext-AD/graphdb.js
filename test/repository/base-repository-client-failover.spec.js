@@ -1,5 +1,3 @@
-/* eslint-disable max-len */
-/* eslint "require-jsdoc": off*/
 const HttpClient = require('http/http-client');
 const ClientConfigBuilder = require('http/client-config-builder');
 const BaseRepositoryClient = require('repository/base-repository-client');
@@ -15,7 +13,8 @@ describe('BaseRepositoryClient', () => {
 
   describe('Automatic failover - retrying with different repo endpoint', () => {
     beforeEach(() => {
-      repoClientConfig = ClientConfigBuilder.repositoryConfig('http://localhost:8083')
+      repoClientConfig = new ClientConfigBuilder()
+        .repositoryConfig('http://localhost:8083')
         .setEndpoints([
           'http://localhost:8081/repositories/test1',
           'http://localhost:8082/repositories/test2',
@@ -30,7 +29,8 @@ describe('BaseRepositoryClient', () => {
       requestBuilder = HttpRequestBuilder.httpGet('/service');
     });
 
-    test('should automatically switch to another repository endpoint if the status is allowed for retry', () => {
+    test('should automatically switch to another repository endpoint ' +
+      'if the status is allowed for retry', () => {
       const httpClient1 = repositoryClient.httpClients[0];
       stubHttpClient(httpClient1, 503);
 
@@ -48,7 +48,8 @@ describe('BaseRepositoryClient', () => {
       });
     });
 
-    test('should reject if all repository endpoint have unsuccessful responses', () => {
+    test('should reject if all repository endpoint have ' +
+      'unsuccessful responses', () => {
       const httpClient1 = repositoryClient.httpClients[0];
       stubHttpClient(httpClient1, 503);
 
@@ -65,7 +66,8 @@ describe('BaseRepositoryClient', () => {
       });
     });
 
-    test('should automatically switch to another repository endpoint if the previous is/are unreachable', () => {
+    test('should automatically switch to another repository endpoint ' +
+      'if the previous is/are unreachable', () => {
       const httpClient1 = repositoryClient.httpClients[0];
       stubHttpClientWithoutResponse(httpClient1);
 
@@ -104,7 +106,8 @@ describe('BaseRepositoryClient', () => {
     test('should reject if the error is not from the HTTP request', () => {
       //
       const httpClient1 = repositoryClient.httpClients[0];
-      httpClient1.request.mockRejectedValue(new Error('Error before/after request'));
+      httpClient1.request
+        .mockRejectedValue(new Error('Error before/after request'));
 
       const httpClient2 = repositoryClient.httpClients[1];
       const httpClient3 = repositoryClient.httpClients[2];

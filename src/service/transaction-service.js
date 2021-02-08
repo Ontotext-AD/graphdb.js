@@ -79,7 +79,8 @@ class TransactionService extends Service {
    */
   getTransactionalClientConfig(locationUrl) {
     const config = this.repositoryClientConfig;
-    return ClientConfigBuilder.repositoryConfig(config.getEndpoint())
+    return new ClientConfigBuilder()
+      .repositoryConfig(config.getEndpoint())
       .setEndpoints([locationUrl])
       .setHeaders(config.getHeaders())
       .setDefaultRDFMimeType(config.getDefaultRDFMimeType())

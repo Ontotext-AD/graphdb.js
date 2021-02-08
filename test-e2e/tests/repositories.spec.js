@@ -16,9 +16,9 @@ describe('Should test repositories', () => {
   });
 
   test('Should verify repositories', () => {
-    const config = ClientConfigBuilder.serverConfig(Config.serverAddress);
+    const config = new ClientConfigBuilder().serverConfig(Config.serverAddress);
     const client = new ServerClient(config);
-    const repositoryClientConfig = ClientConfigBuilder.repositoryConfig(Config.serverAddress)
+    const repositoryClientConfig = new ClientConfigBuilder().repositoryConfig(Config.serverAddress)
       .setEndpoints([`${Config.serverAddress}/repositories/`])
       .setReadTimeout(3001)
       .setWriteTimeout(3001);

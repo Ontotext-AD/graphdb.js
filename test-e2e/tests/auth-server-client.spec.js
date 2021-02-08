@@ -1,4 +1,3 @@
-/* eslint "require-jsdoc": off*/
 const {RepositoryConfig, RepositoryType} = require('graphdb').repository;
 const {GraphDBServerClient} = require('graphdb').server;
 const {ClientConfigBuilder} = require('graphdb').http;
@@ -8,10 +7,6 @@ const Config = require('config');
 const NEW_REPO = 'New_repo';
 
 describe('Should test server client auth', () => {
-  const config = ClientConfigBuilder.serverConfig(Config.serverAddress)
-    .setUsername('admin')
-    .setPass('root');
-
   beforeAll((done) => {
     Utils.toggleSecurity(true).then(() => {
       done();
@@ -29,12 +24,17 @@ describe('Should test server client auth', () => {
   });
 
   test('Should add and delete repository with BASIC auth', (done) => {
+    const config = new ClientConfigBuilder()
+      .serverConfig(Config.serverAddress)
+      .useBasicAuthentication('admin', 'root');
     const serverClient = new GraphDBServerClient(config);
     createRepository(serverClient, done);
   });
 
   test('Should add and delete repository with TOKEN auth', (done) => {
-    config.setBasicAuthentication(false);
+    const config = new ClientConfigBuilder()
+      .serverConfig(Config.serverAddress)
+      .useGdbTokenAuthentication('admin', 'root');
     const serverClient = new GraphDBServerClient(config);
     createRepository(serverClient, done);
   });

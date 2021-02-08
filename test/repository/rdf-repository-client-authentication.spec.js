@@ -1,6 +1,3 @@
-/* eslint-disable max-len */
-/* eslint "require-jsdoc": off*/
-/* eslint prefer-promise-reject-errors: "off"*/
 const HttpClient = require('http/http-client');
 const RDFRepositoryClient = require('repository/rdf-repository-client');
 const ClientConfigBuilder = require('http/client-config-builder');
@@ -31,14 +28,13 @@ describe('RDFRepositoryClient - authentication', () => {
     const writeTimeout = 1000;
     const endpoint = 'http://localhost:7200';
 
-    config = ClientConfigBuilder.repositoryConfig(endpoint)
+    config = new ClientConfigBuilder().repositoryConfig(endpoint)
       .setEndpoints(endpoints)
       .setHeaders(headers)
       .setDefaultRDFMimeType(contentType)
       .setReadTimeout(readTimeout)
       .setWriteTimeout(writeTimeout)
-      .setUsername('testuser')
-      .setPass('pass123');
+      .useGdbTokenAuthentication('testuser', 'pass123');
     repository = new RDFRepositoryClient(config);
     httpRequest = repository.httpClient.request;
 
@@ -120,10 +116,10 @@ describe('RDFRepositoryClient - authentication', () => {
         jest.fn().mockImplementation((request) => {
           if (request.getMethod() === 'get') {
             calls++;
-            if (repository.authenticationService.getLoggedUser()
+            if (repository.getLoggedUser()
               && calls === 2) {
             // emulate token expiration
-              repository.authenticationService.getLoggedUser().clearToken();
+              repository.getLoggedUser().clearToken();
               return Promise.reject({
                 response: {
                   status: 401

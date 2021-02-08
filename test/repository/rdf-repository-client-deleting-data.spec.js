@@ -1,4 +1,3 @@
-/* eslint-disable max-len */
 const HttpClient = require('http/http-client');
 const ClientConfigBuilder = require('http/client-config-builder');
 const RDFRepositoryClient = require('repository/rdf-repository-client');
@@ -21,7 +20,7 @@ describe('RDFRepositoryClient - Deleting statements', () => {
   let httpRequest;
 
   beforeEach(() => {
-    repoClientConfig = ClientConfigBuilder.repositoryConfig('http://localhost:8080')
+    repoClientConfig = new ClientConfigBuilder().repositoryConfig('http://localhost:8080')
       .setEndpoints(['http://localhost:8080/repositories/test'])
       .setReadTimeout(100)
       .setWriteTimeout(200);
@@ -36,43 +35,56 @@ describe('RDFRepositoryClient - Deleting statements', () => {
     test('should allow to delete all statements for given subject', () => {
       return rdfRepositoryClient.deleteStatements(subj).then(() => {
         expect(httpRequest).toHaveBeenCalledTimes(1);
-        expect(httpRequest).toHaveBeenCalledWith(HttpRequestBuilder.httpDelete('/statements').setParams({
-          subj, pred: undefined, obj: undefined, context: undefined
-        }));
+        expect(httpRequest)
+          .toHaveBeenCalledWith(HttpRequestBuilder.httpDelete('/statements')
+            .setParams({
+              subj, pred: undefined, obj: undefined, context: undefined
+            }));
       });
     });
 
     test('should allow to delete specific statement', () => {
       return rdfRepositoryClient.deleteStatements(subj, pred, obj).then(() => {
         expect(httpRequest).toHaveBeenCalledTimes(1);
-        expect(httpRequest).toHaveBeenCalledWith(HttpRequestBuilder.httpDelete('/statements').setParams({
-          subj, pred, obj, context: undefined
-        }));
+        expect(httpRequest)
+          .toHaveBeenCalledWith(HttpRequestBuilder.httpDelete('/statements')
+            .setParams({
+              subj, pred, obj, context: undefined
+            }));
       });
     });
 
-    test('should allow to delete specific statements in specific graphs', () => {
+    test('should allow to delete specific statements in ' +
+      'specific graphs', () => {
       const contexts = [context, '<http://domain/graph/2>'];
-      return rdfRepositoryClient.deleteStatements(subj, pred, obj, contexts).then(() => {
-        expect(httpRequest).toHaveBeenCalledTimes(1);
-        expect(httpRequest).toHaveBeenCalledWith(HttpRequestBuilder.httpDelete('/statements').setParams({
-          subj, pred, obj, context: contexts
-        }));
-      });
+      return rdfRepositoryClient.deleteStatements(subj, pred, obj, contexts)
+        .then(() => {
+          expect(httpRequest).toHaveBeenCalledTimes(1);
+          expect(httpRequest)
+            .toHaveBeenCalledWith(HttpRequestBuilder.httpDelete('/statements')
+              .setParams({
+                subj, pred, obj, context: contexts
+              }));
+        });
     });
 
     test('should allow to delete all statements from specific graph', () => {
-      return rdfRepositoryClient.deleteStatements(null, null, null, context).then(() => {
-        expect(httpRequest).toHaveBeenCalledTimes(1);
-        expect(httpRequest).toHaveBeenCalledWith(HttpRequestBuilder.httpDelete('/statements').setParams({
-          subj: undefined, pred: undefined, obj: undefined, context
-        }));
-      });
+      return rdfRepositoryClient.deleteStatements(null, null, null, context)
+        .then(() => {
+          expect(httpRequest).toHaveBeenCalledTimes(1);
+          expect(httpRequest)
+            .toHaveBeenCalledWith(HttpRequestBuilder.httpDelete('/statements')
+              .setParams({
+                subj: undefined, pred: undefined, obj: undefined, context
+              }));
+        });
     });
 
-    test('should reject deleting statements when the server request is unsuccessful', () => {
+    test('should reject deleting statements when the server request ' +
+      'is unsuccessful', () => {
       httpRequest.mockRejectedValue('error-deleting');
-      return expect(rdfRepositoryClient.deleteStatements(subj)).rejects.toEqual('error-deleting');
+      return expect(rdfRepositoryClient.deleteStatements(subj)).rejects
+        .toEqual('error-deleting');
     });
 
     test('should convert parameters to N-Triple encoded resources', () => {
@@ -82,14 +94,17 @@ describe('RDFRepositoryClient - Deleting statements', () => {
         'http://domain/value/1',
         'http://domain/graph/1').then(() => {
         expect(httpRequest).toHaveBeenCalledTimes(1);
-        expect(httpRequest).toHaveBeenCalledWith(HttpRequestBuilder.httpDelete('/statements').setParams({
-          subj, pred, obj, context
-        }));
+        expect(httpRequest)
+          .toHaveBeenCalledWith(HttpRequestBuilder.httpDelete('/statements')
+            .setParams({
+              subj, pred, obj, context
+            }));
       });
     });
 
     test('should resolve to empty response (HTTP 204)', () => {
-      return expect(rdfRepositoryClient.deleteStatements(subj)).resolves.toEqual();
+      return expect(rdfRepositoryClient.deleteStatements(subj)).resolves
+        .toEqual();
     });
   });
 
@@ -97,17 +112,21 @@ describe('RDFRepositoryClient - Deleting statements', () => {
     test('should properly request all statements deletion', () => {
       return rdfRepositoryClient.deleteAllStatements().then(() => {
         expect(httpRequest).toHaveBeenCalledTimes(1);
-        expect(httpRequest).toHaveBeenCalledWith(HttpRequestBuilder.httpDelete('/statements'));
+        expect(httpRequest)
+          .toHaveBeenCalledWith(HttpRequestBuilder.httpDelete('/statements'));
       });
     });
 
-    test('should reject deleting all statements when the server request is unsuccessful', () => {
+    test('should reject deleting all statements when the server request is ' +
+      'unsuccessful', () => {
       httpRequest.mockRejectedValue('error-deleting-all');
-      return expect(rdfRepositoryClient.deleteAllStatements()).rejects.toEqual('error-deleting-all');
+      return expect(rdfRepositoryClient.deleteAllStatements()).rejects
+        .toEqual('error-deleting-all');
     });
 
     test('should resolve to empty response (HTTP 204)', () => {
-      return expect(rdfRepositoryClient.deleteAllStatements()).resolves.toEqual();
+      return expect(rdfRepositoryClient.deleteAllStatements()).resolves
+        .toEqual();
     });
   });
 });

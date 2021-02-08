@@ -23,25 +23,23 @@ class ClientConfigBuilder {
    * Returns new builder for {@link RepositoryClientConfig}
    * for the provided GDB endpoint with default configurations
    *
-   * @static
    * @param {string} endpoint
    * @return {RepositoryClientConfig}
    */
-  static repositoryConfig(endpoint) {
-    return new ClientConfigBuilder().buildRepositoryClientConfig(endpoint);
+  repositoryConfig(endpoint) {
+    return this.buildRepositoryClientConfig(endpoint);
   }
 
   /**
    * Prepares new builder for {@link ServerClientConfig}
    * for the provided GDB endpoint with default configurations
    *
-   * @static
    * @param {string} endpoint  server base URL that will be prepend
    * to all server requests
    * @return {ServerClientConfig}
    */
-  static serverConfig(endpoint) {
-    return new ClientConfigBuilder().buildServerClientConfig(endpoint);
+  serverConfig(endpoint) {
+    return this.buildServerClientConfig(endpoint);
   }
 
   /**

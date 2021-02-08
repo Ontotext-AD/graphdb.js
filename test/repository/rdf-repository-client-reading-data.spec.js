@@ -1,5 +1,3 @@
-/* eslint-disable max-len */
-/* eslint "require-jsdoc": off*/
 const HttpClient = require('http/http-client');
 const RDFRepositoryClient = require('repository/rdf-repository-client');
 const ClientConfigBuilder = require('http/client-config-builder');
@@ -32,8 +30,10 @@ jest.mock('http/http-client');
 
 import data from './data/read-statements';
 
-const jsonldDataFile = path.resolve(__dirname, './data/read-statements-jsonld.txt');
-const rdfxmlDataFile = path.resolve(__dirname, './data/read-statements-rdfxml.txt');
+const jsonldDataFile =
+  path.resolve(__dirname, './data/read-statements-jsonld.txt');
+const rdfxmlDataFile =
+  path.resolve(__dirname, './data/read-statements-rdfxml.txt');
 
 describe('RDFRepositoryClient - reading statements', () => {
   let config;
@@ -49,7 +49,7 @@ describe('RDFRepositoryClient - reading statements', () => {
     const readTimeout = 1000;
     const writeTimeout = 1000;
 
-    config = ClientConfigBuilder.repositoryConfig('http://host')
+    config = new ClientConfigBuilder().repositoryConfig('http://host')
       .setEndpoints(endpoints)
       .setHeaders(headers)
       .setDefaultRDFMimeType(contentType)
@@ -79,7 +79,8 @@ describe('RDFRepositoryClient - reading statements', () => {
         .setResponseType(type);
     }
 
-    test('should fetch statement in N-Triples format and return it converted to quads', () => {
+    test('should fetch statement in N-Triples format and return it ' +
+      'converted to quads', () => {
       repository.registerParser(new NTriplesParser());
 
       mockHttpRequest(RDFMimeType.N_TRIPLES);
@@ -88,7 +89,8 @@ describe('RDFRepositoryClient - reading statements', () => {
       return expect(repository.get(payload)).resolves.toEqual(expected);
     });
 
-    test('should fetch statement in N3 format and return it converted to quads', () => {
+    test('should fetch statement in N3 format and return it ' +
+      'converted to quads', () => {
       repository.registerParser(new N3Parser());
 
       mockHttpRequest(RDFMimeType.N3);
@@ -97,7 +99,8 @@ describe('RDFRepositoryClient - reading statements', () => {
       return expect(repository.get(payload)).resolves.toEqual(expected);
     });
 
-    test('should fetch statement in TriG format and return it converted to quads', () => {
+    test('should fetch statement in TriG format and return it ' +
+      'converted to quads', () => {
       repository.registerParser(new TriGParser());
 
       mockHttpRequest(RDFMimeType.TRIG);
@@ -106,7 +109,8 @@ describe('RDFRepositoryClient - reading statements', () => {
       return expect(repository.get(payload)).resolves.toEqual(expected);
     });
 
-    test('should fetch statement in N-Quads format and return it converted to quads', () => {
+    test('should fetch statement in N-Quads format and return it ' +
+      'converted to quads', () => {
       repository.registerParser(new NQuadsParser());
 
       mockHttpRequest(RDFMimeType.N_QUADS);
@@ -115,7 +119,8 @@ describe('RDFRepositoryClient - reading statements', () => {
       return expect(repository.get(payload)).resolves.toEqual(expected);
     });
 
-    test('should fetch statement in Turtle format and return it converted to quads', () => {
+    test('should fetch statement in Turtle format and return it ' +
+      'converted to quads', () => {
       repository.registerParser(new TurtleParser());
 
       mockHttpRequest(RDFMimeType.TURTLE);
@@ -124,7 +129,8 @@ describe('RDFRepositoryClient - reading statements', () => {
       return expect(repository.get(payload)).resolves.toEqual(expected);
     });
 
-    test('should fetch statement in jsonld format and return it converted to quads', () => {
+    test('should fetch statement in jsonld format and return it ' +
+      'converted to quads', () => {
       httpRequest.mockResolvedValue({
         data: FileUtils.getReadStream(jsonldDataFile)
       });
@@ -133,7 +139,8 @@ describe('RDFRepositoryClient - reading statements', () => {
 
       // prepare expected outcome data
       let expected;
-      const stream = new JsonLDParser().parse(FileUtils.getReadStream(jsonldDataFile));
+      const stream = new JsonLDParser()
+        .parse(FileUtils.getReadStream(jsonldDataFile));
       return testUtils.readObjectsStream(stream)
         .then((parsed) => {
           expected = parsed;
@@ -147,7 +154,8 @@ describe('RDFRepositoryClient - reading statements', () => {
         });
     });
 
-    test('should fetch statement in rdfxml format and return it converted to quads', () => {
+    test('should fetch statement in rdfxml format and return it ' +
+      'converted to quads', () => {
       httpRequest.mockResolvedValue({
         data: FileUtils.getReadStream(rdfxmlDataFile)
       });
@@ -156,7 +164,8 @@ describe('RDFRepositoryClient - reading statements', () => {
 
       // prepare expected outcome data
       let expected;
-      const stream = new RDFXmlParser().parse(FileUtils.getReadStream(rdfxmlDataFile));
+      const stream = new RDFXmlParser()
+        .parse(FileUtils.getReadStream(rdfxmlDataFile));
       return testUtils.readObjectsStream(stream)
         .then((parsed) => {
           expected = parsed;
@@ -175,10 +184,12 @@ describe('RDFRepositoryClient - reading statements', () => {
     test('should reject with error if response fails', () => {
       httpRequest.mockRejectedValue({response: 'Server error'});
 
-      return expect(repository.get(new GetStatementsPayload())).rejects.toEqual({response: 'Server error'});
+      return expect(repository.get(new GetStatementsPayload())).rejects
+        .toEqual({response: 'Server error'});
     });
 
-    test('should populate http header and parameters according to provided data', () => {
+    test('should populate http header and parameters according to ' +
+      'provided data', () => {
       httpRequest.mockResolvedValue({data: ''});
 
       const payload = new GetStatementsPayload()
@@ -194,7 +205,8 @@ describe('RDFRepositoryClient - reading statements', () => {
       });
     });
 
-    test('should convert the provided payload to N-Triple resources if not already encoded', () => {
+    test('should convert the provided payload to N-Triple resources if not ' +
+      'already encoded', () => {
       const payload = new GetStatementsPayload()
         .setResponseType(RDFMimeType.RDF_JSON)
         .setSubject('http://eunis.eea.europa.eu/countries/AZ')
@@ -225,7 +237,8 @@ describe('RDFRepositoryClient - reading statements', () => {
 
     test('should fetch and return single statement as plain string', () => {
       httpRequest.mockResolvedValue({
-        data: data.repositories.repo1.statements.GET['single_application/rdf+xml']
+        data: data.repositories.repo1.statements
+          .GET['single_application/rdf+xml']
       });
 
       const payload = new GetStatementsPayload()
@@ -256,7 +269,8 @@ describe('RDFRepositoryClient - reading statements', () => {
   });
 
   describe('download', () => {
-    test('should fetch data and return readable stream to the client', (done) => {
+    test('should fetch data and return readable stream to ' +
+      'the client', (done) => {
       const source = streamSource();
       const stream = new ObjectReadableMock(source);
       const expected = expectedStream();
@@ -295,7 +309,8 @@ describe('RDFRepositoryClient - reading statements', () => {
       });
     });
 
-    test('should convert the download request to N-Triple resources if not already encoded', () => {
+    test('should convert the download request to N-Triple resources if ' +
+      'not already encoded', () => {
       const payload = new GetStatementsPayload()
         .setResponseType(RDFMimeType.TURTLE)
         .setSubject('http://eunis.eea.europa.eu/countries/AZ')

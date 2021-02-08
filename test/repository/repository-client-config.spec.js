@@ -1,4 +1,3 @@
-/* eslint-disable max-len */
 const ClientConfigBuilder = require('http/client-config-builder');
 const RDFMimeType = require('http/rdf-mime-type');
 
@@ -17,10 +16,11 @@ describe('RepositoryClientConfig', () => {
   const writeTimeout = 2000;
 
   test('should instantiate with the default configuration parameters', () => {
-    const config = ClientConfigBuilder.repositoryConfig(endpoint);
+    const config = new ClientConfigBuilder().repositoryConfig(endpoint);
     expect(config.getEndpoint()).toEqual(endpoint);
     expect(config.getHeaders()).toEqual({});
-    expect(config.getDefaultRDFMimeType()).toEqual('application/sparql-results+json');
+    expect(config.getDefaultRDFMimeType())
+      .toEqual('application/sparql-results+json');
     expect(config.getEndpoints()).toEqual([]);
     expect(config.getReadTimeout()).toEqual(10000);
     expect(config.getWriteTimeout()).toEqual(10000);
@@ -31,14 +31,14 @@ describe('RepositoryClientConfig', () => {
   });
 
   test('should support initialization via fluent API', () => {
-    const config = ClientConfigBuilder.repositoryConfig(endpoint)
+    const config = new ClientConfigBuilder()
+      .repositoryConfig(endpoint)
       .setEndpoints(endpoints)
       .setHeaders(headers)
       .setDefaultRDFMimeType(defaultRDFMimeType)
       .setReadTimeout(readTimeout)
       .setWriteTimeout(writeTimeout)
-      .setUsername('testuser')
-      .setPass('P@ssw0rd')
+      .useGdbTokenAuthentication('testuser', 'P@ssw0rd')
       .setKeepAlive(false);
     expect(config.getEndpoints()).toEqual(endpoints);
     expect(config.getHeaders()).toEqual(headers);
@@ -47,22 +47,21 @@ describe('RepositoryClientConfig', () => {
     expect(config.getWriteTimeout()).toEqual(writeTimeout);
     expect(config.getUsername()).toEqual('testuser');
     expect(config.getPass()).toEqual('P@ssw0rd');
+    expect(config.getBasicAuthentication()).toBeFalsy();
+    expect(config.getGdbTokenAuthentication()).toBeTruthy();
     expect(config.getKeepAlive()).toBeFalsy();
+
+    config.useBasicAuthentication('testuser2', 'P@ssw0rd2');
+    expect(config.getUsername()).toEqual('testuser2');
+    expect(config.getPass()).toEqual('P@ssw0rd2');
+    expect(config.getBasicAuthentication()).toBeTruthy();
+    expect(config.getGdbTokenAuthentication()).toBeFalsy();
   });
 
   test('should allow addition of repository endpoints', () => {
-    const config = ClientConfigBuilder.repositoryConfig(endpoint);
+    const config = new ClientConfigBuilder()
+      .repositoryConfig(endpoint);
     endpoints.forEach((endpoint) => config.addEndpoint(endpoint));
     expect(config.getEndpoints()).toEqual(endpoints);
-  });
-
-  test('should instantiate with basic auth configuration parameters', () => {
-    const config = ClientConfigBuilder.repositoryConfig(endpoint);
-    expect(config.getEndpoint()).toEqual(endpoint);
-    const securedHeaders = {'Authorization': 'Basic dGVzdHVzZXI6UEBzc3cwcmQ='};
-    config.setUsername('testuser')
-      .setPass('P@ssw0rd')
-      .setBasicAuthentication(true);
-    expect(config.getHeaders()).toEqual(securedHeaders);
   });
 });
