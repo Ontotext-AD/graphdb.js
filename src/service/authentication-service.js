@@ -100,7 +100,7 @@ class AuthenticationService {
   /**
    * Authentication type getter
    * @param {ClientConfig} clientConfig concrete client configuration
-   * @return {BasicAuthentication|GdbTokenAuthentication} conctrete
+   * @return {BasicAuthentication|GdbTokenAuthentication} concrete
    * authentication type
    */
   getAuthentication(clientConfig) {

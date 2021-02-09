@@ -5,8 +5,8 @@ const PATH_TRANSACTIONS = require('./service-paths').PATH_TRANSACTIONS;
 const LoggingUtils = require('../logging/logging-utils');
 const StringUtils = require('../util/string-utils');
 
-const ClientConfigBuilder =
-  require('../http/client-config-builder');
+const RepositoryClientConfig =
+  require('../repository/repository-client-config');
 const TransactionalRepositoryClient =
   require('../transaction/transactional-repository-client');
 
@@ -79,8 +79,7 @@ class TransactionService extends Service {
    */
   getTransactionalClientConfig(locationUrl) {
     const config = this.repositoryClientConfig;
-    return new ClientConfigBuilder()
-      .repositoryConfig(config.getEndpoint())
+    return new RepositoryClientConfig(config.getEndpoint())
       .setEndpoints([locationUrl])
       .setHeaders(config.getHeaders())
       .setDefaultRDFMimeType(config.getDefaultRDFMimeType())

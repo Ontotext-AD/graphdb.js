@@ -1,7 +1,10 @@
 const {RDFRepositoryClient,
   RepositoryType, RepositoryConfig} = require('graphdb').repository;
-const {RDFMimeType, ClientConfigBuilder} = require('graphdb').http;
-const {GraphDBServerClient, AppSettings} = require('graphdb').server;
+const {RDFMimeType} = require('graphdb').http;
+const {
+  GraphDBServerClient,
+  AppSettings,
+  ServerClientConfig} = require('graphdb').server;
 const path = require('path');
 const Utils = require('utils');
 const Config = require('config');
@@ -11,8 +14,7 @@ const NEW_REPO = 'New_repo';
 
 describe('Should test graphDB server client', () => {
   const rdfClient = new RDFRepositoryClient(Config.restApiConfig);
-  const serverConfig = new ClientConfigBuilder()
-    .serverConfig(Config.serverAddress)
+  const serverConfig = new ServerClientConfig(Config.serverAddress)
     .useGdbTokenAuthentication('admin', 'root');
   const serverClient = new GraphDBServerClient(serverConfig);
 

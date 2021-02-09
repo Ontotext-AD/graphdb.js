@@ -1,6 +1,6 @@
 const HttpClient = require('http/http-client');
 const RDFRepositoryClient = require('repository/rdf-repository-client');
-const ClientConfigBuilder = require('http/client-config-builder');
+const RepositoryClientConfig = require('repository/repository-client-config');
 const GetQueryPayload = require('query/get-query-payload');
 const QueryLanguage = require('query/query-language');
 const QueryType = require('query/query-type');
@@ -25,7 +25,7 @@ describe('RDFRepositoryClient - query', () => {
 
   beforeEach(() => {
     HttpClient.mockImplementation(() => httpClientStub());
-    config = new ClientConfigBuilder().repositoryConfig('http://host')
+    config = new RepositoryClientConfig('http://host')
       .setEndpoints(['http://host/repositories/repo1'])
       .setReadTimeout(1000)
       .setWriteTimeout(1000);

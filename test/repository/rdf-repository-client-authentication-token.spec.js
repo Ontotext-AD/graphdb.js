@@ -1,6 +1,6 @@
 const HttpClient = require('http/http-client');
 const RDFRepositoryClient = require('repository/rdf-repository-client');
-const ClientConfigBuilder = require('http/client-config-builder');
+const RepositoryClientConfig = require('repository/repository-client-config');
 const GetStatementsPayload = require('repository/get-statements-payload');
 const RDFMimeType = require('http/rdf-mime-type');
 const HttpRequestBuilder = require('http/http-request-builder');
@@ -28,7 +28,7 @@ describe('RDFRepositoryClient - authentication', () => {
     const writeTimeout = 1000;
     const endpoint = 'http://localhost:7200';
 
-    config = new ClientConfigBuilder().repositoryConfig(endpoint)
+    config = new RepositoryClientConfig(endpoint)
       .setEndpoints(endpoints)
       .setHeaders(headers)
       .setDefaultRDFMimeType(contentType)
@@ -96,7 +96,7 @@ describe('RDFRepositoryClient - authentication', () => {
       const loginMock = repository.httpClient.request;
       const requestMock = repository.httpClients[0].request;
 
-      // expect 2 invocations:
+      // expect 2 invocations:ClientConfigBuilder
       // first login
       // second getRepositoryIDs
       // expecting 5 invocations:

@@ -1,6 +1,6 @@
 const HttpClient = require('http/http-client');
 const RDFRepositoryClient = require('repository/rdf-repository-client');
-const ClientConfigBuilder = require('http/client-config-builder');
+const RepositoryClientConfig = require('repository/repository-client-config');
 const TransactionalRepositoryClient =
   require('transaction/transactional-repository-client');
 const TransactionIsolationLevel =
@@ -41,7 +41,7 @@ describe('RDFRepositoryClient - transactions', () => {
     './data/add-statements-complex.txt');
 
   beforeEach(() => {
-    repoClientConfig = new ClientConfigBuilder().repositoryConfig('http://localhost:8080')
+    repoClientConfig = new RepositoryClientConfig('http://localhost:8080')
       .setEndpoints([
         'http://localhost:8080/repositories/test',
         'http://localhost:8081/repositories/test'

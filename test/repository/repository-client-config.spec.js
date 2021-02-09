@@ -1,4 +1,4 @@
-const ClientConfigBuilder = require('http/client-config-builder');
+const RepositoryClientConfig = require('repository/repository-client-config');
 const RDFMimeType = require('http/rdf-mime-type');
 
 describe('RepositoryClientConfig', () => {
@@ -16,7 +16,7 @@ describe('RepositoryClientConfig', () => {
   const writeTimeout = 2000;
 
   test('should instantiate with the default configuration parameters', () => {
-    const config = new ClientConfigBuilder().repositoryConfig(endpoint);
+    const config = new RepositoryClientConfig(endpoint);
     expect(config.getEndpoint()).toEqual(endpoint);
     expect(config.getHeaders()).toEqual({});
     expect(config.getDefaultRDFMimeType())
@@ -31,8 +31,7 @@ describe('RepositoryClientConfig', () => {
   });
 
   test('should support initialization via fluent API', () => {
-    const config = new ClientConfigBuilder()
-      .repositoryConfig(endpoint)
+    const config = new RepositoryClientConfig(endpoint)
       .setEndpoints(endpoints)
       .setHeaders(headers)
       .setDefaultRDFMimeType(defaultRDFMimeType)
@@ -59,8 +58,7 @@ describe('RepositoryClientConfig', () => {
   });
 
   test('should allow addition of repository endpoints', () => {
-    const config = new ClientConfigBuilder()
-      .repositoryConfig(endpoint);
+    const config = new RepositoryClientConfig(endpoint);
     endpoints.forEach((endpoint) => config.addEndpoint(endpoint));
     expect(config.getEndpoints()).toEqual(endpoints);
   });

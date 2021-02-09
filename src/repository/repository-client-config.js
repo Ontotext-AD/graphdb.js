@@ -28,6 +28,8 @@ class RepositoryClientConfig extends ClientConfig {
   constructor(endpoint) {
     super(endpoint);
     this.setEndpoints([]);
+    this.setHeaders({});
+    this.setKeepAlive(true);
     this.setDefaultRDFMimeType(RDFMimeType.SPARQL_RESULTS_JSON);
     this.setReadTimeout(defaultTimeout);
     this.setWriteTimeout(defaultTimeout);

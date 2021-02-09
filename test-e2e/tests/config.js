@@ -1,28 +1,27 @@
 /* eslint-disable max-len */
-const {RDFMimeType, ClientConfigBuilder} = require('graphdb').http;
+const {RDFMimeType} = require('graphdb').http;
+const {ServerClientConfig} = require('graphdb').server;
+const {RepositoryClientConfig} = require('graphdb').repository;
 
 // Variables used in tests
 const serverAddress = 'http://localhost:7200';
 const testRepoPath = './tests/data/repositories/GDB_Free/repository1.ttl';
 const testRepo2Path = './tests/data/repositories/GDB_Free/repository2.ttl';
 
-const restApiConfig = new ClientConfigBuilder()
-  .repositoryConfig(serverAddress)
+const restApiConfig = new RepositoryClientConfig(serverAddress)
   .setEndpoints([`${serverAddress}/repositories/Test_repo`])
   .setHeaders({
     'Accept': RDFMimeType.SPARQL_RESULTS_XML
   });
 
-const restApiBasicAuthConfig = new ClientConfigBuilder()
-  .repositoryConfig(serverAddress)
+const restApiBasicAuthConfig = new RepositoryClientConfig(serverAddress)
   .setEndpoints([`${serverAddress}/repositories/Test_repo`])
   .setHeaders({
     'Accept': RDFMimeType.SPARQL_RESULTS_XML
   })
   .useBasicAuthentication('admin', 'root');
 
-const restApiTokenAuthConfig = new ClientConfigBuilder()
-  .repositoryConfig(serverAddress)
+const restApiTokenAuthConfig = new RepositoryClientConfig(serverAddress)
   .setEndpoints([`${serverAddress}/repositories/Test_repo`])
   .setHeaders({
     'Accept': RDFMimeType.SPARQL_RESULTS_XML
@@ -30,13 +29,13 @@ const restApiTokenAuthConfig = new ClientConfigBuilder()
   .useGdbTokenAuthentication('admin', 'root');
 
 
-const serverBasicAuthConfig = new ClientConfigBuilder().serverConfig(serverAddress)
+const serverBasicAuthConfig = new ServerClientConfig(serverAddress)
   .setHeaders({
     'Accept': RDFMimeType.SPARQL_RESULTS_JSON
   })
   .useBasicAuthentication('admin', 'root');
 
-const serverConfig = new ClientConfigBuilder().serverConfig(serverAddress)
+const serverConfig = new ServerClientConfig(serverAddress)
   .setHeaders({
     'Accept': RDFMimeType.SPARQL_RESULTS_JSON
   });

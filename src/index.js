@@ -4,8 +4,7 @@ module.exports = {
     HttpClient: require('./http/http-client'),
     HttpRequestBuilder: require('./http/http-request-builder'),
     QueryContentType: require('./http/query-content-type'),
-    RDFMimeType: require('./http/rdf-mime-type'),
-    ClientConfigBuilder: require('./http/client-config-builder')
+    RDFMimeType: require('./http/rdf-mime-type')
   },
 
   server: {

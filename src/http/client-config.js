@@ -1,3 +1,7 @@
+const BASIC_AUTH = 'BASIC';
+const GDB_TOKEN = 'GDB_TOKEN';
+const OFF = 'OFF';
+
 /**
  * Abstract configuration wrapper used for initialization of concrete
  * Client instances. Concrete client configuration wrappers must extend
@@ -81,7 +85,7 @@ class ClientConfig {
   useBasicAuthentication(username, pass) {
     this.username = username;
     this.pass = pass;
-    this.enableBasicAuthentication(true);
+    this.switchAuthentication(BASIC_AUTH);
     return this;
   }
 
@@ -95,13 +99,11 @@ class ClientConfig {
 
   /**
    * @private
-   * @param {boolean} basicAuth if use Basic Auth when authenticating
+   * @param {string} auth authentication type
    */
-  enableBasicAuthentication(basicAuth) {
-    this.basicAuth = basicAuth;
-    if (this.getBasicAuthentication() && this.getGdbTokenAuthentication()) {
-      this.enableGdbTokenAuthentication(false);
-    }
+  switchAuthentication(auth) {
+    this.basicAuth = auth === BASIC_AUTH;
+    this.gdbTokenAuth = auth === GDB_TOKEN;
   }
 
   /**
@@ -123,28 +125,15 @@ class ClientConfig {
   useGdbTokenAuthentication(username, pass) {
     this.username = username;
     this.pass = pass;
-    this.enableGdbTokenAuthentication(true);
+    this.switchAuthentication(GDB_TOKEN);
     return this;
-  }
-
-  /**
-   * @private
-   * @param {boolean} gdbTokenAuth if use Basic Auth when authenticating
-   */
-  enableGdbTokenAuthentication(gdbTokenAuth) {
-    this.gdbTokenAuth = gdbTokenAuth;
-
-    if (this.getGdbTokenAuthentication() && this.getBasicAuthentication()) {
-      this.enableBasicAuthentication(false);
-    }
   }
 
   /**
    * Disables authentication.
    */
   disableAuthentication() {
-    this.gdbTokenAuth = false;
-    this.basicAuth = false;
+    this.switchAuthentication(OFF);
   }
 
   /**

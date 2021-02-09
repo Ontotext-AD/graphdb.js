@@ -1,4 +1,4 @@
-const ClientConfigBuilder = require('http/client-config-builder');
+const RepositoryClientConfig = require('repository/repository-client-config');
 const RDFRepositoryClient = require('repository/rdf-repository-client');
 const ServerClientConfig = require('server/server-client-config');
 const HttpClient = require('http/http-client');
@@ -18,8 +18,7 @@ describe('RDFRepositoryClient', () => {
   };
 
   test('should initialize according the provided client configuration', () => {
-    const repoClientConfig = new ClientConfigBuilder()
-      .repositoryConfig('http://localhost:8080')
+    const repoClientConfig = new RepositoryClientConfig('http://localhost:8080')
       .setEndpoints([
         'http://localhost:8080/repositories/test'
       ])
@@ -46,7 +45,7 @@ describe('RDFRepositoryClient', () => {
 
   test('should initialize with multiple endpoints from the client ' +
     'configuration', () => {
-    const repoClientConfig = new ClientConfigBuilder().repositoryConfig('http://localhost:8080')
+    const repoClientConfig = new RepositoryClientConfig('http://localhost:8080')
       .setEndpoints([
         'http://localhost:8081/repositories/test1',
         'http://localhost:8082/repositories/test2',
@@ -74,7 +73,7 @@ describe('RDFRepositoryClient', () => {
     expect(() => new RDFRepositoryClient(
       new ServerClientConfig('', 1, {}))).toThrow(Error);
     expect(() => new RDFRepositoryClient(
-      new ClientConfigBuilder().repositoryConfig([]))).toThrow(Error);
+      new RepositoryClientConfig([]))).toThrow(Error);
   });
 
   describe('getSize()', () => {
@@ -82,7 +81,7 @@ describe('RDFRepositoryClient', () => {
     let httpRequest;
 
     beforeEach(() => {
-      const repoClientConfig = new ClientConfigBuilder().repositoryConfig('http://localhost:8080')
+      const repoClientConfig = new RepositoryClientConfig('http://localhost:8080')
         .setEndpoints(['http://localhost:8080/repositories/test'])
         .setHeaders(defaultHeaders)
         .setDefaultRDFMimeType('application/json')

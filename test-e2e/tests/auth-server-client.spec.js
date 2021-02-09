@@ -1,6 +1,5 @@
 const {RepositoryConfig, RepositoryType} = require('graphdb').repository;
-const {GraphDBServerClient} = require('graphdb').server;
-const {ClientConfigBuilder} = require('graphdb').http;
+const {GraphDBServerClient, ServerClientConfig} = require('graphdb').server;
 const Utils = require('utils');
 const Config = require('config');
 
@@ -24,16 +23,14 @@ describe('Should test server client auth', () => {
   });
 
   test('Should add and delete repository with BASIC auth', (done) => {
-    const config = new ClientConfigBuilder()
-      .serverConfig(Config.serverAddress)
+    const config = new ServerClientConfig(Config.serverAddress)
       .useBasicAuthentication('admin', 'root');
     const serverClient = new GraphDBServerClient(config);
     createRepository(serverClient, done);
   });
 
   test('Should add and delete repository with TOKEN auth', (done) => {
-    const config = new ClientConfigBuilder()
-      .serverConfig(Config.serverAddress)
+    const config = new ServerClientConfig(Config.serverAddress)
       .useGdbTokenAuthentication('admin', 'root');
     const serverClient = new GraphDBServerClient(config);
     createRepository(serverClient, done);

@@ -1,6 +1,6 @@
 /* eslint-disable max-len */
-const {ClientConfigBuilder} = require('graphdb').http;
-const {ServerClient} = require('graphdb').server;
+const {ServerClientConfig, ServerClient} = require('graphdb').server;
+const {RepositoryClientConfig} = require('graphdb').repository;
 const Utils = require('utils');
 const Config = require('config');
 
@@ -16,9 +16,9 @@ describe('Should test repositories', () => {
   });
 
   test('Should verify repositories', () => {
-    const config = new ClientConfigBuilder().serverConfig(Config.serverAddress);
+    const config = new ServerClientConfig(Config.serverAddress);
     const client = new ServerClient(config);
-    const repositoryClientConfig = new ClientConfigBuilder().repositoryConfig(Config.serverAddress)
+    const repositoryClientConfig = new RepositoryClientConfig(Config.serverAddress)
       .setEndpoints([`${Config.serverAddress}/repositories/`])
       .setReadTimeout(3001)
       .setWriteTimeout(3001);

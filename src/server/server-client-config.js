@@ -22,6 +22,8 @@ class ServerClientConfig extends ClientConfig {
    */
   constructor(endpoint) {
     super(endpoint);
+    this.setHeaders({});
+    this.setKeepAlive(true);
     this.setTimeout(defaultTimeout);
   }
 

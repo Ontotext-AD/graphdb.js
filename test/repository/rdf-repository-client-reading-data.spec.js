@@ -1,6 +1,6 @@
 const HttpClient = require('http/http-client');
 const RDFRepositoryClient = require('repository/rdf-repository-client');
-const ClientConfigBuilder = require('http/client-config-builder');
+const RepositoryClientConfig = require('repository/repository-client-config');
 const GetStatementsPayload = require('repository/get-statements-payload');
 const RDFMimeType = require('http/rdf-mime-type');
 const TurtleParser = require('parser/turtle-parser');
@@ -49,7 +49,7 @@ describe('RDFRepositoryClient - reading statements', () => {
     const readTimeout = 1000;
     const writeTimeout = 1000;
 
-    config = new ClientConfigBuilder().repositoryConfig('http://host')
+    config = new RepositoryClientConfig('http://host')
       .setEndpoints(endpoints)
       .setHeaders(headers)
       .setDefaultRDFMimeType(contentType)

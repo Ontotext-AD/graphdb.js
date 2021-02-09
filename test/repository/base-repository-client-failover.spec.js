@@ -1,5 +1,5 @@
 const HttpClient = require('http/http-client');
-const ClientConfigBuilder = require('http/client-config-builder');
+const RepositoryClientConfig = require('repository/repository-client-config');
 const BaseRepositoryClient = require('repository/base-repository-client');
 const HttpRequestBuilder = require('http/http-request-builder');
 const httpClientStub = require('../http/http-client.stub');
@@ -13,8 +13,7 @@ describe('BaseRepositoryClient', () => {
 
   describe('Automatic failover - retrying with different repo endpoint', () => {
     beforeEach(() => {
-      repoClientConfig = new ClientConfigBuilder()
-        .repositoryConfig('http://localhost:8083')
+      repoClientConfig = new RepositoryClientConfig('http://localhost:8083')
         .setEndpoints([
           'http://localhost:8081/repositories/test1',
           'http://localhost:8082/repositories/test2',

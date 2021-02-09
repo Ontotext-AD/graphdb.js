@@ -1,5 +1,5 @@
 const HttpClient = require('http/http-client');
-const ClientConfigBuilder = require('http/client-config-builder');
+const RepositoryClientConfig = require('repository/repository-client-config');
 const RDFRepositoryClient = require('repository/rdf-repository-client');
 const HttpRequestBuilder = require('http/http-request-builder');
 const httpClientStub = require('../http/http-client.stub');
@@ -20,7 +20,7 @@ describe('RDFRepositoryClient - Deleting statements', () => {
   let httpRequest;
 
   beforeEach(() => {
-    repoClientConfig = new ClientConfigBuilder().repositoryConfig('http://localhost:8080')
+    repoClientConfig = new RepositoryClientConfig('http://localhost:8080')
       .setEndpoints(['http://localhost:8080/repositories/test'])
       .setReadTimeout(100)
       .setWriteTimeout(200);

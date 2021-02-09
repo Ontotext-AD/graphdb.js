@@ -1,10 +1,10 @@
-const ClientConfigBuilder = require('http/client-config-builder');
+const ServerClientConfig = require('server/server-client-config');
 
 describe('ServerClientConfig', () => {
   const endpoint = 'http://endpoint';
 
   test('should initialize with the default parameters', () => {
-    const config = new ClientConfigBuilder().serverConfig(endpoint);
+    const config = new ServerClientConfig(endpoint);
 
     expect(config.getEndpoint()).toEqual(endpoint);
     expect(config.getHeaders()).toEqual({});
@@ -17,7 +17,7 @@ describe('ServerClientConfig', () => {
 
   test('should support initialization via fluent API ', () => {
     const headers = {'Accept': 'text/plain'};
-    const config = new ClientConfigBuilder().serverConfig(endpoint)
+    const config = new ServerClientConfig(endpoint)
       .setTimeout(1000)
       .setHeaders(headers)
       .useBasicAuthentication('testuser', 'P@sw0rd');
