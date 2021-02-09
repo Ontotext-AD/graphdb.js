@@ -19,6 +19,8 @@ export class AuthenticationFactory {
       return new BasicAuthentication(clientConfig);
     } else if (clientConfig.getGdbTokenAuthentication()) {
       return new GdbTokenAuthentication(clientConfig);
+    } else {
+      throw Error('Authentication is not configured properly');
     }
   }
 }

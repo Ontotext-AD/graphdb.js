@@ -39,4 +39,22 @@ describe('ServerClientConfig', () => {
     expect(config.getBasicAuthentication()).toBeFalsy();
     expect(config.getGdbTokenAuthentication()).toBeTruthy();
   });
+
+  test('should switch and disable authentication', () => {
+    const config = new ServerClientConfig(endpoint);
+    expect(config.getBasicAuthentication()).toBeFalsy();
+    expect(config.getGdbTokenAuthentication()).toBeFalsy();
+
+    config.useGdbTokenAuthentication('user', 'pass');
+    expect(config.getBasicAuthentication()).toBeFalsy();
+    expect(config.getGdbTokenAuthentication()).toBeTruthy();
+
+    config.useBasicAuthentication('user', 'pass');
+    expect(config.getBasicAuthentication()).toBeTruthy();
+    expect(config.getGdbTokenAuthentication()).toBeFalsy();
+
+    config.disableAuthentication();
+    expect(config.getBasicAuthentication()).toBeFalsy();
+    expect(config.getGdbTokenAuthentication()).toBeFalsy();
+  });
 });

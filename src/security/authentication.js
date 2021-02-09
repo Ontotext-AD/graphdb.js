@@ -20,7 +20,7 @@ export class Authentication {
    * login request builder
   */
   getLoginRequestBuilder() {
-    throw new Error('Must be overridden!');
+    throw new Error('Method #getLoginRequestBuilder() must be implemented!');
   }
 
   /**
@@ -28,7 +28,7 @@ export class Authentication {
    * token from response
    */
   getResponseAuthToken() {
-    throw new Error('Must be overridden!');
+    throw new Error('Method #getResponseAuthToken() must be implemented!');
   }
 }
 
