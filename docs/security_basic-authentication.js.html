@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Class: CommonUtils</title>
+    <title>JSDoc: Source: security/basic-authentication.js</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,259 +17,52 @@
 
 <div id="main">
 
-    <h1 class="page-title">Class: CommonUtils</h1>
+    <h1 class="page-title">Source: security/basic-authentication.js</h1>
 
     
 
 
 
-
-<section>
-
-<header>
     
-        <h2><span class="attribs"><span class="type-signature"></span></span>CommonUtils<span class="signature">()</span><span class="type-signature"></span></h2>
-        
-            <div class="class-description"><p>Common utility functions.</p></div>
-        
-    
-</header>
-
-<article>
-    <div class="container-overview">
-    
-        
-
-    
-    <h2>Constructor</h2>
-    
-
-    
-    <h4 class="name" id="CommonUtils"><span class="type-signature"></span>new CommonUtils<span class="signature">()</span><span class="type-signature"></span></h4>
-    
-
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-author">Author:</dt>
-    <dd class="tag-author">
-        <ul>
-            <li>Mihail Radkov</li>
-        </ul>
-    </dd>
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="util_common-utils.js.html">util/common-utils.js</a>, <a href="util_common-utils.js.html#line7">line 7</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    
-    </div>
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-        <h3 class="subsection-title">Methods</h3>
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id=".hasNullArguments"><span class="type-signature">(static) </span>hasNullArguments<span class="signature">()</span><span class="type-signature"> &rarr; {boolean}</span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    <p>Checks if at least one of the supplied arguments is undefined or null.</p>
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="util_common-utils.js.html">util/common-utils.js</a>, <a href="util_common-utils.js.html#line14">line 14</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
-<div class="param-desc">
-    <p><code>true</code> if there is null argument or
-<code>false</code> otherwise</p>
-</div>
-
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">boolean</span>
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-
-
-        
-    
-
-    
-
-    
-</article>
-
-</section>
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>const Authentication = require('./authentication');
+const HttpRequestBuilder = require('../http/http-request-builder');
+
+/**
+ * Basic authentication type class.
+ * Used for basic authentication against secured gdb server.
+ *
+ * @class
+ * @author Teodossi Dossev
+ */
+export class BasicAuthentication extends Authentication {
+  /**
+   * @override
+   * @return {HttpRequestBuilder} requestBuilder
+   */
+  getLoginRequestBuilder() {
+    const username = this.clientConfig.getUsername();
+    const pass = this.clientConfig.getPass();
+    const credentials = `${username}:${pass}`;
+
+    return HttpRequestBuilder.httpGet(`/rest/security/authenticatedUser`)
+      .addAuthorizationHeader(`Basic ${btoa(credentials)}`);
+  }
+
+  /**
+   * @override
+   * @return {string} token
+   */
+  getResponseAuthToken(response) {
+    return response.config.headers['authorization'];
+  }
+}
+
+module.exports = BasicAuthentication;
+</code></pre>
+        </article>
+    </section>
 
 
 

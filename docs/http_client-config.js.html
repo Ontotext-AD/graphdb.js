@@ -26,7 +26,11 @@
     
     <section>
         <article>
-            <pre class="prettyprint source linenums"><code>/**
+            <pre class="prettyprint source linenums"><code>const BASIC_AUTH = 'BASIC';
+const GDB_TOKEN = 'GDB_TOKEN';
+const OFF = 'OFF';
+
+/**
  * Abstract configuration wrapper used for initialization of concrete
  * Client instances. Concrete client configuration wrappers must extend
  * this class and override it's methods if necessary.
@@ -38,23 +42,13 @@
  */
 class ClientConfig {
   /**
-   * @param {Map&lt;string, string>} [headers] An http headers map.
-   * @param {string} [username] username which should be authenticated
-   * @param {string} [pass] the password to be used
-   * @param {boolean} [keepAlive=true] if the logged in user should be
-   * reauthenticated after auth token expire. This config has meaning when the
-   * server is secured and username and passwords are provided.
-   * @param {boolean} [useBasicAuth] if use Basic Auth when authenticating
+   * Client configuration constructor.
+   *
    * @param {string} endpoint server base URL that will be prepend
    * to all server requests
    */
-  constructor(headers, username, pass, keepAlive, useBasicAuth, endpoint) {
-    this.headers = headers;
-    this.endpoint = endpoint;
-    this.username = username;
-    this.pass = pass;
-    this.keepAlive = keepAlive !== undefined ? keepAlive : true;
-    this.setBasicAuthentication(useBasicAuth);
+  constructor(endpoint) {
+    this.setEndpoint(endpoint);
   }
 
   /**
@@ -85,28 +79,10 @@ class ClientConfig {
   }
 
   /**
-   * @param {string} username
-   * @return {this} the concrete configuration config for method chaining
-   */
-  setUsername(username) {
-    this.username = username;
-    return this;
-  }
-
-  /**
    * @return {string} the user password
    */
   getPass() {
     return this.pass;
-  }
-
-  /**
-   * @param {string} pass
-   * @return {this} the concrete configuration config for method chaining
-   */
-  setPass(pass) {
-    this.pass = pass;
-    return this;
   }
 
   /**
@@ -126,44 +102,100 @@ class ClientConfig {
   }
 
   /**
-   * @param {boolean} [basicAuth] if use Basic Auth when authenticating
+   * Username and password for user logging setter.
+   * Sets basic authentication as client authentication type.
+   *
+   * @param {string} [username]
+   * @param {string} [pass]
+   *
    * @return {this} the concrete configuration config for method chaining
    */
-  setBasicAuthentication(basicAuth) {
-    this.basicAuth = basicAuth;
-    this.useBasicAuthentication();
+  useBasicAuthentication(username, pass) {
+    this.username = username;
+    this.pass = pass;
+    this.switchAuthentication(BASIC_AUTH);
     return this;
+  }
+
+
+  /**
+   * @return {boolean} [basicAuth] if use Basic Auth
+   */
+  getBasicAuthentication() {
+    return this.basicAuth;
   }
 
   /**
    * @private
+   * @param {string} auth authentication type
    */
-  useBasicAuthentication() {
-    if (this.basicAuth) {
-      const credentials = `${this.username}:${this.pass}`;
-      this.headers['Authorization'] = `Basic ${btoa(credentials)}`;
-    }
+  switchAuthentication(auth) {
+    this.basicAuth = auth === BASIC_AUTH;
+    this.gdbTokenAuth = auth === GDB_TOKEN;
+  }
+
+  /**
+   * @return {boolean} [gdbTokenAuth] if use Gdb Token Auth
+   */
+  getGdbTokenAuthentication() {
+    return this.gdbTokenAuth;
+  }
+
+  /**
+   * Username and password for user logging setter.
+   * Sets gdb token authentication as client authentication type.
+   * *
+   * @param {string} [username]
+   * @param {string} [pass]
+   *
+   * @return {this} the concrete configuration config for method chaining
+   */
+  useGdbTokenAuthentication(username, pass) {
+    this.username = username;
+    this.pass = pass;
+    this.switchAuthentication(GDB_TOKEN);
+    return this;
+  }
+
+  /**
+   * Disables authentication.
+   */
+  disableAuthentication() {
+    this.switchAuthentication(OFF);
   }
 
   /**
    * Sets the server's endpoint URL.
    *
    * @param {string} endpoint the endpoint URL
-   *
    * @return {this} the current config for method chaining
    */
   setEndpoint(endpoint) {
-    this.endpoint = endpoint;
-    return this;
+    if (endpoint &amp;&amp;
+      (typeof endpoint === 'string' || endpoint instanceof String)) {
+      this.endpoint = endpoint;
+      return this;
+    } else {
+      throw new Error('Invalid Endpoint parameter!');
+    }
   }
 
   /**
    * Returns the server's endpoint URL.
-   *
    * @return {string} the endpoint URL
    */
   getEndpoint() {
     return this.endpoint;
+  }
+
+  /**
+   * Returns &lt;code>true&lt;/code> if basic or gdb token authentication
+   * is enabled. &lt;code>false&lt;/code> otherwise.
+   *
+   * @return {boolean} is authentication enabled
+   */
+  shouldAuthenticate() {
+    return this.basicAuth || this.gdbTokenAuth;
   }
 }
 
@@ -178,13 +210,13 @@ module.exports = ClientConfig;
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="AddStatementPayload.html">AddStatementPayload</a></li><li><a href="AppSettings.html">AppSettings</a></li><li><a href="AuthenticationService.html">AuthenticationService</a></li><li><a href="BaseRepositoryClient.html">BaseRepositoryClient</a></li><li><a href="ClientConfig.html">ClientConfig</a></li><li><a href="CommonUtils.html">CommonUtils</a></li><li><a href="ConsoleLogger.html">ConsoleLogger</a></li><li><a href="ContentParser.html">ContentParser</a></li><li><a href="DownloadService.html">DownloadService</a></li><li><a href="FileUtils.html">FileUtils</a></li><li><a href="GetQueryPayload.html">GetQueryPayload</a></li><li><a href="GetStatementsPayload.html">GetStatementsPayload</a></li><li><a href="GraphDBServerClient.html">GraphDBServerClient</a></li><li><a href="HttpClient.html">HttpClient</a></li><li><a href="HttpRequestBuilder.html">HttpRequestBuilder</a></li><li><a href="HttpResponse.html">HttpResponse</a></li><li><a href="Iterable.html">Iterable</a></li><li><a href="JsonLDParser.html">JsonLDParser</a></li><li><a href="LoggingUtils.html">LoggingUtils</a></li><li><a href="N3Parser.html">N3Parser</a></li><li><a href="Namespace.html">Namespace</a></li><li><a href="NamespaceService.html">NamespaceService</a></li><li><a href="NQuadsParser.html">NQuadsParser</a></li><li><a href="NTriplesParser.html">NTriplesParser</a></li><li><a href="PagedResponse.html">PagedResponse</a></li><li><a href="ParserRegistry.html">ParserRegistry</a></li><li><a href="QueryPayload.html">QueryPayload</a></li><li><a href="QueryService.html">QueryService</a></li><li><a href="RDFRepositoryClient.html">RDFRepositoryClient</a></li><li><a href="RDFXmlParser.html">RDFXmlParser</a></li><li><a href="RepositoryClientConfig.html">RepositoryClientConfig</a></li><li><a href="RepositoryConfig.html">RepositoryConfig</a></li><li><a href="RepositoryService.html">RepositoryService</a></li><li><a href="ResponseIterator.html">ResponseIterator</a></li><li><a href="ServerClient.html">ServerClient</a></li><li><a href="ServerClientConfig.html">ServerClientConfig</a></li><li><a href="Service.html">Service</a></li><li><a href="ServiceRequest.html">ServiceRequest</a></li><li><a href="SparqlJsonResultParser.html">SparqlJsonResultParser</a></li><li><a href="SparqlXmlResultParser.html">SparqlXmlResultParser</a></li><li><a href="StatementPayload.html">StatementPayload</a></li><li><a href="StatementsService.html">StatementsService</a></li><li><a href="StringUtils.html">StringUtils</a></li><li><a href="TermConverter.html">TermConverter</a></li><li><a href="TransactionalRepositoryClient.html">TransactionalRepositoryClient</a></li><li><a href="TransactionService.html">TransactionService</a></li><li><a href="TriGParser.html">TriGParser</a></li><li><a href="TurtleParser.html">TurtleParser</a></li><li><a href="UpdateQueryPayload.html">UpdateQueryPayload</a></li><li><a href="UploadService.html">UploadService</a></li><li><a href="User.html">User</a></li></ul><h3>Interfaces</h3><ul><li><a href="Logger.html">Logger</a></li></ul><h3>Global</h3><ul><li><a href="global.html#Authority">Authority</a></li><li><a href="global.html#MediaType">MediaType</a></li><li><a href="global.html#PATH_NAMESPACES">PATH_NAMESPACES</a></li><li><a href="global.html#PATH_SIZE">PATH_SIZE</a></li><li><a href="global.html#PATH_STATEMENTS">PATH_STATEMENTS</a></li><li><a href="global.html#PATH_TRANSACTIONS">PATH_TRANSACTIONS</a></li><li><a href="global.html#QueryContentType">QueryContentType</a></li><li><a href="global.html#QueryLanguage">QueryLanguage</a></li><li><a href="global.html#QueryType">QueryType</a></li><li><a href="global.html#RDFMimeType">RDFMimeType</a></li><li><a href="global.html#RepositoryType">RepositoryType</a></li><li><a href="global.html#RETRIABLE_STATUSES">RETRIABLE_STATUSES</a></li><li><a href="global.html#TransactionIsolationLevel">TransactionIsolationLevel</a></li><li><a href="global.html#XSD">XSD</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="AddStatementPayload.html">AddStatementPayload</a></li><li><a href="AppSettings.html">AppSettings</a></li><li><a href="Authentication.html">Authentication</a></li><li><a href="AuthenticationFactory.html">AuthenticationFactory</a></li><li><a href="AuthenticationService.html">AuthenticationService</a></li><li><a href="BaseRepositoryClient.html">BaseRepositoryClient</a></li><li><a href="BasicAuthentication.html">BasicAuthentication</a></li><li><a href="ClientConfig.html">ClientConfig</a></li><li><a href="CommonUtils.html">CommonUtils</a></li><li><a href="ConsoleLogger.html">ConsoleLogger</a></li><li><a href="ContentParser.html">ContentParser</a></li><li><a href="DownloadService.html">DownloadService</a></li><li><a href="FileUtils.html">FileUtils</a></li><li><a href="GdbTokenAuthentication.html">GdbTokenAuthentication</a></li><li><a href="GetQueryPayload.html">GetQueryPayload</a></li><li><a href="GetStatementsPayload.html">GetStatementsPayload</a></li><li><a href="GraphDBServerClient.html">GraphDBServerClient</a></li><li><a href="HttpClient.html">HttpClient</a></li><li><a href="HttpRequestBuilder.html">HttpRequestBuilder</a></li><li><a href="HttpResponse.html">HttpResponse</a></li><li><a href="Iterable.html">Iterable</a></li><li><a href="JsonLDParser.html">JsonLDParser</a></li><li><a href="LoggingUtils.html">LoggingUtils</a></li><li><a href="N3Parser.html">N3Parser</a></li><li><a href="Namespace.html">Namespace</a></li><li><a href="NamespaceService.html">NamespaceService</a></li><li><a href="NQuadsParser.html">NQuadsParser</a></li><li><a href="NTriplesParser.html">NTriplesParser</a></li><li><a href="PagedResponse.html">PagedResponse</a></li><li><a href="ParserRegistry.html">ParserRegistry</a></li><li><a href="QueryPayload.html">QueryPayload</a></li><li><a href="QueryService.html">QueryService</a></li><li><a href="RDFRepositoryClient.html">RDFRepositoryClient</a></li><li><a href="RDFXmlParser.html">RDFXmlParser</a></li><li><a href="RepositoryClientConfig.html">RepositoryClientConfig</a></li><li><a href="RepositoryConfig.html">RepositoryConfig</a></li><li><a href="RepositoryService.html">RepositoryService</a></li><li><a href="ResponseIterator.html">ResponseIterator</a></li><li><a href="ServerClient.html">ServerClient</a></li><li><a href="ServerClientConfig.html">ServerClientConfig</a></li><li><a href="Service.html">Service</a></li><li><a href="ServiceRequest.html">ServiceRequest</a></li><li><a href="SparqlJsonResultParser.html">SparqlJsonResultParser</a></li><li><a href="SparqlXmlResultParser.html">SparqlXmlResultParser</a></li><li><a href="StatementPayload.html">StatementPayload</a></li><li><a href="StatementsService.html">StatementsService</a></li><li><a href="StringUtils.html">StringUtils</a></li><li><a href="TermConverter.html">TermConverter</a></li><li><a href="TransactionalRepositoryClient.html">TransactionalRepositoryClient</a></li><li><a href="TransactionService.html">TransactionService</a></li><li><a href="TriGParser.html">TriGParser</a></li><li><a href="TurtleParser.html">TurtleParser</a></li><li><a href="UpdateQueryPayload.html">UpdateQueryPayload</a></li><li><a href="UploadService.html">UploadService</a></li><li><a href="User.html">User</a></li></ul><h3>Interfaces</h3><ul><li><a href="Logger.html">Logger</a></li></ul><h3>Global</h3><ul><li><a href="global.html#Authority">Authority</a></li><li><a href="global.html#MediaType">MediaType</a></li><li><a href="global.html#PATH_NAMESPACES">PATH_NAMESPACES</a></li><li><a href="global.html#PATH_SIZE">PATH_SIZE</a></li><li><a href="global.html#PATH_STATEMENTS">PATH_STATEMENTS</a></li><li><a href="global.html#PATH_TRANSACTIONS">PATH_TRANSACTIONS</a></li><li><a href="global.html#QueryContentType">QueryContentType</a></li><li><a href="global.html#QueryLanguage">QueryLanguage</a></li><li><a href="global.html#QueryType">QueryType</a></li><li><a href="global.html#RDFMimeType">RDFMimeType</a></li><li><a href="global.html#RepositoryType">RepositoryType</a></li><li><a href="global.html#RETRIABLE_STATUSES">RETRIABLE_STATUSES</a></li><li><a href="global.html#TransactionIsolationLevel">TransactionIsolationLevel</a></li><li><a href="global.html#XSD">XSD</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.6</a> on Wed Feb 10 2021 07:10:15 GMT+0100 (Central European Standard Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.6</a> on Wed Feb 10 2021 09:07:38 GMT+0200 (Eastern European Standard Time)
 </footer>
 
 <script> prettyPrint(); </script>

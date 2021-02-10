@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Class: CommonUtils</title>
+    <title>JSDoc: Class: AuthenticationFactory</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Class: CommonUtils</h1>
+    <h1 class="page-title">Class: AuthenticationFactory</h1>
 
     
 
@@ -28,9 +28,10 @@
 
 <header>
     
-        <h2><span class="attribs"><span class="type-signature"></span></span>CommonUtils<span class="signature">()</span><span class="type-signature"></span></h2>
+        <h2><span class="attribs"><span class="type-signature"></span></span>AuthenticationFactory<span class="signature">()</span><span class="type-signature"></span></h2>
         
-            <div class="class-description"><p>Common utility functions.</p></div>
+            <div class="class-description"><p>Factory to create concrete authentication type, based on
+client configuration.</p></div>
         
     
 </header>
@@ -45,7 +46,7 @@
     
 
     
-    <h4 class="name" id="CommonUtils"><span class="type-signature"></span>new CommonUtils<span class="signature">()</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="AuthenticationFactory"><span class="type-signature"></span>new AuthenticationFactory<span class="signature">()</span><span class="type-signature"></span></h4>
     
 
     
@@ -86,7 +87,7 @@
     <dt class="tag-author">Author:</dt>
     <dd class="tag-author">
         <ul>
-            <li>Mihail Radkov</li>
+            <li>Teodossi Dossev</li>
         </ul>
     </dd>
     
@@ -100,7 +101,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="util_common-utils.js.html">util/common-utils.js</a>, <a href="util_common-utils.js.html#line7">line 7</a>
+        <a href="security_authentication-factory.js.html">security/authentication-factory.js</a>, <a href="security_authentication-factory.js.html#line11">line 11</a>
     </li></ul></dd>
     
 
@@ -156,7 +157,7 @@
     
 
     
-    <h4 class="name" id=".hasNullArguments"><span class="type-signature">(static) </span>hasNullArguments<span class="signature">()</span><span class="type-signature"> &rarr; {boolean}</span></h4>
+    <h4 class="name" id="getAuthenticationType"><span class="type-signature"></span>getAuthenticationType<span class="signature">(clientConfig)</span><span class="type-signature"> &rarr; {<a href="BasicAuthentication.html">BasicAuthentication</a>|<a href="GdbTokenAuthentication.html">GdbTokenAuthentication</a>}</span></h4>
     
 
     
@@ -164,7 +165,7 @@
 
 
 <div class="description">
-    <p>Checks if at least one of the supplied arguments is undefined or null.</p>
+    <p>Concrete authentication type generator.</p>
 </div>
 
 
@@ -173,6 +174,55 @@
 
 
 
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>clientConfig</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="ClientConfig.html">ClientConfig</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+    </tbody>
+</table>
 
 
 
@@ -208,7 +258,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="util_common-utils.js.html">util/common-utils.js</a>, <a href="util_common-utils.js.html#line14">line 14</a>
+        <a href="security_authentication-factory.js.html">security/authentication-factory.js</a>, <a href="security_authentication-factory.js.html#line17">line 17</a>
     </li></ul></dd>
     
 
@@ -236,11 +286,6 @@
 <h5>Returns:</h5>
 
         
-<div class="param-desc">
-    <p><code>true</code> if there is null argument or
-<code>false</code> otherwise</p>
-</div>
-
 
 
 <dl>
@@ -249,7 +294,10 @@
     </dt>
     <dd>
         
-<span class="param-type">boolean</span>
+<span class="param-type"><a href="BasicAuthentication.html">BasicAuthentication</a></span>
+|
+
+<span class="param-type"><a href="GdbTokenAuthentication.html">GdbTokenAuthentication</a></span>
 
 
     </dd>

@@ -6,6 +6,24 @@
 * `Check the GDB server version and report mismatches if the client version implements a different version unless the check is stopped.`
 * `Support secured endpoints exposing only HTTPS`
 
+## 2.0.0 (2021-02-10)
+* Major changes in the construction of server and repository client configurations.
+* Update Readme.md
+
+## 1.7.0 (2021-02-10)
+* Upgrade to graphDb 9.6.0
+
+## 1.6.1 (2021-02-09)
+* Authenticate against a secured GDB server
+* Manage repositories through GraphDBServerClient
+* Fix latest vulnerabilities and lib updates
+* Migrate to Jenkins
+* Update repository tutorials in Readme.md
+* Created README for the e2e-test package
+
+**Bugfixes**
+* Repository client authentication endpoint fix
+  
 ## 1.5.0 (2020-12-10)
 * Upgrade to graphDb 9.5.0
 
