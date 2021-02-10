@@ -17,6 +17,7 @@ class ServerClientConfig extends ClientConfig {
    * Server client configuration constructor.
    * Sets configuration default value to
    * [timeout]{@link ServerClientConfig#timeout}
+   * and [keepAlive]{@link ServerClientConfig#keepAlive}
    *
    * @param {string} [endpoint] Endpoint url.
    */
