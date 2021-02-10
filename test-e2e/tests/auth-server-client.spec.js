@@ -6,9 +6,6 @@ const Config = require('config');
 const NEW_REPO = 'New_repo';
 
 describe('Should test server client auth', () => {
-  const config = new ServerClientConfig(Config.serverAddress, 10000,
-    new Map(), 'admin', 'root', true, true);
-
   beforeAll((done) => {
     Utils.toggleSecurity(true).then(() => {
       done();
@@ -26,12 +23,15 @@ describe('Should test server client auth', () => {
   });
 
   test('Should add and delete repository with BASIC auth', (done) => {
+    const config = new ServerClientConfig(Config.serverAddress)
+      .useBasicAuthentication('admin', 'root');
     const serverClient = new GraphDBServerClient(config);
     createRepository(serverClient, done);
   });
 
   test('Should add and delete repository with TOKEN auth', (done) => {
-    config.setBasicAuthentication(false);
+    const config = new ServerClientConfig(Config.serverAddress)
+      .useGdbTokenAuthentication('admin', 'root');
     const serverClient = new GraphDBServerClient(config);
     createRepository(serverClient, done);
   });

@@ -1,41 +1,44 @@
-const {RepositoryClientConfig} = require('graphdb').repository;
+/* eslint-disable max-len */
 const {RDFMimeType} = require('graphdb').http;
 const {ServerClientConfig} = require('graphdb').server;
+const {RepositoryClientConfig} = require('graphdb').repository;
 
 // Variables used in tests
 const serverAddress = 'http://localhost:7200';
 const testRepoPath = './tests/data/repositories/GDB_Free/repository1.ttl';
 const testRepo2Path = './tests/data/repositories/GDB_Free/repository2.ttl';
 
-const restApiConfig = new RepositoryClientConfig(
-
-  [`${serverAddress}/repositories/Test_repo`], {
+const restApiConfig = new RepositoryClientConfig(serverAddress)
+  .setEndpoints([`${serverAddress}/repositories/Test_repo`])
+  .setHeaders({
     'Accept': RDFMimeType.SPARQL_RESULTS_XML
-  },
-  '', 10000, 10000);
-
-const restApiBasicAuthConfig = new RepositoryClientConfig(
-  [`${serverAddress}/repositories/Test_repo`], {
-    'Accept': RDFMimeType.SPARQL_RESULTS_XML,
-    'Authorization': 'Basic YWRtaW46cm9vdA=='
-  },
-  '', 10000, 10000);
-
-const serverBasicAuthConfig = new ServerClientConfig(
-  serverAddress,
-  10000,
-  {
-    'Accept': RDFMimeType.SPARQL_RESULTS_JSON,
-    'Authorization': 'Basic YWRtaW46cm9vdA=='
   });
 
-const serverConfig = new ServerClientConfig(
-  serverAddress,
-  10000,
-  {
+const restApiBasicAuthConfig = new RepositoryClientConfig(serverAddress)
+  .setEndpoints([`${serverAddress}/repositories/Test_repo`])
+  .setHeaders({
+    'Accept': RDFMimeType.SPARQL_RESULTS_XML
+  })
+  .useBasicAuthentication('admin', 'root');
+
+const restApiTokenAuthConfig = new RepositoryClientConfig(serverAddress)
+  .setEndpoints([`${serverAddress}/repositories/Test_repo`])
+  .setHeaders({
+    'Accept': RDFMimeType.SPARQL_RESULTS_XML
+  })
+  .useGdbTokenAuthentication('admin', 'root');
+
+
+const serverBasicAuthConfig = new ServerClientConfig(serverAddress)
+  .setHeaders({
+    'Accept': RDFMimeType.SPARQL_RESULTS_JSON
+  })
+  .useBasicAuthentication('admin', 'root');
+
+const serverConfig = new ServerClientConfig(serverAddress)
+  .setHeaders({
     'Accept': RDFMimeType.SPARQL_RESULTS_JSON
   });
 
-
 module.exports = {restApiConfig, serverAddress, testRepoPath, testRepo2Path,
-  restApiBasicAuthConfig, serverBasicAuthConfig, serverConfig};
+  restApiBasicAuthConfig, restApiTokenAuthConfig, serverBasicAuthConfig, serverConfig};

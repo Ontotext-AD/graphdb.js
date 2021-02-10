@@ -1,6 +1,6 @@
 const HttpClient = require('http/http-client');
-const RDFRepositoryClient = require('repository/rdf-repository-client');
 const RepositoryClientConfig = require('repository/repository-client-config');
+const RDFRepositoryClient = require('repository/rdf-repository-client');
 const UpdateQueryPayload = require('query/update-query-payload');
 const QueryContentType = require('http/query-content-type');
 const HttpRequestBuilder = require('http/http-request-builder');
@@ -16,15 +16,16 @@ describe('RDFRepositoryClient - update query', () => {
 
   beforeEach(() => {
     HttpClient.mockImplementation(() => httpClientStub());
-    config = new RepositoryClientConfig()
-      .addEndpoint('http://host/repositories/repo1')
+    config = new RepositoryClientConfig('http://host')
+      .setEndpoints(['http://host/repositories/repo1'])
       .setReadTimeout(1000)
       .setWriteTimeout(1000);
     repository = new RDFRepositoryClient(config);
     httpRequest = repository.httpClients[0].request;
   });
 
-  test('should make a POST request with Content-Type/sparql-update header and unencoded sparql query as body', () => {
+  test('should make a POST request with Content-Type/sparql-update header ' +
+    'and unencoded sparql query as body', () => {
     const payload = new UpdateQueryPayload()
       .setQuery('INSERT {?s ?p ?o} WHERE {?s ?p ?o}');
 
@@ -40,7 +41,8 @@ describe('RDFRepositoryClient - update query', () => {
     });
   });
 
-  test('should make a POST request with Content-Type/x-www-form-urlencoded header and encoded query plus parameters as body', () => {
+  test('should make a POST request with Content-Type/x-www-form-urlencoded ' +
+    'header and encoded query plus parameters as body', () => {
     const payload = new UpdateQueryPayload()
       .setQuery('INSERT {?s ?p ?o} WHERE {?s ?p ?o}')
       .setContentType(QueryContentType.X_WWW_FORM_URLENCODED)
@@ -51,7 +53,13 @@ describe('RDFRepositoryClient - update query', () => {
       .setInsertGraphs('<http://example.org/graph4>')
       .setTimeout(5);
 
-    const expectedData = 'update=INSERT%20%7B%3Fs%20%3Fp%20%3Fo%7D%20WHERE%20%7B%3Fs%20%3Fp%20%3Fo%7D&infer=true&using-graph-uri=%3Chttp%3A%2F%2Fexample.org%2Fgraph1%3E&using-named-graph-uri=%3Chttp%3A%2F%2Fexample.org%2Fgraph2%3E&remove-graph-uri=%3Chttp%3A%2F%2Fexample.org%2Fgraph3%3E&insert-graph-uri=%3Chttp%3A%2F%2Fexample.org%2Fgraph4%3E&timeout=5';
+    const expectedData =
+      'update=INSERT%20%7B%3Fs%20%3Fp%20%3Fo%7D%20WHERE' +
+      '%20%7B%3Fs%20%3Fp%20%3Fo%7D&infer=true&using-graph-uri=' +
+      '%3Chttp%3A%2F%2Fexample.org%2Fgraph1%3E&using-named-graph-uri=' +
+      '%3Chttp%3A%2F%2Fexample.org%2Fgraph2%3E&remove-graph-uri=' +
+      '%3Chttp%3A%2F%2Fexample.org%2Fgraph3%3E&insert-graph-uri=' +
+      '%3Chttp%3A%2F%2Fexample.org%2Fgraph4%3E&timeout=5';
     const expectedRequestConfig = HttpRequestBuilder.httpPost('/statements')
       .setData(expectedData)
       .setHeaders({
@@ -69,7 +77,8 @@ describe('RDFRepositoryClient - update query', () => {
       const payload = new UpdateQueryPayload()
         .setContentType(QueryContentType.X_WWW_FORM_URLENCODED);
 
-      return expect(() => repository.update(payload)).toThrow(Error('Parameter query is mandatory!'));
+      return expect(() => repository.update(payload))
+        .toThrow(Error('Parameter query is mandatory!'));
     });
   });
 

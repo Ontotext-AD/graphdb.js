@@ -1,5 +1,7 @@
 const ClientConfig = require('../http/client-config');
 
+const defaultTimeout = 10000;
+
 /**
  * Configuration wrapper used for initialization of {@link ServerClient}
  * instances.
@@ -8,32 +10,29 @@ const ClientConfig = require('../http/client-config');
  * @extends ClientConfig
  * @author Mihail Radkov
  * @author Svilen Velikov
+ * @author Teodossi Dossev
  */
 class ServerClientConfig extends ClientConfig {
   /**
+   * Server client configuration constructor.
+   * Sets configuration default value to
+   * [timeout]{@link ServerClientConfig#timeout}
+   * and [keepAlive]{@link ServerClientConfig#keepAlive}
+   *
    * @param {string} [endpoint] Endpoint url.
-   * @param {number} [timeout] Specifies the number of milliseconds before the
-   *                         request times out.
-   * @param {Map<string, string>} [headers] An http headers map.
-   * @param {string} [username] username which should be authenticated
-   * @param {string} [pass] the password to be used
-   * @param {boolean} [keepAlive=true] if the logged in user should be
-   * reauthenticated after auth token expire. This config has meaning when the
-   * server is secured and username and passwords are provided.
-   * @param {boolean} [useBasicAuth] if use Basic Auth when authenticating
    */
-  constructor(endpoint, timeout, headers, username, pass,
-      keepAlive, useBasicAuth) {
-    super(headers, username, pass, keepAlive, useBasicAuth, endpoint);
-    this.timeout = timeout;
-    // TODO refactor to reduce constructor params
-    //  related to https://github.com/Ontotext-AD/graphdb.js/issues/124
+  constructor(endpoint) {
+    super(endpoint);
+    this.setHeaders({});
+    this.setKeepAlive(true);
+    this.setTimeout(defaultTimeout);
   }
 
   /**
     * Sets the timeout for HTTP requests.
     *
-    * @param {number} timeout the timeout in milliseconds
+    * @param {number} timeout the timeout in milliseconds before the
+    * request times out.
     * @return {this} the concrete configuration config for method chaining
     */
   setTimeout(timeout) {

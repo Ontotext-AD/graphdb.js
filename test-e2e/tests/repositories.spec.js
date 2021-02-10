@@ -1,10 +1,10 @@
+/* eslint-disable max-len */
+const {ServerClientConfig, ServerClient} = require('graphdb').server;
 const {RepositoryClientConfig} = require('graphdb').repository;
-const {ServerClient, ServerClientConfig} = require('graphdb').server;
 const Utils = require('utils');
 const Config = require('config');
 
 describe('Should test repositories', () => {
-
   beforeAll(() => {
     return Utils.createRepo(Config.testRepoPath).then(() => {
       return Utils.createRepo(Config.testRepo2Path);
@@ -16,12 +16,15 @@ describe('Should test repositories', () => {
   });
 
   test('Should verify repositories', () => {
-    let config = new ServerClientConfig(Config.serverAddress, 10000, {});
-    let client = new ServerClient(config);
-    let repositoryClientConfig = new RepositoryClientConfig([`${Config.serverAddress}/repositories/`], {}, '', 3001, 3001);
+    const config = new ServerClientConfig(Config.serverAddress);
+    const client = new ServerClient(config);
+    const repositoryClientConfig = new RepositoryClientConfig(Config.serverAddress)
+      .setEndpoints([`${Config.serverAddress}/repositories/`])
+      .setReadTimeout(3001)
+      .setWriteTimeout(3001);
 
     return client.getRepositoryIDs().then((response) => {
-      let expected = ['Test_repo', 'Test_repo_2'];
+      const expected = ['Test_repo', 'Test_repo_2'];
       expect(response.sort()).toEqual(expected);
       return client.hasRepository('Test_repo');
     }).then((response) => {
@@ -37,7 +40,7 @@ describe('Should test repositories', () => {
       expect(response.repositoryClientConfig.readTimeout).toBe(3001);
       expect(response.repositoryClientConfig.writeTimeout).toBe(3001);
       expect(response.repositoryClientConfig.headers).toStrictEqual({});
-      expect(response.repositoryClientConfig.defaultRDFMimeType).toBe('');
+      expect(response.repositoryClientConfig.defaultRDFMimeType).toBe('application/sparql-results+json');
     });
   });
 });

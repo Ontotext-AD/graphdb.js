@@ -171,11 +171,10 @@ class BaseRepositoryClient {
    */
   retryExecution(httpClients, requestBuilder, currentHttpClient) {
     const httpClient = currentHttpClient || httpClients.next();
-    const username = this.repositoryClientConfig.getUsername();
-    const pass = this.repositoryClientConfig.getPass();
     return this.authenticationService
-      .login(username, pass)
-      .then(() => {
+      .login(this.repositoryClientConfig, this.user)
+      .then((user) => {
+        this.setLoggedUser(user);
         this.decorateRequestConfig(requestBuilder);
         return httpClient.request(requestBuilder).then((response) => {
           return new HttpResponse(response, httpClient);
@@ -217,7 +216,8 @@ class BaseRepositoryClient {
    * @param {HttpRequestBuilder} requestBuilder
    */
   decorateRequestConfig(requestBuilder) {
-    const token = this.authenticationService.getAuthentication();
+    const token = this.authenticationService
+      .getAuthenticationToken(this.getLoggedUser());
     if (token) {
       requestBuilder.addAuthorizationHeader(token);
     }
@@ -280,6 +280,25 @@ class BaseRepositoryClient {
       throw new Error('Cannot instantiate a repository without repository '
         + 'endpoint configuration! At least one endpoint must be provided.');
     }
+  }
+
+  /**
+   * Logged user getter.
+   * @return {User} user
+   */
+  getLoggedUser() {
+    return this.user;
+  }
+
+  /**
+   * User setter
+   * @param {User} user
+   *
+   * @return {BaseRepositoryClient}
+   */
+  setLoggedUser(user) {
+    this.user = user;
+    return this;
   }
 }
 

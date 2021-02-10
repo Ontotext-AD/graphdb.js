@@ -128,10 +128,24 @@ first.
 const {ServerClient, ServerClientConfig} = require('graphdb').server;
 const {RDFMimeType} = require('graphdb').http;
 
-const serverConfig = new ServerClientConfig('http://rdf4j-compliant-server/', 0, {
-    'Accept': RDFMimeType.SPARQL_RESULTS_JSON
-});
+const serverConfig = new ServerClientConfig('http://rdf4j-compliant-server/')
+    .setTimeout(5000)
+    .setHeaders({
+        'Accept': RDFMimeType.SPARQL_RESULTS_JSON
+    })
+    .setKeepAlive(true);
+
 const server = new ServerClient(serverConfig);
+```
+
+When created, configurations receive the following default parameters:
+```javascript
+    /**
+    * The Server client configuration constructor
+    * sets configuration default value to 
+    * timeout = 10000,
+    * keepAlive = true
+    */
 ```
 
 *  Fetch repository ids
@@ -180,8 +194,8 @@ Used to automate the security user management API: add, edit, or remove users.  
 // Import all classes needed for work
 const {GraphDBServerClient, ServerClientConfig} = require('graphdb').server; 
 // Instance the server configuration
-const serverConfig = new ServerClientConfig('http://rdf4j-compliant-server/', 10000,
-    new Map(), 'admin', 'root', true, true);
+const serverConfig = new ServerClientConfig('http://rdf4j-compliant-server/')
+    .useGdbTokenAuthentication('admin', 'root');
 // Instance the server client
 const serverClient = new GraphDBServerClient(serverConfig);
 ```
@@ -289,12 +303,28 @@ Use with extreme caution, as the changes that are made to the application settin
 * Instantiating repository client
 
 ```javascript
+const endpoint = 'http://GDB';
 const readTimeout = 30000;
 const writeTimeout = 30000;
-const config = new RepositoryClientConfig(['http://GDB/repositories/my-repo'], {
-  'Accept': RDFMimeType.TURTLE
-}, '', readTimeout, writeTimeout);
+const config = new RepositoryClientConfig(endpoint)
+    .setEndpoints(['http://GDB/repositories/my-repo'])
+    .setHeaders({
+      'Accept': RDFMimeType.TURTLE
+    })
+    .setReadTimeout(readTimeout)
+    .setWriteTimeout(writeTimeout);
 const repository = new RDFRepositoryClient(config);
+```
+When created, configurations receive the following default parameters:
+```javascript
+    /**
+    * The Repository client configuration constructor
+    * sets configuration default value to 
+    * defaultRDFMimeType = 'application/sparql-results+json',
+    * keepAlive = true,
+    * readTimeout = 10000,
+    * writeTimeout = 10000
+    */
 ```
 
 * Obtaining repository client instance through a ServerClient
@@ -303,14 +333,20 @@ const repository = new RDFRepositoryClient(config);
 const {ServerClient, ServerClientConfig} = require('graphdb').server;
 const {RepositoryClientConfig} = require('graphdb').repository;
 
-const config = new ServerClientConfig('http://GDB', 0, {});
+const endpoint = 'http://GDB';
+const config = new ServerClientConfig(endpoint);
 const server = new ServerClient(config);
 
 const readTimeout = 30000;
 const writeTimeout = 30000;
-const repositoryClientConfig = new RepositoryClientConfig(['http://GDB/repositories/my-repo'], {}, '', readTimeout, writeTimeout);
-return server.getRepository('automotive', repositoryClientConfig).then((rdfRepositoryClient) => {
-// rdfRepositoryClient is a configured instance of RDFRepositoryClient
+
+const repositoryClientConfig = new RepositoryClientConfig(endpoint)
+    .setEndpoints(['http://GDB/repositories/my-repo'])
+    .setReadTimeout(readTimeout)
+    .setWriteTimeout(writeTimeout);
+return server.getRepository('automotive', repositoryClientConfig)
+    .then((rdfRepositoryClient) => {
+    // rdfRepositoryClient is a configured instance of RDFRepositoryClient
 });
 ```
 
@@ -436,7 +472,7 @@ return repository.update(payload).then(() => {
 
 ```javascript
 repository.deleteStatements(subj, pred, obj, contexts).then(() => {
-
+    // do work
 });
 ```
 
@@ -568,24 +604,28 @@ In case the server requires that requests should be authenticated, then in the `
 ##### ServerClient
 ```javascript
  const headers = {'Accept': 'text/plain'};
- const config = new ServerClientConfig('/endpoint', 1000, headers, 'testuser', 'P@sw0rd');
+ const config = new ServerClientConfig('/endpoint')
+    .setTimeout(5000)
+    .setHeaders(headers)
+    .useGdbTokenAuthentication('user', 'root');
+ const client = new ServerClient(config);
 ```
 ##### RepositoryClient
 ```javascript
+const endpoint = 'http://host/';
 const endpoints = ['http://host/repositories/repo1'];
 const headers = {};
 const contentType = '';
 const readTimeout = 1000;
 const writeTimeout = 1000;
 
-const config = new RepositoryClientConfig()
+const config = new RepositoryClientConfig(endpoint)
   .setEndpoints(endpoints)
   .setHeaders(headers)
   .setDefaultRDFMimeType(contentType)
   .setReadTimeout(readTimeout)
   .setWriteTimeout(writeTimeout)
-  .setUsername('testuser')
-  .setPass('pass123');
+  .useGdbTokenAuthentication('testuser', 'pass123');
 const repository = new RDFRepositoryClient(config);
 const httpRequest = repository.httpClients[0].request;
 ````
@@ -599,11 +639,17 @@ If the GDB token expires, then the first API call will be rejected with an http 
 Instead of using GDB token, users can access secured GraphDB by passing valid base-64 encoded username:password combinations as a header.
 In case Basic authentication will be used, then the headers in the `ServerClientConfig` and `RepositoryClientConfig` must be configured to send the `username` and `password` which to be used for the authentication. From this moment on, with every API call is sent also an `authorization` header with the encoded credentials as value.
 ```javascript
-config.setBasicAuthentication(true);
+config.useBasicAuthentication('admin', 'root');
 ```
 
 > **Note:**  
 > Basic Authentication is even more vulnerable to man-in-the-middle attacks than GDB token! Anyone who intercepts your requests will be able to reuse your credentials indefinitely until you change them. Since the credentials are merely base-64 encoded, they will also get your username and password. This is why it is very important to always use encryption in transit.
+
+##### Disable authentication
+If necessary, authentication can be disabled in the configuration. 
+```javascript
+config.disableAuthentication();
+```
 
 ### Response Parsers
 

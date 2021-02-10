@@ -28,15 +28,13 @@ describe('RDFRepositoryClient - authentication', () => {
     const writeTimeout = 1000;
     const endpoint = 'http://localhost:7200';
 
-    config = new RepositoryClientConfig()
+    config = new RepositoryClientConfig(endpoint)
       .setEndpoints(endpoints)
       .setHeaders(headers)
       .setDefaultRDFMimeType(contentType)
       .setReadTimeout(readTimeout)
       .setWriteTimeout(writeTimeout)
-      .setUsername('testuser')
-      .setPass('pass123')
-      .setEndpoint(endpoint);
+      .useGdbTokenAuthentication('testuser', 'pass123');
     repository = new RDFRepositoryClient(config);
     httpRequest = repository.httpClient.request;
 
@@ -91,14 +89,14 @@ describe('RDFRepositoryClient - authentication', () => {
   test('should try relogin after token gets expired', () => {
     mockClient();
 
-    return repository.get(payload).then((response) => {
+    return repository.get(payload).then(() => {
       return repository.get(payload);
-    }).then((response) => {
+    }).then(() => {
       // verify that exact requests have been made
       const loginMock = repository.httpClient.request;
       const requestMock = repository.httpClients[0].request;
 
-      // expect 2 invocations:
+      // expect 2 invocations:ClientConfigBuilder
       // first login
       // second getRepositoryIDs
       // expecting 5 invocations:
@@ -118,10 +116,10 @@ describe('RDFRepositoryClient - authentication', () => {
         jest.fn().mockImplementation((request) => {
           if (request.getMethod() === 'get') {
             calls++;
-            if (repository.authenticationService.getLoggedUser()
+            if (repository.getLoggedUser()
               && calls === 2) {
             // emulate token expiration
-              repository.authenticationService.getLoggedUser().clearToken();
+              repository.getLoggedUser().clearToken();
               return Promise.reject({
                 response: {
                   status: 401

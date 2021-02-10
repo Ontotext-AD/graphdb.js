@@ -46,21 +46,24 @@ describe('Should test namespaces in secured environment', () => {
     new RDFRepositoryClient(Config.restApiBasicAuthConfig);
 
   beforeAll((done) => {
-    Utils.createRepo(Config.testRepoPath).then(() => {
-      const wineRdf = path.resolve(__dirname, './data/wine.rdf');
-      return rdfSecuredClient
-        .addFile(wineRdf, RDFMimeType.RDF_XML, null, null);
-    }).then(() => {
-      return Utils.toggleSecurity(true);
-    }).then(() => {
-      done();
-    });
+    Utils.createRepo(Config.testRepoPath)
+      .then(() => {
+        return Utils.toggleSecurity(true);
+      }).then(() => {
+        const wineRdf = path.resolve(__dirname, './data/wine.rdf');
+        return rdfSecuredClient
+          .addFile(wineRdf, RDFMimeType.RDF_XML, null, null);
+      }).then(() => {
+        return done();
+      }).catch((e) => {
+        throw new Error(e);
+      });
   });
 
-  afterAll(() => {
+  afterAll((done) => {
     return Utils.toggleSecurity(false).then(() => {
       return Utils.deleteRepo('Test_repo');
-    });
+    }).then(()=> done());
   });
 
   test('Should list namespaces', () => {

@@ -1,11 +1,12 @@
-const HttpRequestBuilder = require('../http/http-request-builder');
 const User = require('../auth/user');
+const AuthenticationFactory = require('../security/authentication-factory');
 
 /**
  * Service dealing with user authentication in a secured server.
  *
  * @author Mihail Radkov
  * @author Svilen Velikov
+ * @author Teodossi Dossev
  */
 class AuthenticationService {
   /**
@@ -15,6 +16,7 @@ class AuthenticationService {
    */
   constructor(httpClient) {
     this.httpClient = httpClient;
+    this.authenticationFactory = new AuthenticationFactory();
   }
 
   /**
@@ -22,25 +24,24 @@ class AuthenticationService {
    * password. Upon successful authentication a {@link User} instance is created
    * with the user data and the auth token and returned to the client.
    *
-   * @param {string} username is the username of the logged in user
-   * @param {string} pass is the password of the logged in user
+   * @param {ClientConfig} clientConfig concrete client configuration
+   * @param {User} user logged in user
    *
    * @return {Promise<User>} a promise resolving to an authenticated
    * {@link User} instance.
    */
-  login(username, pass) {
-    if (!this.shouldAuthenticate(username, pass)) {
-      return Promise.resolve();
+  login(clientConfig, user) {
+    if (!clientConfig.shouldAuthenticate() ||
+      !this.isAlreadyAuthenticated(clientConfig, user)) {
+      return Promise.resolve(user);
     }
-    const requestBuilder =
-      HttpRequestBuilder.httpPost(`/rest/login/${username}`)
-        .addGraphDBPasswordHeader(pass);
-    return this.httpClient.request(requestBuilder).then((response) => {
-      const token = response.headers['authorization'];
-      const user = new User(token, pass, response.data);
-      this.setLoggedUser(user);
-      return user;
-    });
+
+    const authentication = this.getAuthentication(clientConfig);
+    return this.httpClient.request(this.getLoginRequest(clientConfig))
+      .then((response) => {
+        const token = authentication.getResponseAuthToken(response);
+        return new User(token, clientConfig.getPass(), response.data);
+      });
   }
 
   /**
@@ -48,10 +49,12 @@ class AuthenticationService {
    * the client user. Every consecutive call against secured server will result
    * in <code>Unauthorized</code> error with status code <code>401</code>.
    *
+   * @param {User} user logged in user
+   *
    * @return {Promise} returns a promise which resolves with undefined.
    */
-  logout() {
-    this.getLoggedUser() && this.getLoggedUser().clearToken();
+  logout(user) {
+    user.clearToken();
     return Promise.resolve();
   }
 
@@ -60,10 +63,11 @@ class AuthenticationService {
    * request header <code>Authorization: token</code>. If there is no logged in
    * user, then this method returns <code>undefined</code>.
    *
-   * @return {string|undefined}
+   * @param {User} user logged in user
+   * @return {string|undefined} authentication token
    */
-  getAuthentication() {
-    return this.getLoggedUser() && this.getLoggedUser().getToken();
+  getAuthenticationToken(user) {
+    return user && user.getToken();
   }
 
   /**
@@ -71,40 +75,36 @@ class AuthenticationService {
    * yet. If that's the case, authentication should be made.
    *
    * @private
-   *
-   * @param {string} username is the username of the logged in user
-   * @param {string} pass is the password of the logged in user
+   * @param {ClientConfig} clientConfig concrete client config
+   * @param {User} user logged in user
    *
    * @return {boolean} true if authentication should be made
    */
-  shouldAuthenticate(username, pass) {
-    const hasCredentials = username && pass;
-    const isAuthenticated = this.getLoggedUser()
-      && this.getLoggedUser().getToken();
+  isAlreadyAuthenticated(clientConfig, user) {
+    const hasCredentials = clientConfig.getUsername() && clientConfig.getPass();
+    const isAuthenticated = user && user.getToken();
     return hasCredentials && !isAuthenticated;
   }
 
   /**
-   * @param {User} user
+   * Returns authentication type related {@link HttpRequestBuilder}
+   * login request builder
+   *
+   * @param {ClientConfig} clientConfig concrete client configuration
+   * @return {HttpRequestBuilder} request builder
    */
-  setLoggedUser(user) {
-    this.loggedUser = user;
+  getLoginRequest(clientConfig) {
+    return this.getAuthentication(clientConfig).getLoginRequestBuilder();
   }
 
   /**
-   * @return {User}
+   * Authentication type getter
+   * @param {ClientConfig} clientConfig concrete client configuration
+   * @return {BasicAuthentication|GdbTokenAuthentication} concrete
+   * authentication type
    */
-  getLoggedUser() {
-    return this.loggedUser;
-  }
-
-  /**
-   * @param {HttpClient} httpClient
-   * @return {AuthenticationService}
-   */
-  setHttpClient(httpClient) {
-    this.httpClient = httpClient;
-    return this;
+  getAuthentication(clientConfig) {
+    return this.authenticationFactory.getAuthenticationType(clientConfig);
   }
 }
 

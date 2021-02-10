@@ -15,10 +15,11 @@ const TransactionalRepositoryClient =
  *
  * @author Mihail Radkov
  * @author Svilen Velikov
+ * @author Teodossi Dossev
  */
 class TransactionService extends Service {
   /**
-   * Instantiates the transaction service wioth the supplied executor and
+   * Instantiates the transaction service with the supplied executor and
    * repository client config.
    *
    * @param {Function} httpRequestExecutor used to execute HTTP requests
@@ -78,7 +79,7 @@ class TransactionService extends Service {
    */
   getTransactionalClientConfig(locationUrl) {
     const config = this.repositoryClientConfig;
-    return new RepositoryClientConfig()
+    return new RepositoryClientConfig(config.getEndpoint())
       .setEndpoints([locationUrl])
       .setHeaders(config.getHeaders())
       .setDefaultRDFMimeType(config.getDefaultRDFMimeType())

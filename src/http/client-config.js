@@ -1,3 +1,7 @@
+const BASIC_AUTH = 'BASIC';
+const GDB_TOKEN = 'GDB_TOKEN';
+const OFF = 'OFF';
+
 /**
  * Abstract configuration wrapper used for initialization of concrete
  * Client instances. Concrete client configuration wrappers must extend
@@ -10,23 +14,13 @@
  */
 class ClientConfig {
   /**
-   * @param {Map<string, string>} [headers] An http headers map.
-   * @param {string} [username] username which should be authenticated
-   * @param {string} [pass] the password to be used
-   * @param {boolean} [keepAlive=true] if the logged in user should be
-   * reauthenticated after auth token expire. This config has meaning when the
-   * server is secured and username and passwords are provided.
-   * @param {boolean} [useBasicAuth] if use Basic Auth when authenticating
+   * Client configuration constructor.
+   *
    * @param {string} endpoint server base URL that will be prepend
    * to all server requests
    */
-  constructor(headers, username, pass, keepAlive, useBasicAuth, endpoint) {
-    this.headers = headers;
-    this.endpoint = endpoint;
-    this.username = username;
-    this.pass = pass;
-    this.keepAlive = keepAlive !== undefined ? keepAlive : true;
-    this.setBasicAuthentication(useBasicAuth);
+  constructor(endpoint) {
+    this.setEndpoint(endpoint);
   }
 
   /**
@@ -57,28 +51,10 @@ class ClientConfig {
   }
 
   /**
-   * @param {string} username
-   * @return {this} the concrete configuration config for method chaining
-   */
-  setUsername(username) {
-    this.username = username;
-    return this;
-  }
-
-  /**
    * @return {string} the user password
    */
   getPass() {
     return this.pass;
-  }
-
-  /**
-   * @param {string} pass
-   * @return {this} the concrete configuration config for method chaining
-   */
-  setPass(pass) {
-    this.pass = pass;
-    return this;
   }
 
   /**
@@ -98,44 +74,100 @@ class ClientConfig {
   }
 
   /**
-   * @param {boolean} [basicAuth] if use Basic Auth when authenticating
+   * Username and password for user logging setter.
+   * Sets basic authentication as client authentication type.
+   *
+   * @param {string} [username]
+   * @param {string} [pass]
+   *
    * @return {this} the concrete configuration config for method chaining
    */
-  setBasicAuthentication(basicAuth) {
-    this.basicAuth = basicAuth;
-    this.useBasicAuthentication();
+  useBasicAuthentication(username, pass) {
+    this.username = username;
+    this.pass = pass;
+    this.switchAuthentication(BASIC_AUTH);
     return this;
+  }
+
+
+  /**
+   * @return {boolean} [basicAuth] if use Basic Auth
+   */
+  getBasicAuthentication() {
+    return this.basicAuth;
   }
 
   /**
    * @private
+   * @param {string} auth authentication type
    */
-  useBasicAuthentication() {
-    if (this.basicAuth) {
-      const credentials = `${this.username}:${this.pass}`;
-      this.headers['Authorization'] = `Basic ${btoa(credentials)}`;
-    }
+  switchAuthentication(auth) {
+    this.basicAuth = auth === BASIC_AUTH;
+    this.gdbTokenAuth = auth === GDB_TOKEN;
+  }
+
+  /**
+   * @return {boolean} [gdbTokenAuth] if use Gdb Token Auth
+   */
+  getGdbTokenAuthentication() {
+    return this.gdbTokenAuth;
+  }
+
+  /**
+   * Username and password for user logging setter.
+   * Sets gdb token authentication as client authentication type.
+   * *
+   * @param {string} [username]
+   * @param {string} [pass]
+   *
+   * @return {this} the concrete configuration config for method chaining
+   */
+  useGdbTokenAuthentication(username, pass) {
+    this.username = username;
+    this.pass = pass;
+    this.switchAuthentication(GDB_TOKEN);
+    return this;
+  }
+
+  /**
+   * Disables authentication.
+   */
+  disableAuthentication() {
+    this.switchAuthentication(OFF);
   }
 
   /**
    * Sets the server's endpoint URL.
    *
    * @param {string} endpoint the endpoint URL
-   *
    * @return {this} the current config for method chaining
    */
   setEndpoint(endpoint) {
-    this.endpoint = endpoint;
-    return this;
+    if (endpoint &&
+      (typeof endpoint === 'string' || endpoint instanceof String)) {
+      this.endpoint = endpoint;
+      return this;
+    } else {
+      throw new Error('Invalid Endpoint parameter!');
+    }
   }
 
   /**
    * Returns the server's endpoint URL.
-   *
    * @return {string} the endpoint URL
    */
   getEndpoint() {
     return this.endpoint;
+  }
+
+  /**
+   * Returns <code>true</code> if basic or gdb token authentication
+   * is enabled. <code>false</code> otherwise.
+   *
+   * @return {boolean} is authentication enabled
+   */
+  shouldAuthenticate() {
+    return this.basicAuth || this.gdbTokenAuth;
   }
 }
 

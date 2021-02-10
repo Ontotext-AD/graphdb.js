@@ -24,5 +24,16 @@
     "node": true,
     "browser": true,
     "jest": true
-  }
+  },
+  "overrides": [
+    {
+      "files": ["test/**", "test-e2e/**"],
+      "rules": {
+        "require-jsdoc": "off",
+        "prefer-promise-reject-errors": "off",
+        "valid-jsdoc": "off"
+      }
+    }
+  ]
 }
+

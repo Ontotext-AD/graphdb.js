@@ -1,43 +1,60 @@
 const ServerClientConfig = require('server/server-client-config');
 
 describe('ServerClientConfig', () => {
-  test('should initialize with the supplied parameters', () => {
-    const headers = {'Accept': 'text/plain'};
-    let config = new ServerClientConfig('/endpoint', 1000,
-      headers, 'testuser', 'P@sw0rd');
-    expect(config.getEndpoint()).toEqual('/endpoint');
-    expect(config.getTimeout()).toEqual(1000);
-    expect(config.getHeaders()).toEqual(headers);
-    expect(config.getUsername()).toEqual('testuser');
-    expect(config.getPass()).toEqual('P@sw0rd');
-    expect(config.getKeepAlive()).toBeTruthy();
+  const endpoint = 'http://endpoint';
 
-    config = new ServerClientConfig('/endpoint', 1000,
-      headers, 'testuser', 'P@sw0rd', false);
-    expect(config.getKeepAlive()).toBeFalsy();
+  test('should initialize with the default parameters', () => {
+    const config = new ServerClientConfig(endpoint);
+
+    expect(config.getEndpoint()).toEqual(endpoint);
+    expect(config.getHeaders()).toEqual({});
+    expect(config.getTimeout()).toEqual(10000);
+    expect(config.getUsername()).toEqual(undefined);
+    expect(config.getPass()).toEqual(undefined);
+    expect(config.getBasicAuthentication()).toBeFalsy();
+    expect(config.getKeepAlive()).toBeTruthy();
   });
 
   test('should support initialization via fluent API ', () => {
-    let headers = {'Accept': 'text/plain'};
-    const config = new ServerClientConfig()
-      .setEndpoint('/endpoint')
+    const headers = {'Accept': 'text/plain'};
+    const config = new ServerClientConfig(endpoint)
       .setTimeout(1000)
       .setHeaders(headers)
-      .setUsername('testuser')
-      .setPass('P@sw0rd');
-    expect(config.getEndpoint()).toEqual('/endpoint');
+      .useBasicAuthentication('testuser', 'P@sw0rd');
+    expect(config.getEndpoint()).toEqual('http://endpoint');
     expect(config.getTimeout()).toEqual(1000);
     expect(config.getHeaders()).toEqual(headers);
     expect(config.getUsername()).toEqual('testuser');
     expect(config.getPass()).toEqual('P@sw0rd');
+    expect(config.getBasicAuthentication()).toBeTruthy();
+    expect(config.getGdbTokenAuthentication()).toBeFalsy();
     expect(config.getKeepAlive()).toBeTruthy();
 
     config.setKeepAlive(false);
     expect(config.getKeepAlive()).toBeFalsy();
 
-    headers = {'Accept': 'text/plain',
-      'Authorization': 'Basic dGVzdHVzZXI6UEBzdzByZA=='};
-    config.setBasicAuthentication(true);
-    expect(config.getHeaders()).toEqual(headers);
+    config.useGdbTokenAuthentication('testuser2', 'P@sw0rd2');
+    expect(config.getUsername()).toEqual('testuser2');
+    expect(config.getPass()).toEqual('P@sw0rd2');
+    expect(config.getBasicAuthentication()).toBeFalsy();
+    expect(config.getGdbTokenAuthentication()).toBeTruthy();
+  });
+
+  test('should switch and disable authentication', () => {
+    const config = new ServerClientConfig(endpoint);
+    expect(config.getBasicAuthentication()).toBeFalsy();
+    expect(config.getGdbTokenAuthentication()).toBeFalsy();
+
+    config.useGdbTokenAuthentication('user', 'pass');
+    expect(config.getBasicAuthentication()).toBeFalsy();
+    expect(config.getGdbTokenAuthentication()).toBeTruthy();
+
+    config.useBasicAuthentication('user', 'pass');
+    expect(config.getBasicAuthentication()).toBeTruthy();
+    expect(config.getGdbTokenAuthentication()).toBeFalsy();
+
+    config.disableAuthentication();
+    expect(config.getBasicAuthentication()).toBeFalsy();
+    expect(config.getGdbTokenAuthentication()).toBeFalsy();
   });
 });

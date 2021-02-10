@@ -42,7 +42,7 @@ function getReadStream(filePath) {
 
 function createRepo(path) {
   const data = new FormData();
-  data.append("config", fs.createReadStream(path));
+  data.append('config', fs.createReadStream(path));
 
   return axios({
     method: 'post',
@@ -50,22 +50,6 @@ function createRepo(path) {
     data: data,
     timeout: 5000,
     headers: data.getHeaders()
-  });
-}
-
-
-function createSecuredRepo(path) {
-  const data = new FormData();
-  data.append('config', fs.createReadStream(path));
-
-  const headers = data.getHeaders();
-  headers['Authorization'] = 'Basic YWRtaW46cm9vdA==';
-  return axios({
-    method: 'post',
-    url: `${Config.serverAddress}/rest/repositories?local=true`,
-    data: data,
-    timeout: 5000,
-    headers
   });
 }
 
@@ -77,17 +61,19 @@ function deleteRepo(name) {
 }
 
 function toggleSecurity(enable) {
-    return axios({
-      method: 'post',
-      headers: { 'Content-Type': 'application/json', 'Connection': 'keep-alive', 'Accept': '*/*'},
-      url: `${Config.serverAddress}/rest/security?useSecurity=${enable}`,
-      data: `${enable}`,
-      timeout: 5000,
-      auth: {
-        username: 'admin',
-        password: 'root'
-      }
-    });
+  return axios({
+    method: 'post',
+    headers: {
+      'Content-Type': 'application/json',
+      'Connection': 'keep-alive',
+      'Accept': '*/*',
+      'Authorization': 'Basic YWRtaW46cm9vdA=='
+    },
+    url: `${Config.serverAddress}/rest/security?useSecurity=${enable}`,
+    data: `${enable}`,
+    timeout: 5000
+  });
 }
 
-module.exports = {loadFile, readStream, getReadStream, createRepo, deleteRepo, toggleSecurity, createSecuredRepo};
+module.exports = {loadFile, readStream, getReadStream,
+  createRepo, deleteRepo, toggleSecurity};

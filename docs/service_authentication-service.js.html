@@ -26,14 +26,15 @@
     
     <section>
         <article>
-            <pre class="prettyprint source linenums"><code>const HttpRequestBuilder = require('../http/http-request-builder');
-const User = require('../auth/user');
+            <pre class="prettyprint source linenums"><code>const User = require('../auth/user');
+const AuthenticationFactory = require('../security/authentication-factory');
 
 /**
  * Service dealing with user authentication in a secured server.
  *
  * @author Mihail Radkov
  * @author Svilen Velikov
+ * @author Teodossi Dossev
  */
 class AuthenticationService {
   /**
@@ -43,6 +44,7 @@ class AuthenticationService {
    */
   constructor(httpClient) {
     this.httpClient = httpClient;
+    this.authenticationFactory = new AuthenticationFactory();
   }
 
   /**
@@ -50,25 +52,24 @@ class AuthenticationService {
    * password. Upon successful authentication a {@link User} instance is created
    * with the user data and the auth token and returned to the client.
    *
-   * @param {string} username is the username of the logged in user
-   * @param {string} pass is the password of the logged in user
+   * @param {ClientConfig} clientConfig concrete client configuration
+   * @param {User} user logged in user
    *
    * @return {Promise&lt;User>} a promise resolving to an authenticated
    * {@link User} instance.
    */
-  login(username, pass) {
-    if (!this.shouldAuthenticate(username, pass)) {
-      return Promise.resolve();
+  login(clientConfig, user) {
+    if (!clientConfig.shouldAuthenticate() ||
+      !this.isAlreadyAuthenticated(clientConfig, user)) {
+      return Promise.resolve(user);
     }
-    const requestBuilder =
-      HttpRequestBuilder.httpPost(`/rest/login/${username}`)
-        .addGraphDBPasswordHeader(pass);
-    return this.httpClient.request(requestBuilder).then((response) => {
-      const token = response.headers['authorization'];
-      const user = new User(token, pass, response.data);
-      this.setLoggedUser(user);
-      return user;
-    });
+
+    const authentication = this.getAuthentication(clientConfig);
+    return this.httpClient.request(this.getLoginRequest(clientConfig))
+      .then((response) => {
+        const token = authentication.getResponseAuthToken(response);
+        return new User(token, clientConfig.getPass(), response.data);
+      });
   }
 
   /**
@@ -76,10 +77,12 @@ class AuthenticationService {
    * the client user. Every consecutive call against secured server will result
    * in &lt;code>Unauthorized&lt;/code> error with status code &lt;code>401&lt;/code>.
    *
+   * @param {User} user logged in user
+   *
    * @return {Promise} returns a promise which resolves with undefined.
    */
-  logout() {
-    this.getLoggedUser() &amp;&amp; this.getLoggedUser().clearToken();
+  logout(user) {
+    user.clearToken();
     return Promise.resolve();
   }
 
@@ -88,10 +91,11 @@ class AuthenticationService {
    * request header &lt;code>Authorization: token&lt;/code>. If there is no logged in
    * user, then this method returns &lt;code>undefined&lt;/code>.
    *
-   * @return {string|undefined}
+   * @param {User} user logged in user
+   * @return {string|undefined} authentication token
    */
-  getAuthentication() {
-    return this.getLoggedUser() &amp;&amp; this.getLoggedUser().getToken();
+  getAuthenticationToken(user) {
+    return user &amp;&amp; user.getToken();
   }
 
   /**
@@ -99,40 +103,36 @@ class AuthenticationService {
    * yet. If that's the case, authentication should be made.
    *
    * @private
-   *
-   * @param {string} username is the username of the logged in user
-   * @param {string} pass is the password of the logged in user
+   * @param {ClientConfig} clientConfig concrete client config
+   * @param {User} user logged in user
    *
    * @return {boolean} true if authentication should be made
    */
-  shouldAuthenticate(username, pass) {
-    const hasCredentials = username &amp;&amp; pass;
-    const isAuthenticated = this.getLoggedUser()
-      &amp;&amp; this.getLoggedUser().getToken();
+  isAlreadyAuthenticated(clientConfig, user) {
+    const hasCredentials = clientConfig.getUsername() &amp;&amp; clientConfig.getPass();
+    const isAuthenticated = user &amp;&amp; user.getToken();
     return hasCredentials &amp;&amp; !isAuthenticated;
   }
 
   /**
-   * @param {User} user
+   * Returns authentication type related {@link HttpRequestBuilder}
+   * login request builder
+   *
+   * @param {ClientConfig} clientConfig concrete client configuration
+   * @return {HttpRequestBuilder} request builder
    */
-  setLoggedUser(user) {
-    this.loggedUser = user;
+  getLoginRequest(clientConfig) {
+    return this.getAuthentication(clientConfig).getLoginRequestBuilder();
   }
 
   /**
-   * @return {User}
+   * Authentication type getter
+   * @param {ClientConfig} clientConfig concrete client configuration
+   * @return {BasicAuthentication|GdbTokenAuthentication} concrete
+   * authentication type
    */
-  getLoggedUser() {
-    return this.loggedUser;
-  }
-
-  /**
-   * @param {HttpClient} httpClient
-   * @return {AuthenticationService}
-   */
-  setHttpClient(httpClient) {
-    this.httpClient = httpClient;
-    return this;
+  getAuthentication(clientConfig) {
+    return this.authenticationFactory.getAuthenticationType(clientConfig);
   }
 }
 
@@ -147,13 +147,13 @@ module.exports = AuthenticationService;
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="AddStatementPayload.html">AddStatementPayload</a></li><li><a href="AppSettings.html">AppSettings</a></li><li><a href="AuthenticationService.html">AuthenticationService</a></li><li><a href="BaseRepositoryClient.html">BaseRepositoryClient</a></li><li><a href="ClientConfig.html">ClientConfig</a></li><li><a href="CommonUtils.html">CommonUtils</a></li><li><a href="ConsoleLogger.html">ConsoleLogger</a></li><li><a href="ContentParser.html">ContentParser</a></li><li><a href="DownloadService.html">DownloadService</a></li><li><a href="FileUtils.html">FileUtils</a></li><li><a href="GetQueryPayload.html">GetQueryPayload</a></li><li><a href="GetStatementsPayload.html">GetStatementsPayload</a></li><li><a href="GraphDBServerClient.html">GraphDBServerClient</a></li><li><a href="HttpClient.html">HttpClient</a></li><li><a href="HttpRequestBuilder.html">HttpRequestBuilder</a></li><li><a href="HttpResponse.html">HttpResponse</a></li><li><a href="Iterable.html">Iterable</a></li><li><a href="JsonLDParser.html">JsonLDParser</a></li><li><a href="LoggingUtils.html">LoggingUtils</a></li><li><a href="N3Parser.html">N3Parser</a></li><li><a href="Namespace.html">Namespace</a></li><li><a href="NamespaceService.html">NamespaceService</a></li><li><a href="NQuadsParser.html">NQuadsParser</a></li><li><a href="NTriplesParser.html">NTriplesParser</a></li><li><a href="PagedResponse.html">PagedResponse</a></li><li><a href="ParserRegistry.html">ParserRegistry</a></li><li><a href="QueryPayload.html">QueryPayload</a></li><li><a href="QueryService.html">QueryService</a></li><li><a href="RDFRepositoryClient.html">RDFRepositoryClient</a></li><li><a href="RDFXmlParser.html">RDFXmlParser</a></li><li><a href="RepositoryClientConfig.html">RepositoryClientConfig</a></li><li><a href="RepositoryConfig.html">RepositoryConfig</a></li><li><a href="RepositoryService.html">RepositoryService</a></li><li><a href="ResponseIterator.html">ResponseIterator</a></li><li><a href="ServerClient.html">ServerClient</a></li><li><a href="ServerClientConfig.html">ServerClientConfig</a></li><li><a href="Service.html">Service</a></li><li><a href="ServiceRequest.html">ServiceRequest</a></li><li><a href="SparqlJsonResultParser.html">SparqlJsonResultParser</a></li><li><a href="SparqlXmlResultParser.html">SparqlXmlResultParser</a></li><li><a href="StatementPayload.html">StatementPayload</a></li><li><a href="StatementsService.html">StatementsService</a></li><li><a href="StringUtils.html">StringUtils</a></li><li><a href="TermConverter.html">TermConverter</a></li><li><a href="TransactionalRepositoryClient.html">TransactionalRepositoryClient</a></li><li><a href="TransactionService.html">TransactionService</a></li><li><a href="TriGParser.html">TriGParser</a></li><li><a href="TurtleParser.html">TurtleParser</a></li><li><a href="UpdateQueryPayload.html">UpdateQueryPayload</a></li><li><a href="UploadService.html">UploadService</a></li><li><a href="User.html">User</a></li></ul><h3>Interfaces</h3><ul><li><a href="Logger.html">Logger</a></li></ul><h3>Global</h3><ul><li><a href="global.html#Authority">Authority</a></li><li><a href="global.html#MediaType">MediaType</a></li><li><a href="global.html#PATH_NAMESPACES">PATH_NAMESPACES</a></li><li><a href="global.html#PATH_SIZE">PATH_SIZE</a></li><li><a href="global.html#PATH_STATEMENTS">PATH_STATEMENTS</a></li><li><a href="global.html#PATH_TRANSACTIONS">PATH_TRANSACTIONS</a></li><li><a href="global.html#QueryContentType">QueryContentType</a></li><li><a href="global.html#QueryLanguage">QueryLanguage</a></li><li><a href="global.html#QueryType">QueryType</a></li><li><a href="global.html#RDFMimeType">RDFMimeType</a></li><li><a href="global.html#RepositoryType">RepositoryType</a></li><li><a href="global.html#RETRIABLE_STATUSES">RETRIABLE_STATUSES</a></li><li><a href="global.html#TransactionIsolationLevel">TransactionIsolationLevel</a></li><li><a href="global.html#XSD">XSD</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="AddStatementPayload.html">AddStatementPayload</a></li><li><a href="AppSettings.html">AppSettings</a></li><li><a href="Authentication.html">Authentication</a></li><li><a href="AuthenticationFactory.html">AuthenticationFactory</a></li><li><a href="AuthenticationService.html">AuthenticationService</a></li><li><a href="BaseRepositoryClient.html">BaseRepositoryClient</a></li><li><a href="BasicAuthentication.html">BasicAuthentication</a></li><li><a href="ClientConfig.html">ClientConfig</a></li><li><a href="CommonUtils.html">CommonUtils</a></li><li><a href="ConsoleLogger.html">ConsoleLogger</a></li><li><a href="ContentParser.html">ContentParser</a></li><li><a href="DownloadService.html">DownloadService</a></li><li><a href="FileUtils.html">FileUtils</a></li><li><a href="GdbTokenAuthentication.html">GdbTokenAuthentication</a></li><li><a href="GetQueryPayload.html">GetQueryPayload</a></li><li><a href="GetStatementsPayload.html">GetStatementsPayload</a></li><li><a href="GraphDBServerClient.html">GraphDBServerClient</a></li><li><a href="HttpClient.html">HttpClient</a></li><li><a href="HttpRequestBuilder.html">HttpRequestBuilder</a></li><li><a href="HttpResponse.html">HttpResponse</a></li><li><a href="Iterable.html">Iterable</a></li><li><a href="JsonLDParser.html">JsonLDParser</a></li><li><a href="LoggingUtils.html">LoggingUtils</a></li><li><a href="N3Parser.html">N3Parser</a></li><li><a href="Namespace.html">Namespace</a></li><li><a href="NamespaceService.html">NamespaceService</a></li><li><a href="NQuadsParser.html">NQuadsParser</a></li><li><a href="NTriplesParser.html">NTriplesParser</a></li><li><a href="PagedResponse.html">PagedResponse</a></li><li><a href="ParserRegistry.html">ParserRegistry</a></li><li><a href="QueryPayload.html">QueryPayload</a></li><li><a href="QueryService.html">QueryService</a></li><li><a href="RDFRepositoryClient.html">RDFRepositoryClient</a></li><li><a href="RDFXmlParser.html">RDFXmlParser</a></li><li><a href="RepositoryClientConfig.html">RepositoryClientConfig</a></li><li><a href="RepositoryConfig.html">RepositoryConfig</a></li><li><a href="RepositoryService.html">RepositoryService</a></li><li><a href="ResponseIterator.html">ResponseIterator</a></li><li><a href="ServerClient.html">ServerClient</a></li><li><a href="ServerClientConfig.html">ServerClientConfig</a></li><li><a href="Service.html">Service</a></li><li><a href="ServiceRequest.html">ServiceRequest</a></li><li><a href="SparqlJsonResultParser.html">SparqlJsonResultParser</a></li><li><a href="SparqlXmlResultParser.html">SparqlXmlResultParser</a></li><li><a href="StatementPayload.html">StatementPayload</a></li><li><a href="StatementsService.html">StatementsService</a></li><li><a href="StringUtils.html">StringUtils</a></li><li><a href="TermConverter.html">TermConverter</a></li><li><a href="TransactionalRepositoryClient.html">TransactionalRepositoryClient</a></li><li><a href="TransactionService.html">TransactionService</a></li><li><a href="TriGParser.html">TriGParser</a></li><li><a href="TurtleParser.html">TurtleParser</a></li><li><a href="UpdateQueryPayload.html">UpdateQueryPayload</a></li><li><a href="UploadService.html">UploadService</a></li><li><a href="User.html">User</a></li></ul><h3>Interfaces</h3><ul><li><a href="Logger.html">Logger</a></li></ul><h3>Global</h3><ul><li><a href="global.html#Authority">Authority</a></li><li><a href="global.html#MediaType">MediaType</a></li><li><a href="global.html#PATH_NAMESPACES">PATH_NAMESPACES</a></li><li><a href="global.html#PATH_SIZE">PATH_SIZE</a></li><li><a href="global.html#PATH_STATEMENTS">PATH_STATEMENTS</a></li><li><a href="global.html#PATH_TRANSACTIONS">PATH_TRANSACTIONS</a></li><li><a href="global.html#QueryContentType">QueryContentType</a></li><li><a href="global.html#QueryLanguage">QueryLanguage</a></li><li><a href="global.html#QueryType">QueryType</a></li><li><a href="global.html#RDFMimeType">RDFMimeType</a></li><li><a href="global.html#RepositoryType">RepositoryType</a></li><li><a href="global.html#RETRIABLE_STATUSES">RETRIABLE_STATUSES</a></li><li><a href="global.html#TransactionIsolationLevel">TransactionIsolationLevel</a></li><li><a href="global.html#XSD">XSD</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.6</a> on Wed Feb 10 2021 07:10:15 GMT+0100 (Central European Standard Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.6</a> on Wed Feb 10 2021 09:07:38 GMT+0200 (Eastern European Standard Time)
 </footer>
 
 <script> prettyPrint(); </script>

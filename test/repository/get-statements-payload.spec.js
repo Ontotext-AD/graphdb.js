@@ -3,11 +3,12 @@ const RDFMimeType = require('http/rdf-mime-type');
 
 describe('GetStatementsPayload', () => {
   test('should set responseType=application/rdf+json by default', () => {
-    expect(new GetStatementsPayload().get().responseType).toEqual('application/rdf+json');
+    expect(new GetStatementsPayload().get().responseType)
+      .toEqual('application/rdf+json');
   });
 
   test('should populate properties in the underlying payload', () => {
-    let payload = new GetStatementsPayload()
+    const payload = new GetStatementsPayload()
       .setResponseType(RDFMimeType.RDF_XML)
       .setSubject('<http://eunis.eea.europa.eu/countries/AZ>')
       .setPredicate('<http://eunis.eea.europa.eu/rdf/schema.rdf#population>')

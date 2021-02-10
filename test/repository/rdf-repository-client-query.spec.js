@@ -25,8 +25,8 @@ describe('RDFRepositoryClient - query', () => {
 
   beforeEach(() => {
     HttpClient.mockImplementation(() => httpClientStub());
-    config = new RepositoryClientConfig()
-      .addEndpoint('http://host/repositories/repo1')
+    config = new RepositoryClientConfig('http://host')
+      .setEndpoints(['http://host/repositories/repo1'])
       .setReadTimeout(1000)
       .setWriteTimeout(1000);
     repository = new RDFRepositoryClient(config);
@@ -215,7 +215,8 @@ describe('RDFRepositoryClient - query', () => {
       .setOffset(0)
       .setTimeout(5);
 
-    const expectedData = 'query=select%20*%20where%20%7B%3Fs%20%3Fp%20%3Fo%7D&queryLn=sparql&infer=true&distinct=true&limit=100&offset=0&timeout=5';
+    const expectedData = 'query=select%20*%20where%20%7B%3Fs%20%3Fp%20%3Fo%7D' +
+      '&queryLn=sparql&infer=true&distinct=true&limit=100&offset=0&timeout=5';
     const expectedRequestConfig = HttpRequestBuilder.httpPost('')
       .setData(expectedData)
       .setHeaders({
@@ -231,7 +232,8 @@ describe('RDFRepositoryClient - query', () => {
   });
 
   describe('on payload misconfiguration', () => {
-    test('should throw error if responseType is not properly configured for CONSTRUCT query', () => {
+    test('should throw error if responseType is not properly configured for ' +
+      'CONSTRUCT query', () => {
       const payload = new GetQueryPayload()
         .setQuery('select * where {?s ?p ?o}')
         .setQueryType(QueryType.SELECT)
@@ -240,7 +242,8 @@ describe('RDFRepositoryClient - query', () => {
       return expect(() => repository.query(payload)).toThrow(Error);
     });
 
-    test('should throw error if responseType is not properly configured for DESCRIBE query', () => {
+    test('should throw error if responseType is not properly configured for ' +
+      'DESCRIBE query', () => {
       const payload = new GetQueryPayload()
         .setQuery('PREFIX books: <http://www.example/book/> DESCRIBE books:book6')
         .setQueryType(QueryType.DESCRIBE)
@@ -249,7 +252,8 @@ describe('RDFRepositoryClient - query', () => {
       return expect(() => repository.query(payload)).toThrow(Error);
     });
 
-    test('should throw error if responseType is not properly configured for CONSTRUCT query', () => {
+    test('should throw error if responseType is not properly configured for ' +
+      'CONSTRUCT query', () => {
       const payload = new GetQueryPayload()
         .setQuery('construct {?s ?p ?o} where {?s ?p ?o}')
         .setQueryType(QueryType.CONSTRUCT)
@@ -258,7 +262,8 @@ describe('RDFRepositoryClient - query', () => {
       return expect(() => repository.query(payload)).toThrow(Error);
     });
 
-    test('should throw error if responseType is not properly configured for ASK query', () => {
+    test('should throw error if responseType is not properly configured for ' +
+      'ASK query', () => {
       const payload = new GetQueryPayload()
         .setQuery('ask {?s ?p ?o}')
         .setQueryType(QueryType.ASK)
