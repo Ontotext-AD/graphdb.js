@@ -489,9 +489,9 @@ const payload = new GetQueryPayload()
   // Simple string literal
   .addBinding('name', "24")
   // Literal with specified data type
-  .addBinding('age', "\"24\"^^<http:\/\/example.org\/simpleTypes#adultAge>")
-  // Literal with specified language tag
-  .addBinding('name', "\"abc\"@langTag");
+  .addBinding('age', "\"24\"^^<http:\/\/www.w3.org\/2001\/XMLSchema#int>")
+  // Literal with specified language tag according to RFC 3066
+  .addBinding('name', "\"abc\"@en-gb");
 ```
 
 ### Transactions
