@@ -87,7 +87,7 @@
     "base64url": "^3.0.1",
     "eslint-config-google": "^0.13.0",
     "jsonld-streaming-parser": "^2.2.0",
-    "n3": "^1.7.0",
+    "n3": "^1.16.2",
     "pino": "^5.17.0",
     "qs": "^6.9.4",
     "rdfxml-streaming-parser": "^1.4.0",

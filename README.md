@@ -476,6 +476,24 @@ repository.deleteStatements(subj, pred, obj, contexts).then(() => {
 });
 ```
 
+#### Value bindings
+Value bindings can be added using the `addBinding()` method.
+
+The binding variable must be an N-Triple (RDF triple, URI, blank node or literal).
+
+* For literals a language tag or data type can be specified.
+```javascript
+const payload = new GetQueryPayload()
+  .setQuery(query)
+  .setQueryType(QueryType.SELECT)
+  // Simple string literal
+  .addBinding('name', "24")
+  // Literal with specified data type
+  .addBinding('age', "\"24\"^^<http:\/\/www.w3.org\/2001\/XMLSchema#int>")
+  // Literal with specified language tag according to RFC 3066
+  .addBinding('name', "\"abc\"@en-gb");
+```
+
 ### Transactions
 
 Repository operations can be executed in transaction. In order to work with 
