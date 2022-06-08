@@ -287,7 +287,7 @@ describe('RDFRepositoryClient - reading statements', () => {
         data: stream
       });
 
-      return repository.download(payload).then((stream) => {
+      repository.download(payload).then((stream) => {
         stream.on('data', (chunk) => {
           expect(chunk).toEqual(expectedIt.next().value);
         });

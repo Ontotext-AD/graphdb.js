@@ -51,7 +51,7 @@ describe('RDFRepositoryClient - authentication', () => {
   });
 
   afterAll(() => {
-    repository.disableAuthentication();
+    repository.repositoryClientConfig.disableAuthentication();
   });
 
   const payload = new GetStatementsPayload()

@@ -15,7 +15,7 @@ describe('Should test server client auth', () => {
   });
 
   afterAll((done) => {
-    return Utils.toggleSecurity(false).then(() => {
+    Utils.toggleSecurity(false).then(() => {
       done();
     }).catch((e) => {
       throw new Error(e);

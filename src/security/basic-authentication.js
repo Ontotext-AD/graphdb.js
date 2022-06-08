@@ -19,7 +19,16 @@ export class BasicAuthentication extends Authentication {
     const credentials = `${username}:${pass}`;
 
     return HttpRequestBuilder.httpGet(`/rest/security/authenticatedUser`)
-      .addAuthorizationHeader(`Basic ${btoa(credentials)}`);
+      .addAuthorizationHeader(`Basic ${this.toBase64(credentials)}`);
+  }
+
+  /**
+   * Converts string to Base64
+   * @param {String} string
+   * @return {string} converted string
+   */
+  toBase64(string) {
+    return Buffer.from(string).toString('base64');
   }
 
   /**
