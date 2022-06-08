@@ -50,9 +50,9 @@ pipeline {
         sh "git checkout ${branch}"
 
         // Change versions
-        sh "npm version --git-tag-version=false ${ReleaseVersion}"
+        sh "npm version --git-tag-version=false --allow-same-version=true ${ReleaseVersion}"
         dir("test-e2e/") {
-          sh "npm version --git-tag-version=false ${ReleaseVersion}"
+          sh "npm version --git-tag-version=false --allow-same-version=true ${ReleaseVersion}"
         }
 
         // Install
