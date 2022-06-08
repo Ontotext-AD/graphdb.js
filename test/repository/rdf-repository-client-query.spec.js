@@ -56,7 +56,7 @@ describe('RDFRepositoryClient - query', () => {
         .setResponseType(RDFMimeType.SPARQL_RESULTS_JSON)
         .setLimit(100);
 
-      return repository.query(payload).then((stream) => {
+      repository.query(payload).then((stream) => {
         stream.on('data', (chunk) => {
           expect(chunk).toEqual(expectedIt.next().value);
         });
@@ -71,7 +71,7 @@ describe('RDFRepositoryClient - query', () => {
         .setResponseType(RDFMimeType.RDF_XML)
         .setLimit(100);
 
-      return repository.query(payload).then((stream) => {
+      repository.query(payload).then((stream) => {
         stream.on('data', (chunk) => {
           expect(chunk).toEqual(expectedIt.next().value);
         });
@@ -86,7 +86,7 @@ describe('RDFRepositoryClient - query', () => {
         .setResponseType(RDFMimeType.RDF_XML)
         .setLimit(100);
 
-      return repository.query(payload).then((stream) => {
+      repository.query(payload).then((stream) => {
         stream.on('data', (chunk) => {
           expect(chunk).toEqual(expectedIt.next().value);
         });
@@ -101,7 +101,7 @@ describe('RDFRepositoryClient - query', () => {
         .setResponseType(RDFMimeType.BOOLEAN_RESULT)
         .setLimit(100);
 
-      return repository.query(payload).then((stream) => {
+      repository.query(payload).then((stream) => {
         stream.on('data', (chunk) => {
           expect(chunk).toEqual(expectedIt.next().value);
         });
@@ -128,7 +128,7 @@ describe('RDFRepositoryClient - query', () => {
 
       repository.registerParser(new SparqlXmlResultParser());
 
-      return repository.query(payload).then((stream) => {
+      repository.query(payload).then((stream) => {
         stream.on('data', (bindings) => {
           expect(bindings).toEqual(expectedIt.next().value);
         });
@@ -151,7 +151,7 @@ describe('RDFRepositoryClient - query', () => {
 
       repository.registerParser(new SparqlXmlResultParser());
 
-      return repository.query(payload).then((data) => {
+      repository.query(payload).then((data) => {
         expect(data).toEqual(true);
         done();
       });
@@ -174,7 +174,7 @@ describe('RDFRepositoryClient - query', () => {
 
       repository.registerParser(new SparqlJsonResultParser());
 
-      return repository.query(payload).then((stream) => {
+      repository.query(payload).then((stream) => {
         stream.on('data', (bindings) => {
           expect(bindings).toEqual(expectedIt.next().value);
         });
@@ -196,7 +196,7 @@ describe('RDFRepositoryClient - query', () => {
 
       repository.registerParser(new SparqlJsonResultParser());
 
-      return repository.query(payload).then((data) => {
+      repository.query(payload).then((data) => {
         expect(data).toEqual(false);
         done();
       });

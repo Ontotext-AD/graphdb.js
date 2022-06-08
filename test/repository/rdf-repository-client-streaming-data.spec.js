@@ -43,7 +43,7 @@ describe('RdfRepositoryClient - streaming data', () => {
       const stream = new ObjectReadableMock(source);
       const expectedIt = source[Symbol.iterator]();
 
-      return rdfRepositoryClient.upload(stream, contentType, context, baseURI)
+      rdfRepositoryClient.upload(stream, contentType, context, baseURI)
         .then(() => {
           stream.on('data', (chunk) => {
             expect(chunk).toEqual(expectedIt.next().value);
@@ -96,7 +96,7 @@ describe('RdfRepositoryClient - streaming data', () => {
       const stream = new ObjectReadableMock(source);
       const expectedIt = source[Symbol.iterator]();
 
-      return rdfRepositoryClient
+      rdfRepositoryClient
         .overwrite(stream, contentType, context, baseURI)
         .then(() => {
           stream.on('data', (chunk) => {
