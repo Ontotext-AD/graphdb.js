@@ -61,7 +61,7 @@ describe('Should test namespaces in secured environment', () => {
   });
 
   afterAll((done) => {
-    return Utils.toggleSecurity(false).then(() => {
+    Utils.toggleSecurity(false).then(() => {
       return Utils.deleteRepo('Test_repo');
     }).then(()=> done());
   });

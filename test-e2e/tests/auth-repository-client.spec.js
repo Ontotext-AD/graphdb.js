@@ -24,7 +24,7 @@ describe('Should test repository client auth', () => {
   });
 
   afterAll((done) => {
-    return Utils.toggleSecurity(false)
+    Utils.toggleSecurity(false)
       .then(() => {
         return Utils.deleteRepo('Test_repo');
       }).then(() => {

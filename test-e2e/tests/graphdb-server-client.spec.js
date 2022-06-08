@@ -32,7 +32,7 @@ describe('Should test graphDB server client', () => {
   });
 
   afterAll((done) => {
-    return Utils.toggleSecurity(false)
+    Utils.toggleSecurity(false)
       .then(() => {
         return Utils.deleteRepo(TEST_REPO);
       }).then(() => {
@@ -49,7 +49,7 @@ describe('Should test graphDB server client', () => {
   test('Should get repo type default config', (done) => {
     const expectedResponse = Utils.loadFile('./data/graphdb-server-client/' +
       'expected_response_default_config_free_repo.txt');
-    return serverClient.getDefaultConfig(RepositoryType.FREE)
+    serverClient.getDefaultConfig(RepositoryType.FREE)
       .then((response) => {
         expect(response.response.data)
           .toStrictEqual(JSON.parse(expectedResponse));
@@ -62,7 +62,7 @@ describe('Should test graphDB server client', () => {
   test('Should get repo config', (done) => {
     const expectedResponse = Utils.loadFile('./data/graphdb-server-client/' +
       'expected_response_repo_config.txt');
-    return serverClient.getRepositoryConfig(TEST_REPO)
+    serverClient.getRepositoryConfig(TEST_REPO)
       .then((response) => {
         expect(response.response.data)
           .toStrictEqual(JSON.parse(expectedResponse));
@@ -78,7 +78,7 @@ describe('Should test graphDB server client', () => {
       'expected_response_repo_config_turtle.txt');
     Utils.getReadStream(sampleRdf).on('data', (data) => expected = data);
 
-    return serverClient.downloadRepositoryConfig(TEST_REPO)
+    serverClient.downloadRepositoryConfig(TEST_REPO)
       .then((stream) => {
         stream.on('data', (data) => {
           expect(data).toEqual(expected);
@@ -91,7 +91,7 @@ describe('Should test graphDB server client', () => {
     const config = new RepositoryConfig(NEW_REPO, '',
       new Map(), '', 'Repo title', RepositoryType.FREE);
 
-    return serverClient.getRepositoryIDs()
+    serverClient.getRepositoryIDs()
       .then((response) => {
         const expected = [TEST_REPO];
         expect(response.sort()).toEqual(expected);
@@ -116,7 +116,7 @@ describe('Should test graphDB server client', () => {
   });
 
   test('Should check and toggle security repo', (done) => {
-    return serverClient.isSecurityEnabled()
+    serverClient.isSecurityEnabled()
       .then((response) => {
         return expect(response.response.data).toBe(true);
       }).then(() => {
@@ -145,7 +145,7 @@ describe('Should test graphDB server client', () => {
     const appSettings = new AppSettings(true,
       true, false, true);
 
-    return serverClient.getFreeAccess()
+    serverClient.getFreeAccess()
       .then((response) => {
         return expect(response.response.data.enabled).toStrictEqual(false);
       }).then(() => {
@@ -174,7 +174,7 @@ describe('Should test graphDB server client', () => {
     const expextedAppSettings = new AppSettings(true, true, true, false);
     const newAppSettings = new AppSettings(false, false, false, true);
 
-    return serverClient.createUser('test_user', '123456')
+    serverClient.createUser('test_user', '123456')
       .then((response) => {
         return expect(response.response.status).toBe(201);
       }).then(() => {
