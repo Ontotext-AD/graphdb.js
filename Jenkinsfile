@@ -4,6 +4,10 @@ pipeline {
     label 'graphdb-jenkins-node'
   }
 
+  tools {
+    nodejs 'nodejs-14.17.0'
+  }
+
   environment {
     CI = "true"
   }
