@@ -1,10 +1,10 @@
 const path = require('path');
 const {RDFRepositoryClient} = require('graphdb').repository;
 const {RDFMimeType} = require('graphdb').http;
-const Utils = require('utils');
-const Config = require('config');
+const Utils = require('utils.js');
+const Config = require('config.js');
 
-describe('Should load the data to GraphDB', () => {
+describe('Import RDF', () => {
 
   let rdfClient = new RDFRepositoryClient(Config.restApiConfig);
 
@@ -17,7 +17,7 @@ describe('Should load the data to GraphDB', () => {
   });
 
   test('Should load wine rdf via addFile', () => {
-    let wineRdf = path.resolve(__dirname, './data/wine.rdf');
+    let wineRdf = path.resolve(__dirname, './../data/wine.rdf');
 
     return rdfClient.addFile(wineRdf, RDFMimeType.RDF_XML, null, null).then(() => {
       return rdfClient.getSize();
@@ -27,7 +27,7 @@ describe('Should load the data to GraphDB', () => {
   });
 
   test('Should overwrite file via putFile', () => {
-    let rowsRdf = path.resolve(__dirname, './data/rows.rdf');
+    let rowsRdf = path.resolve(__dirname, './../data/rows.rdf');
 
     return rdfClient.putFile(rowsRdf, RDFMimeType.RDF_XML, null, null).then(() => {
       return rdfClient.getSize();
