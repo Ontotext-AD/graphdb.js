@@ -2,7 +2,8 @@ const fs = require('fs');
 const path = require('path');
 const axios = require('axios');
 const FormData = require('form-data');
-const Config = require('config');
+const Config = require('config.js');
+const {RDFMimeType} = require('graphdb').http;
 
 function loadFile(relativePath) {
   return fs.readFileSync(path.resolve(__dirname, relativePath), 'UTF-8');
@@ -53,10 +54,30 @@ function createRepo(path) {
   });
 }
 
+function createRepositories(repositoryNames) {
+  const requests = repositoryNames.map((repoName) => createRepo(repoName));
+  return Promise.all(requests).catch((e) => {
+    throw new Error(e);
+  });
+}
+
 function deleteRepo(name) {
   return axios({
     method: 'delete',
     url: `${Config.serverAddress}/rest/repositories/${name}`
+  }).catch((e) => {
+    throw new Error(e);
+  });
+}
+
+function deleteRepoSecurely(name) {
+  return toggleSecurity(false).then(() => {
+    return axios({
+      method: 'delete',
+      url: `${Config.serverAddress}/rest/repositories/${name}`
+    });
+  }).catch((e) => {
+    throw new Error(e);
   });
 }
 
@@ -75,5 +96,37 @@ function toggleSecurity(enable) {
   });
 }
 
-module.exports = {loadFile, readStream, getReadStream,
-  createRepo, deleteRepo, toggleSecurity};
+function importData(rdfClient) {
+  return createRepo(Config.testRepoPath).then((res) => {
+    const wineRdf = path.resolve(__dirname, './data/wine.rdf');
+    return rdfClient.addFile(wineRdf, RDFMimeType.RDF_XML, null, null);
+  }).catch((e) => {
+    throw new Error(e);
+  });
+}
+
+function importDataSecurely(rdfSecuredClient) {
+  return createRepo(Config.testRepoPath)
+    .then(() => {
+      return toggleSecurity(true);
+    }).then(() => {
+    const wineRdf = path.resolve(__dirname, './data/wine.rdf');
+    return rdfSecuredClient
+      .addFile(wineRdf, RDFMimeType.RDF_XML, null, null);
+  }).catch((e) => {
+    throw new Error(e);
+  });
+}
+
+module.exports = {
+  loadFile,
+  readStream,
+  getReadStream,
+  createRepo,
+  createRepositories,
+  deleteRepo,
+  deleteRepoSecurely,
+  toggleSecurity,
+  importData,
+  importDataSecurely
+};
