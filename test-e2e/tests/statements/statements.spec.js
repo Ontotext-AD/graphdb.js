@@ -1,18 +1,14 @@
-const path = require('path');
 const {RDFMimeType} = require('graphdb').http;
 const {RDFRepositoryClient, GetStatementsPayload, AddStatementPayload} = require('graphdb').repository;
-const Utils = require('utils');
-const Config = require('config');
+const Utils = require('utils.js');
+const Config = require('config.js');
 
-describe('Should test adding updating removing data', () => {
+describe('Statements management', () => {
 
   let rdfClient = new RDFRepositoryClient(Config.restApiConfig);
 
   beforeAll(() => {
-    return Utils.createRepo(Config.testRepoPath).then(() => {
-      let wineRdf = path.resolve(__dirname, './data/wine.rdf');
-      return rdfClient.addFile(wineRdf, RDFMimeType.RDF_XML, null, null);
-    })
+    return Utils.importData(rdfClient);
   });
 
   afterAll(() => {
