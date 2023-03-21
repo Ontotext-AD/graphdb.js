@@ -1,14 +1,12 @@
 /* eslint-disable max-len */
 const {ServerClientConfig, ServerClient} = require('graphdb').server;
 const {RepositoryClientConfig} = require('graphdb').repository;
-const Utils = require('utils');
-const Config = require('config');
+const Utils = require('utils.js');
+const Config = require('config.js');
 
-describe('Should test repositories', () => {
+describe('Repositories management', () => {
   beforeAll(() => {
-    return Utils.createRepo(Config.testRepoPath).then(() => {
-      return Utils.createRepo(Config.testRepo2Path);
-    });
+    return Utils.createRepositories([Config.testRepoPath, Config.testRepo2Path]);
   });
 
   afterAll(() => {

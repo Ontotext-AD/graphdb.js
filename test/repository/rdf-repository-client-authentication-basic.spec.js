@@ -75,7 +75,7 @@ describe('RDFRepositoryClient - authentication', () => {
 
       // first request was a login with expected parameters
       const expectedLoginRequest = HttpRequestBuilder
-        .httpGet('/rest/security/authenticatedUser')
+        .httpGet('/rest/security/authenticated-user')
         .addAuthorizationHeader('Basic dGVzdHVzZXI6cGFzczEyMw==');
       expect(loginMock).toHaveBeenNthCalledWith(1, expectedLoginRequest);
 

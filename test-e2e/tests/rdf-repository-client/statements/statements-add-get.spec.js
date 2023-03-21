@@ -1,25 +1,21 @@
-const path = require('path');
 const {RDFMimeType} = require('graphdb').http;
 const {RDFRepositoryClient, GetStatementsPayload, AddStatementPayload} = require('graphdb').repository;
-const Utils = require('utils');
-const Config = require('config');
+const Utils = require('utils.js');
+const Config = require('config.js');
 
-describe('Should test adding updating removing data', () => {
+describe('Statements add and get', () => {
 
   let rdfClient = new RDFRepositoryClient(Config.restApiConfig);
 
   beforeAll(() => {
-    return Utils.createRepo(Config.testRepoPath).then(() => {
-      let wineRdf = path.resolve(__dirname, './data/wine.rdf');
-      return rdfClient.addFile(wineRdf, RDFMimeType.RDF_XML, null, null);
-    })
+    return Utils.importData(rdfClient);
   });
 
   afterAll(() => {
     return Utils.deleteRepo('Test_repo');
   });
 
-  test('Should verify statements', () => {
+  test('Should be able to add and get statements', () => {
 
     let addPayload = new AddStatementPayload()
       .setSubject('http://domain/resource/resource-1')

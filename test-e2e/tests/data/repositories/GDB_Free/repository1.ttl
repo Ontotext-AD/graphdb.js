@@ -8,9 +8,9 @@
     rep:repositoryID "Test_repo" ;
     rdfs:label "Test_repo" ;
     rep:repositoryImpl [
-        rep:repositoryType "graphdb:FreeSailRepository" ;
+        rep:repositoryType "graphdb:SailRepository" ;
         sr:sailImpl [
-            sail:sailType "graphdb:FreeSail" ;
+            sail:sailType "graphdb:Sail" ;
 
             owlim:base-URL "http://example.org/graphdb#" ;
             owlim:defaultNS "" ;

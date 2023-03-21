@@ -6,6 +6,13 @@
 * `Check the GDB server version and report mismatches if the client version implements a different version unless the check is stopped.`
 * `Support secured endpoints exposing only HTTPS`
 
+## 2.1.0 (2023-03-23)
+* GDB 10 support 
+  * Changes in the services internal implementation to match the changes in the GDB REST API
+  which are mainly syntactic changes in the endpoints at least in these supported by this 
+    library.
+* Updates in the readme.
+
 ## 2.0.0 (2021-02-10)
 * Major changes in the construction of server and repository client configurations.
 * Update Readme.md
