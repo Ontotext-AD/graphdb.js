@@ -3,7 +3,7 @@ const {RDFRepositoryClient, GetStatementsPayload, AddStatementPayload} = require
 const Utils = require('utils.js');
 const Config = require('config.js');
 
-describe('Statements management', () => {
+describe('Statements add and get', () => {
 
   let rdfClient = new RDFRepositoryClient(Config.restApiConfig);
 
@@ -15,7 +15,7 @@ describe('Statements management', () => {
     return Utils.deleteRepo('Test_repo');
   });
 
-  test('Should verify statements', () => {
+  test('Should be able to add and get statements', () => {
 
     let addPayload = new AddStatementPayload()
       .setSubject('http://domain/resource/resource-1')
