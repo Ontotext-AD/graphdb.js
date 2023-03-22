@@ -1,10 +1,10 @@
 const {RDFRepositoryClient,
   GetStatementsPayload, AddStatementPayload} = require('graphdb').repository;
 const {RDFMimeType} = require('graphdb').http;
-const Utils = require('utils');
-const Config = require('config');
+const Utils = require('utils.js');
+const Config = require('config.js');
 
-describe('Should test download method', () => {
+describe('Download', () => {
   const rdfClient = new RDFRepositoryClient(Config.restApiConfig);
 
   beforeAll(() => {
@@ -15,7 +15,7 @@ describe('Should test download method', () => {
     return Utils.deleteRepo('Test_repo');
   });
 
-  test('Should download data as stream', () => {
+  test('Should download data as stream in turtle format', () => {
     const addPayload = new AddStatementPayload()
       .setSubject('http://domain/resource/resource-1')
       .setPredicate('http://domain/property/relation-1')
@@ -32,7 +32,7 @@ describe('Should test download method', () => {
     }).then((stream) => {
       return Utils.readStream(stream);
     }).then((stream) => {
-      expect(stream.length).toBe(409);
+      expect(stream.length).toBe(1426);
       expect(stream).toContain('<http://domain/resource/resource-1>');
       expect(stream).toContain('<http://domain/property/relation-1>');
       expect(stream).toContain('"Title"@en');
