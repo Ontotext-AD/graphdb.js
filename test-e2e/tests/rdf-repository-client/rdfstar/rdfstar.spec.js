@@ -9,14 +9,14 @@ const N3 = require('n3');
 const {DataFactory} = N3;
 const {namedNode, quad, defaultGraph} = DataFactory;
 
-describe('Should test RDFStar', () => {
+describe('RDFStar support', () => {
   let rdfClient = new RDFRepositoryClient(Config.restApiConfig);
   let expected;
   let response;
 
   beforeAll(() => {
     return Utils.createRepo(Config.testRepoPath).then(() => {
-      let RDFStar = path.resolve(__dirname, './../data/rdf-star.ttls');
+      let RDFStar = path.resolve(__dirname, './../../data/rdf-star.ttls');
       return rdfClient.addFile(RDFStar, RDFMimeType.TURTLE_STAR, null, null);
     }).catch((e) => {
       throw new Error(e);

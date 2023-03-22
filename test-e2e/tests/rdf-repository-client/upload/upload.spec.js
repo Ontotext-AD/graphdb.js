@@ -6,6 +6,8 @@ const Utils = require('utils.js');
 
 describe('Upload data', () => {
 
+  let rdfClient = new RDFRepositoryClient(Config.restApiConfig);
+
   beforeAll(() => {
     return Utils.createRepo(Config.testRepoPath);
   });
@@ -13,8 +15,6 @@ describe('Upload data', () => {
   afterAll(() => {
     return Utils.deleteRepo('Test_repo');
   });
-
-  let rdfClient = new RDFRepositoryClient(Config.restApiConfig);
 
   test('Should upload and overwrite data', () => {
     let params = new GetStatementsPayload()
@@ -26,10 +26,10 @@ describe('Upload data', () => {
     let expectedResponse = Utils.loadFile('./data/upload_overwrite/expected_response.json');
     let expectedResponseOverwritten = Utils.loadFile('./data/upload_overwrite/expected_response_overwritten.json');
 
-    let sampleRdf = path.resolve(__dirname, './../data/sample-turtle.ttl');
+    let sampleRdf = path.resolve(__dirname, './../../data/sample-turtle.ttl');
     let turtleStream = Utils.getReadStream(sampleRdf);
 
-    let sampleRdfEdited = path.resolve(__dirname, './../data/sample-turtle_edited.ttl');
+    let sampleRdfEdited = path.resolve(__dirname, './../../data/sample-turtle_edited.ttl');
     let turtleStreamEdited = Utils.getReadStream(sampleRdfEdited);
 
     let context = '<http://domain/graph/data-graph-3>';

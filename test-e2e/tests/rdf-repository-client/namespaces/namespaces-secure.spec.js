@@ -2,9 +2,8 @@ const {RDFRepositoryClient} = require('graphdb').repository;
 const Utils = require('utils.js');
 const Config = require('config.js');
 
-describe('Secured: Namespaces management', () => {
-  const rdfSecuredClient =
-    new RDFRepositoryClient(Config.restApiBasicAuthConfig);
+describe('Manage namespaces securely', () => {
+  const rdfSecuredClient = new RDFRepositoryClient(Config.restApiBasicAuthConfig);
 
   beforeAll(() => {
     return Utils.importDataSecurely(rdfSecuredClient);

@@ -2,7 +2,7 @@ const {RDFRepositoryClient} = require('graphdb').repository;
 const Utils = require('utils.js');
 const Config = require('config.js');
 
-describe('Namespaces management', () => {
+describe('Manage namespaces', () => {
   const rdfClient = new RDFRepositoryClient(Config.restApiConfig);
 
   beforeAll(() => {

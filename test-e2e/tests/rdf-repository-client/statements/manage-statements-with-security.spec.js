@@ -37,7 +37,7 @@ describe('Manage statements with security', () => {
 });
 
 function addAndDeleteStatements(client) {
-  const wineRdf = path.resolve(__dirname, './../data/wine.rdf');
+  const wineRdf = path.resolve(__dirname, './../../data/wine.rdf');
   return client.addFile(wineRdf, RDFMimeType.RDF_XML, null, null)
     .then(() => {
       return client.deleteAllStatements();

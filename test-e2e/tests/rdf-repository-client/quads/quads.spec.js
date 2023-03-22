@@ -8,6 +8,7 @@ const Utils = require('utils.js');
 const Config = require('config.js');
 
 describe('Manage quads', () => {
+  let rdfClient = new RDFRepositoryClient(Config.restApiConfig);
 
   beforeAll(() => {
     return Utils.createRepo(Config.testRepoPath);
@@ -16,8 +17,6 @@ describe('Manage quads', () => {
   afterAll(() => {
     return Utils.deleteRepo('Test_repo');
   });
-
-  let rdfClient = new RDFRepositoryClient(Config.restApiConfig);
 
   let quads = [
     getQuad('resource-1', 'relation-1', 'uri-1'),
