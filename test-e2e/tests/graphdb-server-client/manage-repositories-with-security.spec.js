@@ -1,45 +1,54 @@
 const {RepositoryConfig, RepositoryType} = require('graphdb').repository;
 const {GraphDBServerClient, ServerClientConfig} = require('graphdb').server;
-const Utils = require('utils');
-const Config = require('config');
+const Utils = require('utils.js');
+const Config = require('config.js');
 
 const NEW_REPO = 'New_repo';
 
-describe('Should test server client auth', () => {
-  beforeAll((done) => {
-    Utils.toggleSecurity(true).then(() => {
-      done();
-    }).catch((e) => {
+describe('Manage GraphDB repositories with security enabled', () => {
+  beforeAll(() => {
+    return Utils.toggleSecurity(true).catch((e) => {
       throw new Error(e);
     });
   });
 
-  afterAll((done) => {
-    Utils.toggleSecurity(false).then(() => {
-      done();
-    }).catch((e) => {
+  afterAll(() => {
+    return Utils.toggleSecurity(false).catch((e) => {
       throw new Error(e);
     });
   });
 
-  test('Should add and delete repository with BASIC auth', (done) => {
+  test('Should add and delete repository with BASIC auth', () => {
     const config = new ServerClientConfig(Config.serverAddress)
       .useBasicAuthentication('admin', 'root');
     const serverClient = new GraphDBServerClient(config);
-    createRepository(serverClient, done);
+    return createRepository(serverClient);
   });
 
-  test('Should add and delete repository with TOKEN auth', (done) => {
+  test('Should add and delete repository with TOKEN auth', () => {
     const config = new ServerClientConfig(Config.serverAddress)
       .useGdbTokenAuthentication('admin', 'root');
     const serverClient = new GraphDBServerClient(config);
-    createRepository(serverClient, done);
+    return createRepository(serverClient);
   });
 });
 
-function createRepository(serverClient, done) {
+function createRepository(serverClient) {
+  // It doesn't work with Map
+  const params = {
+    "defaultNS": {
+      "name": "defaultNS",
+      "label": "Default namespaces for imports(';' delimited)",
+      "value": ""
+    },
+    "imports": {
+      "name": "imports",
+      "label": "Imported RDF files(';' delimited)",
+      "value": ""
+    }
+  };
   const config = new RepositoryConfig(NEW_REPO, '',
-    new Map(), '', 'Repo title', RepositoryType.FREE);
+    params, '', 'Repo title', RepositoryType.GRAPHDB);
 
   return serverClient.getRepositoryIDs()
     .then((response) => {
@@ -59,7 +68,6 @@ function createRepository(serverClient, done) {
     }).then((response) => {
       const expected = [];
       expect(response).toEqual(expected);
-      done();
     }).catch((e) => {
       throw new Error(e);
     });
