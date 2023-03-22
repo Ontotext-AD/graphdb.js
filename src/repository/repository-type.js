@@ -11,7 +11,8 @@ const RepositoryType = {
   MASTER: 'master',
   WORKER: 'worker',
   FREE: 'free',
-  ONTOP: 'ontop'
+  ONTOP: 'ontop',
+  GRAPHDB: 'graphdb'
 };
 
 module.exports = RepositoryType;

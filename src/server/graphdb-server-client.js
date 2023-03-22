@@ -42,7 +42,7 @@ class GraphDBServerClient extends ServerClient {
 
     const requestBuilder = HttpRequestBuilder
       .httpGet(
-        `${REPOSITORY_SERVICE_URL}/defaultConfig/${repositoryType}`)
+        `${REPOSITORY_SERVICE_URL}/default-config/${repositoryType}`)
       .addAcceptHeader(MediaType.APPLICATION_JSON);
     return this.execute(requestBuilder);
   }
@@ -61,9 +61,9 @@ class GraphDBServerClient extends ServerClient {
     }
 
     const repositoryLocation = location ? `?location=${location}` : '';
+    const url = `${REPOSITORY_SERVICE_URL}/${repositoryId}${repositoryLocation}`;
     const requestBuilder = HttpRequestBuilder
-      .httpGet(
-        `${REPOSITORY_SERVICE_URL}/${repositoryId}${repositoryLocation}`)
+      .httpGet(url)
       .addContentTypeHeader(MediaType.APPLICATION_JSON);
     return this.execute(requestBuilder);
   }
@@ -78,7 +78,7 @@ class GraphDBServerClient extends ServerClient {
    */
   downloadRepositoryConfig(repositoryId, location) {
     const requestBuilder = HttpRequestBuilder
-      .httpGet(`${REPOSITORY_SERVICE_URL}/${repositoryId}/download`)
+      .httpGet(`${REPOSITORY_SERVICE_URL}/${repositoryId}/download-ttl`)
       .addContentTypeHeader(MediaType.TEXT_TURTLE)
       .setResponseType('stream');
     return this.execute(requestBuilder).then((response) => {
@@ -171,7 +171,7 @@ class GraphDBServerClient extends ServerClient {
   updateFreeAccess(enabled, authorities, appSettings) {
     const requestBuilder =
       HttpRequestBuilder
-        .httpPost(`${SECURITY_SERVICE_URL}/freeaccess`)
+        .httpPost(`${SECURITY_SERVICE_URL}/free-access`)
         .addContentTypeHeader(MediaType.APPLICATION_JSON)
         .addAcceptHeader(MediaType.TEXT_PLAIN)
         .setData({
@@ -190,7 +190,7 @@ class GraphDBServerClient extends ServerClient {
   getFreeAccess() {
     const requestBuilder =
       HttpRequestBuilder
-        .httpGet(`${SECURITY_SERVICE_URL}/freeaccess`)
+        .httpGet(`${SECURITY_SERVICE_URL}/free-access`)
         .addContentTypeHeader(MediaType.APPLICATION_JSON);
     return this.execute(requestBuilder);
   }
@@ -211,7 +211,7 @@ class GraphDBServerClient extends ServerClient {
   createUser(username, password, grantedAuthorities, appSettings) {
     const requestBuilder =
       HttpRequestBuilder
-        .httpPost(`${SECURITY_SERVICE_URL}/user/${username}`)
+        .httpPost(`${SECURITY_SERVICE_URL}/users/${username}`)
         .addContentTypeHeader(MediaType.APPLICATION_JSON)
         .addAcceptHeader(MediaType.TEXT_PLAIN)
         .setData({
@@ -242,7 +242,7 @@ class GraphDBServerClient extends ServerClient {
   updateUser(username, password, grantedAuthorities, appSettings) {
     const requestBuilder =
       HttpRequestBuilder
-        .httpPut(`${SECURITY_SERVICE_URL}/user/${username}`)
+        .httpPut(`${SECURITY_SERVICE_URL}/users/${username}`)
         .addContentTypeHeader(MediaType.APPLICATION_JSON)
         .addAcceptHeader(MediaType.TEXT_PLAIN)
         .setData({
@@ -269,7 +269,7 @@ class GraphDBServerClient extends ServerClient {
   updateUserData(username, password, appSettings) {
     const requestBuilder =
       HttpRequestBuilder
-        .httpPatch(`${SECURITY_SERVICE_URL}/user/${username}`)
+        .httpPatch(`${SECURITY_SERVICE_URL}/users/${username}`)
         .addContentTypeHeader(MediaType.APPLICATION_JSON)
         .addAcceptHeader(MediaType.TEXT_PLAIN)
         .setData({
@@ -289,7 +289,7 @@ class GraphDBServerClient extends ServerClient {
   getUser(username) {
     const requestBuilder =
       HttpRequestBuilder
-        .httpGet(`${SECURITY_SERVICE_URL}/user/${username}`)
+        .httpGet(`${SECURITY_SERVICE_URL}/users/${username}`)
         .addContentTypeHeader(MediaType.APPLICATION_JSON);
     return this.execute(requestBuilder);
   }
@@ -303,7 +303,7 @@ class GraphDBServerClient extends ServerClient {
   deleteUser(username) {
     const requestBuilder =
       HttpRequestBuilder
-        .httpDelete(`${SECURITY_SERVICE_URL}/user/${username}`)
+        .httpDelete(`${SECURITY_SERVICE_URL}/users/${username}`)
         .addAcceptHeader(MediaType.TEXT_PLAIN);
     return this.execute(requestBuilder);
   }
