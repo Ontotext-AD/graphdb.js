@@ -96,6 +96,13 @@ function toggleSecurity(enable) {
   });
 }
 
+function importFile(rdfClient) {
+  const wineRdf = path.resolve(__dirname, './data/wine.rdf');
+  return rdfClient.addFile(wineRdf, RDFMimeType.RDF_XML, null, null).catch((e) => {
+    throw new Error(e);
+  });
+}
+
 function importData(rdfClient) {
   return createRepo(Config.testRepoPath).then((res) => {
     const wineRdf = path.resolve(__dirname, './data/wine.rdf');
@@ -120,6 +127,7 @@ function importDataSecurely(rdfSecuredClient) {
 
 module.exports = {
   loadFile,
+  importFile,
   readStream,
   getReadStream,
   createRepo,

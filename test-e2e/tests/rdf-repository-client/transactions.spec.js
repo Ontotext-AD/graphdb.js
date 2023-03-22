@@ -1,17 +1,17 @@
 const path = require('path');
-const Utils = require('utils');
+const Utils = require('utils.js');
+const Config = require('config.js');
 const {RDFRepositoryClient,
   GetStatementsPayload, AddStatementPayload} = require('graphdb').repository;
 const {RDFMimeType, QueryContentType} = require('graphdb').http;
 const N3 = require('n3');
 const {DataFactory} = N3;
 const {namedNode, literal, quad} = DataFactory;
-const Config = require('config');
 const {GetQueryPayload,
   QueryType, QueryLanguage, UpdateQueryPayload} = require('graphdb').query;
 const {XSD} = require('graphdb').model.Types;
 
-describe('Should test transactions', () => {
+describe('Transactional operations', () => {
   beforeAll(() => {
     return Utils.createRepo(Config.testRepoPath);
   });
@@ -23,7 +23,7 @@ describe('Should test transactions', () => {
   const rdfClient = new RDFRepositoryClient(Config.restApiConfig);
 
   test('Should begin a transaction and check size', () => {
-    const wineRdf = path.resolve(__dirname, './data/wine.rdf');
+    const wineRdf = path.resolve(__dirname, './../data/wine.rdf');
     let transactionalClient;
     return rdfClient.addFile(wineRdf, RDFMimeType.RDF_XML, null, null)
       .then(() => {
@@ -47,7 +47,7 @@ describe('Should test transactions', () => {
 
   test('Should begin a transaction add file and commit it', () => {
     let transactionalClient;
-    const rowsRdf = path.resolve(__dirname, './data/rows.rdf');
+    const rowsRdf = path.resolve(__dirname, './../data/rows.rdf');
 
     return rdfClient.beginTransaction().then((transaction) => {
       transactionalClient = transaction;
@@ -72,7 +72,7 @@ describe('Should test transactions', () => {
 
   test('Should begin a transaction add file and rollback it', () => {
     let transactionalClient;
-    const rowsRdf = path.resolve(__dirname, './data/rows.rdf');
+    const rowsRdf = path.resolve(__dirname, './../data/rows.rdf');
 
     return rdfClient.beginTransaction().then((transaction) => {
       transactionalClient = transaction;
@@ -95,7 +95,7 @@ describe('Should test transactions', () => {
       .setPredicate('<http://learningsparql.com/ns/addressbook/firstName>')
       .setContext('<http://domain/graph/data-graph-3>');
 
-    const sampleRdf = path.resolve(__dirname, './data/sample-turtle.ttl');
+    const sampleRdf = path.resolve(__dirname, './../data/sample-turtle.ttl');
     const turtleStream = Utils.getReadStream(sampleRdf);
     const context = '<http://domain/graph/data-graph-3>';
 
@@ -260,7 +260,7 @@ describe('Should test transactions', () => {
 
   describe('Should test queries in transactions', () => {
     beforeAll(() => {
-      const wineRdf = path.resolve(__dirname, './data/wine.rdf');
+      const wineRdf = path.resolve(__dirname, './../data/wine.rdf');
       return rdfClient.addFile(wineRdf, RDFMimeType.RDF_XML, null, null);
     });
 
