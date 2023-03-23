@@ -4,9 +4,12 @@ pipeline {
     label 'graphdb-jenkins-node'
   }
 
-  tools {
-    nodejs 'nodejs-14.17.0'
-  }
+// Doesn't work on Jenkins due to some errors in GDB responses. Locally it works though.
+// It works fine using the default node version in jenkins node which is 12.19.0, but SonarCloud
+// doesn't like it.
+//   tools {
+//     nodejs 'nodejs-14.17.0'
+//   }
 
   environment {
     CI = "true"
@@ -43,13 +46,14 @@ pipeline {
       }
     }
 
-    stage('Sonar') {
-      steps {
-        withSonarQubeEnv('SonarCloud') {
-          sh "node sonar-project.js --branch='${env.ghprbSourceBranch}' --target-branch='${env.ghprbTargetBranch}' --pull-request-id='${env.ghprbPullId}'"
-        }
-      }
-    }
+// Doesn't work with the nodejs 12.19.0 which is the default on jenkins node.
+//     stage('Sonar') {
+//       steps {
+//         withSonarQubeEnv('SonarCloud') {
+//           sh "node sonar-project.js --branch='${env.ghprbSourceBranch}' --target-branch='${env.ghprbTargetBranch}' --pull-request-id='${env.ghprbPullId}'"
+//         }
+//       }
+//     }
   }
 
   post {
