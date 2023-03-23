@@ -55,7 +55,7 @@ pipeline {
   post {
     always {
       dir("test-e2e/") {
-        sh "docker logs graphd"
+        sh "docker logs graphdb"
         sh "docker-compose down -v --remove-orphans --rmi=local || true"
       }
     }
