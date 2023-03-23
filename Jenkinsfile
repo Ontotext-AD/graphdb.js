@@ -4,9 +4,9 @@ pipeline {
     label 'graphdb-jenkins-node'
   }
 
-//   tools {
-//     nodejs 'nodejs-14.17.0'
-//   }
+  tools {
+    nodejs 'nodejs-14.17.0'
+  }
 
   environment {
     CI = "true"
@@ -55,6 +55,7 @@ pipeline {
   post {
     always {
       dir("test-e2e/") {
+        sh docker logs graphd
         sh "docker-compose down -v --remove-orphans --rmi=local || true"
       }
     }
