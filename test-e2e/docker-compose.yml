@@ -7,6 +7,6 @@ services:
     container_name: graphdb
     # This will allow GraphDB to access host resources (locally running or in CI)
     # Needed to load data from localhost (see queries.spec.js)
-    network_mode: host
-#    ports:
-#      - '7200:7200'
+#    network_mode: host
+    ports:
+      - '7200:7200'

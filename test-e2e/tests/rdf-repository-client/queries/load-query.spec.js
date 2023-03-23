@@ -29,7 +29,9 @@ describe('Load query', () => {
     });
   });
 
-  test('Should load data in a named graph', () => {
+  // skipped due to limitation in docker-compose to bind the port and also exposing the hots on  the
+  // network
+  test.skip('Should load data in a named graph', () => {
     let expected = Utils.loadFile('./data/queries/expected_results_load_data.json');
 
     let clearGraph = new UpdateQueryPayload()
