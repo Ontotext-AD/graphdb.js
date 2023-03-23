@@ -61,7 +61,8 @@ class GraphDBServerClient extends ServerClient {
     }
 
     const repositoryLocation = location ? `?location=${location}` : '';
-    const url = `${REPOSITORY_SERVICE_URL}/${repositoryId}${repositoryLocation}`;
+    const url =
+      `${REPOSITORY_SERVICE_URL}/${repositoryId}${repositoryLocation}`;
     const requestBuilder = HttpRequestBuilder
       .httpGet(url)
       .addContentTypeHeader(MediaType.APPLICATION_JSON);
