@@ -1,11 +1,28 @@
-@prefix wgs: <http://www.w3.org/2003/01/geo/wgs84_pos#> .
-@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix agg: <http://jena.apache.org/ARQ/function/aggregate#> .
+@prefix sail: <http://www.openrdf.org/config/sail#> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
-@prefix gn: <http://www.geonames.org/ontology#> .
+@prefix geof: <http://www.opengis.net/def/function/geosparql/> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix fn: <http://www.w3.org/2005/xpath-functions> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix spif: <http://spinrdf.org/spif#> .
+@prefix path: <http://www.ontotext.com/path#> .
+@prefix array: <http://www.w3.org/2005/xpath-functions/array> .
+@prefix apf: <http://jena.apache.org/ARQ/property#> .
+@prefix rep: <http://www.openrdf.org/config/repository#> .
+@prefix map: <http://www.w3.org/2005/xpath-functions/map> .
+@prefix sr: <http://www.openrdf.org/config/repository/sail#> .
+@prefix wgs: <http://www.w3.org/2003/01/geo/wgs84_pos#> .
+@prefix gn: <http://www.geonames.org/ontology#> .
+@prefix afn: <http://jena.apache.org/ARQ/function#> .
+@prefix list: <http://jena.apache.org/ARQ/list#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix ofn: <http://www.ontotext.com/sparql/functions/> .
+@prefix geoext: <http://rdf.useekm.com/ext#> .
+@prefix graphdb: <http://www.ontotext.com/config/graphdb#> .
+@prefix math: <http://www.w3.org/2005/xpath-functions/math> .
+@prefix omgeo: <http://www.ontotext.com/owlim/geo#> .
 
 <http://domain/graph/data-graph-1> {
   <http://domain/resource/resource-3> <http://domain/property/relation-1> <http://domain/value/uri-4> .
 }
-

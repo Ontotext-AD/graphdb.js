@@ -17,7 +17,7 @@ export class RepositoryConfig {
    * <code>owlim:ReplicationClusterWorker</code> for worker repository
    * <code>owlim:MonitorRepository</code> for se repository
    * <code>openrdf:SailRepository</code> for se repository
-   * <code>graphdb:FreeSailRepository</code> for free repository
+   * <code>graphdb:SailRepository</code> for free repository
    * <code>openrdf:SystemRepository</code> for openrdf-system repository
    * <code>graphdb:OntopRepository</code> for ontop repository
    * @param {string} [title] Repository title

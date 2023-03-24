@@ -4,10 +4,11 @@ const {N3Parser} = require('graphdb').parser;
 const N3 = require('n3');
 const {DataFactory} = N3;
 const {namedNode, literal, quad, defaultGraph} = DataFactory;
-const Utils = require('utils');
-const Config = require('config');
+const Utils = require('utils.js');
+const Config = require('config.js');
 
-describe('Should test adding and updating quads', () => {
+describe('Manage quads', () => {
+  let rdfClient = new RDFRepositoryClient(Config.restApiConfig);
 
   beforeAll(() => {
     return Utils.createRepo(Config.testRepoPath);
@@ -16,8 +17,6 @@ describe('Should test adding and updating quads', () => {
   afterAll(() => {
     return Utils.deleteRepo('Test_repo');
   });
-
-  let rdfClient = new RDFRepositoryClient(Config.restApiConfig);
 
   let quads = [
     getQuad('resource-1', 'relation-1', 'uri-1'),
@@ -84,13 +83,6 @@ describe('Should test adding and updating quads', () => {
   });
 
   test('Should add quads and retrieve them in different format', () => {
-
-    function buildPayload(type) {
-      return new GetStatementsPayload()
-        .setSubject('<http://domain/resource/resource-3>')
-        .setResponseType(type);
-    }
-
     rdfClient.registerParser((new N3Parser()));
     let payload = buildPayload(RDFMimeType.TRIG);
     let expected = Utils.loadFile('./data/quads/expectedResponseTrig.txt').trim();
@@ -112,6 +104,12 @@ describe('Should test adding and updating quads', () => {
     });
   });
 });
+
+function buildPayload(type) {
+  return new GetStatementsPayload()
+    .setSubject('<http://domain/resource/resource-3>')
+    .setResponseType(type);
+}
 
 function getQuad(s, p, o, g) {
   if (g) {

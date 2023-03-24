@@ -1,7 +1,7 @@
 const path = require('path');
 const {RDFRepositoryClient, GetStatementsPayload} = require('graphdb').repository;
-const Utils = require('utils');
-const Config = require('config');
+const Utils = require('utils.js');
+const Config = require('config.js');
 const {GetQueryPayload, QueryType} = require('graphdb').query;
 const {RDFMimeType} = require('graphdb').http;
 const {RDFXmlParser, N3Parser} = require('graphdb').parser;
@@ -9,16 +9,18 @@ const N3 = require('n3');
 const {DataFactory} = N3;
 const {namedNode, quad, defaultGraph} = DataFactory;
 
-describe('Should test RDFStar', () => {
+describe('RDFStar support', () => {
   let rdfClient = new RDFRepositoryClient(Config.restApiConfig);
   let expected;
   let response;
 
   beforeAll(() => {
     return Utils.createRepo(Config.testRepoPath).then(() => {
-      let RDFStar = path.resolve(__dirname, './data/rdf-star.ttls');
+      let RDFStar = path.resolve(__dirname, './../../data/rdf-star.ttls');
       return rdfClient.addFile(RDFStar, RDFMimeType.TURTLE_STAR, null, null);
-    })
+    }).catch((e) => {
+      throw new Error(e);
+    });
   });
 
   afterAll(() => {
@@ -67,19 +69,12 @@ describe('Should test RDFStar', () => {
   });
 
   test('Should receive proper STAR responses', () => {
-    function buildPayload(type) {
-      return new GetStatementsPayload()
-        .setSubject('<<<http://www.wikidata.org/entity/Q472> <http://www.wikidata.org/prop/direct/P1889> <http://www.wikidata.org/entity/Q202904>>>')
-        .setResponseType(type);
-    }
-
     let expectedTurtleStar = Utils.loadFile('./data/rdfstar/expected_response_turtle_star.txt');
     let expectedTrigStar = Utils.loadFile('./data/rdfstar/expected_response_trig_star.txt');
 
     let payload = buildPayload(RDFMimeType.TURTLE_STAR);
     return rdfClient.get(payload).then((resp) => {
       expect(resp.trim()).toEqual(expectedTurtleStar.trim());
-
       payload = buildPayload(RDFMimeType.TRIG_STAR);
       return rdfClient.get(payload);
     }).then((resp) => {
@@ -129,5 +124,10 @@ describe('Should test RDFStar', () => {
   function unsubscribe() {
     response.removeListener('data', onData);
   }
-});
 
+  function buildPayload(type) {
+    return new GetStatementsPayload()
+      .setSubject('<<<http://www.wikidata.org/entity/Q472> <http://www.wikidata.org/prop/direct/P1889> <http://www.wikidata.org/entity/Q202904>>>')
+      .setResponseType(type);
+  }
+});

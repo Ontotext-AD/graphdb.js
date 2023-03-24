@@ -1,41 +1,49 @@
 #
-# RDF4J configuration template for a GraphDB Free repository
+# RDF4J configuration template for a GraphDB repository
 #
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>.
 @prefix rep: <http://www.openrdf.org/config/repository#>.
 @prefix sr: <http://www.openrdf.org/config/repository/sail#>.
 @prefix sail: <http://www.openrdf.org/config/sail#>.
-@prefix owlim: <http://www.ontotext.com/trree/owlim#>.
+@prefix graphdb: <http://www.ontotext.com/config/graphdb#>.
 
 [] a rep:Repository ;
     rep:repositoryID "Test_repo" ;
     rdfs:label "Test_repo" ;
     rep:repositoryImpl [
-        rep:repositoryType "graphdb:FreeSailRepository" ;
+        rep:repositoryType "graphdb:SailRepository" ;
         sr:sailImpl [
-            sail:sailType "graphdb:FreeSail" ;
-            
-            owlim:base-URL "http://example.org/graphdb#" ;
-            owlim:defaultNS "" ;
-            owlim:entity-index-size "10000000" ;
-            owlim:entity-id-size  "32" ;
-            owlim:imports "" ;
-        	owlim:repository-type "file-repository" ;
-            owlim:ruleset "rdfsplus-optimized" ;
-            owlim:storage-folder "storage" ;
- 
-            owlim:enable-context-index "false" ;
+            sail:sailType "graphdb:Sail" ;
 
-            owlim:enablePredicateList "true" ;
+            graphdb:read-only "false" ;
 
-            owlim:in-memory-literal-properties "true" ;
-            owlim:enable-literal-index "true" ;
+            # Inference and Validation
+            graphdb:ruleset "rdfsplus-optimized" ;
+            graphdb:disable-sameAs "true" ;
+            graphdb:check-for-inconsistencies "false" ;
 
-            owlim:check-for-inconsistencies "false" ;
-            owlim:disable-sameAs  "false" ;
-            owlim:query-timeout  "0" ;
-            owlim:query-limit-results  "0" ;
-            owlim:throw-QueryEvaluationException-on-timeout "false" ;
-            owlim:read-only "false" ;
+            # Indexing
+            graphdb:entity-id-size "32" ;
+            graphdb:enable-context-index "false" ;
+            graphdb:enablePredicateList "true" ;
+            graphdb:enable-fts-index "false" ;
+            graphdb:fts-indexes ("default" "iri") ;
+            graphdb:fts-string-literals-index "default" ;
+            graphdb:fts-iris-index "none" ;
+
+            # Queries and Updates
+            graphdb:query-timeout "0" ;
+            graphdb:throw-QueryEvaluationException-on-timeout "false" ;
+            graphdb:query-limit-results "0" ;
+
+            # Settable in the file but otherwise hidden in the UI and in the RDF4J console
+            graphdb:base-URL "http://example.org/owlim#" ;
+            graphdb:defaultNS "" ;
+            graphdb:imports "" ;
+            graphdb:repository-type "file-repository" ;
+            graphdb:storage-folder "storage" ;
+            graphdb:entity-index-size "10000000" ;
+            graphdb:in-memory-literal-properties "true" ;
+            graphdb:enable-literal-index "true" ;
         ]
     ].

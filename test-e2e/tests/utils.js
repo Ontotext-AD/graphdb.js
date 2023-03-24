@@ -2,7 +2,8 @@ const fs = require('fs');
 const path = require('path');
 const axios = require('axios');
 const FormData = require('form-data');
-const Config = require('config');
+const Config = require('config.js');
+const {RDFMimeType} = require('graphdb').http;
 
 function loadFile(relativePath) {
   return fs.readFileSync(path.resolve(__dirname, relativePath), 'UTF-8');
@@ -32,18 +33,15 @@ function getReadStream(filePath) {
   if (isBlank(filePath)) {
     throw new Error('File path is required');
   }
-
   if (!fs.existsSync(filePath)) {
     throw new Error('File does not exist for path=' + filePath);
   }
-
   return fs.createReadStream(filePath);
 }
 
 function createRepo(path) {
   const data = new FormData();
   data.append('config', fs.createReadStream(path));
-
   return axios({
     method: 'post',
     url: `${Config.serverAddress}/rest/repositories?local=true`,
@@ -53,10 +51,19 @@ function createRepo(path) {
   });
 }
 
+function createRepositories(repositoryNames) {
+  const requests = repositoryNames.map((repoName) => createRepo(repoName));
+  return Promise.all(requests).catch((e) => {
+    throw new Error(e);
+  });
+}
+
 function deleteRepo(name) {
   return axios({
     method: 'delete',
     url: `${Config.serverAddress}/rest/repositories/${name}`
+  }).catch((e) => {
+    throw new Error(e);
   });
 }
 
@@ -75,5 +82,36 @@ function toggleSecurity(enable) {
   });
 }
 
-module.exports = {loadFile, readStream, getReadStream,
-  createRepo, deleteRepo, toggleSecurity};
+function importData(rdfClient) {
+  return createRepo(Config.testRepoPath).then((res) => {
+    const wineRdf = path.resolve(__dirname, './data/wine.rdf');
+    return rdfClient.addFile(wineRdf, RDFMimeType.RDF_XML, null, null);
+  }).catch((e) => {
+    throw new Error(e);
+  });
+}
+
+function importDataSecurely(rdfSecuredClient) {
+  return createRepo(Config.testRepoPath)
+    .then(() => {
+      return toggleSecurity(true);
+    }).then(() => {
+    const wineRdf = path.resolve(__dirname, './data/wine.rdf');
+    return rdfSecuredClient
+      .addFile(wineRdf, RDFMimeType.RDF_XML, null, null);
+  }).catch((e) => {
+    throw new Error(e);
+  });
+}
+
+module.exports = {
+  loadFile,
+  readStream,
+  getReadStream,
+  createRepo,
+  createRepositories,
+  deleteRepo,
+  toggleSecurity,
+  importData,
+  importDataSecurely
+};
