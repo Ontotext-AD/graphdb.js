@@ -33,18 +33,15 @@ function getReadStream(filePath) {
   if (isBlank(filePath)) {
     throw new Error('File path is required');
   }
-
   if (!fs.existsSync(filePath)) {
     throw new Error('File does not exist for path=' + filePath);
   }
-
   return fs.createReadStream(filePath);
 }
 
 function createRepo(path) {
   const data = new FormData();
   data.append('config', fs.createReadStream(path));
-
   return axios({
     method: 'post',
     url: `${Config.serverAddress}/rest/repositories?local=true`,
@@ -70,17 +67,6 @@ function deleteRepo(name) {
   });
 }
 
-function deleteRepoSecurely(name) {
-  return toggleSecurity(false).then(() => {
-    return axios({
-      method: 'delete',
-      url: `${Config.serverAddress}/rest/repositories/${name}`
-    });
-  }).catch((e) => {
-    throw new Error(e);
-  });
-}
-
 function toggleSecurity(enable) {
   return axios({
     method: 'post',
@@ -93,13 +79,6 @@ function toggleSecurity(enable) {
     url: `${Config.serverAddress}/rest/security?useSecurity=${enable}`,
     data: `${enable}`,
     timeout: 5000
-  });
-}
-
-function importFile(rdfClient) {
-  const wineRdf = path.resolve(__dirname, './data/wine.rdf');
-  return rdfClient.addFile(wineRdf, RDFMimeType.RDF_XML, null, null).catch((e) => {
-    throw new Error(e);
   });
 }
 
@@ -127,13 +106,11 @@ function importDataSecurely(rdfSecuredClient) {
 
 module.exports = {
   loadFile,
-  importFile,
   readStream,
   getReadStream,
   createRepo,
   createRepositories,
   deleteRepo,
-  deleteRepoSecurely,
   toggleSecurity,
   importData,
   importDataSecurely

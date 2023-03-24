@@ -10,7 +10,9 @@ describe('Manage namespaces securely', () => {
   });
 
   afterAll(() => {
-    return Utils.deleteRepoSecurely('Test_repo');
+    return Utils.toggleSecurity(false).then(() => {
+      return Utils.deleteRepo('Test_repo')
+    });
   });
 
   test('Should list namespaces', () => {
