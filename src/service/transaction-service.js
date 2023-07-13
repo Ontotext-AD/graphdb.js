@@ -79,12 +79,24 @@ class TransactionService extends Service {
    */
   getTransactionalClientConfig(locationUrl) {
     const config = this.repositoryClientConfig;
-    return new RepositoryClientConfig(config.getEndpoint())
+    const transactionConfig = new RepositoryClientConfig(config.getEndpoint())
       .setEndpoints([locationUrl])
       .setHeaders(config.getHeaders())
       .setDefaultRDFMimeType(config.getDefaultRDFMimeType())
       .setReadTimeout(config.getReadTimeout())
       .setWriteTimeout(config.getWriteTimeout());
+
+    if (config.shouldAuthenticate()) {
+      const userName = config.getUsername();
+      const password = config.getPass();
+      if (config.getBasicAuthentication()) {
+        transactionConfig.useBasicAuthentication(userName, password);
+      } else if (config.getGdbTokenAuthentication()) {
+        transactionConfig.useGdbTokenAuthentication(userName, password);
+      }
+    }
+
+    return transactionConfig;
   }
 
   /**

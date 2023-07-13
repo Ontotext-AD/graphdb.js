@@ -377,6 +377,41 @@ describe('Transactional operations', () => {
       });
     });
   });
+
+  describe('Should test queries in transactions in secured database', () => {
+    beforeAll(async () => {
+      const wineRdf = path.resolve(__dirname, './../data/wine.rdf');
+      await rdfClient.addFile(wineRdf, RDFMimeType.RDF_XML, null, null);
+      await Utils.toggleSecurity(true);
+    });
+
+    afterAll(async () => {
+      await Utils.toggleSecurity(false);
+    })
+
+    test('Should test SELECT query in transaction in secured database', async () => {
+      const wineRdf = path.resolve(__dirname, './../data/wine.rdf');
+      const payloadWithInferenceTrue = new GetQueryPayload()
+        .setQuery('select * where {<http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#StonleighSauvignonBlanc> ?p ?o}')
+        .setQueryType(QueryType.SELECT)
+        .setContentType(QueryContentType.SPARQL_QUERY)
+        .setResponseType(RDFMimeType.SPARQL_RESULTS_JSON)
+        .setQueryLn(QueryLanguage.SPARQL)
+        .setInference(true);
+
+      const rdfClientWithBasicAuth = new RDFRepositoryClient(Config.restApiBasicAuthConfig);
+      const transactionalClient = await rdfClientWithBasicAuth.beginTransaction();
+      await transactionalClient.query(payloadWithInferenceTrue)
+        .then((response) => {
+          return Utils.readStream(response);
+        })
+        .then((stream) => {
+          const expectedResponse = Utils.loadFile('./data/queries/expected_results_payload_inference_true.json');
+          expect(JSON.parse(stream)).toEqual(JSON.parse(expectedResponse));
+          return transactionalClient.commit();
+        });
+    });
+  });
 });
 
 function getQuad(s, p, o, g) {
