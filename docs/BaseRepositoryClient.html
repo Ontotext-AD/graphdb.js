@@ -19,7 +19,7 @@
 
     <h1 class="page-title">Class: BaseRepositoryClient</h1>
 
-    
+
 
 
 
@@ -27,31 +27,31 @@
 <section>
 
 <header>
-    
+
         <h2><span class="attribs"><span class="type-signature">(abstract) </span></span>BaseRepositoryClient<span class="signature">(repositoryClientConfig)</span><span class="type-signature"></span></h2>
-        
+
             <div class="class-description"><p>Implementation of the RDF repository operations.</p>
 <p>The repository will construct a list of HTTP clients for each supplied
 repository endpoint in the configuration. These clients will be used as
 fallback strategy.</p></div>
-        
-    
+
+
 </header>
 
 <article>
     <div class="container-overview">
-    
-        
 
-    
+
+
+
     <h2>Constructor</h2>
-    
 
-    
+
+
     <h4 class="name" id="BaseRepositoryClient"><span class="type-signature">(abstract) </span>new BaseRepositoryClient<span class="signature">(repositoryClientConfig)</span><span class="type-signature"></span></h4>
-    
 
-    
+
+
 
 
 
@@ -68,50 +68,50 @@ fallback strategy.</p></div>
 
 
     <h5>Parameters:</h5>
-    
+
 
 <table class="params">
     <thead>
     <tr>
-        
+
         <th>Name</th>
-        
+
 
         <th>Type</th>
 
-        
 
-        
+
+
 
         <th class="last">Description</th>
     </tr>
     </thead>
 
     <tbody>
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>repositoryClientConfig</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type"><a href="RepositoryClientConfig.html">RepositoryClientConfig</a></span>
 
 
-            
+
             </td>
 
-            
 
-            
+
+
 
             <td class="description last"></td>
         </tr>
 
-    
+
     </tbody>
 </table>
 
@@ -122,51 +122,51 @@ fallback strategy.</p></div>
 
 <dl class="details">
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
+
+
+
+
+
+
+
+
+
     <dt class="tag-author">Author:</dt>
     <dd class="tag-author">
         <ul>
             <li>Mihail Radkov</li>
-        
+
             <li>Svilen Velikov</li>
         </ul>
     </dd>
-    
 
-    
 
-    
 
-    
 
-    
+
+
+
+
+
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
         <a href="repository_base-repository-client.js.html">repository/base-repository-client.js</a>, <a href="repository_base-repository-client.js.html#line32">line 32</a>
     </li></ul></dd>
-    
 
-    
 
-    
 
-    
+
+
+
+
 </dl>
 
 
@@ -188,36 +188,36 @@ fallback strategy.</p></div>
 
 
 
-    
+
     </div>
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
+
+
+
+
+
+
+
+
         <h3 class="subsection-title">Methods</h3>
 
-        
-            
 
-    
 
-    
+
+
+
+
     <h4 class="name" id="execute"><span class="type-signature">(protected) </span>execute<span class="signature">(requestBuilder)</span><span class="type-signature"> &rarr; {Promise.&lt;(<a href="HttpResponse.html">HttpResponse</a>|Error)>}</span></h4>
-    
 
-    
+
+
 
 
 
@@ -240,51 +240,51 @@ with promise rejection.</p>
 
 
     <h5>Parameters:</h5>
-    
+
 
 <table class="params">
     <thead>
     <tr>
-        
+
         <th>Name</th>
-        
+
 
         <th>Type</th>
 
-        
 
-        
+
+
 
         <th class="last">Description</th>
     </tr>
     </thead>
 
     <tbody>
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>requestBuilder</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type"><a href="HttpRequestBuilder.html">HttpRequestBuilder</a></span>
 
 
-            
+
             </td>
 
-            
 
-            
+
+
 
             <td class="description last"><p>the http request data to be
 passed to a http client</p></td>
         </tr>
 
-    
+
     </tbody>
 </table>
 
@@ -295,42 +295,42 @@ passed to a http client</p></td>
 
 <dl class="details">
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
+
+
+
+
+
+
+
+
+
+
+
+
+
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
         <a href="repository_base-repository-client.js.html">repository/base-repository-client.js</a>, <a href="repository_base-repository-client.js.html#line144">line 144</a>
     </li></ul></dd>
-    
 
-    
 
-    
 
-    
+
+
+
+
 </dl>
 
 
@@ -349,7 +349,7 @@ passed to a http client</p></td>
 
 <h5>Returns:</h5>
 
-        
+
 <div class="param-desc">
     <p>a promise which resolves to response
 wrapper or rejects with error if thrown during execution.</p>
@@ -362,29 +362,235 @@ wrapper or rejects with error if thrown during execution.</p>
         Type
     </dt>
     <dd>
-        
+
 <span class="param-type">Promise.&lt;(<a href="HttpResponse.html">HttpResponse</a>|Error)></span>
 
 
     </dd>
 </dl>
 
-    
 
 
 
 
 
-        
-            
 
-    
 
-    
+
+
+
+
+
+    <h4 class="name" id="getLogPayload"><span class="type-signature">(protected) </span>getLogPayload<span class="signature">(response, params<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {object}</span></h4>
+
+
+
+
+
+
+<div class="description">
+    <p>Creates an object from the provided HTTP response that is suitable for
+structured logging.</p>
+<p>Any additional key-value entries from <code>params</code> will be assigned
+in the created payload object.</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+
+
+<table class="params">
+    <thead>
+    <tr>
+
+        <th>Name</th>
+
+
+        <th>Type</th>
+
+
+        <th>Attributes</th>
+
+
+
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+
+
+        <tr>
+
+                <td class="name"><code>response</code></td>
+
+
+            <td class="type">
+
+
+<span class="param-type"><a href="HttpResponse.html">HttpResponse</a></span>
+
+
+
+            </td>
+
+
+                <td class="attributes">
+
+
+
+
+
+                </td>
+
+
+
+
+            <td class="description last"><p>the HTTP response.
+Used to get the execution time and the base URL</p></td>
+        </tr>
+
+
+
+        <tr>
+
+                <td class="name"><code>params</code></td>
+
+
+            <td class="type">
+
+
+<span class="param-type">object</span>
+
+
+
+            </td>
+
+
+                <td class="attributes">
+
+                    &lt;optional><br>
+
+
+
+
+
+                </td>
+
+
+
+
+            <td class="description last"><p>additional parameters to be appended</p></td>
+        </tr>
+
+
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="repository_base-repository-client.js.html">repository/base-repository-client.js</a>, <a href="repository_base-repository-client.js.html#line239">line 239</a>
+    </li></ul></dd>
+
+
+
+
+
+
+
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+
+<div class="param-desc">
+    <p>the constructed payload object for logging</p>
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+
+<span class="param-type">object</span>
+
+
+    </dd>
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
     <h4 class="name" id="getLoggedUser"><span class="type-signature"></span>getLoggedUser<span class="signature">()</span><span class="type-signature"> &rarr; {<a href="User.html">User</a>}</span></h4>
-    
 
-    
+
+
 
 
 
@@ -406,42 +612,42 @@ wrapper or rejects with error if thrown during execution.</p>
 
 <dl class="details">
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
+
+
+
+
+
+
+
+
+
+
+
+
+
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
         <a href="repository_base-repository-client.js.html">repository/base-repository-client.js</a>, <a href="repository_base-repository-client.js.html#line289">line 289</a>
     </li></ul></dd>
-    
 
-    
 
-    
 
-    
+
+
+
+
 </dl>
 
 
@@ -460,7 +666,7 @@ wrapper or rejects with error if thrown during execution.</p>
 
 <h5>Returns:</h5>
 
-        
+
 <div class="param-desc">
     <p>user</p>
 </div>
@@ -472,29 +678,29 @@ wrapper or rejects with error if thrown during execution.</p>
         Type
     </dt>
     <dd>
-        
+
 <span class="param-type"><a href="User.html">User</a></span>
 
 
     </dd>
 </dl>
 
-    
 
 
 
 
 
-        
-            
 
-    
 
-    
+
+
+
+
+
     <h4 class="name" id="getLogger"><span class="type-signature"></span>getLogger<span class="signature">()</span><span class="type-signature"> &rarr; {<a href="Logger.html">Logger</a>}</span></h4>
-    
 
-    
+
+
 
 
 
@@ -516,42 +722,42 @@ wrapper or rejects with error if thrown during execution.</p>
 
 <dl class="details">
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
+
+
+
+
+
+
+
+
+
+
+
+
+
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
         <a href="repository_base-repository-client.js.html">repository/base-repository-client.js</a>, <a href="repository_base-repository-client.js.html#line72">line 72</a>
     </li></ul></dd>
-    
 
-    
 
-    
 
-    
+
+
+
+
 </dl>
 
 
@@ -570,7 +776,7 @@ wrapper or rejects with error if thrown during execution.</p>
 
 <h5>Returns:</h5>
 
-        
+
 <div class="param-desc">
     <p>the logger instance</p>
 </div>
@@ -582,235 +788,29 @@ wrapper or rejects with error if thrown during execution.</p>
         Type
     </dt>
     <dd>
-        
+
 <span class="param-type"><a href="Logger.html">Logger</a></span>
 
 
     </dd>
 </dl>
 
-    
 
 
 
 
 
-        
-            
 
-    
 
-    
-    <h4 class="name" id="getLogPayload"><span class="type-signature">(protected) </span>getLogPayload<span class="signature">(response, params<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {object}</span></h4>
-    
 
-    
 
 
 
-<div class="description">
-    <p>Creates an object from the provided HTTP response that is suitable for
-structured logging.</p>
-<p>Any additional key-value entries from <code>params</code> will be assigned
-in the created payload object.</p>
-</div>
 
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-        <th>Attributes</th>
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>response</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="HttpResponse.html">HttpResponse</a></span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-
-                
-
-                
-                </td>
-            
-
-            
-
-            <td class="description last"><p>the HTTP response.
-Used to get the execution time and the base URL</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>params</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">object</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-
-            <td class="description last"><p>additional parameters to be appended</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="repository_base-repository-client.js.html">repository/base-repository-client.js</a>, <a href="repository_base-repository-client.js.html#line239">line 239</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
-<div class="param-desc">
-    <p>the constructed payload object for logging</p>
-</div>
-
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">object</span>
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-
-
-        
-            
-
-    
-
-    
     <h4 class="name" id="parse"><span class="type-signature">(protected) </span>parse<span class="signature">(content, responseType, parserConfig<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {string|Term|Array.&lt;Term>}</span></h4>
-    
 
-    
+
+
 
 
 
@@ -831,124 +831,124 @@ Parsing is done synchronously!</p>
 
 
     <h5>Parameters:</h5>
-    
+
 
 <table class="params">
     <thead>
     <tr>
-        
+
         <th>Name</th>
-        
+
 
         <th>Type</th>
 
-        
-        <th>Attributes</th>
-        
 
-        
+        <th>Attributes</th>
+
+
+
 
         <th class="last">Description</th>
     </tr>
     </thead>
 
     <tbody>
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>content</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type">string</span>
 
 
-            
+
             </td>
 
-            
+
                 <td class="attributes">
-                
 
-                
 
-                
+
+
+
                 </td>
-            
 
-            
+
+
 
             <td class="description last"></td>
         </tr>
 
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>responseType</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type">string</span>
 
 
-            
+
             </td>
 
-            
+
                 <td class="attributes">
-                
 
-                
 
-                
+
+
+
                 </td>
-            
 
-            
+
+
 
             <td class="description last"></td>
         </tr>
 
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>parserConfig</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type">Object</span>
 
 
-            
+
             </td>
 
-            
+
                 <td class="attributes">
-                
+
                     &lt;optional><br>
-                
 
-                
 
-                
+
+
+
                 </td>
-            
 
-            
+
+
 
             <td class="description last"><p>optional parser configuration</p></td>
         </tr>
 
-    
+
     </tbody>
 </table>
 
@@ -959,42 +959,42 @@ Parsing is done synchronously!</p>
 
 <dl class="details">
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
+
+
+
+
+
+
+
+
+
+
+
+
+
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
         <a href="repository_base-repository-client.js.html">repository/base-repository-client.js</a>, <a href="repository_base-repository-client.js.html#line113">line 113</a>
     </li></ul></dd>
-    
 
-    
 
-    
 
-    
+
+
+
+
 </dl>
 
 
@@ -1013,7 +1013,7 @@ Parsing is done synchronously!</p>
 
 <h5>Returns:</h5>
 
-        
+
 
 
 <dl>
@@ -1021,7 +1021,7 @@ Parsing is done synchronously!</p>
         Type
     </dt>
     <dd>
-        
+
 <span class="param-type">string</span>
 |
 
@@ -1034,22 +1034,22 @@ Parsing is done synchronously!</p>
     </dd>
 </dl>
 
-    
 
 
 
 
 
-        
-            
 
-    
 
-    
+
+
+
+
+
     <h4 class="name" id="registerParser"><span class="type-signature"></span>registerParser<span class="signature">(parser)</span><span class="type-signature"></span></h4>
-    
 
-    
+
+
 
 
 
@@ -1066,50 +1066,50 @@ Parsing is done synchronously!</p>
 
 
     <h5>Parameters:</h5>
-    
+
 
 <table class="params">
     <thead>
     <tr>
-        
+
         <th>Name</th>
-        
+
 
         <th>Type</th>
 
-        
 
-        
+
+
 
         <th class="last">Description</th>
     </tr>
     </thead>
 
     <tbody>
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>parser</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type"><a href="ContentParser.html">ContentParser</a></span>
 
 
-            
+
             </td>
 
-            
 
-            
+
+
 
             <td class="description last"><p>implementation wrapper.</p></td>
         </tr>
 
-    
+
     </tbody>
 </table>
 
@@ -1120,42 +1120,42 @@ Parsing is done synchronously!</p>
 
 <dl class="details">
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
+
+
+
+
+
+
+
+
+
+
+
+
+
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
         <a href="repository_base-repository-client.js.html">repository/base-repository-client.js</a>, <a href="repository_base-repository-client.js.html#line96">line 96</a>
     </li></ul></dd>
-    
 
-    
 
-    
 
-    
+
+
+
+
 </dl>
 
 
@@ -1177,16 +1177,16 @@ Parsing is done synchronously!</p>
 
 
 
-        
-            
 
-    
 
-    
+
+
+
+
     <h4 class="name" id="setLoggedUser"><span class="type-signature"></span>setLoggedUser<span class="signature">(user)</span><span class="type-signature"> &rarr; {<a href="BaseRepositoryClient.html">BaseRepositoryClient</a>}</span></h4>
-    
 
-    
+
+
 
 
 
@@ -1203,50 +1203,50 @@ Parsing is done synchronously!</p>
 
 
     <h5>Parameters:</h5>
-    
+
 
 <table class="params">
     <thead>
     <tr>
-        
+
         <th>Name</th>
-        
+
 
         <th>Type</th>
 
-        
 
-        
+
+
 
         <th class="last">Description</th>
     </tr>
     </thead>
 
     <tbody>
-    
+
 
         <tr>
-            
+
                 <td class="name"><code>user</code></td>
-            
+
 
             <td class="type">
-            
-                
+
+
 <span class="param-type"><a href="User.html">User</a></span>
 
 
-            
+
             </td>
 
-            
 
-            
+
+
 
             <td class="description last"></td>
         </tr>
 
-    
+
     </tbody>
 </table>
 
@@ -1257,42 +1257,42 @@ Parsing is done synchronously!</p>
 
 <dl class="details">
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
 
-    
+
+
+
+
+
+
+
+
+
+
+
+
+
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
         <a href="repository_base-repository-client.js.html">repository/base-repository-client.js</a>, <a href="repository_base-repository-client.js.html#line299">line 299</a>
     </li></ul></dd>
-    
 
-    
 
-    
 
-    
+
+
+
+
 </dl>
 
 
@@ -1311,7 +1311,7 @@ Parsing is done synchronously!</p>
 
 <h5>Returns:</h5>
 
-        
+
 
 
 <dl>
@@ -1319,25 +1319,25 @@ Parsing is done synchronously!</p>
         Type
     </dt>
     <dd>
-        
+
 <span class="param-type"><a href="BaseRepositoryClient.html">BaseRepositoryClient</a></span>
 
 
     </dd>
 </dl>
 
-    
 
 
 
 
 
-        
-    
 
-    
 
-    
+
+
+
+
+
 </article>
 
 </section>
@@ -1348,13 +1348,13 @@ Parsing is done synchronously!</p>
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="AddStatementPayload.html">AddStatementPayload</a></li><li><a href="AppSettings.html">AppSettings</a></li><li><a href="Authentication.html">Authentication</a></li><li><a href="AuthenticationFactory.html">AuthenticationFactory</a></li><li><a href="AuthenticationService.html">AuthenticationService</a></li><li><a href="BaseRepositoryClient.html">BaseRepositoryClient</a></li><li><a href="BasicAuthentication.html">BasicAuthentication</a></li><li><a href="ClientConfig.html">ClientConfig</a></li><li><a href="CommonUtils.html">CommonUtils</a></li><li><a href="ConsoleLogger.html">ConsoleLogger</a></li><li><a href="ContentParser.html">ContentParser</a></li><li><a href="DownloadService.html">DownloadService</a></li><li><a href="FileUtils.html">FileUtils</a></li><li><a href="GdbTokenAuthentication.html">GdbTokenAuthentication</a></li><li><a href="GetQueryPayload.html">GetQueryPayload</a></li><li><a href="GetStatementsPayload.html">GetStatementsPayload</a></li><li><a href="GraphDBServerClient.html">GraphDBServerClient</a></li><li><a href="HttpClient.html">HttpClient</a></li><li><a href="HttpRequestBuilder.html">HttpRequestBuilder</a></li><li><a href="HttpResponse.html">HttpResponse</a></li><li><a href="Iterable.html">Iterable</a></li><li><a href="JsonLDParser.html">JsonLDParser</a></li><li><a href="LoggingUtils.html">LoggingUtils</a></li><li><a href="N3Parser.html">N3Parser</a></li><li><a href="Namespace.html">Namespace</a></li><li><a href="NamespaceService.html">NamespaceService</a></li><li><a href="NQuadsParser.html">NQuadsParser</a></li><li><a href="NTriplesParser.html">NTriplesParser</a></li><li><a href="PagedResponse.html">PagedResponse</a></li><li><a href="ParserRegistry.html">ParserRegistry</a></li><li><a href="QueryPayload.html">QueryPayload</a></li><li><a href="QueryService.html">QueryService</a></li><li><a href="RDFRepositoryClient.html">RDFRepositoryClient</a></li><li><a href="RDFXmlParser.html">RDFXmlParser</a></li><li><a href="RepositoryClientConfig.html">RepositoryClientConfig</a></li><li><a href="RepositoryConfig.html">RepositoryConfig</a></li><li><a href="RepositoryService.html">RepositoryService</a></li><li><a href="ResponseIterator.html">ResponseIterator</a></li><li><a href="ServerClient.html">ServerClient</a></li><li><a href="ServerClientConfig.html">ServerClientConfig</a></li><li><a href="Service.html">Service</a></li><li><a href="ServiceRequest.html">ServiceRequest</a></li><li><a href="SparqlJsonResultParser.html">SparqlJsonResultParser</a></li><li><a href="SparqlXmlResultParser.html">SparqlXmlResultParser</a></li><li><a href="StatementPayload.html">StatementPayload</a></li><li><a href="StatementsService.html">StatementsService</a></li><li><a href="StringUtils.html">StringUtils</a></li><li><a href="TermConverter.html">TermConverter</a></li><li><a href="TransactionalRepositoryClient.html">TransactionalRepositoryClient</a></li><li><a href="TransactionService.html">TransactionService</a></li><li><a href="TriGParser.html">TriGParser</a></li><li><a href="TurtleParser.html">TurtleParser</a></li><li><a href="UpdateQueryPayload.html">UpdateQueryPayload</a></li><li><a href="UploadService.html">UploadService</a></li><li><a href="User.html">User</a></li></ul><h3>Interfaces</h3><ul><li><a href="Logger.html">Logger</a></li></ul><h3>Global</h3><ul><li><a href="global.html#Authority">Authority</a></li><li><a href="global.html#MediaType">MediaType</a></li><li><a href="global.html#PATH_NAMESPACES">PATH_NAMESPACES</a></li><li><a href="global.html#PATH_SIZE">PATH_SIZE</a></li><li><a href="global.html#PATH_STATEMENTS">PATH_STATEMENTS</a></li><li><a href="global.html#PATH_TRANSACTIONS">PATH_TRANSACTIONS</a></li><li><a href="global.html#QueryContentType">QueryContentType</a></li><li><a href="global.html#QueryLanguage">QueryLanguage</a></li><li><a href="global.html#QueryType">QueryType</a></li><li><a href="global.html#RDFMimeType">RDFMimeType</a></li><li><a href="global.html#RepositoryType">RepositoryType</a></li><li><a href="global.html#RETRIABLE_STATUSES">RETRIABLE_STATUSES</a></li><li><a href="global.html#TransactionIsolationLevel">TransactionIsolationLevel</a></li><li><a href="global.html#XSD">XSD</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="AddStatementPayload.html">AddStatementPayload</a></li><li><a href="AppSettings.html">AppSettings</a></li><li><a href="Authentication.html">Authentication</a></li><li><a href="AuthenticationFactory.html">AuthenticationFactory</a></li><li><a href="AuthenticationService.html">AuthenticationService</a></li><li><a href="BaseRepositoryClient.html">BaseRepositoryClient</a></li><li><a href="BasicAuthentication.html">BasicAuthentication</a></li><li><a href="ClientConfig.html">ClientConfig</a></li><li><a href="CommonUtils.html">CommonUtils</a></li><li><a href="ConsoleLogger.html">ConsoleLogger</a></li><li><a href="ContentParser.html">ContentParser</a></li><li><a href="DownloadService.html">DownloadService</a></li><li><a href="FileUtils.html">FileUtils</a></li><li><a href="GdbTokenAuthentication.html">GdbTokenAuthentication</a></li><li><a href="GetQueryPayload.html">GetQueryPayload</a></li><li><a href="GetStatementsPayload.html">GetStatementsPayload</a></li><li><a href="GraphDBServerClient.html">GraphDBServerClient</a></li><li><a href="HttpClient.html">HttpClient</a></li><li><a href="HttpRequestBuilder.html">HttpRequestBuilder</a></li><li><a href="HttpResponse.html">HttpResponse</a></li><li><a href="Iterable.html">Iterable</a></li><li><a href="JsonLDParser.html">JsonLDParser</a></li><li><a href="LoggingUtils.html">LoggingUtils</a></li><li><a href="N3Parser.html">N3Parser</a></li><li><a href="NQuadsParser.html">NQuadsParser</a></li><li><a href="NTriplesParser.html">NTriplesParser</a></li><li><a href="Namespace.html">Namespace</a></li><li><a href="NamespaceService.html">NamespaceService</a></li><li><a href="PagedResponse.html">PagedResponse</a></li><li><a href="ParserRegistry.html">ParserRegistry</a></li><li><a href="QueryPayload.html">QueryPayload</a></li><li><a href="QueryService.html">QueryService</a></li><li><a href="RDFRepositoryClient.html">RDFRepositoryClient</a></li><li><a href="RDFXmlParser.html">RDFXmlParser</a></li><li><a href="RepositoryClientConfig.html">RepositoryClientConfig</a></li><li><a href="RepositoryConfig.html">RepositoryConfig</a></li><li><a href="RepositoryService.html">RepositoryService</a></li><li><a href="ResponseIterator.html">ResponseIterator</a></li><li><a href="ServerClient.html">ServerClient</a></li><li><a href="ServerClientConfig.html">ServerClientConfig</a></li><li><a href="Service.html">Service</a></li><li><a href="ServiceRequest.html">ServiceRequest</a></li><li><a href="SparqlJsonResultParser.html">SparqlJsonResultParser</a></li><li><a href="SparqlXmlResultParser.html">SparqlXmlResultParser</a></li><li><a href="StatementPayload.html">StatementPayload</a></li><li><a href="StatementsService.html">StatementsService</a></li><li><a href="StringUtils.html">StringUtils</a></li><li><a href="TermConverter.html">TermConverter</a></li><li><a href="TransactionService.html">TransactionService</a></li><li><a href="TransactionalRepositoryClient.html">TransactionalRepositoryClient</a></li><li><a href="TriGParser.html">TriGParser</a></li><li><a href="TurtleParser.html">TurtleParser</a></li><li><a href="UpdateQueryPayload.html">UpdateQueryPayload</a></li><li><a href="UploadService.html">UploadService</a></li><li><a href="User.html">User</a></li></ul><h3>Interfaces</h3><ul><li><a href="Logger.html">Logger</a></li></ul><h3>Global</h3><ul><li><a href="global.html#Authority">Authority</a></li><li><a href="global.html#MediaType">MediaType</a></li><li><a href="global.html#PATH_NAMESPACES">PATH_NAMESPACES</a></li><li><a href="global.html#PATH_SIZE">PATH_SIZE</a></li><li><a href="global.html#PATH_STATEMENTS">PATH_STATEMENTS</a></li><li><a href="global.html#PATH_TRANSACTIONS">PATH_TRANSACTIONS</a></li><li><a href="global.html#QueryContentType">QueryContentType</a></li><li><a href="global.html#QueryLanguage">QueryLanguage</a></li><li><a href="global.html#QueryType">QueryType</a></li><li><a href="global.html#RDFMimeType">RDFMimeType</a></li><li><a href="global.html#RETRIABLE_STATUSES">RETRIABLE_STATUSES</a></li><li><a href="global.html#RepositoryType">RepositoryType</a></li><li><a href="global.html#TransactionIsolationLevel">TransactionIsolationLevel</a></li><li><a href="global.html#XSD">XSD</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.10</a> on Thu Jul 13 2023 16:00:22 GMT+0300 (Eastern European Summer Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.2</a> on Mon Jul 17 2023 10:14:22 GMT+0300 (Eastern European Summer Time)
 </footer>
 
 <script> prettyPrint(); </script>
