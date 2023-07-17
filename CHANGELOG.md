@@ -6,6 +6,11 @@
 * `Check the GDB server version and report mismatches if the client version implements a different version unless the check is stopped.`
 * `Support secured endpoints exposing only HTTPS`
 
+## Unreleased
+* Fix passing of credentials to the TransactionalRepositoryClient configuration, if set in the RepositoryClientConfig
+* Enable static code analysis in the Jenkins pipeline and updated GraphDB version in docker-compose file
+* Updated third party libraries and fixed vulnerabilities
+
 ## 3.0.0 (2023-03-24)
 **Breaking changes**
 This version won't work with GDB<10 due to changes in the REST API.
