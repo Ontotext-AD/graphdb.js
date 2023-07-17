@@ -40,7 +40,7 @@ pipeline {
     stage('Acceptance Test') {
       steps {
         sh "npm run build"
-        sh "sudo npm run install:local"
+        sh "npm run install:local"
         sh "wait-on http://localhost:7200/protocol -t 60000"
         sh "(cd test-e2e/ && npm install && npm link graphdb && npm run test)"
       }
