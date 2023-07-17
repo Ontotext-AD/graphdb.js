@@ -19,7 +19,7 @@
 
     <h1 class="page-title">Class: GraphDBServerClient</h1>
 
-
+    
 
 
 
@@ -27,33 +27,33 @@
 <section>
 
 <header>
-
+    
         <h2><span class="attribs"><span class="type-signature"></span></span>GraphDBServerClient<span class="signature">(config)</span><span class="type-signature"></span></h2>
-
+        
             <div class="class-description"><p>Implementation of the graphDB server operations.</p>
 <p>Used to automate the security user management API:
 add, edit, or remove users.  Also used to add, edit,
 or remove a repository to/from any attached location.
 You can work with multiple remote locations from a
 single access point.</p></div>
-
-
+        
+    
 </header>
 
 <article>
     <div class="container-overview">
+    
+        
 
-
-
-
+    
     <h2>Constructor</h2>
+    
 
-
-
+    
     <h4 class="name" id="GraphDBServerClient"><span class="type-signature"></span>new GraphDBServerClient<span class="signature">(config)</span><span class="type-signature"></span></h4>
+    
 
-
-
+    
 
 
 
@@ -66,50 +66,50 @@ single access point.</p></div>
 
 
     <h5>Parameters:</h5>
-
+    
 
 <table class="params">
     <thead>
     <tr>
-
+        
         <th>Name</th>
-
+        
 
         <th>Type</th>
 
+        
 
-
-
+        
 
         <th class="last">Description</th>
     </tr>
     </thead>
 
     <tbody>
-
+    
 
         <tr>
-
+            
                 <td class="name"><code>config</code></td>
-
+            
 
             <td class="type">
-
-
+            
+                
 <span class="param-type"><a href="ServerClientConfig.html">ServerClientConfig</a></span>
 
 
-
+            
             </td>
 
+            
 
-
-
+            
 
             <td class="description last"><p>for the server client.</p></td>
         </tr>
 
-
+    
     </tbody>
 </table>
 
@@ -120,49 +120,49 @@ single access point.</p></div>
 
 <dl class="details">
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
-
-
-
-
-
-
-
-
-
+    
     <dt class="tag-author">Author:</dt>
     <dd class="tag-author">
         <ul>
             <li>Teodossi Dossev</li>
         </ul>
     </dd>
+    
 
+    
 
+    
 
+    
 
-
-
-
-
-
+    
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
         <a href="server_graphdb-server-client.js.html">server/graphdb-server-client.js</a>, <a href="server_graphdb-server-client.js.html#line22">line 22</a>
     </li></ul></dd>
+    
 
+    
 
+    
 
-
-
-
-
+    
 </dl>
 
 
@@ -184,36 +184,36 @@ single access point.</p></div>
 
 
 
-
+    
     </div>
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
-
-
-
-
-
-
-
-
+    
         <h3 class="subsection-title">Methods</h3>
 
+        
+            
 
+    
 
-
-
-
-
+    
     <h4 class="name" id="createRepository"><span class="type-signature"></span>createRepository<span class="signature">(repositoryConfig)</span><span class="type-signature"> &rarr; {Promise.&lt;(<a href="HttpResponse.html">HttpResponse</a>|Error)>}</span></h4>
+    
 
-
-
+    
 
 
 
@@ -230,50 +230,50 @@ single access point.</p></div>
 
 
     <h5>Parameters:</h5>
-
+    
 
 <table class="params">
     <thead>
     <tr>
-
+        
         <th>Name</th>
-
+        
 
         <th>Type</th>
 
+        
 
-
-
+        
 
         <th class="last">Description</th>
     </tr>
     </thead>
 
     <tbody>
-
+    
 
         <tr>
-
+            
                 <td class="name"><code>repositoryConfig</code></td>
-
+            
 
             <td class="type">
-
-
+            
+                
 <span class="param-type"><a href="RepositoryConfig.html">RepositoryConfig</a></span>
 
 
-
+            
             </td>
 
+            
 
-
-
+            
 
             <td class="description last"></td>
         </tr>
 
-
+    
     </tbody>
 </table>
 
@@ -284,42 +284,42 @@ single access point.</p></div>
 
 <dl class="details">
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+    
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
         <a href="server_graphdb-server-client.js.html">server/graphdb-server-client.js</a>, <a href="server_graphdb-server-client.js.html#line98">line 98</a>
     </li></ul></dd>
+    
 
+    
 
+    
 
-
-
-
-
+    
 </dl>
 
 
@@ -338,7 +338,7 @@ single access point.</p></div>
 
 <h5>Returns:</h5>
 
-
+        
 <div class="param-desc">
     <p>a promise which resolves
 to response wrapper or rejects with error if thrown during execution.</p>
@@ -351,29 +351,29 @@ to response wrapper or rejects with error if thrown during execution.</p>
         Type
     </dt>
     <dd>
-
+        
 <span class="param-type">Promise.&lt;(<a href="HttpResponse.html">HttpResponse</a>|Error)></span>
 
 
     </dd>
 </dl>
 
+    
 
 
 
 
 
+        
+            
 
+    
 
-
-
-
-
-
+    
     <h4 class="name" id="createUser"><span class="type-signature"></span>createUser<span class="signature">(username, password, grantedAuthorities<span class="signature-attributes">opt</span>, appSettings<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {Promise.&lt;(<a href="HttpResponse.html">HttpResponse</a>|Error)>}</span></h4>
+    
 
-
-
+    
 
 
 
@@ -390,119 +390,119 @@ to response wrapper or rejects with error if thrown during execution.</p>
 
 
     <h5>Parameters:</h5>
-
+    
 
 <table class="params">
     <thead>
     <tr>
-
+        
         <th>Name</th>
-
+        
 
         <th>Type</th>
 
-
+        
         <th>Attributes</th>
+        
 
-
-
+        
 
         <th class="last">Description</th>
     </tr>
     </thead>
 
     <tbody>
-
+    
 
         <tr>
-
+            
                 <td class="name"><code>username</code></td>
-
+            
 
             <td class="type">
-
-
+            
+                
 <span class="param-type">string</span>
 
 
-
+            
             </td>
 
-
+            
                 <td class="attributes">
+                
 
+                
 
-
-
-
+                
                 </td>
+            
 
-
-
+            
 
             <td class="description last"><p>User name</p></td>
         </tr>
 
-
+    
 
         <tr>
-
+            
                 <td class="name"><code>password</code></td>
-
+            
 
             <td class="type">
-
-
+            
+                
 <span class="param-type">string</span>
 
 
-
+            
             </td>
 
-
+            
                 <td class="attributes">
+                
 
+                
 
-
-
-
+                
                 </td>
+            
 
-
-
+            
 
             <td class="description last"><p>User password</p></td>
         </tr>
 
-
+    
 
         <tr>
-
+            
                 <td class="name"><code>grantedAuthorities</code></td>
-
+            
 
             <td class="type">
-
-
+            
+                
 <span class="param-type">Array.&lt;string></span>
 
 
-
+            
             </td>
 
-
+            
                 <td class="attributes">
-
+                
                     &lt;optional><br>
+                
 
+                
 
-
-
-
+                
                 </td>
+            
 
-
-
+            
 
             <td class="description last"><p>Array of read and/or write access
 rights described in the following template:
@@ -510,41 +510,41 @@ rights described in the following template:
 <code>WRITE_REPO_{repository ID}</code> to grant repository write rights</p></td>
         </tr>
 
-
+    
 
         <tr>
-
+            
                 <td class="name"><code>appSettings</code></td>
-
+            
 
             <td class="type">
-
-
+            
+                
 <span class="param-type"><a href="AppSettings.html">AppSettings</a></span>
 
 
-
+            
             </td>
 
-
+            
                 <td class="attributes">
-
+                
                     &lt;optional><br>
+                
 
+                
 
-
-
-
+                
                 </td>
+            
 
-
-
+            
 
             <td class="description last"><p>configure the default behavior
 of the GraphDB Workbench</p></td>
         </tr>
 
-
+    
     </tbody>
 </table>
 
@@ -555,42 +555,42 @@ of the GraphDB Workbench</p></td>
 
 <dl class="details">
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+    
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
         <a href="server_graphdb-server-client.js.html">server/graphdb-server-client.js</a>, <a href="server_graphdb-server-client.js.html#line212">line 212</a>
     </li></ul></dd>
+    
 
+    
 
+    
 
-
-
-
-
+    
 </dl>
 
 
@@ -609,7 +609,7 @@ of the GraphDB Workbench</p></td>
 
 <h5>Returns:</h5>
 
-
+        
 <div class="param-desc">
     <p>a promise which resolves
 to response wrapper or rejects with error if thrown during execution.</p>
@@ -622,29 +622,29 @@ to response wrapper or rejects with error if thrown during execution.</p>
         Type
     </dt>
     <dd>
-
+        
 <span class="param-type">Promise.&lt;(<a href="HttpResponse.html">HttpResponse</a>|Error)></span>
 
 
     </dd>
 </dl>
 
+    
 
 
 
 
 
+        
+            
 
+    
 
-
-
-
-
-
+    
     <h4 class="name" id="deleteRepository"><span class="type-signature"></span>deleteRepository<span class="signature">(id)</span><span class="type-signature"> &rarr; {Promise.&lt;any>}</span></h4>
+    
 
-
-
+    
 
 
 
@@ -661,50 +661,50 @@ to response wrapper or rejects with error if thrown during execution.</p>
 
 
     <h5>Parameters:</h5>
-
+    
 
 <table class="params">
     <thead>
     <tr>
-
+        
         <th>Name</th>
-
+        
 
         <th>Type</th>
 
+        
 
-
-
+        
 
         <th class="last">Description</th>
     </tr>
     </thead>
 
     <tbody>
-
+    
 
         <tr>
-
+            
                 <td class="name"><code>id</code></td>
-
+            
 
             <td class="type">
-
-
+            
+                
 <span class="param-type">string</span>
 
 
-
+            
             </td>
 
+            
 
-
-
+            
 
             <td class="description last"><p>of the repository which should be deleted.</p></td>
         </tr>
 
-
+    
     </tbody>
 </table>
 
@@ -715,42 +715,42 @@ to response wrapper or rejects with error if thrown during execution.</p>
 
 <dl class="details">
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+    
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
         <a href="server_graphdb-server-client.js.html">server/graphdb-server-client.js</a>, <a href="server_graphdb-server-client.js.html#line113">line 113</a>
     </li></ul></dd>
+    
 
+    
 
+    
 
-
-
-
-
+    
 </dl>
 
 
@@ -769,7 +769,7 @@ to response wrapper or rejects with error if thrown during execution.</p>
 
 <h5>Returns:</h5>
 
-
+        
 <div class="param-desc">
     <p>promise which resolves with the delete result.</p>
 </div>
@@ -781,29 +781,29 @@ to response wrapper or rejects with error if thrown during execution.</p>
         Type
     </dt>
     <dd>
-
+        
 <span class="param-type">Promise.&lt;any></span>
 
 
     </dd>
 </dl>
 
+    
 
 
 
 
 
+        
+            
 
+    
 
-
-
-
-
-
+    
     <h4 class="name" id="deleteUser"><span class="type-signature"></span>deleteUser<span class="signature">(username)</span><span class="type-signature"> &rarr; {Promise.&lt;(<a href="HttpResponse.html">HttpResponse</a>|Error)>}</span></h4>
+    
 
-
-
+    
 
 
 
@@ -820,50 +820,50 @@ to response wrapper or rejects with error if thrown during execution.</p>
 
 
     <h5>Parameters:</h5>
-
+    
 
 <table class="params">
     <thead>
     <tr>
-
+        
         <th>Name</th>
-
+        
 
         <th>Type</th>
 
+        
 
-
-
+        
 
         <th class="last">Description</th>
     </tr>
     </thead>
 
     <tbody>
-
+    
 
         <tr>
-
+            
                 <td class="name"><code>username</code></td>
-
+            
 
             <td class="type">
-
-
+            
+                
 <span class="param-type">string</span>
 
 
-
+            
             </td>
 
+            
 
-
-
+            
 
             <td class="description last"><p>User name</p></td>
         </tr>
 
-
+    
     </tbody>
 </table>
 
@@ -874,42 +874,42 @@ to response wrapper or rejects with error if thrown during execution.</p>
 
 <dl class="details">
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+    
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
         <a href="server_graphdb-server-client.js.html">server/graphdb-server-client.js</a>, <a href="server_graphdb-server-client.js.html#line304">line 304</a>
     </li></ul></dd>
+    
 
+    
 
+    
 
-
-
-
-
+    
 </dl>
 
 
@@ -928,7 +928,7 @@ to response wrapper or rejects with error if thrown during execution.</p>
 
 <h5>Returns:</h5>
 
-
+        
 <div class="param-desc">
     <p>a promise which resolves
 to response wrapper or rejects with error if thrown during execution.</p>
@@ -941,29 +941,29 @@ to response wrapper or rejects with error if thrown during execution.</p>
         Type
     </dt>
     <dd>
-
+        
 <span class="param-type">Promise.&lt;(<a href="HttpResponse.html">HttpResponse</a>|Error)></span>
 
 
     </dd>
 </dl>
 
+    
 
 
 
 
 
+        
+            
 
+    
 
-
-
-
-
-
+    
     <h4 class="name" id="downloadRepositoryConfig"><span class="type-signature"></span>downloadRepositoryConfig<span class="signature">(repositoryId, location<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {Promise.&lt;(string|any)>}</span></h4>
+    
 
-
-
+    
 
 
 
@@ -980,93 +980,93 @@ to response wrapper or rejects with error if thrown during execution.</p>
 
 
     <h5>Parameters:</h5>
-
+    
 
 <table class="params">
     <thead>
     <tr>
-
+        
         <th>Name</th>
-
+        
 
         <th>Type</th>
 
-
+        
         <th>Attributes</th>
+        
 
-
-
+        
 
         <th class="last">Description</th>
     </tr>
     </thead>
 
     <tbody>
-
+    
 
         <tr>
-
+            
                 <td class="name"><code>repositoryId</code></td>
-
+            
 
             <td class="type">
-
-
+            
+                
 <span class="param-type">string</span>
 
 
-
+            
             </td>
 
-
+            
                 <td class="attributes">
+                
 
+                
 
-
-
-
+                
                 </td>
+            
 
-
-
+            
 
             <td class="description last"><p>the repository id</p></td>
         </tr>
 
-
+    
 
         <tr>
-
+            
                 <td class="name"><code>location</code></td>
-
+            
 
             <td class="type">
-
-
+            
+                
 <span class="param-type">string</span>
 
 
-
+            
             </td>
 
-
+            
                 <td class="attributes">
-
+                
                     &lt;optional><br>
+                
 
+                
 
-
-
-
+                
                 </td>
+            
 
-
-
+            
 
             <td class="description last"><p>optional repository location</p></td>
         </tr>
 
-
+    
     </tbody>
 </table>
 
@@ -1077,42 +1077,42 @@ to response wrapper or rejects with error if thrown during execution.</p>
 
 <dl class="details">
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+    
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
         <a href="server_graphdb-server-client.js.html">server/graphdb-server-client.js</a>, <a href="server_graphdb-server-client.js.html#line80">line 80</a>
     </li></ul></dd>
+    
 
+    
 
+    
 
-
-
-
-
+    
 </dl>
 
 
@@ -1131,7 +1131,7 @@ to response wrapper or rejects with error if thrown during execution.</p>
 
 <h5>Returns:</h5>
 
-
+        
 <div class="param-desc">
     <p>a service request that will resolve to a
 readable stream to which the client can subscribe and consume the emitted
@@ -1145,29 +1145,29 @@ strings as soon as they are available. Resolves to turtle format.</p>
         Type
     </dt>
     <dd>
-
+        
 <span class="param-type">Promise.&lt;(string|any)></span>
 
 
     </dd>
 </dl>
 
+    
 
 
 
 
 
+        
+            
 
+    
 
-
-
-
-
-
+    
     <h4 class="name" id="getDefaultConfig"><span class="type-signature"></span>getDefaultConfig<span class="signature">(repositoryType)</span><span class="type-signature"> &rarr; {Promise.&lt;(<a href="HttpResponse.html">HttpResponse</a>|Error)>}</span></h4>
+    
 
-
-
+    
 
 
 
@@ -1184,54 +1184,54 @@ strings as soon as they are available. Resolves to turtle format.</p>
 
 
     <h5>Parameters:</h5>
-
+    
 
 <table class="params">
     <thead>
     <tr>
-
+        
         <th>Name</th>
-
+        
 
         <th>Type</th>
 
+        
 
-
-
+        
 
         <th class="last">Description</th>
     </tr>
     </thead>
 
     <tbody>
-
+    
 
         <tr>
-
+            
                 <td class="name"><code>repositoryType</code></td>
-
+            
 
             <td class="type">
-
-
+            
+                
 <span class="param-type"><a href="global.html#RepositoryType">RepositoryType</a></span>
 |
 
 <span class="param-type">String</span>
 
 
-
+            
             </td>
 
+            
 
-
-
+            
 
             <td class="description last"><p>the type for which a
 default configuration is required</p></td>
         </tr>
 
-
+    
     </tbody>
 </table>
 
@@ -1242,42 +1242,42 @@ default configuration is required</p></td>
 
 <dl class="details">
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+    
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
         <a href="server_graphdb-server-client.js.html">server/graphdb-server-client.js</a>, <a href="server_graphdb-server-client.js.html#line38">line 38</a>
     </li></ul></dd>
+    
 
+    
 
+    
 
-
-
-
-
+    
 </dl>
 
 
@@ -1296,7 +1296,7 @@ default configuration is required</p></td>
 
 <h5>Returns:</h5>
 
-
+        
 <div class="param-desc">
     <p>a promise which resolves to response
 wrapper or rejects with error if thrown during execution.</p>
@@ -1309,29 +1309,29 @@ wrapper or rejects with error if thrown during execution.</p>
         Type
     </dt>
     <dd>
-
+        
 <span class="param-type">Promise.&lt;(<a href="HttpResponse.html">HttpResponse</a>|Error)></span>
 
 
     </dd>
 </dl>
 
+    
 
 
 
 
 
+        
+            
 
+    
 
-
-
-
-
-
+    
     <h4 class="name" id="getFreeAccess"><span class="type-signature"></span>getFreeAccess<span class="signature">()</span><span class="type-signature"> &rarr; {Promise.&lt;(<a href="HttpResponse.html">HttpResponse</a>|Error)>}</span></h4>
+    
 
-
-
+    
 
 
 
@@ -1353,42 +1353,42 @@ wrapper or rejects with error if thrown during execution.</p>
 
 <dl class="details">
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+    
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
         <a href="server_graphdb-server-client.js.html">server/graphdb-server-client.js</a>, <a href="server_graphdb-server-client.js.html#line191">line 191</a>
     </li></ul></dd>
+    
 
+    
 
+    
 
-
-
-
-
+    
 </dl>
 
 
@@ -1407,7 +1407,7 @@ wrapper or rejects with error if thrown during execution.</p>
 
 <h5>Returns:</h5>
 
-
+        
 <div class="param-desc">
     <p>a promise which resolves
 to response wrapper or rejects with error if thrown during execution.</p>
@@ -1420,29 +1420,29 @@ to response wrapper or rejects with error if thrown during execution.</p>
         Type
     </dt>
     <dd>
-
+        
 <span class="param-type">Promise.&lt;(<a href="HttpResponse.html">HttpResponse</a>|Error)></span>
 
 
     </dd>
 </dl>
 
+    
 
 
 
 
 
+        
+            
 
+    
 
-
-
-
-
-
+    
     <h4 class="name" id="getRepositoryConfig"><span class="type-signature"></span>getRepositoryConfig<span class="signature">(repositoryId, location<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {Promise.&lt;(<a href="HttpResponse.html">HttpResponse</a>|string|Error)>}</span></h4>
+    
 
-
-
+    
 
 
 
@@ -1459,93 +1459,93 @@ to response wrapper or rejects with error if thrown during execution.</p>
 
 
     <h5>Parameters:</h5>
-
+    
 
 <table class="params">
     <thead>
     <tr>
-
+        
         <th>Name</th>
-
+        
 
         <th>Type</th>
 
-
+        
         <th>Attributes</th>
+        
 
-
-
+        
 
         <th class="last">Description</th>
     </tr>
     </thead>
 
     <tbody>
-
+    
 
         <tr>
-
+            
                 <td class="name"><code>repositoryId</code></td>
-
+            
 
             <td class="type">
-
-
+            
+                
 <span class="param-type">string</span>
 
 
-
+            
             </td>
 
-
+            
                 <td class="attributes">
+                
 
+                
 
-
-
-
+                
                 </td>
+            
 
-
-
+            
 
             <td class="description last"><p>the repository id</p></td>
         </tr>
 
-
+    
 
         <tr>
-
+            
                 <td class="name"><code>location</code></td>
-
+            
 
             <td class="type">
-
-
+            
+                
 <span class="param-type">string</span>
 
 
-
+            
             </td>
 
-
+            
                 <td class="attributes">
-
+                
                     &lt;optional><br>
+                
 
+                
 
-
-
-
+                
                 </td>
+            
 
-
-
+            
 
             <td class="description last"><p>optional repository location</p></td>
         </tr>
 
-
+    
     </tbody>
 </table>
 
@@ -1556,42 +1556,42 @@ to response wrapper or rejects with error if thrown during execution.</p>
 
 <dl class="details">
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+    
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
         <a href="server_graphdb-server-client.js.html">server/graphdb-server-client.js</a>, <a href="server_graphdb-server-client.js.html#line58">line 58</a>
     </li></ul></dd>
+    
 
+    
 
+    
 
-
-
-
-
+    
 </dl>
 
 
@@ -1610,7 +1610,7 @@ to response wrapper or rejects with error if thrown during execution.</p>
 
 <h5>Returns:</h5>
 
-
+        
 <div class="param-desc">
     <p>a promise which resolves
 to response wrapper or rejects with error if thrown during execution.</p>
@@ -1623,29 +1623,29 @@ to response wrapper or rejects with error if thrown during execution.</p>
         Type
     </dt>
     <dd>
-
+        
 <span class="param-type">Promise.&lt;(<a href="HttpResponse.html">HttpResponse</a>|string|Error)></span>
 
 
     </dd>
 </dl>
 
+    
 
 
 
 
 
+        
+            
 
+    
 
-
-
-
-
-
+    
     <h4 class="name" id="getUser"><span class="type-signature"></span>getUser<span class="signature">(username)</span><span class="type-signature"> &rarr; {Promise.&lt;(<a href="HttpResponse.html">HttpResponse</a>|Error)>}</span></h4>
+    
 
-
-
+    
 
 
 
@@ -1662,50 +1662,50 @@ to response wrapper or rejects with error if thrown during execution.</p>
 
 
     <h5>Parameters:</h5>
-
+    
 
 <table class="params">
     <thead>
     <tr>
-
+        
         <th>Name</th>
-
+        
 
         <th>Type</th>
 
+        
 
-
-
+        
 
         <th class="last">Description</th>
     </tr>
     </thead>
 
     <tbody>
-
+    
 
         <tr>
-
+            
                 <td class="name"><code>username</code></td>
-
+            
 
             <td class="type">
-
-
+            
+                
 <span class="param-type">string</span>
 
 
-
+            
             </td>
 
+            
 
-
-
+            
 
             <td class="description last"><p>User name</p></td>
         </tr>
 
-
+    
     </tbody>
 </table>
 
@@ -1716,42 +1716,42 @@ to response wrapper or rejects with error if thrown during execution.</p>
 
 <dl class="details">
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+    
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
         <a href="server_graphdb-server-client.js.html">server/graphdb-server-client.js</a>, <a href="server_graphdb-server-client.js.html#line290">line 290</a>
     </li></ul></dd>
+    
 
+    
 
+    
 
-
-
-
-
+    
 </dl>
 
 
@@ -1770,7 +1770,7 @@ to response wrapper or rejects with error if thrown during execution.</p>
 
 <h5>Returns:</h5>
 
-
+        
 <div class="param-desc">
     <p>a promise which resolves
 to response wrapper or rejects with error if thrown during execution.</p>
@@ -1783,29 +1783,29 @@ to response wrapper or rejects with error if thrown during execution.</p>
         Type
     </dt>
     <dd>
-
+        
 <span class="param-type">Promise.&lt;(<a href="HttpResponse.html">HttpResponse</a>|Error)></span>
 
 
     </dd>
 </dl>
 
+    
 
 
 
 
 
+        
+            
 
+    
 
-
-
-
-
-
+    
     <h4 class="name" id="isSecurityEnabled"><span class="type-signature"></span>isSecurityEnabled<span class="signature">()</span><span class="type-signature"> &rarr; {Promise.&lt;(<a href="HttpResponse.html">HttpResponse</a>|Error)>}</span></h4>
+    
 
-
-
+    
 
 
 
@@ -1827,42 +1827,42 @@ to response wrapper or rejects with error if thrown during execution.</p>
 
 <dl class="details">
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+    
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
         <a href="server_graphdb-server-client.js.html">server/graphdb-server-client.js</a>, <a href="server_graphdb-server-client.js.html#line130">line 130</a>
     </li></ul></dd>
+    
 
+    
 
+    
 
-
-
-
-
+    
 </dl>
 
 
@@ -1881,7 +1881,7 @@ to response wrapper or rejects with error if thrown during execution.</p>
 
 <h5>Returns:</h5>
 
-
+        
 <div class="param-desc">
     <p>a promise which resolves
 to response wrapper or rejects with error if thrown during execution.</p>
@@ -1894,29 +1894,29 @@ to response wrapper or rejects with error if thrown during execution.</p>
         Type
     </dt>
     <dd>
-
+        
 <span class="param-type">Promise.&lt;(<a href="HttpResponse.html">HttpResponse</a>|Error)></span>
 
 
     </dd>
 </dl>
 
+    
 
 
 
 
 
+        
+            
 
+    
 
-
-
-
-
-
+    
     <h4 class="name" id="toggleSecurity"><span class="type-signature"></span>toggleSecurity<span class="signature">(enabled)</span><span class="type-signature"> &rarr; {Promise.&lt;(<a href="HttpResponse.html">HttpResponse</a>|Error)>}</span></h4>
+    
 
-
-
+    
 
 
 
@@ -1933,51 +1933,51 @@ to response wrapper or rejects with error if thrown during execution.</p>
 
 
     <h5>Parameters:</h5>
-
+    
 
 <table class="params">
     <thead>
     <tr>
-
+        
         <th>Name</th>
-
+        
 
         <th>Type</th>
 
+        
 
-
-
+        
 
         <th class="last">Description</th>
     </tr>
     </thead>
 
     <tbody>
-
+    
 
         <tr>
-
+            
                 <td class="name"><code>enabled</code></td>
-
+            
 
             <td class="type">
-
-
+            
+                
 <span class="param-type">boolean</span>
 
 
-
+            
             </td>
 
+            
 
-
-
+            
 
             <td class="description last"><p><code>true</code> if security is enabled and
 <code>false</code> otherwise.</p></td>
         </tr>
 
-
+    
     </tbody>
 </table>
 
@@ -1988,42 +1988,42 @@ to response wrapper or rejects with error if thrown during execution.</p>
 
 <dl class="details">
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+    
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
         <a href="server_graphdb-server-client.js.html">server/graphdb-server-client.js</a>, <a href="server_graphdb-server-client.js.html#line144">line 144</a>
     </li></ul></dd>
+    
 
+    
 
+    
 
-
-
-
-
+    
 </dl>
 
 
@@ -2042,7 +2042,7 @@ to response wrapper or rejects with error if thrown during execution.</p>
 
 <h5>Returns:</h5>
 
-
+        
 <div class="param-desc">
     <p>a promise which resolves
 to response wrapper or rejects with error if thrown during execution.</p>
@@ -2055,29 +2055,29 @@ to response wrapper or rejects with error if thrown during execution.</p>
         Type
     </dt>
     <dd>
-
+        
 <span class="param-type">Promise.&lt;(<a href="HttpResponse.html">HttpResponse</a>|Error)></span>
 
 
     </dd>
 </dl>
 
+    
 
 
 
 
 
+        
+            
 
+    
 
-
-
-
-
-
+    
     <h4 class="name" id="updateFreeAccess"><span class="type-signature"></span>updateFreeAccess<span class="signature">(enabled, authorities, appSettings)</span><span class="type-signature"> &rarr; {Promise.&lt;(<a href="HttpResponse.html">HttpResponse</a>|Error)>}</span></h4>
+    
 
-
-
+    
 
 
 
@@ -2100,69 +2100,69 @@ if logged in as admin.</p>
 
 
     <h5>Parameters:</h5>
-
+    
 
 <table class="params">
     <thead>
     <tr>
-
+        
         <th>Name</th>
-
+        
 
         <th>Type</th>
 
+        
 
-
-
+        
 
         <th class="last">Description</th>
     </tr>
     </thead>
 
     <tbody>
-
+    
 
         <tr>
-
+            
                 <td class="name"><code>enabled</code></td>
-
+            
 
             <td class="type">
-
-
+            
+                
 <span class="param-type">boolean</span>
 
 
-
+            
             </td>
 
+            
 
-
-
+            
 
             <td class="description last"><p><code>true</code> if free access is enabled and
 <code>false</code> otherwise.</p></td>
         </tr>
 
-
+    
 
         <tr>
-
+            
                 <td class="name"><code>authorities</code></td>
-
+            
 
             <td class="type">
-
-
+            
+                
 <span class="param-type">Array.&lt;string></span>
 
 
-
+            
             </td>
 
+            
 
-
-
+            
 
             <td class="description last"><p>Array of read and/or write access rights
 described in the following template:
@@ -2170,31 +2170,31 @@ described in the following template:
 <code>WRITE_REPO_{repository ID}</code> to grant repository write rights</p></td>
         </tr>
 
-
+    
 
         <tr>
-
+            
                 <td class="name"><code>appSettings</code></td>
-
+            
 
             <td class="type">
-
-
+            
+                
 <span class="param-type"><a href="AppSettings.html">AppSettings</a></span>
 
 
-
+            
             </td>
 
+            
 
-
-
+            
 
             <td class="description last"><p>configure the default behavior
 of the GraphDB Workbench</p></td>
         </tr>
 
-
+    
     </tbody>
 </table>
 
@@ -2205,42 +2205,42 @@ of the GraphDB Workbench</p></td>
 
 <dl class="details">
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+    
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
         <a href="server_graphdb-server-client.js.html">server/graphdb-server-client.js</a>, <a href="server_graphdb-server-client.js.html#line172">line 172</a>
     </li></ul></dd>
+    
 
+    
 
+    
 
-
-
-
-
+    
 </dl>
 
 
@@ -2259,7 +2259,7 @@ of the GraphDB Workbench</p></td>
 
 <h5>Returns:</h5>
 
-
+        
 <div class="param-desc">
     <p>a promise which resolves
 to response wrapper or rejects with error if thrown during execution.</p>
@@ -2272,29 +2272,29 @@ to response wrapper or rejects with error if thrown during execution.</p>
         Type
     </dt>
     <dd>
-
+        
 <span class="param-type">Promise.&lt;(<a href="HttpResponse.html">HttpResponse</a>|Error)></span>
 
 
     </dd>
 </dl>
 
+    
 
 
 
 
 
+        
+            
 
+    
 
-
-
-
-
-
+    
     <h4 class="name" id="updateUser"><span class="type-signature"></span>updateUser<span class="signature">(username, password<span class="signature-attributes">opt</span>, grantedAuthorities<span class="signature-attributes">opt</span>, appSettings<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {Promise.&lt;(<a href="HttpResponse.html">HttpResponse</a>|Error)>}</span></h4>
+    
 
-
-
+    
 
 
 
@@ -2314,121 +2314,121 @@ GraphDB Workbench for the user.</p>
 
 
     <h5>Parameters:</h5>
-
+    
 
 <table class="params">
     <thead>
     <tr>
-
+        
         <th>Name</th>
-
+        
 
         <th>Type</th>
 
-
+        
         <th>Attributes</th>
+        
 
-
-
+        
 
         <th class="last">Description</th>
     </tr>
     </thead>
 
     <tbody>
-
+    
 
         <tr>
-
+            
                 <td class="name"><code>username</code></td>
-
+            
 
             <td class="type">
-
-
+            
+                
 <span class="param-type">string</span>
 
 
-
+            
             </td>
 
-
+            
                 <td class="attributes">
+                
 
+                
 
-
-
-
+                
                 </td>
+            
 
-
-
+            
 
             <td class="description last"><p>User name</p></td>
         </tr>
 
-
+    
 
         <tr>
-
+            
                 <td class="name"><code>password</code></td>
-
+            
 
             <td class="type">
-
-
+            
+                
 <span class="param-type">string</span>
 
 
-
+            
             </td>
 
-
+            
                 <td class="attributes">
-
+                
                     &lt;optional><br>
+                
 
+                
 
-
-
-
+                
                 </td>
+            
 
-
-
+            
 
             <td class="description last"><p>User password</p></td>
         </tr>
 
-
+    
 
         <tr>
-
+            
                 <td class="name"><code>grantedAuthorities</code></td>
-
+            
 
             <td class="type">
-
-
+            
+                
 <span class="param-type">Array.&lt;string></span>
 
 
-
+            
             </td>
 
-
+            
                 <td class="attributes">
-
+                
                     &lt;optional><br>
+                
 
+                
 
-
-
-
+                
                 </td>
+            
 
-
-
+            
 
             <td class="description last"><p>Array of read and/or write access
 rights described in the following template:
@@ -2436,41 +2436,41 @@ rights described in the following template:
 <code>WRITE_REPO_{repository ID}</code> to grant repository write rights</p></td>
         </tr>
 
-
+    
 
         <tr>
-
+            
                 <td class="name"><code>appSettings</code></td>
-
+            
 
             <td class="type">
-
-
+            
+                
 <span class="param-type"><a href="AppSettings.html">AppSettings</a></span>
 
 
-
+            
             </td>
 
-
+            
                 <td class="attributes">
-
+                
                     &lt;optional><br>
+                
 
+                
 
-
-
-
+                
                 </td>
+            
 
-
-
+            
 
             <td class="description last"><p>configure the default behavior
 of the GraphDB Workbench</p></td>
         </tr>
 
-
+    
     </tbody>
 </table>
 
@@ -2481,42 +2481,42 @@ of the GraphDB Workbench</p></td>
 
 <dl class="details">
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+    
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
         <a href="server_graphdb-server-client.js.html">server/graphdb-server-client.js</a>, <a href="server_graphdb-server-client.js.html#line243">line 243</a>
     </li></ul></dd>
+    
 
+    
 
+    
 
-
-
-
-
+    
 </dl>
 
 
@@ -2535,7 +2535,7 @@ of the GraphDB Workbench</p></td>
 
 <h5>Returns:</h5>
 
-
+        
 <div class="param-desc">
     <p>a promise which resolves
 to response wrapper or rejects with error if thrown during execution.</p>
@@ -2548,29 +2548,29 @@ to response wrapper or rejects with error if thrown during execution.</p>
         Type
     </dt>
     <dd>
-
+        
 <span class="param-type">Promise.&lt;(<a href="HttpResponse.html">HttpResponse</a>|Error)></span>
 
 
     </dd>
 </dl>
 
+    
 
 
 
 
 
+        
+            
 
+    
 
-
-
-
-
-
+    
     <h4 class="name" id="updateUserData"><span class="type-signature"></span>updateUserData<span class="signature">(username, password<span class="signature-attributes">opt</span>, appSettings<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {Promise.&lt;(<a href="HttpResponse.html">HttpResponse</a>|Error)>}</span></h4>
+    
 
-
-
+    
 
 
 
@@ -2590,127 +2590,127 @@ GraphDB Workbench for the user.</p>
 
 
     <h5>Parameters:</h5>
-
+    
 
 <table class="params">
     <thead>
     <tr>
-
+        
         <th>Name</th>
-
+        
 
         <th>Type</th>
 
-
+        
         <th>Attributes</th>
+        
 
-
-
+        
 
         <th class="last">Description</th>
     </tr>
     </thead>
 
     <tbody>
-
+    
 
         <tr>
-
+            
                 <td class="name"><code>username</code></td>
-
+            
 
             <td class="type">
-
-
+            
+                
 <span class="param-type">string</span>
 
 
-
+            
             </td>
 
-
+            
                 <td class="attributes">
+                
 
+                
 
-
-
-
+                
                 </td>
+            
 
-
-
+            
 
             <td class="description last"><p>User name</p></td>
         </tr>
 
-
+    
 
         <tr>
-
+            
                 <td class="name"><code>password</code></td>
-
+            
 
             <td class="type">
-
-
+            
+                
 <span class="param-type">string</span>
 
 
-
+            
             </td>
 
-
+            
                 <td class="attributes">
-
+                
                     &lt;optional><br>
+                
 
+                
 
-
-
-
+                
                 </td>
+            
 
-
-
+            
 
             <td class="description last"><p>User password</p></td>
         </tr>
 
-
+    
 
         <tr>
-
+            
                 <td class="name"><code>appSettings</code></td>
-
+            
 
             <td class="type">
-
-
+            
+                
 <span class="param-type"><a href="AppSettings.html">AppSettings</a></span>
 
 
-
+            
             </td>
 
-
+            
                 <td class="attributes">
-
+                
                     &lt;optional><br>
+                
 
+                
 
-
-
-
+                
                 </td>
+            
 
-
-
+            
 
             <td class="description last"><p>configure the default behavior
 of the GraphDB Workbench</p></td>
         </tr>
 
-
+    
     </tbody>
 </table>
 
@@ -2721,42 +2721,42 @@ of the GraphDB Workbench</p></td>
 
 <dl class="details">
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
+    
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+    
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
         <a href="server_graphdb-server-client.js.html">server/graphdb-server-client.js</a>, <a href="server_graphdb-server-client.js.html#line270">line 270</a>
     </li></ul></dd>
+    
 
+    
 
+    
 
-
-
-
-
+    
 </dl>
 
 
@@ -2775,7 +2775,7 @@ of the GraphDB Workbench</p></td>
 
 <h5>Returns:</h5>
 
-
+        
 <div class="param-desc">
     <p>a promise which resolves
 to response wrapper or rejects with error if thrown during execution.</p>
@@ -2788,25 +2788,25 @@ to response wrapper or rejects with error if thrown during execution.</p>
         Type
     </dt>
     <dd>
-
+        
 <span class="param-type">Promise.&lt;(<a href="HttpResponse.html">HttpResponse</a>|Error)></span>
 
 
     </dd>
 </dl>
 
+    
 
 
 
 
 
+        
+    
 
+    
 
-
-
-
-
-
+    
 </article>
 
 </section>
@@ -2823,7 +2823,7 @@ to response wrapper or rejects with error if thrown during execution.</p>
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.2</a> on Mon Jul 17 2023 10:14:22 GMT+0300 (Eastern European Summer Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.2</a> on Mon Jul 17 2023 11:31:24 GMT+0300 (Eastern European Summer Time)
 </footer>
 
 <script> prettyPrint(); </script>
