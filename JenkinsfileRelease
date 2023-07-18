@@ -36,6 +36,10 @@ pipeline {
     timestamps()
   }
 
+  tools {
+    nodejs 'nodejs-14.17.0'
+  }
+
   environment {
     CI = "true"
     NPM_TOKEN = credentials('npm-token')
@@ -46,6 +50,9 @@ pipeline {
   stages {
     stage ('Prepare') {
       steps {
+        // show node version
+        sh "node --version"
+
         // Switch to branch
         sh "git checkout ${branch}"
 
