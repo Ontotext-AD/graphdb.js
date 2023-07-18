@@ -1,8 +1,8 @@
 const ContentParser = require('../parser/content-parser');
 const RDFMimeType = require('../http/rdf-mime-type');
 const QueryType = require('../query/query-type');
+const {SparqlJsonParser} = require('sparqljson-parse');
 const DataFactory = require('n3').DataFactory;
-import {SparqlJsonParser} from 'sparqljson-parse';
 
 /**
  * Parse a sparql tuple query json result and convert it RDFJS-based
