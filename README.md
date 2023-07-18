@@ -24,7 +24,7 @@ npm install graphdb
 The library is written in ES2016. During the build process source files `src/`
 are transpiled to ES2015 and copied to `lib/` directory.
 
-A typescript definition file `types.d.ts` is generated in the `lib/` as well.
+A typescript definition file `index.d.ts` is generated in the `lib/` as well.
 
 Documentation is generated in `docs/` from the JSDoc annotations in the source
 code.
@@ -36,7 +36,7 @@ code.
 * `lib` : Transpiled but files are built here when the library is published to npm.
 * `docs` : Documentation generated with JSDoc when the library is published to npm.
 * `src/index.js` : The library external API exporting main functional classes. This is also present in `lib`.
-* `lib/types.d.ts` : The typescript definitions generated when the library is published to npm.
+* `lib/index.d.ts` : The typescript definitions generated when the library is published to npm.
 * `scripts` : Service scripts related to building, publishing and so on.
 
 ### Setup Environment
