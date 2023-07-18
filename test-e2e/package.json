@@ -1,6 +1,6 @@
 {
   "name": "graphdb-acceptance-tests",
-  "version": "3.0.1-RC1",
+  "version": "3.0.1",
   "author": {
     "name": "\"Sirma AI\" JSC, trading as Ontotext",
     "url": "https://www.ontotext.com/"
