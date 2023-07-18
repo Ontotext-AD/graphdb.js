@@ -10,6 +10,7 @@
 * Fix passing of credentials to the TransactionalRepositoryClient configuration, if set in the RepositoryClientConfig
 * Enable static code analysis in the Jenkins pipeline and updated GraphDB version in docker-compose file
 * Updated third party libraries and fixed vulnerabilities
+* Changed TS types generation to use TypeScript
 
 ## 3.0.0 (2023-03-24)
 **Breaking changes**
