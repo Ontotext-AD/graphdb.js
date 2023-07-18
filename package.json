@@ -1,6 +1,6 @@
 {
   "name": "graphdb",
-  "version": "3.0.1",
+  "version": "3.0.1-RC1",
   "description": "Javascript client library supporting GraphDB and RDF4J REST API.",
   "author": {
     "name": "\"Sirma AI\" JSC, trading as Ontotext",
@@ -78,7 +78,6 @@
     "jsdoc": "^4.0.2",
     "sonarqube-scanner": "^2.8.0",
     "stream-mock": "^2.0.5",
-    "typescript": "^5.1.6",
     "webpack": "5.76.0",
     "webpack-cli": "^3.3.12"
   },
@@ -93,6 +92,7 @@
     "rdfxml-streaming-parser": "^1.4.0",
     "sparqljson-parse": "^1.6.0",
     "sparqlxml-parse": "^1.4.0",
+    "typescript": "^5.1.6",
     "uuid": "^3.4.0"
   }
 }
