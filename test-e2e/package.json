@@ -1,6 +1,6 @@
 {
   "name": "graphdb-acceptance-tests",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "author": {
     "name": "\"Sirma AI\" JSC, trading as Ontotext",
     "url": "https://www.ontotext.com/"
@@ -15,7 +15,7 @@
     "axios": "^0.21.4",
     "express": "^4.17.3",
     "form-data": "^2.5.1",
-    "graphdb": "^2.0.0",
+    "graphdb": "^3.0.0",
     "jest": "^28.1.1",
     "jest-junit": "^6.3.0",
     "n3": "^1.16.2"
