@@ -1,5 +1,5 @@
 const axios = require('axios');
-const uuidv4 = require('uuid/v4');
+const {v4: uuidv4} = require('uuid');
 const qs = require('qs');
 const ConsoleLogger = require('../logging/console-logger');
 
