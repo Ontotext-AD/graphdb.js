@@ -271,14 +271,14 @@ class BaseRepositoryClient {
    */
   static validateConfig(repositoryClientConfig) {
     if (!(repositoryClientConfig instanceof RepositoryClientConfig)) {
-      throw new Error('Cannot instantiate repository with unsupported config '
-        + 'type!');
+      throw new Error('Cannot instantiate repository with unsupported config ' +
+        'type!');
     }
 
     const endpoints = repositoryClientConfig.getEndpoints();
     if (!endpoints || !endpoints.length) {
-      throw new Error('Cannot instantiate a repository without repository '
-        + 'endpoint configuration! At least one endpoint must be provided.');
+      throw new Error('Cannot instantiate a repository without repository ' +
+        'endpoint configuration! At least one endpoint must be provided.');
     }
   }
 
