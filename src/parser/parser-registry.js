@@ -95,8 +95,8 @@ class ParserRegistry {
    */
   static validateParser(parser) {
     if (!parser || !(parser instanceof ContentParser)) {
-      throw new Error('Parser is not provided or does not implement'
-        + ' ContentParser!');
+      throw new Error('Parser is not provided or does not implement' +
+        ' ContentParser!');
     }
     if (!parser.getSupportedType()) {
       throw new Error('Parser type is mandatory parameter!');
