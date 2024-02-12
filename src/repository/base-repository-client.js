@@ -251,7 +251,7 @@ class BaseRepositoryClient {
    */
   static canRetryExecution(error) {
     // Not an error from the HTTP client, do not retry
-    if (!error || !error.request) {
+    if (!error?.request) {
       return false;
     }
     // The current client couldn't get a response from the server, try again
@@ -277,7 +277,7 @@ class BaseRepositoryClient {
     }
 
     const endpoints = repositoryClientConfig.getEndpoints();
-    if (!endpoints || !endpoints.length) {
+    if (!endpoints?.length) {
       throw new Error('Cannot instantiate a repository without repository ' +
         'endpoint configuration! At least one endpoint must be provided.');
     }
