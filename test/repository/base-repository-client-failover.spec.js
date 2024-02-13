@@ -3,6 +3,9 @@ const RepositoryClientConfig = require('repository/repository-client-config');
 const BaseRepositoryClient = require('repository/base-repository-client');
 const HttpRequestBuilder = require('http/http-request-builder');
 const httpClientStub = require('../http/http-client.stub');
+const userdata = require('../auth/data/logged-user-data.json');
+const User = require('../../lib/auth/user');
+import data from './data/read-statements';
 
 jest.mock('http/http-client');
 
@@ -142,6 +145,62 @@ describe('BaseRepositoryClient', () => {
       return expect(repositoryClient.execute()).rejects.toEqual(err);
     });
   });
+
+  describe('Retry execution', () => {
+    beforeEach(() => {
+      repoClientConfig = new RepositoryClientConfig('http://localhost:8083')
+        .setEndpoints([
+          'http://localhost:8081/repositories/test1',
+          'http://localhost:8082/repositories/test2',
+          'http://localhost:8083/repositories/test3'
+        ])
+        .setReadTimeout(100)
+        .setWriteTimeout(200);
+
+      HttpClient.mockImplementation(() => httpClientStub());
+
+      repositoryClient = new TestRepositoryClient(repoClientConfig);
+      requestBuilder = HttpRequestBuilder.httpGet('/service');
+    });
+
+    test('should fetch new token if server returns 401', () => {
+      const userSpy = jest.spyOn(User, 'clearToken');
+      mockClient();
+
+      return repositoryClient.execute(requestBuilder).then(() => {
+        expect(userSpy).toHaveBeenCalled();
+      });
+    });
+  });
+
+  function mockClient() {
+    let calls = 0;
+
+    repositoryClient.httpClients[0].request =
+      jest.fn().mockImplementation((request) => {
+        if (request.getMethod() === 'get') {
+          calls++;
+          if (repositoryClient.getLoggedUser() &&
+            calls === 2) {
+            // token should get deleted at this point
+            return Promise.reject({
+              response: {
+                status: 401
+              }
+            });
+          }
+          return Promise.resolve({data: data.repositories.GET});
+        } else if (request.getMethod() === 'post') {
+          return Promise.resolve({
+            headers: {
+              authorization: 'token123'
+            },
+            data: userdata
+          });
+        }
+        return Promise.reject();
+      });
+  }
 
   function stubHttpClient(client, status) {
     client.request = jest.fn();
