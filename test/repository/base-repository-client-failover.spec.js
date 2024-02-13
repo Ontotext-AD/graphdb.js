@@ -3,7 +3,6 @@ const RepositoryClientConfig = require('repository/repository-client-config');
 const BaseRepositoryClient = require('repository/base-repository-client');
 const HttpRequestBuilder = require('http/http-request-builder');
 const httpClientStub = require('../http/http-client.stub');
-const userdata = require('../auth/data/logged-user-data.json');
 const User = require('../../lib/auth/user');
 import data from './data/read-statements';
 
@@ -164,11 +163,15 @@ describe('BaseRepositoryClient', () => {
     });
 
     test('should fetch new token if server returns 401', () => {
-      const userSpy = jest.spyOn(User, 'clearToken');
+      const userTest = new User('token123', 'pass123', 'testuser123');
+      repositoryClient.setLoggedUser(userTest);
+      const userSpy = jest.spyOn(userTest, 'clearToken');
+      const httpClient = repositoryClient.httpClients[0];
       mockClient();
 
       return repositoryClient.execute(requestBuilder).then(() => {
-        expect(userSpy).toHaveBeenCalled();
+        expect(userSpy).toHaveBeenCalledTimes(1);
+        expect(httpClient.request).toHaveBeenCalledTimes(2);
       });
     });
   });
@@ -181,22 +184,22 @@ describe('BaseRepositoryClient', () => {
         if (request.getMethod() === 'get') {
           calls++;
           if (repositoryClient.getLoggedUser() &&
-            calls === 2) {
+            calls === 1) {
             // token should get deleted at this point
             return Promise.reject({
               response: {
                 status: 401
               }
             });
+          } else if (repositoryClient.getLoggedUser() &&
+            calls === 2) {
+            return Promise.resolve({
+              response: {
+                status: 200
+              }
+            });
           }
           return Promise.resolve({data: data.repositories.GET});
-        } else if (request.getMethod() === 'post') {
-          return Promise.resolve({
-            headers: {
-              authorization: 'token123'
-            },
-            data: userdata
-          });
         }
         return Promise.reject();
       });
