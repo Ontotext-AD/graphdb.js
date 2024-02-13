@@ -3,6 +3,8 @@ const RepositoryClientConfig = require('repository/repository-client-config');
 const BaseRepositoryClient = require('repository/base-repository-client');
 const HttpRequestBuilder = require('http/http-request-builder');
 const httpClientStub = require('../http/http-client.stub');
+const User = require('../../lib/auth/user');
+import data from './data/read-statements';
 
 jest.mock('http/http-client');
 
@@ -26,6 +28,18 @@ describe('BaseRepositoryClient', () => {
 
       repositoryClient = new TestRepositoryClient(repoClientConfig);
       requestBuilder = HttpRequestBuilder.httpGet('/service');
+    });
+
+    test('should throw error, if no endpoints', () => {
+      repoClientConfig = new RepositoryClientConfig('http://localhost:8083')
+        .setEndpoints([])
+        .setReadTimeout(100)
+        .setWriteTimeout(200);
+
+      expect(() => {
+        new TestRepositoryClient(repoClientConfig);
+      }).toThrow('Cannot instantiate a repository without repository ' +
+        'endpoint configuration! At least one endpoint must be provided.');
     });
 
     test('should automatically switch to another repository endpoint ' +
@@ -142,6 +156,66 @@ describe('BaseRepositoryClient', () => {
       return expect(repositoryClient.execute()).rejects.toEqual(err);
     });
   });
+
+  describe('Retry execution', () => {
+    beforeEach(() => {
+      repoClientConfig = new RepositoryClientConfig('http://localhost:8083')
+        .setEndpoints([
+          'http://localhost:8081/repositories/test1',
+          'http://localhost:8082/repositories/test2',
+          'http://localhost:8083/repositories/test3'
+        ])
+        .setReadTimeout(100)
+        .setWriteTimeout(200);
+
+      HttpClient.mockImplementation(() => httpClientStub());
+
+      repositoryClient = new TestRepositoryClient(repoClientConfig);
+      requestBuilder = HttpRequestBuilder.httpGet('/service');
+    });
+
+    test('should fetch new token if server returns 401', () => {
+      const userTest = new User('token123', 'pass123', 'testuser123');
+      repositoryClient.setLoggedUser(userTest);
+      const userSpy = jest.spyOn(userTest, 'clearToken');
+      const httpClient = repositoryClient.httpClients[0];
+      mockClient();
+
+      return repositoryClient.execute(requestBuilder).then(() => {
+        expect(userSpy).toHaveBeenCalledTimes(1);
+        expect(httpClient.request).toHaveBeenCalledTimes(2);
+      });
+    });
+  });
+
+  function mockClient() {
+    let calls = 0;
+
+    repositoryClient.httpClients[0].request =
+      jest.fn().mockImplementation((request) => {
+        if (request.getMethod() === 'get') {
+          calls++;
+          if (repositoryClient.getLoggedUser() &&
+            calls === 1) {
+            // token should get deleted at this point
+            return Promise.reject({
+              response: {
+                status: 401
+              }
+            });
+          } else if (repositoryClient.getLoggedUser() &&
+            calls === 2) {
+            return Promise.resolve({
+              response: {
+                status: 200
+              }
+            });
+          }
+          return Promise.resolve({data: data.repositories.GET});
+        }
+        return Promise.reject();
+      });
+  }
 
   function stubHttpClient(client, status) {
     client.request = jest.fn();

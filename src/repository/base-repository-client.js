@@ -182,6 +182,7 @@ class BaseRepositoryClient {
           const status = error.response ? error.response.status : null;
           const isUnauthorized = status && status === 401;
           if (isUnauthorized && this.repositoryClientConfig.getKeepAlive()) {
+            this.user.clearToken();
             // re-execute will try to re-login the user and update it
             return this.retryExecution(httpClients, requestBuilder, httpClient);
           }
@@ -250,7 +251,10 @@ class BaseRepositoryClient {
    */
   static canRetryExecution(error) {
     // Not an error from the HTTP client, do not retry
-    if (!error || !error.request) {
+    if (!error) {
+      return false;
+    }
+    if (!error.request) {
       return false;
     }
     // The current client couldn't get a response from the server, try again
@@ -276,7 +280,7 @@ class BaseRepositoryClient {
     }
 
     const endpoints = repositoryClientConfig.getEndpoints();
-    if (!endpoints || !endpoints.length) {
+    if (!endpoints || endpoints.length === 0) {
       throw new Error('Cannot instantiate a repository without repository ' +
         'endpoint configuration! At least one endpoint must be provided.');
     }
