@@ -30,6 +30,18 @@ describe('BaseRepositoryClient', () => {
       requestBuilder = HttpRequestBuilder.httpGet('/service');
     });
 
+    test('should throw error, if no endpoints', () => {
+      repoClientConfig = new RepositoryClientConfig('http://localhost:8083')
+        .setEndpoints([])
+        .setReadTimeout(100)
+        .setWriteTimeout(200);
+
+      expect(() => {
+        new TestRepositoryClient(repoClientConfig);
+      }).toThrow('Cannot instantiate a repository without repository ' +
+        'endpoint configuration! At least one endpoint must be provided.');
+    });
+
     test('should automatically switch to another repository endpoint ' +
       'if the status is allowed for retry', () => {
       const httpClient1 = repositoryClient.httpClients[0];
