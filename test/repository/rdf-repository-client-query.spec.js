@@ -219,6 +219,15 @@ describe('RDFRepositoryClient - query', () => {
       '&queryLn=sparql&infer=true&distinct=true&limit=100&offset=0&timeout=5';
     const expectedRequestConfig = HttpRequestBuilder.httpPost('')
       .setData(expectedData)
+      .setParams({
+        'distinct': true,
+        'infer': true,
+        'limit': 100,
+        'offset': 0,
+        'query': 'select * where {?s ?p ?o}',
+        'queryLn': 'sparql',
+        'timeout': 5
+      })
       .setHeaders({
         'Accept': 'application/sparql-results+json',
         'Content-Type': 'application/x-www-form-urlencoded'

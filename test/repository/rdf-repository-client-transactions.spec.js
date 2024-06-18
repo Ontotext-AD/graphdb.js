@@ -349,7 +349,9 @@ describe('RDFRepositoryClient - transactions', () => {
               'Content-Type': QueryContentType.SPARQL_QUERY
             })
             .setParams({
-              action: 'QUERY'
+              'action': 'QUERY',
+              'query': 'ask {?s ?p ?o}',
+              'timeout': 5
             })
             .setResponseType('stream');
           expect(transactionHttpRequest).toHaveBeenCalledTimes(1);

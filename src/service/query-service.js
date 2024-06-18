@@ -41,6 +41,7 @@ class QueryService extends Service {
    */
   query(payload) {
     const requestBuilder = HttpRequestBuilder.httpPost('')
+      .setParams(payload.getPayloadParams())
       .setData(payload.getParams())
       .setResponseType('stream')
       .addAcceptHeader(payload.getResponseType())
