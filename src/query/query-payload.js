@@ -97,6 +97,13 @@ class QueryPayload {
   }
 
   /**
+   * @return {{}} the entire payload.
+   */
+  getPayloadParams() {
+    return this.payload;
+  }
+
+  /**
    * Utility method which serializes a single level json object to properly
    * encoded string that can be used in a request.
    *
