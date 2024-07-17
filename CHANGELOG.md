@@ -12,6 +12,13 @@
 * Updated third party libraries and fixed vulnerabilities
 * Changed TS types generation to use TypeScript
 
+## 3.0.4 (2024-06-19)
+* When executing a query with a POST request and a valid QueryPayload, 
+regardless of the content type, the parameters will be included in the request.
+
+## 3.0.2 (2024-02-14)
+* When the back-end server returns 401, a new attempt to log in will be made, in order to fetch a new token.
+  
 ## 3.0.0 (2023-03-24)
 **Breaking changes**
 This version won't work with GDB<10 due to changes in the REST API.
