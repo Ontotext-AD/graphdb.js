@@ -46,8 +46,8 @@ describe('Manage GraphDB repositories', () => {
 
   test('Should get repo default config', () => {
     const expectedResponse = Utils.loadFile('./data/graphdb-server-client/' +
-      'expected_response_default_config_free_repo.txt');
-    return serverClient.getDefaultConfig(RepositoryType.FREE).then((response) => {
+      'expected_response_default_config.txt');
+    return serverClient.getDefaultConfig(RepositoryType.GRAPHDB).then((response) => {
       expect(response.response.data).toStrictEqual(JSON.parse(expectedResponse));
     }).catch((e) => {
       throw new Error(e);

@@ -225,7 +225,7 @@ const serverClient = new GraphDBServerClient(serverConfig);
 
 * Get repo type default config
 ```javascript
- serverClient.getDefaultConfig(RepositoryType.FREE).then((response) => {
+ serverClient.getDefaultConfig(RepositoryType.GRAPHDB).then((response) => {
     console.log(response);
  });
 ```
@@ -252,7 +252,7 @@ const serverClient = new GraphDBServerClient(serverConfig);
   // Import repository configuration class
   const {RepositoryConfig} = require('graphdb').repository;  
     // Create repository configuration
-  const config = new RepositoryConfig('repo_id', '', new Map(), '',  'Repo title', RepositoryType.FREE);
+  const config = new RepositoryConfig('repo_id', '', new Map(), '',  'Repo title', RepositoryType.GRAPHDB);
   // Use the configuration to create new repository
   serverClient.createRepository(config)
       .then(() => {
@@ -777,6 +777,15 @@ return repository.query(payload).then((stream) => {
      });
 });
 ```
+
+### GraphDB and graphdb.js Version Compatibility
+| graphdb.js | GraphDB Version |
+|------------|-----------------|
+| 1+         | 8+              |
+| 1.1+       | 9+              |
+| 2+         | 9.6+            |
+| 3+         | 10+             |
+
 
 ### License
 [LICENSE](LICENSE)

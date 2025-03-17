@@ -1,1 +1,0 @@
-{"id": null, "location": null, "params": null, "sesameType": null, "title": null, "type": "free"}
