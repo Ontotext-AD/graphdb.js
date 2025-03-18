@@ -1,0 +1,35 @@
+services:
+
+  graphdb:
+    image: docker-registry.ontotext.com/graphdb:${GDB_VERSION}
+    container_name: graphdb
+    # This will allow GraphDB to access host resources (locally running or in CI)
+    # Needed to load data from localhost (see queries.spec.js)
+#    network_mode: host
+    ports:
+      - '7200:7200'
+    networks:
+      - graphdbjsnetwork
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f -H 'Accept: text/html' ${GRAPHDB_URL}/index.html"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  e2e-tests:
+    build:
+      context: .
+      dockerfile: Dockerfile.e2e
+    container_name: e2e-tests
+    depends_on:
+      graphdb:
+        condition: service_healthy
+    networks:
+      - graphdbjsnetwork
+    environment:
+      - GRAPHDB_URL=http://graphdb:7200
+#    entrypoint: [ "sh", "-c", "sleep infinity" ]
+
+networks:
+  graphdbjsnetwork:
+    driver: bridge

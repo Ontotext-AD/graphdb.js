@@ -1,0 +1,202 @@
+@Library('ontotext-platform@v0.1.51') _
+import groovy.json.JsonOutput
+
+pipeline {
+
+  parameters {
+    gitParameter name: 'GIT_BRANCH',
+                 description: 'The branch to check out',
+                 branchFilter: 'origin/(.*)',
+                 defaultValue: 'master',
+                 selectedValue: 'DEFAULT',
+                 type: 'PT_BRANCH',
+                 listSize: '0',
+                 quickFilterEnabled: true
+
+    string name: 'RELEASE_VERSION',
+           description: 'Version to release',
+           defaultValue: ''
+
+    text name: 'RELEASE_DESCRIPTION',
+           description: 'Release description',
+           defaultValue: ''
+
+    booleanParam name: 'PRE_RELEASE',
+           description: 'This is a pre-release. Will not publish to npm if selected',
+           defaultValue: false
+  }
+
+  agent {
+      label 'aws-small'
+  }
+
+  options {
+    disableConcurrentBuilds()
+    timeout(time: 15, unit: 'MINUTES')
+    timestamps()
+  }
+
+  tools {
+    nodejs 'nodejs-18.9.0'
+  }
+
+  environment {
+    API_URL = "https://api.github.com/repos/Ontotext-AD/graphdb.js"
+  }
+
+  stages {
+    stage ('Prepare') {
+      steps {
+        script {
+          git_cmd.checkout(branch: params.GIT_BRANCH)
+          npm.prepareRelease(version: params.RELEASE_VERSION, scripts: ['build'])
+          npm.prepareRelease(version: params.RELEASE_VERSION, dir: "test-e2e/")
+        }
+      }
+    }
+
+    stage ('Publish') {
+      steps {
+        withKsm(
+          application: [
+            [
+              credentialsId: 'ksm-jenkins',
+              secrets: [
+                [destination: 'env', envVar: 'NPM_TOKEN', filePath: '', notation: 'keeper://FcbEgbi287PN2yx_3uCz4Q/field/note']
+              ]
+            ]
+          ]
+        ) {
+          script {
+            if (params.PRE_RELEASE == false) {
+              sh "echo //registry.npmjs.org/:_authToken=${NPM_TOKEN} > .npmrc"
+              sh "npm publish"
+            }
+          }
+        }
+      }
+    }
+  }
+
+  post {
+    success {
+      dir("${env.WORKSPACE}") {
+        sh "rm -f .npmrc"
+        withKsm(application: [
+          [
+            credentialsId: 'ksm-jenkins',
+            secrets: [
+              [destination: 'env', envVar: 'GIT_USER', filePath: '', notation: 'keeper://8hm1g9HCfBPgoWAmpiHn6w/field/login'],
+              [destination: 'env', envVar: 'GIT_TOKEN', filePath: '', notation: 'keeper://BsykE_Za61bPoY8a1KwH_Q/field/note']
+            ]
+          ]
+        ]) {
+          // Commit, tag and push the changes in Git
+          sh "git commit -a -m 'Release ${params.RELEASE_VERSION}'"
+          sh "git tag -a v${params.RELEASE_VERSION} -m 'Release v${params.RELEASE_VERSION}'"
+
+          sh 'mkdir -p ~/.ssh'
+          sh 'ssh-keyscan github.com >> ~/.ssh/known_hosts'
+
+          sh 'git config --global user.name "$GIT_USER"'
+          sh 'git config --global user.email "$GIT_USER@users.noreply.github.com"'
+
+          sh 'git remote set-url origin git@github.com:Ontotext-AD/graphdb.js.git'
+          sh "git push --set-upstream origin '${params.GIT_BRANCH}'"
+          sh "git push --tags"
+
+          script {
+            def latest = getLatestReleaseTagName()
+            echo "Last revision ${latest}"
+
+            def gitMessages = getReleaseMessagesFromGit(latest)
+            echo "Recent merge commit messages collected"
+
+            def result = postRelease(composeReleaseMessage(gitMessages), "$GIT_TOKEN")
+            echo result
+          }
+        }
+      }
+    }
+
+    failure {
+      dir("${env.WORKSPACE}") {
+        wrap([$class: 'BuildUser']) {
+          sendMail(env.BUILD_USER_EMAIL)
+        }
+      }
+    }
+
+    always {
+      dir("${env.WORKSPACE}") {
+        sh "rm -f .npmrc"
+      }
+    }
+  }
+}
+
+// Latest revision tag name getter
+def getLatestReleaseTagName() {
+  def latest = readJSON text: sh(script: 'curl -H "Accept: application/vnd.github.v3+json" -H "Authorization: Bearer $GIT_TOKEN" $API_URL/releases/latest', returnStdout: true)
+  return latest.tag_name
+}
+
+// Merge commit messages getter
+// Returns commit messages between given commit tag and master
+def getReleaseMessagesFromGit(String latest) {
+  def response = sh(script: "curl -H \"Accept: application/vnd.github.v3+json\" -H \"Authorization: Bearer $GIT_TOKEN\" ${env.API_URL}/compare/${latest}...master", returnStdout: true)
+  def resp = readJSON text: response
+
+  def commits = resp.commits
+  def message = ""
+  def matcher = "Merge pull request #"
+  for(commit in commits) {
+    if(commit.commit.message != null && commit.commit.message.startsWith(matcher)) {
+      // Remove unnecessary repetitive merge descriptions
+      def commitMessage = commit.commit.message.substring(matcher.length() - 1)
+      message += newlineToHtml("* ${commitMessage}")
+    }
+  }
+  return message
+}
+
+// Composes final release message from jenkins build configuration, github commit messages and environment variables
+def composeReleaseMessage(String gitMessages) {
+   def message = ""
+   def releaseDescription = newlineToHtml(params.RELEASE_DESCRIPTION)
+   wrap([$class: 'BuildUser']) {
+      message = "${releaseDescription} <br/> ${gitMessages} <br/> Released on ${new Date().format('yyyy/MM/dd HH:mm', TimeZone.getTimeZone('UTC'))} UTC by ${env.BUILD_USER}"
+    }
+  return message
+}
+
+// Post release to github
+// returns response from the operation
+def postRelease(String desc, String auth) {
+  def body = [
+    tag_name: "v${params.RELEASE_VERSION}",
+    target_commitish: "${params.GIT_BRANCH}",
+    name: "v${params.RELEASE_VERSION}",
+    body: desc,
+    draft: false,
+    prerelease: params.PRE_RELEASE
+  ]
+
+  def json = JsonOutput.toJson(body)
+  writeFile file: 'release.json', text: json
+
+  def curlCommand = "curl -X POST -H \"Accept: application/vnd.github.v3+json\" -H \"Authorization: Bearer ${auth}\" --data @release.json ${API_URL}/releases"
+  return sh(script: curlCommand, returnStdout: true)
+}
+
+// New line symbol to html br tag converter.
+def newlineToHtml(String desc) {
+  def description = ""
+
+  def lines = desc.tokenize("\n")
+  for (line in lines) {
+    description += line
+    description += "<br/>"
+  }
+  return description
+}

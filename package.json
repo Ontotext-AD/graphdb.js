@@ -53,7 +53,7 @@
     "node": ">=14.17.0"
   },
   "scripts": {
-    "build": "node scripts/build.js && npm run doc && npm run tsd",
+    "build": "node ./scripts/build.js && npm run doc && npm run tsd",
     "prepare": "npm run build",
     "test": "jest",
     "test:watch": "jest --watch",
@@ -66,15 +66,16 @@
     "install:local": "npm pack && npm install -g ./$npm_package_name-$npm_package_version.tgz",
     "install:e2e": "cd test-e2e/ && npm clean-install && npm link graphdb",
     "e2e:local": "npm run install:local && npm run install:e2e",
-    "e2e:run": "npm run e2e:local && cd test-e2e/ && npm run test"
+    "e2e:run": "npm run e2e:local && cd test-e2e/ && npm run test:single",
+    "e2e:test:docker": "sh ./scripts/run-e2e.sh"
   },
   "devDependencies": {
     "@babel/core": "^7.26.10",
     "@babel/preset-env": "^7.26.9",
     "cross-env": "^7.0.3",
     "eslint": "^8.57.1",
-    "eslint-plugin-no-only-tests": "^3.3.0",
     "eslint-config-google": "^0.14.0",
+    "eslint-plugin-no-only-tests": "^3.3.0",
     "jest": "^29.7.0",
     "jsdoc": "^4.0.4",
     "minimist": "^1.2.8",

@@ -1,0 +1,12 @@
+FROM node:18-alpine
+
+WORKDIR /app/test-e2e
+
+COPY test-e2e ./
+
+RUN npm install
+
+COPY graphdb-*.tgz ./
+RUN PACKAGE=$(find . -name "graphdb-*.tgz") && npm install $PACKAGE
+
+CMD ["npm", "run", "test"]

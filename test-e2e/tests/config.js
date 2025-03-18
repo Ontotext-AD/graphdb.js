@@ -4,7 +4,7 @@ const {ServerClientConfig} = require('graphdb').server;
 const {RepositoryClientConfig} = require('graphdb').repository;
 
 // Variables used in tests
-const serverAddress = 'http://localhost:7200';
+const serverAddress = process.env.GRAPHDB_URL || 'http://localhost:7200';
 const testRepoPath = './tests/data/repositories/GDB/repository1.ttl';
 const testRepo2Path = './tests/data/repositories/GDB/repository2.ttl';
 
