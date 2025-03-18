@@ -9,6 +9,7 @@
   "license": "Apache-2.0",
   "scripts": {
     "test": "jest --runInBand --config=jest-e2e.config.js",
+    "test:single": "jest --runInBand --config=jest-e2e.config.js -- tests/graphdb-server-client/manage-repositories.spec.js",
     "debug": "node --inspect-brk node_modules/.bin/jest --runInBand --config=jest-e2e.config.js"
   },
   "devDependencies": {

@@ -53,7 +53,7 @@
     "node": ">=8.16.0"
   },
   "scripts": {
-    "build": "node scripts/build.js && npm run doc && npm run tsd",
+    "build": "node ./scripts/build.js && npm run doc && npm run tsd",
     "prepare": "npm run build",
     "test": "jest",
     "test:watch": "jest --watch",
@@ -63,10 +63,11 @@
     "lint:test": "eslint --no-eslintrc --config .eslintrc-test ./test",
     "doc": "jsdoc -c jsdoc.conf.json",
     "tsd": "tsc",
-    "install:local": "npm pack && npm install -g ./$npm_package_name-$npm_package_version.tgz",
+    "install:local": "npm pack && npm link",
     "install:e2e": "cd test-e2e/ && npm clean-install && npm link graphdb",
     "e2e:local": "npm run install:local && npm run install:e2e",
-    "e2e:run": "npm run e2e:local && cd test-e2e/ && npm run test"
+    "e2e:run": "npm run e2e:local && cd test-e2e/ && npm run test:single",
+    "e2e:test:docker": "sh ./scripts/run-e2e.sh"
   },
   "devDependencies": {
     "@babel/core": "^7.23.7",
