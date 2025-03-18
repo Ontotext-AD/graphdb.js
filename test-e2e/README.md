@@ -13,7 +13,7 @@ through the NPM registry similarly to all other dependencies
 required dependencies.
 * Make sure that you have a running GraphDB instance accessible on 
 `localhost:7200`. You can run one using the `docker-compose.yml` in the same
-directory by executing: `docker-compose up`.
+directory by executing: `GRAPHDB_VERSION=10.8.4 docker compose -f docker-compose.yml up -d`.
 * Run the tests with `npm run test`.
  
 > Important note: For local development, you need to publish and install the 
