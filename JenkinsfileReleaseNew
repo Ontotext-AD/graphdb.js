@@ -1,0 +1,210 @@
+@Library('ontotext-platform@v0.1.49') _
+
+pipeline {
+
+  parameters {
+    gitParameter name: 'GIT_BRANCH',
+                 description: 'The branch to check out',
+                 branchFilter: 'origin/(.*)',
+                 defaultValue: 'master',
+                 selectedValue: 'DEFAULT',
+                 type: 'PT_BRANCH',
+                 listSize: '0',
+                 quickFilterEnabled: true
+
+    string name: 'RELEASE_VERSION',
+           description: 'Version to release',
+           defaultValue: ''
+
+    text name: 'RELEASE_DESCRIPTION',
+           description: 'Release description',
+           defaultValue: ''
+
+    booleanParam name: 'PRE_RELEASE',
+           description: 'This is a pre-release. Will not publish to npm if selected',
+           defaultValue: false
+
+    string name: 'JENKINS_CREDENTIAL_ID',
+           description: 'Jenkins credential ID'
+  }
+
+  agent {
+      label 'aws-small'
+  }
+
+  options {
+    disableConcurrentBuilds()
+    timeout(time: 15, unit: 'MINUTES')
+    timestamps()
+  }
+
+  tools {
+    nodejs 'nodejs-18.9.0'
+  }
+
+  environment {
+    // CI = "true"
+    // NPM_TOKEN = credentials('npm-token')
+    API_URL = "https://api.github.com/repos/Ontotext-AD/graphdb.js"
+    // AUTH = credentials("${params.JENKINS_CREDENTIAL_ID}")
+  }
+
+  stages {
+    stage ('Prepare') {
+      steps {
+        // show node version
+        sh "node --version"
+
+        echo "Checking out branch: ${params.GIT_BRANCH}"
+
+        // Switch to branch
+        sh "git checkout ${params.GIT_BRANCH}"
+
+        // Change versions
+        sh "npm version --git-tag-version=false --allow-same-version=true ${params.RELEASE_VERSION}"
+        dir("test-e2e/") {
+          sh "npm version --git-tag-version=false --allow-same-version=true ${params.RELEASE_VERSION}"
+        }
+
+        // Install
+        sh "npm ci"
+
+        // Build
+        sh "npm run build"
+      }
+    }
+
+    stage ('Publish') {
+      steps {
+        withKsm(
+          application: [
+            [
+              credentialsId: 'ksm-jenkins',
+              secrets: [
+                [destination: 'env', envVar: 'NPM_TOKEN', filePath: '', notation: 'keeper://FcbEgbi287PN2yx_3uCz4Q/field/note']
+              ]
+            ]
+          ]
+        ) {
+          script {
+            if (params.PRE_RELEASE == false) {
+              sh "echo //registry.npmjs.org/:_authToken=${NPM_TOKEN} > .npmrc"
+              sh "npm publish"
+            }
+          }
+        }
+      }
+    }
+  }
+
+  post {
+    success {
+      node('aws-small') {
+        // Commit, tag and push the changes in Git
+        sh "git commit -a -m 'Release ${params.RELEASE_VERSION}'"
+        sh "git tag -a v${params.RELEASE_VERSION} -m 'Release v${params.RELEASE_VERSION}'"
+
+        withKsm(application: [
+          [
+            credentialsId: 'ksm-jenkins',
+            secrets: [
+              [destination: 'env', envVar: 'GIT_USER', filePath: '', notation: 'keeper://8hm1g9HCfBPgoWAmpiHn6w/field/login'],
+              [destination: 'env', envVar: 'GIT_TOKEN', filePath: '', notation: 'keeper://8hm1g9HCfBPgoWAmpiHn6w/field/password']
+            ]
+          ]
+        ]) {
+          sh 'mkdir -p ~/.ssh'
+          sh 'ssh-keyscan github.com >> ~/.ssh/known_hosts'
+
+          sh 'git config --global user.name "$GIT_USER"'
+          sh 'git config --global user.email "$GIT_USER@users.noreply.github.com"'
+
+          sh 'git remote set-url origin git@github.com:Ontotext-AD/graphdb.js.git'
+          sh "git push --set-upstream origin ${params.GIT_BRANCH}"
+          sh "git fetch --all"
+          sh "git reset --hard origin/${params.GIT_BRANCH}"
+          // sh "git pull --rebase origin ${params.GIT_BRANCH}"
+          sh "git push --tags"
+
+          script {
+            def latest = getLatestReleaseTagName()
+            echo "Last revision ${latest}"
+
+            def gitMessages = getReleaseMessagesFromGit(latest)
+            echo "Recent merge commit messages collected"
+
+            def result = postRelease(composeReleaseMessage(gitMessages), "$GIT_TOKEN")
+            echo result
+          }
+        }
+      }
+    }
+
+    failure {
+      node('aws-small') {
+        wrap([$class: 'BuildUser']) {
+          sendMail(env.BUILD_USER_EMAIL)
+        }
+      }
+    }
+
+    always {
+      node('aws-small') {
+        sh "rm -f .npmrc"
+      }
+    }
+  }
+}
+
+// Latest revision tag name getter
+def getLatestReleaseTagName() {
+  def latest = readJSON text: sh(script: 'curl -H \"Accept: application/vnd.github.v3+json\" ${API_URL}/releases/latest', returnStdout: true)
+  return latest.tag_name
+}
+
+// Merge commit messages getter
+// Returns commit messages between given commit tag and master
+def getReleaseMessagesFromGit(String latest) {
+  def response = sh(script: "curl -H \"Accept: application/vnd.github.v3+json\" ${API_URL}/compare/${latest}...master", returnStdout: true)
+  def resp = readJSON text: response
+
+  def commits = resp.commits
+  def message = ""
+  def matcher = "Merge pull request #"
+  for(commit in commits) {
+    if(commit.commit.message != null && commit.commit.message.startsWith(matcher)) {
+      // Remove unnecessary repetitive merge descriptions
+      def commitMessage = commit.commit.message.substring(matcher.length() - 1)
+      message += newlineToHtml("* ${commitMessage}")
+    }
+  }
+  return message
+}
+
+// Composes final release message from jenkins build configuration, github commit messages and environment variables
+def composeReleaseMessage(String gitMessages) {
+   def message = ""
+   def releaseDescription = newlineToHtml(params.RELEASE_DESCRIPTION)
+   wrap([$class: 'BuildUser']) {
+      message = "${params.RELEASE_DESCRIPTION} <br/> ${gitMessages} <br/> Released on ${new Date().format("yyyy/MM/dd HH:mm", TimeZone.getTimeZone('UTC'))} UTC by ${env.BUILD_USER}"
+    }
+  return message
+}
+
+// Post release to github
+// returns response from the operation
+def postRelease(String desc, String auth) {
+  return sh(script: "curl -X POST -H \"Accept: application/vnd.github.v3+json\" -H \"Authorization: token ${auth}\" --data '{\"tag_name\": \"v${params.RELEASE_VERSION}\", \"target_commitish\": \"${params.GIT_BRANCH}\", \"name\": \"v${params.RELEASE_VERSION}\", \"body\": \"${desc}\", \"draft\": false, \"prerelease\": ${params.PRE_RELEASE}}' ${API_URL}/releases" , returnStdout: true)
+}
+
+// New line symbol to html br tag converter.
+def newlineToHtml(String desc) {
+  def description = ""
+
+  def lines = desc.tokenize("\n")
+  for (line in lines) {
+    description += line
+    description += "<br/>"
+  }
+  return description
+}
