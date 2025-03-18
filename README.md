@@ -10,7 +10,7 @@ A GraphDB and RDF4J data access library written in JavaScript to be used in Node
 ## Installation
 
 ### Prerequisites
-* Node >= 8
+* Node >= 8, tested up to v18
 * NPM ([npm](https://npmjs.org/))
 
 ```
@@ -19,15 +19,13 @@ npm install graphdb
 
 ## Development
 
-*Library documentation* can be found [here](https://ontotext-ad.github.io/graphdb.js/)
-
 The library is written in ES2016. During the build process source files `src/`
 are transpiled to ES2015 and copied to `lib/` directory.
 
 A typescript definition file `index.d.ts` is generated in the `lib/` as well.
 
 Documentation is generated in `docs/` from the JSDoc annotations in the source
-code.
+code. Source code documentation can be found [here](https://ontotext-ad.github.io/graphdb.js/)
 
 ### Project Structure
 
@@ -41,49 +39,39 @@ code.
 
 ### Setup Environment
 
-* Checkout or clone the project.
-* Make sure prerequisites are covered: node js and npm must be present and versions
-should be supported.
-* Enter the project directory and execute
-
-```
-npm install
-```
+* Make sure prerequisites are covered: node.js and npm must be present and versions should be supported.
+* Clone the project from GitHub.
+* In project root directory and execute `npm install` to install all dependencies. Do the same in `test-e2e` directory.
 
 ### Running Tests
-After any change the tests should be run and check if any existing functionality
-is not broken in result.
 
-```
-npm run test
-```
+The library has two types of tests: unit tests and e2e tests. Both are written with Jest.
 
-or constantly watching for changes in source files and tests and re-execute the 
-test suite
+#### Unit Tests
+After any change the tests should be run and check if any existing functionality is not broken in result. To do so, run
+`npm run test`. This will run all tests in the `test` directory.
 
-```
-npm run test:watch
-```
+It is sometimes more convenient to run the tests in watch mode in which the tests are run every time a file is changed. 
+To do so, run `npm run test:watch`.
 
-### Running e2e test locally
-This will pack the project locally, install it and run all e2e test against it.
-```
-npm run e2e:run
-```
+#### e2e tests
 
-or run a single e2e spec file
-```
-npm run e2e:run -t '{test_file_name.spec.js}'
-```
+All e2e tests are run against a local GraphDB instance. The tests are located in the `test-e2e` directory and can be run
+with the following command from the project root `npm run e2e:run`. This command will pack the project locally, install 
+it and run all e2e tests against it. A graphdb instance must be running on `http://localhost:7200`. Using the 
+`docker-compose.yml` file, a GraphDB instance can be started with the following command `docker-compose up -d --build`.
+
+During development, it might be useful to run only a single test file. This can be done with the following command
+`npm run e2e:run -t '{test_file_name.spec.js}` or the `npm run test:single` command from the `test-e2e` package.
+
+For convenience, there is a command that can be used to do a dry build and run all tests in a docker container. This can
+be done with the following command `npm run e2e:test:docker`. The command will build the project, start an instance of
+GraphDB and run all e2e tests against it the same way as the library is tested in the CI pipeline.
 
 ### Checking the codestyle
 
-The library uses Google [style](https://google.github.io/styleguide/jsguide.html) 
-in conjunction with ESLint's recommended ruleset.
-
-```
-npm run lint
-```
+The library uses Google [style](https://google.github.io/styleguide/jsguide.html) in conjunction with ESLint's recommended ruleset. The codestyle can be checked with
+the following command `npm run lint`
 
 ### Testing the packaging
 
@@ -99,6 +87,10 @@ Furture the archive could be used as a source for `npm install` where the path
 pointing the archive is provided.
 
 ### Publishing
+
+The library is published to npmjs.com. The publishing process is automated and the version is increased automatically.
+
+Below are steps for manual publishing (usually this should not be needed):
 
 * Increase the package version.
 ```
@@ -649,7 +641,7 @@ Deleting data during a transaction is different than the one in
 `RDFRepositoryClient`, it expects RDF data document instead of statements 
 filter parameters.
 
-Currently it supports only Turtle or TriG formatted RDF data:
+Currently, it supports only Turtle or TriG formatted RDF data:
 ```javascript
 const turtlePath = __dirname + '/statements.ttl';
 const turtleData = fs.readFileSync(turtlePath, 'utf8');
@@ -698,7 +690,7 @@ Repository operations like create, edit, delete, shutdown are not supported by t
 
 #### GDB token
 
-If the library is going to be used agains a secured server, then all API calls must be authenticated by sending an http authorization header with a token which is obtained after a call to `rest/login/user_name` with a password provided as a specific header.
+If the library is going to be used against a secured server, then all API calls must be authenticated by sending an http authorization header with a token which is obtained after a call to `rest/login/user_name` with a password provided as a specific header.
 
 In case the server requires that requests should be authenticated, then in the `ServerClientConfig` and `RepositoryClientConfig` must be configured the `username` and `password` which to be used for the authentication. If those are provided, then the client assumes that authentication is mandatory and the login with the provided credentials is performed authomatically before the first API call. After a successful login, user details which are received and the JWT auth token are stored in the `AuthenticationService`. From that moment on, with every API call is sent also an `authorization` header with the GDB token as value.
 ##### ServerClient
@@ -735,7 +727,8 @@ If the GDB token expires, then the first API call will be rejected with an http 
 > **Note:**  
 > GDB token is serialized as “Authorization: GDB” header in every request, so it is vulnerable to a man-in-the-middle attack. Everyone who intercepts the GDB token can reuse the session. To prevent this, we recommend to always enable encryption in transit.
 
-#### Basic Authentication¶
+#### Basic Authentication
+
 Instead of using GDB token, users can access secured GraphDB by passing valid base-64 encoded username:password combinations as a header.
 In case Basic authentication will be used, then the headers in the `ServerClientConfig` and `RepositoryClientConfig` must be configured to send the `username` and `password` which to be used for the authentication. From this moment on, with every API call is sent also an `authorization` header with the encoded credentials as value.
 ```javascript
@@ -746,6 +739,7 @@ config.useBasicAuthentication('admin', 'root');
 > Basic Authentication is even more vulnerable to man-in-the-middle attacks than GDB token! Anyone who intercepts your requests will be able to reuse your credentials indefinitely until you change them. Since the credentials are merely base-64 encoded, they will also get your username and password. This is why it is very important to always use encryption in transit.
 
 ##### Disable authentication
+
 If necessary, authentication can be disabled in the configuration. 
 ```javascript
 config.disableAuthentication();
@@ -814,6 +808,7 @@ For SELECT query results in `json` and `xml` formats as well as boolean results 
 * `application/sparql-results+json`, `text/boolean`: SparqlJsonResultParser ([sparqljson-parse](https://github.com/rubensworks/sparqljson-parse.js))
 
 ### rdf*/sparql*
+
  The library provides basic support of extend RDF with a notion of nested triples, also known as [reification](https://www.w3.org/TR/rdf-mt/#Reif).
  Parsers for RDFStar triples are planned for next versions.
  
