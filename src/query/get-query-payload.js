@@ -47,50 +47,21 @@ const QUERY_TO_RESPONSE_TYPE_FORMATS_MAPPING = {
 };
 
 /**
- * Payload object holding common request parameters applicable for the query
- * endpoint.
+ * Payload object holding common request parameters applicable for
+ * the query endpoint and SPARQL query as well.
  *
- * Mandatory parameters are: query, queryType and responseType. Validation on
- * parameters is executed when <code>QueryPayload.getParams()</code> is invoked.
+ * The SPARQL query and parameters "queryType" and "responseType" are mandatory
  *
- * Content type parameter which is used for setting the Content-Type http header
- * is optional and by default
- * <code>application/x-www-form-urlencoded</code> type is set.
+ * The content type parameter, which is used for setting the HTTP Content-Type
+ * header, can be one of the following:
+ *  - <code>application/x-www-form-urlencoded</code>
+ *  - <code>application/sparql-query</code>
  *
  * @class
  * @author Mihail Radkov
  * @author Svilen Velikov
  */
 class GetQueryPayload extends QueryPayload {
-  /**
-   * Does basic initialization.
-   */
-  constructor() {
-    super();
-    this.contentType = QueryContentType.X_WWW_FORM_URLENCODED;
-  }
-
-  /**
-   * @param {string} query The query as string to be evaluated.
-   * @return {UpdateQueryPayload}
-   * @throws {Error} if the query is not a string
-   */
-  setQuery(query) {
-    if (typeof query !== 'string') {
-      throw new Error('Query must be a string!');
-    }
-
-    this.payload.query = query;
-    return this;
-  }
-
-  /**
-   * @return {string} a query which was populated in the payload.
-   */
-  getQuery() {
-    return this.payload.query;
-  }
-
   /**
    * @param {string} [queryLn] the query language that is used for the query.
    * @return {GetQueryPayload}
@@ -103,7 +74,7 @@ class GetQueryPayload extends QueryPayload {
       throw new Error(`Query language must be one of ${supportedLanguages}!`);
     }
 
-    this.payload.queryLn = queryLn;
+    this.params.queryLn = queryLn;
     return this;
   }
 
@@ -123,7 +94,7 @@ class GetQueryPayload extends QueryPayload {
       throw new Error('Binding and value must be strings!');
     }
 
-    this.payload[binding] = value;
+    this.params[binding] = value;
     return this;
   }
 
@@ -138,7 +109,7 @@ class GetQueryPayload extends QueryPayload {
       throw new Error('Distinct must be a boolean!');
     }
 
-    this.payload.distinct = distinct;
+    this.params.distinct = distinct;
     return this;
   }
 
@@ -153,7 +124,7 @@ class GetQueryPayload extends QueryPayload {
       throw new Error('Limit must be a non negative number!');
     }
 
-    this.payload.limit = limit;
+    this.params.limit = limit;
     return this;
   }
 
@@ -167,18 +138,15 @@ class GetQueryPayload extends QueryPayload {
       throw new Error('Offset must be a non negative number!');
     }
 
-    this.payload.offset = offset;
+    this.params.offset = offset;
     return this;
   }
 
   /**
    * @inheritDoc
-   * @throws {Error} if the validation does not pass
    */
-  validateParams() {
-    if (!this.payload.query) {
-      throw new Error('Parameter query is mandatory!');
-    }
+  validatePayload() {
+    super.validatePayload();
     if (!this.getQueryType()) {
       throw new Error('Parameter queryType is mandatory!');
     }
@@ -195,8 +163,6 @@ class GetQueryPayload extends QueryPayload {
       throw new Error(`Invalid responseType=${responseType}
       for ${this.getQueryType()} query! Must be one of ${allowedFormats}`);
     }
-
-    return true;
   }
 
   /**

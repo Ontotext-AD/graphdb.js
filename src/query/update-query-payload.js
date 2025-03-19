@@ -12,9 +12,10 @@ const UPDATE_QUERY_OPERATION_TYPES = [
  *
  * The query is mandatory parameter.
  *
- * Content type parameter which is used for setting the Content-Type http header
- * is optional and by default
- * <code>application/sparql-update</code> type is set.
+ * The content type parameter, which is used for setting the HTTP Content-Type
+ * header, can be one of the following:
+ *  - <code>application/x-www-form-urlencoded</code>
+ *  - <code>application/sparql-update</code>
  *
  * @class
  * @author Mihail Radkov
@@ -30,32 +31,12 @@ class UpdateQueryPayload extends QueryPayload {
   }
 
   /**
-   * @param {string} query The query as string to be evaluated.
-   * @return {UpdateQueryPayload}
-   */
-  setQuery(query) {
-    if (typeof query !== 'string') {
-      throw new Error('Query must be a string!');
-    }
-
-    this.payload.update = query;
-    return this;
-  }
-
-  /**
-   * @return {string} a query which was populated in the payload.
-   */
-  getQuery() {
-    return this.payload.update;
-  }
-
-  /**
    * One or more named graph URIs to be used as default graph(s) for retrieving.
    * @param {(string|string[])} [defaultGraphs]
    * @return {UpdateQueryPayload}
    */
   setDefaultGraphs(defaultGraphs) {
-    this.payload['using-graph-uri'] = defaultGraphs;
+    this.params['using-graph-uri'] = defaultGraphs;
     return this;
   }
 
@@ -63,7 +44,7 @@ class UpdateQueryPayload extends QueryPayload {
    * @return {(string|string[])} Default graphs for the query for retrieving.
    */
   getDefaultGraphs() {
-    return this.payload['using-graph-uri'];
+    return this.params['using-graph-uri'];
   }
 
   /**
@@ -72,7 +53,7 @@ class UpdateQueryPayload extends QueryPayload {
    * @return {UpdateQueryPayload}
    */
   setNamedGraphs(namedGraphs) {
-    this.payload['using-named-graph-uri'] = namedGraphs;
+    this.params['using-named-graph-uri'] = namedGraphs;
     return this;
   }
 
@@ -80,7 +61,7 @@ class UpdateQueryPayload extends QueryPayload {
    * @return {(string|string[])} Named graphs set for the query for retrieving.
    */
   getNamedGraphs() {
-    return this.payload['using-named-graph-uri'];
+    return this.params['using-named-graph-uri'];
   }
 
   /**
@@ -89,7 +70,7 @@ class UpdateQueryPayload extends QueryPayload {
    * @return {UpdateQueryPayload}
    */
   setRemoveGraphs(removeGraphs) {
-    this.payload['remove-graph-uri'] = removeGraphs;
+    this.params['remove-graph-uri'] = removeGraphs;
     return this;
   }
 
@@ -97,7 +78,7 @@ class UpdateQueryPayload extends QueryPayload {
    * @return {(string|string[])} Default graphs set for the query for removing.
    */
   getRemoveGraphs() {
-    return this.payload['remove-graph-uri'];
+    return this.params['remove-graph-uri'];
   }
 
   /**
@@ -106,7 +87,7 @@ class UpdateQueryPayload extends QueryPayload {
    * @return {UpdateQueryPayload}
    */
   setInsertGraphs(insertGraphs) {
-    this.payload['insert-graph-uri'] = insertGraphs;
+    this.params['insert-graph-uri'] = insertGraphs;
     return this;
   }
 
@@ -114,16 +95,7 @@ class UpdateQueryPayload extends QueryPayload {
    * @return {(string|string[])} Default graphs set for the query for inserting.
    */
   getInsertGraphs() {
-    return this.payload['insert-graph-uri'];
-  }
-  /**
-   * @inheritDoc
-   */
-  validateParams() {
-    if (!this.payload.update) {
-      throw new Error('Parameter query is mandatory!');
-    }
-    return true;
+    return this.params['insert-graph-uri'];
   }
 
   /**

@@ -96,50 +96,26 @@ describe('GetQueryPayload', () => {
     test('should throw error when contentType=sparql-query and query is missing', () => {
       const payload = new GetQueryPayload()
         .setContentType(QueryContentType.SPARQL_QUERY);
-      expect(() => payload.getParams()).toThrow(Error('Parameter query is mandatory!'));
-    });
-
-    test('should return the query parameter only when contentType=sparql-query', () => {
-      const payload = new GetQueryPayload()
-        .setContentType(QueryContentType.SPARQL_QUERY)
-        .setQuery('select * where {?s ?p ?o} limit 10');
-      expect(payload.getParams()).toEqual('select * where {?s ?p ?o} limit 10');
-    });
-
-    test('should serialize and return populated parameters in the payload object when contentType=x-www-form-urlencoded', () => {
-      const payload = new GetQueryPayload()
-        .setQuery('select * where {<http://eunis.eea.europa.eu/countries/NO> ?p ?o}')
-        .setQueryType(QueryType.SELECT)
-        .setResponseType(RDFMimeType.SPARQL_RESULTS_JSON)
-        .setQueryLn(QueryLanguage.SPARQL)
-        .setInference(true)
-        .setDistinct(true)
-        .setLimit(10)
-        .setOffset(0)
-        .setTimeout(5)
-        .addBinding('$p', 'http://ns#type')
-        .addBinding('$o', 'http://ns#Person');
-
-      expect(payload.getParams()).toEqual('query=select%20*%20where%20%7B%3Chttp%3A%2F%2Feunis.eea.europa.eu%2Fcountries%2FNO%3E%20%3Fp%20%3Fo%7D&queryLn=sparql&infer=true&distinct=true&limit=10&offset=0&timeout=5&%24p=http%3A%2F%2Fns%23type&%24o=http%3A%2F%2Fns%23Person');
+      expect(() => payload.validatePayload()).toThrow(Error('Parameter query is mandatory!'));
     });
 
     test('should throw error if query is missing', () => {
       const payload = new GetQueryPayload()
         .setQueryType(QueryType.SELECT);
-      expect(() => payload.getParams()).toThrow(Error('Parameter query is mandatory!'));
+      expect(() => payload.validatePayload()).toThrow(Error('Parameter query is mandatory!'));
     });
 
     test('should throw error if queryType is missing', () => {
       const payload = new GetQueryPayload()
         .setQuery('select * where {<http://eunis.eea.europa.eu/countries/NO> ?p ?o}');
-      expect(() => payload.getParams()).toThrow(Error('Parameter queryType is mandatory!'));
+      expect(() => payload.validatePayload()).toThrow(Error('Parameter queryType is mandatory!'));
     });
 
     test('should throw error if responseType is missing', () => {
       const payload = new GetQueryPayload()
         .setQuery('select * where {<http://eunis.eea.europa.eu/countries/NO> ?p ?o}')
         .setQueryType(QueryType.SELECT);
-      expect(() => payload.getParams()).toThrow(Error('Parameter responseType is mandatory!'));
+      expect(() => payload.validatePayload()).toThrow(Error('Parameter responseType is mandatory!'));
     });
 
     test('should throw error if responseType is not compatible with the SELECT queryType', () => {
@@ -147,7 +123,7 @@ describe('GetQueryPayload', () => {
         .setQuery('select * where {<http://eunis.eea.europa.eu/countries/NO> ?p ?o}')
         .setQueryType(QueryType.SELECT)
         .setResponseType(RDFMimeType.TURTLE);
-      expect(() => payload.getParams()).toThrowError();
+      expect(() => payload.validatePayload()).toThrowError();
     });
 
     test('should throw error if responseType is not compatible with the CONSTRUCT queryType', () => {
@@ -155,7 +131,7 @@ describe('GetQueryPayload', () => {
         .setQuery('construct {?s ?p ?o} where {?s ?p ?o}')
         .setQueryType(QueryType.CONSTRUCT)
         .setResponseType(RDFMimeType.SPARQL_RESULTS_JSON);
-      expect(() => payload.getParams()).toThrowError();
+      expect(() => payload.validatePayload()).toThrowError();
     });
 
     test('should throw error if responseType is not compatible with the DESCRIBE queryType', () => {
@@ -163,7 +139,7 @@ describe('GetQueryPayload', () => {
         .setQuery('PREFIX books: <http://www.example/book/>\n DESCRIBE books:book6')
         .setQueryType(QueryType.DESCRIBE)
         .setResponseType(RDFMimeType.SPARQL_RESULTS_JSON);
-      expect(() => payload.getParams()).toThrowError();
+      expect(() => payload.validatePayload()).toThrowError();
     });
 
     test('should throw error if responseType is not compatible with the АSК queryType', () => {
@@ -171,7 +147,7 @@ describe('GetQueryPayload', () => {
         .setQuery('ask {?s ?p ?o}')
         .setQueryType(QueryType.ASK)
         .setResponseType(RDFMimeType.BINARY_RDF_RESULTS_TABLE);
-      expect(() => payload.getParams()).toThrowError();
+      expect(() => payload.validatePayload()).toThrowError();
     });
   });
 

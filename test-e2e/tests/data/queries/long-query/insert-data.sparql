@@ -1,0 +1,204 @@
+ PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+ PREFIX ex: <http://example.com/resource/>
+    INSERT DATA {
+      <http://example.com/resource/resource1> <http://www.w3.org/2000/01/rdf-schema#label> "Resource 1" .
+      <http://example.com/resource/resource1> <http://example.com/hasValue> "1" .
+      <http://example.com/resource/resource2> <http://www.w3.org/2000/01/rdf-schema#label> "Resource 2" .
+      <http://example.com/resource/resource2> <http://example.com/hasValue> "2" .
+      <http://example.com/resource/resource3> <http://www.w3.org/2000/01/rdf-schema#label> "Resource 3" .
+      <http://example.com/resource/resource3> <http://example.com/hasValue> "3" .
+      <http://example.com/resource/resource4> <http://www.w3.org/2000/01/rdf-schema#label> "Resource 4" .
+      <http://example.com/resource/resource4> <http://example.com/hasValue> "4" .
+      <http://example.com/resource/resource5> <http://www.w3.org/2000/01/rdf-schema#label> "Resource 5" .
+      <http://example.com/resource/resource5> <http://example.com/hasValue> "5" .
+      <http://example.com/resource/resource6> <http://www.w3.org/2000/01/rdf-schema#label> "Resource 6" .
+      <http://example.com/resource/resource6> <http://example.com/hasValue> "6" .
+      <http://example.com/resource/resource7> <http://www.w3.org/2000/01/rdf-schema#label> "Resource 7" .
+      <http://example.com/resource/resource7> <http://example.com/hasValue> "7" .
+      <http://example.com/resource/resource8> <http://www.w3.org/2000/01/rdf-schema#label> "Resource 8" .
+      <http://example.com/resource/resource8> <http://example.com/hasValue> "8" .
+      <http://example.com/resource/resource9> <http://www.w3.org/2000/01/rdf-schema#label> "Resource 9" .
+      <http://example.com/resource/resource9> <http://example.com/hasValue> "9" .
+      <http://example.com/resource/resource10> <http://www.w3.org/2000/01/rdf-schema#label> "Resource 10" .
+      <http://example.com/resource/resource10> <http://example.com/hasValue> "10" .
+      <http://example.com/resource/resource11> <http://www.w3.org/2000/01/rdf-schema#label> "Resource 11" .
+      <http://example.com/resource/resource11> <http://example.com/hasValue> "11" .
+      <http://example.com/resource/resource12> <http://www.w3.org/2000/01/rdf-schema#label> "Resource 12" .
+      <http://example.com/resource/resource12> <http://example.com/hasValue> "12" .
+      <http://example.com/resource/resource13> <http://www.w3.org/2000/01/rdf-schema#label> "Resource 13" .
+      <http://example.com/resource/resource13> <http://example.com/hasValue> "13" .
+      <http://example.com/resource/resource14> <http://www.w3.org/2000/01/rdf-schema#label> "Resource 14" .
+      <http://example.com/resource/resource14> <http://example.com/hasValue> "14" .
+      <http://example.com/resource/resource15> <http://www.w3.org/2000/01/rdf-schema#label> "Resource 15" .
+      <http://example.com/resource/resource15> <http://example.com/hasValue> "15" .
+      <http://example.com/resource/resource16> <http://www.w3.org/2000/01/rdf-schema#label> "Resource 16" .
+      <http://example.com/resource/resource16> <http://example.com/hasValue> "16" .
+      <http://example.com/resource/resource17> <http://www.w3.org/2000/01/rdf-schema#label> "Resource 17" .
+      <http://example.com/resource/resource17> <http://example.com/hasValue> "17" .
+      <http://example.com/resource/resource18> <http://www.w3.org/2000/01/rdf-schema#label> "Resource 18" .
+      <http://example.com/resource/resource18> <http://example.com/hasValue> "18" .
+      <http://example.com/resource/resource19> <http://www.w3.org/2000/01/rdf-schema#label> "Resource 19" .
+      <http://example.com/resource/resource19> <http://example.com/hasValue> "19" .
+      <http://example.com/resource/resource20> <http://www.w3.org/2000/01/rdf-schema#label> "Resource 20" .
+      <http://example.com/resource/resource20> <http://example.com/hasValue> "20" .
+      <http://example.com/resource/resource21> <http://www.w3.org/2000/01/rdf-schema#label> "Resource 21" .
+      <http://example.com/resource/resource21> <http://example.com/hasValue> "21" .
+      <http://example.com/resource/resource22> <http://www.w3.org/2000/01/rdf-schema#label> "Resource 22" .
+      <http://example.com/resource/resource22> <http://example.com/hasValue> "22" .
+      <http://example.com/resource/resource23> <http://www.w3.org/2000/01/rdf-schema#label> "Resource 23" .
+      <http://example.com/resource/resource23> <http://example.com/hasValue> "23" .
+      <http://example.com/resource/resource24> <http://www.w3.org/2000/01/rdf-schema#label> "Resource 24" .
+      <http://example.com/resource/resource24> <http://example.com/hasValue> "24" .
+      <http://example.com/resource/resource25> <http://www.w3.org/2000/01/rdf-schema#label> "Resource 25" .
+      <http://example.com/resource/resource25> <http://example.com/hasValue> "25" .
+      <http://example.com/resource/resource26> <http://www.w3.org/2000/01/rdf-schema#label> "Resource 26" .
+      <http://example.com/resource/resource26> <http://example.com/hasValue> "26" .
+      <http://example.com/resource/resource27> <http://www.w3.org/2000/01/rdf-schema#label> "Resource 27" .
+      <http://example.com/resource/resource27> <http://example.com/hasValue> "27" .
+      <http://example.com/resource/resource28> <http://www.w3.org/2000/01/rdf-schema#label> "Resource 28" .
+      <http://example.com/resource/resource28> <http://example.com/hasValue> "28" .
+      <http://example.com/resource/resource29> <http://www.w3.org/2000/01/rdf-schema#label> "Resource 29" .
+      <http://example.com/resource/resource29> <http://example.com/hasValue> "29" .
+      <http://example.com/resource/resource30> <http://www.w3.org/2000/01/rdf-schema#label> "Resource 30" .
+      <http://example.com/resource/resource30> <http://example.com/hasValue> "30" .
+      <http://example.com/resource/resource31> <http://www.w3.org/2000/01/rdf-schema#label> "Resource 31" .
+      <http://example.com/resource/resource31> <http://example.com/hasValue> "31" .
+      <http://example.com/resource/resource32> <http://www.w3.org/2000/01/rdf-schema#label> "Resource 32" .
+      <http://example.com/resource/resource32> <http://example.com/hasValue> "32" .
+      <http://example.com/resource/resource33> <http://www.w3.org/2000/01/rdf-schema#label> "Resource 33" .
+      <http://example.com/resource/resource33> <http://example.com/hasValue> "33" .
+      <http://example.com/resource/resource34> <http://www.w3.org/2000/01/rdf-schema#label> "Resource 34" .
+      <http://example.com/resource/resource34> <http://example.com/hasValue> "34" .
+      <http://example.com/resource/resource35> <http://www.w3.org/2000/01/rdf-schema#label> "Resource 35" .
+      <http://example.com/resource/resource35> <http://example.com/hasValue> "35" .
+      <http://example.com/resource/resource36> <http://www.w3.org/2000/01/rdf-schema#label> "Resource 36" .
+      <http://example.com/resource/resource36> <http://example.com/hasValue> "36" .
+      <http://example.com/resource/resource37> <http://www.w3.org/2000/01/rdf-schema#label> "Resource 37" .
+      <http://example.com/resource/resource37> <http://example.com/hasValue> "37" .
+      <http://example.com/resource/resource38> <http://www.w3.org/2000/01/rdf-schema#label> "Resource 38" .
+      <http://example.com/resource/resource38> <http://example.com/hasValue> "38" .
+      <http://example.com/resource/resource39> <http://www.w3.org/2000/01/rdf-schema#label> "Resource 39" .
+      <http://example.com/resource/resource39> <http://example.com/hasValue> "39" .
+      <http://example.com/resource/resource40> <http://www.w3.org/2000/01/rdf-schema#label> "Resource 40" .
+      <http://example.com/resource/resource40> <http://example.com/hasValue> "40" .
+      <http://example.com/resource/resource41> <http://www.w3.org/2000/01/rdf-schema#label> "Resource 41" .
+      <http://example.com/resource/resource41> <http://example.com/hasValue> "41" .
+      <http://example.com/resource/resource42> <http://www.w3.org/2000/01/rdf-schema#label> "Resource 42" .
+      <http://example.com/resource/resource42> <http://example.com/hasValue> "42" .
+      <http://example.com/resource/resource43> <http://www.w3.org/2000/01/rdf-schema#label> "Resource 43" .
+      <http://example.com/resource/resource43> <http://example.com/hasValue> "43" .
+      <http://example.com/resource/resource44> <http://www.w3.org/2000/01/rdf-schema#label> "Resource 44" .
+      <http://example.com/resource/resource44> <http://example.com/hasValue> "44" .
+      <http://example.com/resource/resource45> <http://www.w3.org/2000/01/rdf-schema#label> "Resource 45" .
+      <http://example.com/resource/resource45> <http://example.com/hasValue> "45" .
+      <http://example.com/resource/resource46> <http://www.w3.org/2000/01/rdf-schema#label> "Resource 46" .
+      <http://example.com/resource/resource46> <http://example.com/hasValue> "46" .
+      <http://example.com/resource/resource47> <http://www.w3.org/2000/01/rdf-schema#label> "Resource 47" .
+      <http://example.com/resource/resource47> <http://example.com/hasValue> "47" .
+      <http://example.com/resource/resource48> <http://www.w3.org/2000/01/rdf-schema#label> "Resource 48" .
+      <http://example.com/resource/resource48> <http://example.com/hasValue> "48" .
+      <http://example.com/resource/resource49> <http://www.w3.org/2000/01/rdf-schema#label> "Resource 49" .
+      <http://example.com/resource/resource49> <http://example.com/hasValue> "49" .
+      <http://example.com/resource/resource50> <http://www.w3.org/2000/01/rdf-schema#label> "Resource 50" .
+      <http://example.com/resource/resource50> <http://example.com/hasValue> "50" .
+      <http://example.com/resource/resource51> <http://www.w3.org/2000/01/rdf-schema#label> "Resource 51" .
+      <http://example.com/resource/resource51> <http://example.com/hasValue> "51" .
+      <http://example.com/resource/resource52> <http://www.w3.org/2000/01/rdf-schema#label> "Resource 52" .
+      <http://example.com/resource/resource52> <http://example.com/hasValue> "52" .
+      <http://example.com/resource/resource53> <http://www.w3.org/2000/01/rdf-schema#label> "Resource 53" .
+      <http://example.com/resource/resource53> <http://example.com/hasValue> "53" .
+      <http://example.com/resource/resource54> <http://www.w3.org/2000/01/rdf-schema#label> "Resource 54" .
+      <http://example.com/resource/resource54> <http://example.com/hasValue> "54" .
+      <http://example.com/resource/resource55> <http://www.w3.org/2000/01/rdf-schema#label> "Resource 55" .
+      <http://example.com/resource/resource55> <http://example.com/hasValue> "55" .
+      <http://example.com/resource/resource56> <http://www.w3.org/2000/01/rdf-schema#label> "Resource 56" .
+      <http://example.com/resource/resource56> <http://example.com/hasValue> "56" .
+      <http://example.com/resource/resource57> <http://www.w3.org/2000/01/rdf-schema#label> "Resource 57" .
+      <http://example.com/resource/resource57> <http://example.com/hasValue> "57" .
+      <http://example.com/resource/resource58> <http://www.w3.org/2000/01/rdf-schema#label> "Resource 58" .
+      <http://example.com/resource/resource58> <http://example.com/hasValue> "58" .
+      <http://example.com/resource/resource59> <http://www.w3.org/2000/01/rdf-schema#label> "Resource 59" .
+      <http://example.com/resource/resource59> <http://example.com/hasValue> "59" .
+      <http://example.com/resource/resource60> <http://www.w3.org/2000/01/rdf-schema#label> "Resource 60" .
+      <http://example.com/resource/resource60> <http://example.com/hasValue> "60" .
+      <http://example.com/resource/resource61> <http://www.w3.org/2000/01/rdf-schema#label> "Resource 61" .
+      <http://example.com/resource/resource61> <http://example.com/hasValue> "61" .
+      <http://example.com/resource/resource62> <http://www.w3.org/2000/01/rdf-schema#label> "Resource 62" .
+      <http://example.com/resource/resource62> <http://example.com/hasValue> "62" .
+      <http://example.com/resource/resource63> <http://www.w3.org/2000/01/rdf-schema#label> "Resource 63" .
+      <http://example.com/resource/resource63> <http://example.com/hasValue> "63" .
+      <http://example.com/resource/resource64> <http://www.w3.org/2000/01/rdf-schema#label> "Resource 64" .
+      <http://example.com/resource/resource64> <http://example.com/hasValue> "64" .
+      <http://example.com/resource/resource65> <http://www.w3.org/2000/01/rdf-schema#label> "Resource 65" .
+      <http://example.com/resource/resource65> <http://example.com/hasValue> "65" .
+      <http://example.com/resource/resource66> <http://www.w3.org/2000/01/rdf-schema#label> "Resource 66" .
+      <http://example.com/resource/resource66> <http://example.com/hasValue> "66" .
+      <http://example.com/resource/resource67> <http://www.w3.org/2000/01/rdf-schema#label> "Resource 67" .
+      <http://example.com/resource/resource67> <http://example.com/hasValue> "67" .
+      <http://example.com/resource/resource68> <http://www.w3.org/2000/01/rdf-schema#label> "Resource 68" .
+      <http://example.com/resource/resource68> <http://example.com/hasValue> "68" .
+      <http://example.com/resource/resource69> <http://www.w3.org/2000/01/rdf-schema#label> "Resource 69" .
+      <http://example.com/resource/resource69> <http://example.com/hasValue> "69" .
+      <http://example.com/resource/resource70> <http://www.w3.org/2000/01/rdf-schema#label> "Resource 70" .
+      <http://example.com/resource/resource70> <http://example.com/hasValue> "70" .
+      <http://example.com/resource/resource71> <http://www.w3.org/2000/01/rdf-schema#label> "Resource 71" .
+      <http://example.com/resource/resource71> <http://example.com/hasValue> "71" .
+      <http://example.com/resource/resource72> <http://www.w3.org/2000/01/rdf-schema#label> "Resource 72" .
+      <http://example.com/resource/resource72> <http://example.com/hasValue> "72" .
+      <http://example.com/resource/resource73> <http://www.w3.org/2000/01/rdf-schema#label> "Resource 73" .
+      <http://example.com/resource/resource73> <http://example.com/hasValue> "73" .
+      <http://example.com/resource/resource74> <http://www.w3.org/2000/01/rdf-schema#label> "Resource 74" .
+      <http://example.com/resource/resource74> <http://example.com/hasValue> "74" .
+      <http://example.com/resource/resource75> <http://www.w3.org/2000/01/rdf-schema#label> "Resource 75" .
+      <http://example.com/resource/resource75> <http://example.com/hasValue> "75" .
+      <http://example.com/resource/resource76> <http://www.w3.org/2000/01/rdf-schema#label> "Resource 76" .
+      <http://example.com/resource/resource76> <http://example.com/hasValue> "76" .
+      <http://example.com/resource/resource77> <http://www.w3.org/2000/01/rdf-schema#label> "Resource 77" .
+      <http://example.com/resource/resource77> <http://example.com/hasValue> "77" .
+      <http://example.com/resource/resource78> <http://www.w3.org/2000/01/rdf-schema#label> "Resource 78" .
+      <http://example.com/resource/resource78> <http://example.com/hasValue> "78" .
+      <http://example.com/resource/resource79> <http://www.w3.org/2000/01/rdf-schema#label> "Resource 79" .
+      <http://example.com/resource/resource79> <http://example.com/hasValue> "79" .
+      <http://example.com/resource/resource80> <http://www.w3.org/2000/01/rdf-schema#label> "Resource 80" .
+      <http://example.com/resource/resource80> <http://example.com/hasValue> "80" .
+      <http://example.com/resource/resource81> <http://www.w3.org/2000/01/rdf-schema#label> "Resource 81" .
+      <http://example.com/resource/resource81> <http://example.com/hasValue> "81" .
+      <http://example.com/resource/resource82> <http://www.w3.org/2000/01/rdf-schema#label> "Resource 82" .
+      <http://example.com/resource/resource82> <http://example.com/hasValue> "82" .
+      <http://example.com/resource/resource83> <http://www.w3.org/2000/01/rdf-schema#label> "Resource 83" .
+      <http://example.com/resource/resource83> <http://example.com/hasValue> "83" .
+      <http://example.com/resource/resource84> <http://www.w3.org/2000/01/rdf-schema#label> "Resource 84" .
+      <http://example.com/resource/resource84> <http://example.com/hasValue> "84" .
+      <http://example.com/resource/resource85> <http://www.w3.org/2000/01/rdf-schema#label> "Resource 85" .
+      <http://example.com/resource/resource85> <http://example.com/hasValue> "85" .
+      <http://example.com/resource/resource86> <http://www.w3.org/2000/01/rdf-schema#label> "Resource 86" .
+      <http://example.com/resource/resource86> <http://example.com/hasValue> "86" .
+      <http://example.com/resource/resource87> <http://www.w3.org/2000/01/rdf-schema#label> "Resource 87" .
+      <http://example.com/resource/resource87> <http://example.com/hasValue> "87" .
+      <http://example.com/resource/resource88> <http://www.w3.org/2000/01/rdf-schema#label> "Resource 88" .
+      <http://example.com/resource/resource88> <http://example.com/hasValue> "88" .
+      <http://example.com/resource/resource89> <http://www.w3.org/2000/01/rdf-schema#label> "Resource 89" .
+      <http://example.com/resource/resource89> <http://example.com/hasValue> "89" .
+      <http://example.com/resource/resource90> <http://www.w3.org/2000/01/rdf-schema#label> "Resource 90" .
+      <http://example.com/resource/resource90> <http://example.com/hasValue> "90" .
+      <http://example.com/resource/resource91> <http://www.w3.org/2000/01/rdf-schema#label> "Resource 91" .
+      <http://example.com/resource/resource91> <http://example.com/hasValue> "91" .
+      <http://example.com/resource/resource92> <http://www.w3.org/2000/01/rdf-schema#label> "Resource 92" .
+      <http://example.com/resource/resource92> <http://example.com/hasValue> "92" .
+      <http://example.com/resource/resource93> <http://www.w3.org/2000/01/rdf-schema#label> "Resource 93" .
+      <http://example.com/resource/resource93> <http://example.com/hasValue> "93" .
+      <http://example.com/resource/resource94> <http://www.w3.org/2000/01/rdf-schema#label> "Resource 94" .
+      <http://example.com/resource/resource94> <http://example.com/hasValue> "94" .
+      <http://example.com/resource/resource95> <http://www.w3.org/2000/01/rdf-schema#label> "Resource 95" .
+      <http://example.com/resource/resource95> <http://example.com/hasValue> "95" .
+      <http://example.com/resource/resource96> <http://www.w3.org/2000/01/rdf-schema#label> "Resource 96" .
+      <http://example.com/resource/resource96> <http://example.com/hasValue> "96" .
+      <http://example.com/resource/resource97> <http://www.w3.org/2000/01/rdf-schema#label> "Resource 97" .
+      <http://example.com/resource/resource97> <http://example.com/hasValue> "97" .
+      <http://example.com/resource/resource98> <http://www.w3.org/2000/01/rdf-schema#label> "Resource 98" .
+      <http://example.com/resource/resource98> <http://example.com/hasValue> "98" .
+      <http://example.com/resource/resource99> <http://www.w3.org/2000/01/rdf-schema#label> "Resource 99" .
+      <http://example.com/resource/resource99> <http://example.com/hasValue> "99" .
+      <http://example.com/resource/resource100> <http://www.w3.org/2000/01/rdf-schema#label> "Resource 100" .
+      <http://example.com/resource/resource100> <http://example.com/hasValue> "100" .
+ }

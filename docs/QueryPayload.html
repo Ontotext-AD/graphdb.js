@@ -30,8 +30,10 @@
     
         <h2><span class="attribs"><span class="type-signature">(abstract) </span></span>QueryPayload<span class="signature">()</span><span class="type-signature"></span></h2>
         
-            <div class="class-description"><p>Base class from which all query payload classes derives. Successors must
-implement <code>#validateParams</code> and <code>#getSupportedContentTypes</code>.</p></div>
+            <div class="class-description"><p>Base class from which all query payload classes derives.
+Subclasses must implement <code>#getSupportedContentTypes</code>
+and may override <code>#validatePayload</code> if additional validation is needed
+according to the subclass.</p></div>
         
     
 </header>
@@ -107,7 +109,7 @@ implement <code>#validateParams</code> and <code>#getSupportedContentTypes</code
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="query_query-payload.js.html">query/query-payload.js</a>, <a href="query_query-payload.js.html#line12">line 12</a>
+        <a href="query_query-payload.js.html">query/query-payload.js</a>, <a href="query_query-payload.js.html#line14">line 14</a>
     </li></ul></dd>
     
 
@@ -152,6 +154,232 @@ implement <code>#validateParams</code> and <code>#getSupportedContentTypes</code
 
     
 
+    
+        <h3 class="subsection-title">Members</h3>
+
+        
+            
+<h4 class="name" id="contentType"><span class="type-signature"></span>contentType<span class="type-signature"> :string</span></h4>
+
+
+
+
+<div class="description">
+    <p>Holds the content type value to be used in the request to the query
+endpoint. This value will be set as the HTTP 'Content-Type' header when
+sending the request. The value is one of the <a href="global.html#QueryContentType"><code>QueryContentType</code></a>
+enum values.</p>
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">string</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="query_query-payload.js.html">query/query-payload.js</a>, <a href="query_query-payload.js.html#line41">line 41</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="params"><span class="type-signature"></span>params<span class="type-signature"> :Object</span></h4>
+
+
+
+
+<div class="description">
+    <p>Holds common request parameters applicable to the query endpoint.</p>
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">Object</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="query_query-payload.js.html">query/query-payload.js</a>, <a href="query_query-payload.js.html#line24">line 24</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="query"><span class="type-signature"></span>query<span class="type-signature"> :string|undefined</span></h4>
+
+
+
+
+<div class="description">
+    <p>Holds the SPARQL query to be used in the request to the query endpoint.</p>
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">string</span>
+|
+
+<span class="param-type">undefined</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="query_query-payload.js.html">query/query-payload.js</a>, <a href="query_query-payload.js.html#line31">line 31</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
     
 
     
@@ -211,7 +439,7 @@ implement <code>#validateParams</code> and <code>#getSupportedContentTypes</code
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="query_query-payload.js.html">query/query-payload.js</a>, <a href="query_query-payload.js.html#line70">line 70</a>
+        <a href="query_query-payload.js.html">query/query-payload.js</a>, <a href="query_query-payload.js.html#line95">line 95</a>
     </li></ul></dd>
     
 
@@ -240,7 +468,8 @@ implement <code>#validateParams</code> and <code>#getSupportedContentTypes</code
 
         
 <div class="param-desc">
-    <p>content type which was populated in this payload.</p>
+    <p>content type which was populated in this payload.
+The value is one of the <a href="global.html#QueryContentType"><code>QueryContentType</code></a> enum values.</p>
 </div>
 
 
@@ -269,121 +498,7 @@ implement <code>#validateParams</code> and <code>#getSupportedContentTypes</code
     
 
     
-    <h4 class="name" id="getParams"><span class="type-signature"></span>getParams<span class="signature">()</span><span class="type-signature"> &rarr; {string}</span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    <p>Serializes all query parameters populated in the payload. Only parameters
-which are present will be returned.</p>
-<p>Mandatory and dependent parameters are validated and errors are thrown if
-necessary.</p>
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="query_query-payload.js.html">query/query-payload.js</a>, <a href="query_query-payload.js.html#line84">line 84</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
-<div class="param-desc">
-    <p>a serialized payload which holds all available query
-parameters in this payload object.</p>
-</div>
-
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">string</span>
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id="getPayloadParams"><span class="type-signature"></span>getPayloadParams<span class="signature">()</span><span class="type-signature"> &rarr; {Object}</span></h4>
+    <h4 class="name" id="getParams"><span class="type-signature"></span>getParams<span class="signature">()</span><span class="type-signature"> &rarr; {Object}</span></h4>
     
 
     
@@ -431,7 +546,7 @@ parameters in this payload object.</p>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="query_query-payload.js.html">query/query-payload.js</a>, <a href="query_query-payload.js.html#line102">line 102</a>
+        <a href="query_query-payload.js.html">query/query-payload.js</a>, <a href="query_query-payload.js.html#line103">line 103</a>
     </li></ul></dd>
     
 
@@ -460,7 +575,7 @@ parameters in this payload object.</p>
 
         
 <div class="param-desc">
-    <p>the entire payload.</p>
+    <p>the query payload that contains all parameters.</p>
 </div>
 
 
@@ -489,7 +604,7 @@ parameters in this payload object.</p>
     
 
     
-    <h4 class="name" id="getSupportedContentTypes"><span class="type-signature">(abstract, protected) </span>getSupportedContentTypes<span class="signature">()</span><span class="type-signature"> &rarr; {Array.&lt;string>}</span></h4>
+    <h4 class="name" id="getQuery"><span class="type-signature"></span>getQuery<span class="signature">()</span><span class="type-signature"> &rarr; {string}</span></h4>
     
 
     
@@ -497,8 +612,7 @@ parameters in this payload object.</p>
 
 
 <div class="description">
-    <p>Must be implemented in successors and should return a list with supported
-content types.</p>
+    <p>Retrieves the current SPARQL query string.</p>
 </div>
 
 
@@ -542,163 +656,7 @@ content types.</p>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="query_query-payload.js.html">query/query-payload.js</a>, <a href="query_query-payload.js.html#line144">line 144</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">Array.&lt;string></span>
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id="serialize"><span class="type-signature">(protected) </span>serialize<span class="signature">(data)</span><span class="type-signature"> &rarr; {string}</span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    <p>Utility method which serializes a single level json object to properly
-encoded string that can be used in a request.</p>
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>data</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Object</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>object which holds request parameter key:value pairs.</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="query_query-payload.js.html">query/query-payload.js</a>, <a href="query_query-payload.js.html#line114">line 114</a>
+        <a href="query_query-payload.js.html">query/query-payload.js</a>, <a href="query_query-payload.js.html#line126">line 126</a>
     </li></ul></dd>
     
 
@@ -727,7 +685,7 @@ encoded string that can be used in a request.</p>
 
         
 <div class="param-desc">
-    <p>provided object serialized and encoded to string.</p>
+    <p>The currently set SPARQL query string.</p>
 </div>
 
 
@@ -828,8 +786,8 @@ encoded string that can be used in a request.</p>
 
             
 
-            <td class="description last"><p>One of the supported content types for given
-operation.</p></td>
+            <td class="description last"><p>The value is one of the
+<a href="global.html#QueryContentType"><code>QueryContentType</code></a> enum values.</p></td>
         </tr>
 
     
@@ -870,7 +828,7 @@ operation.</p></td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="query_query-payload.js.html">query/query-payload.js</a>, <a href="query_query-payload.js.html#line56">line 56</a>
+        <a href="query_query-payload.js.html">query/query-payload.js</a>, <a href="query_query-payload.js.html#line80">line 80</a>
     </li></ul></dd>
     
 
@@ -1034,7 +992,162 @@ be included in the query evaluation.</p></td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="query_query-payload.js.html">query/query-payload.js</a>, <a href="query_query-payload.js.html#line26">line 26</a>
+        <a href="query_query-payload.js.html">query/query-payload.js</a>, <a href="query_query-payload.js.html#line49">line 49</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="QueryPayload.html">QueryPayload</a></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="setQuery"><span class="type-signature"></span>setQuery<span class="signature">(query)</span><span class="type-signature"> &rarr; {<a href="QueryPayload.html">QueryPayload</a>}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    <p>Sets the SPARQL query string to be used.</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>query</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The query string to set.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="query_query-payload.js.html">query/query-payload.js</a>, <a href="query_query-payload.js.html#line113">line 113</a>
     </li></ul></dd>
     
 
@@ -1198,7 +1311,7 @@ whole seconds.</p></td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="query_query-payload.js.html">query/query-payload.js</a>, <a href="query_query-payload.js.html#line40">line 40</a>
+        <a href="query_query-payload.js.html">query/query-payload.js</a>, <a href="query_query-payload.js.html#line63">line 63</a>
     </li></ul></dd>
     
 
@@ -1252,7 +1365,7 @@ whole seconds.</p></td>
     
 
     
-    <h4 class="name" id="validateParams"><span class="type-signature">(abstract, protected) </span>validateParams<span class="signature">()</span><span class="type-signature"> &rarr; {boolean}</span></h4>
+    <h4 class="name" id="validatePayload"><span class="type-signature"></span>validatePayload<span class="signature">()</span><span class="type-signature"></span></h4>
     
 
     
@@ -1260,8 +1373,7 @@ whole seconds.</p></td>
 
 
 <div class="description">
-    <p>Must be implemented in successors.</p>
-<p>Validates payload for mandatory and invalid parameters.</p>
+    <p>Validates payload for mandatory and invalid parameters.</p>
 </div>
 
 
@@ -1305,7 +1417,7 @@ whole seconds.</p></td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="query_query-payload.js.html">query/query-payload.js</a>, <a href="query_query-payload.js.html#line132">line 132</a>
+        <a href="query_query-payload.js.html">query/query-payload.js</a>, <a href="query_query-payload.js.html#line136">line 136</a>
     </li></ul></dd>
     
 
@@ -1328,31 +1440,37 @@ whole seconds.</p></td>
 
 
 
-
-
-<h5>Returns:</h5>
+<h5>Throws:</h5>
 
         
-<div class="param-desc">
-    <p><code>true</code> if parameters are valid and
-<code>false</code> otherwise.</p>
-</div>
-
-
 
 <dl>
     <dt>
-        Type
+        <div class="param-desc">
+        <p>if the payload is misconfigured</p>
+        </div>
     </dt>
-    <dd>
-        
-<span class="param-type">boolean</span>
+    <dd></dd>
+    <dt>
+        <dl>
+            <dt>
+                Type
+            </dt>
+            <dd>
+                
+<span class="param-type">Error</span>
 
 
-    </dd>
+            </dd>
+        </dl>
+    </dt>
+    <dd></dd>
 </dl>
 
+
     
+
+
 
 
 
@@ -1374,13 +1492,13 @@ whole seconds.</p></td>
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="AddStatementPayload.html">AddStatementPayload</a></li><li><a href="AppSettings.html">AppSettings</a></li><li><a href="Authentication.html">Authentication</a></li><li><a href="AuthenticationFactory.html">AuthenticationFactory</a></li><li><a href="AuthenticationService.html">AuthenticationService</a></li><li><a href="BaseRepositoryClient.html">BaseRepositoryClient</a></li><li><a href="BasicAuthentication.html">BasicAuthentication</a></li><li><a href="ClientConfig.html">ClientConfig</a></li><li><a href="CommonUtils.html">CommonUtils</a></li><li><a href="ConsoleLogger.html">ConsoleLogger</a></li><li><a href="ContentParser.html">ContentParser</a></li><li><a href="DownloadService.html">DownloadService</a></li><li><a href="FileUtils.html">FileUtils</a></li><li><a href="GdbTokenAuthentication.html">GdbTokenAuthentication</a></li><li><a href="GetQueryPayload.html">GetQueryPayload</a></li><li><a href="GetStatementsPayload.html">GetStatementsPayload</a></li><li><a href="GraphDBServerClient.html">GraphDBServerClient</a></li><li><a href="HttpClient.html">HttpClient</a></li><li><a href="HttpRequestBuilder.html">HttpRequestBuilder</a></li><li><a href="HttpResponse.html">HttpResponse</a></li><li><a href="Iterable.html">Iterable</a></li><li><a href="JsonLDParser.html">JsonLDParser</a></li><li><a href="LoggingUtils.html">LoggingUtils</a></li><li><a href="N3Parser.html">N3Parser</a></li><li><a href="NQuadsParser.html">NQuadsParser</a></li><li><a href="NTriplesParser.html">NTriplesParser</a></li><li><a href="Namespace.html">Namespace</a></li><li><a href="NamespaceService.html">NamespaceService</a></li><li><a href="PagedResponse.html">PagedResponse</a></li><li><a href="ParserRegistry.html">ParserRegistry</a></li><li><a href="QueryPayload.html">QueryPayload</a></li><li><a href="QueryService.html">QueryService</a></li><li><a href="RDFRepositoryClient.html">RDFRepositoryClient</a></li><li><a href="RDFXmlParser.html">RDFXmlParser</a></li><li><a href="RepositoryClientConfig.html">RepositoryClientConfig</a></li><li><a href="RepositoryConfig.html">RepositoryConfig</a></li><li><a href="RepositoryService.html">RepositoryService</a></li><li><a href="ResponseIterator.html">ResponseIterator</a></li><li><a href="ServerClient.html">ServerClient</a></li><li><a href="ServerClientConfig.html">ServerClientConfig</a></li><li><a href="Service.html">Service</a></li><li><a href="ServiceRequest.html">ServiceRequest</a></li><li><a href="SparqlJsonResultParser.html">SparqlJsonResultParser</a></li><li><a href="SparqlXmlResultParser.html">SparqlXmlResultParser</a></li><li><a href="StatementPayload.html">StatementPayload</a></li><li><a href="StatementsService.html">StatementsService</a></li><li><a href="StringUtils.html">StringUtils</a></li><li><a href="TermConverter.html">TermConverter</a></li><li><a href="TransactionService.html">TransactionService</a></li><li><a href="TransactionalRepositoryClient.html">TransactionalRepositoryClient</a></li><li><a href="TriGParser.html">TriGParser</a></li><li><a href="TurtleParser.html">TurtleParser</a></li><li><a href="UpdateQueryPayload.html">UpdateQueryPayload</a></li><li><a href="UploadService.html">UploadService</a></li><li><a href="User.html">User</a></li></ul><h3>Interfaces</h3><ul><li><a href="Logger.html">Logger</a></li></ul><h3>Global</h3><ul><li><a href="global.html#Authority">Authority</a></li><li><a href="global.html#MediaType">MediaType</a></li><li><a href="global.html#PATH_NAMESPACES">PATH_NAMESPACES</a></li><li><a href="global.html#PATH_SIZE">PATH_SIZE</a></li><li><a href="global.html#PATH_STATEMENTS">PATH_STATEMENTS</a></li><li><a href="global.html#PATH_TRANSACTIONS">PATH_TRANSACTIONS</a></li><li><a href="global.html#QueryContentType">QueryContentType</a></li><li><a href="global.html#QueryLanguage">QueryLanguage</a></li><li><a href="global.html#QueryType">QueryType</a></li><li><a href="global.html#RDFMimeType">RDFMimeType</a></li><li><a href="global.html#RETRIABLE_STATUSES">RETRIABLE_STATUSES</a></li><li><a href="global.html#RepositoryType">RepositoryType</a></li><li><a href="global.html#TransactionIsolationLevel">TransactionIsolationLevel</a></li><li><a href="global.html#XSD">XSD</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="AddStatementPayload.html">AddStatementPayload</a></li><li><a href="AppSettings.html">AppSettings</a></li><li><a href="Authentication.html">Authentication</a></li><li><a href="AuthenticationFactory.html">AuthenticationFactory</a></li><li><a href="AuthenticationService.html">AuthenticationService</a></li><li><a href="BaseRepositoryClient.html">BaseRepositoryClient</a></li><li><a href="BasicAuthentication.html">BasicAuthentication</a></li><li><a href="ClientConfig.html">ClientConfig</a></li><li><a href="CommonUtils.html">CommonUtils</a></li><li><a href="ConsoleLogger.html">ConsoleLogger</a></li><li><a href="ContentParser.html">ContentParser</a></li><li><a href="DownloadService.html">DownloadService</a></li><li><a href="FileUtils.html">FileUtils</a></li><li><a href="GdbTokenAuthentication.html">GdbTokenAuthentication</a></li><li><a href="GetQueryPayload.html">GetQueryPayload</a></li><li><a href="GetStatementsPayload.html">GetStatementsPayload</a></li><li><a href="GraphDBServerClient.html">GraphDBServerClient</a></li><li><a href="HttpClient.html">HttpClient</a></li><li><a href="HttpRequestBuilder.html">HttpRequestBuilder</a></li><li><a href="HttpResponse.html">HttpResponse</a></li><li><a href="HttpUtils.html">HttpUtils</a></li><li><a href="Iterable.html">Iterable</a></li><li><a href="JsonLDParser.html">JsonLDParser</a></li><li><a href="LoggingUtils.html">LoggingUtils</a></li><li><a href="N3Parser.html">N3Parser</a></li><li><a href="NQuadsParser.html">NQuadsParser</a></li><li><a href="NTriplesParser.html">NTriplesParser</a></li><li><a href="Namespace.html">Namespace</a></li><li><a href="NamespaceService.html">NamespaceService</a></li><li><a href="PagedResponse.html">PagedResponse</a></li><li><a href="ParserRegistry.html">ParserRegistry</a></li><li><a href="QueryPayload.html">QueryPayload</a></li><li><a href="QueryService.html">QueryService</a></li><li><a href="RDFRepositoryClient.html">RDFRepositoryClient</a></li><li><a href="RDFXmlParser.html">RDFXmlParser</a></li><li><a href="RepositoryClientConfig.html">RepositoryClientConfig</a></li><li><a href="RepositoryConfig.html">RepositoryConfig</a></li><li><a href="RepositoryService.html">RepositoryService</a></li><li><a href="ResponseIterator.html">ResponseIterator</a></li><li><a href="ServerClient.html">ServerClient</a></li><li><a href="ServerClientConfig.html">ServerClientConfig</a></li><li><a href="Service.html">Service</a></li><li><a href="ServiceRequest.html">ServiceRequest</a></li><li><a href="SparqlJsonResultParser.html">SparqlJsonResultParser</a></li><li><a href="SparqlXmlResultParser.html">SparqlXmlResultParser</a></li><li><a href="StatementPayload.html">StatementPayload</a></li><li><a href="StatementsService.html">StatementsService</a></li><li><a href="StringUtils.html">StringUtils</a></li><li><a href="TermConverter.html">TermConverter</a></li><li><a href="TransactionService.html">TransactionService</a></li><li><a href="TransactionalRepositoryClient.html">TransactionalRepositoryClient</a></li><li><a href="TriGParser.html">TriGParser</a></li><li><a href="TurtleParser.html">TurtleParser</a></li><li><a href="UpdateQueryPayload.html">UpdateQueryPayload</a></li><li><a href="UploadService.html">UploadService</a></li><li><a href="User.html">User</a></li></ul><h3>Interfaces</h3><ul><li><a href="Logger.html">Logger</a></li></ul><h3>Global</h3><ul><li><a href="global.html#Authority">Authority</a></li><li><a href="global.html#MediaType">MediaType</a></li><li><a href="global.html#PATH_NAMESPACES">PATH_NAMESPACES</a></li><li><a href="global.html#PATH_SIZE">PATH_SIZE</a></li><li><a href="global.html#PATH_STATEMENTS">PATH_STATEMENTS</a></li><li><a href="global.html#PATH_TRANSACTIONS">PATH_TRANSACTIONS</a></li><li><a href="global.html#QueryContentType">QueryContentType</a></li><li><a href="global.html#QueryLanguage">QueryLanguage</a></li><li><a href="global.html#QueryType">QueryType</a></li><li><a href="global.html#RDFMimeType">RDFMimeType</a></li><li><a href="global.html#RETRIABLE_STATUSES">RETRIABLE_STATUSES</a></li><li><a href="global.html#RepositoryType">RepositoryType</a></li><li><a href="global.html#TransactionIsolationLevel">TransactionIsolationLevel</a></li><li><a href="global.html#XSD">XSD</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.2</a> on Mon Mar 17 2025 11:33:55 GMT+0200 (Eastern European Standard Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.2</a> on Thu Mar 20 2025 10:58:19 GMT+0200 (Eastern European Standard Time)
 </footer>
 
 <script> prettyPrint(); </script>

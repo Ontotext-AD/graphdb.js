@@ -1,0 +1,1012 @@
+{
+  "head" : {
+    "vars" : [
+      "targetClass",
+      "label"
+    ]
+  },
+  "results" : {
+    "bindings" : [
+      {
+        "targetClass" : {
+          "type" : "uri",
+          "value" : "http://example.com/resource/resource1"
+        },
+        "label" : {
+          "type" : "literal",
+          "value" : "Resource 1"
+        }
+      },
+      {
+        "targetClass" : {
+          "type" : "uri",
+          "value" : "http://example.com/resource/resource2"
+        },
+        "label" : {
+          "type" : "literal",
+          "value" : "Resource 2"
+        }
+      },
+      {
+        "targetClass" : {
+          "type" : "uri",
+          "value" : "http://example.com/resource/resource3"
+        },
+        "label" : {
+          "type" : "literal",
+          "value" : "Resource 3"
+        }
+      },
+      {
+        "targetClass" : {
+          "type" : "uri",
+          "value" : "http://example.com/resource/resource4"
+        },
+        "label" : {
+          "type" : "literal",
+          "value" : "Resource 4"
+        }
+      },
+      {
+        "targetClass" : {
+          "type" : "uri",
+          "value" : "http://example.com/resource/resource5"
+        },
+        "label" : {
+          "type" : "literal",
+          "value" : "Resource 5"
+        }
+      },
+      {
+        "targetClass" : {
+          "type" : "uri",
+          "value" : "http://example.com/resource/resource6"
+        },
+        "label" : {
+          "type" : "literal",
+          "value" : "Resource 6"
+        }
+      },
+      {
+        "targetClass" : {
+          "type" : "uri",
+          "value" : "http://example.com/resource/resource7"
+        },
+        "label" : {
+          "type" : "literal",
+          "value" : "Resource 7"
+        }
+      },
+      {
+        "targetClass" : {
+          "type" : "uri",
+          "value" : "http://example.com/resource/resource8"
+        },
+        "label" : {
+          "type" : "literal",
+          "value" : "Resource 8"
+        }
+      },
+      {
+        "targetClass" : {
+          "type" : "uri",
+          "value" : "http://example.com/resource/resource9"
+        },
+        "label" : {
+          "type" : "literal",
+          "value" : "Resource 9"
+        }
+      },
+      {
+        "targetClass" : {
+          "type" : "uri",
+          "value" : "http://example.com/resource/resource10"
+        },
+        "label" : {
+          "type" : "literal",
+          "value" : "Resource 10"
+        }
+      },
+      {
+        "targetClass" : {
+          "type" : "uri",
+          "value" : "http://example.com/resource/resource11"
+        },
+        "label" : {
+          "type" : "literal",
+          "value" : "Resource 11"
+        }
+      },
+      {
+        "targetClass" : {
+          "type" : "uri",
+          "value" : "http://example.com/resource/resource12"
+        },
+        "label" : {
+          "type" : "literal",
+          "value" : "Resource 12"
+        }
+      },
+      {
+        "targetClass" : {
+          "type" : "uri",
+          "value" : "http://example.com/resource/resource13"
+        },
+        "label" : {
+          "type" : "literal",
+          "value" : "Resource 13"
+        }
+      },
+      {
+        "targetClass" : {
+          "type" : "uri",
+          "value" : "http://example.com/resource/resource14"
+        },
+        "label" : {
+          "type" : "literal",
+          "value" : "Resource 14"
+        }
+      },
+      {
+        "targetClass" : {
+          "type" : "uri",
+          "value" : "http://example.com/resource/resource15"
+        },
+        "label" : {
+          "type" : "literal",
+          "value" : "Resource 15"
+        }
+      },
+      {
+        "targetClass" : {
+          "type" : "uri",
+          "value" : "http://example.com/resource/resource16"
+        },
+        "label" : {
+          "type" : "literal",
+          "value" : "Resource 16"
+        }
+      },
+      {
+        "targetClass" : {
+          "type" : "uri",
+          "value" : "http://example.com/resource/resource17"
+        },
+        "label" : {
+          "type" : "literal",
+          "value" : "Resource 17"
+        }
+      },
+      {
+        "targetClass" : {
+          "type" : "uri",
+          "value" : "http://example.com/resource/resource18"
+        },
+        "label" : {
+          "type" : "literal",
+          "value" : "Resource 18"
+        }
+      },
+      {
+        "targetClass" : {
+          "type" : "uri",
+          "value" : "http://example.com/resource/resource19"
+        },
+        "label" : {
+          "type" : "literal",
+          "value" : "Resource 19"
+        }
+      },
+      {
+        "targetClass" : {
+          "type" : "uri",
+          "value" : "http://example.com/resource/resource20"
+        },
+        "label" : {
+          "type" : "literal",
+          "value" : "Resource 20"
+        }
+      },
+      {
+        "targetClass" : {
+          "type" : "uri",
+          "value" : "http://example.com/resource/resource21"
+        },
+        "label" : {
+          "type" : "literal",
+          "value" : "Resource 21"
+        }
+      },
+      {
+        "targetClass" : {
+          "type" : "uri",
+          "value" : "http://example.com/resource/resource22"
+        },
+        "label" : {
+          "type" : "literal",
+          "value" : "Resource 22"
+        }
+      },
+      {
+        "targetClass" : {
+          "type" : "uri",
+          "value" : "http://example.com/resource/resource23"
+        },
+        "label" : {
+          "type" : "literal",
+          "value" : "Resource 23"
+        }
+      },
+      {
+        "targetClass" : {
+          "type" : "uri",
+          "value" : "http://example.com/resource/resource24"
+        },
+        "label" : {
+          "type" : "literal",
+          "value" : "Resource 24"
+        }
+      },
+      {
+        "targetClass" : {
+          "type" : "uri",
+          "value" : "http://example.com/resource/resource25"
+        },
+        "label" : {
+          "type" : "literal",
+          "value" : "Resource 25"
+        }
+      },
+      {
+        "targetClass" : {
+          "type" : "uri",
+          "value" : "http://example.com/resource/resource26"
+        },
+        "label" : {
+          "type" : "literal",
+          "value" : "Resource 26"
+        }
+      },
+      {
+        "targetClass" : {
+          "type" : "uri",
+          "value" : "http://example.com/resource/resource27"
+        },
+        "label" : {
+          "type" : "literal",
+          "value" : "Resource 27"
+        }
+      },
+      {
+        "targetClass" : {
+          "type" : "uri",
+          "value" : "http://example.com/resource/resource28"
+        },
+        "label" : {
+          "type" : "literal",
+          "value" : "Resource 28"
+        }
+      },
+      {
+        "targetClass" : {
+          "type" : "uri",
+          "value" : "http://example.com/resource/resource29"
+        },
+        "label" : {
+          "type" : "literal",
+          "value" : "Resource 29"
+        }
+      },
+      {
+        "targetClass" : {
+          "type" : "uri",
+          "value" : "http://example.com/resource/resource30"
+        },
+        "label" : {
+          "type" : "literal",
+          "value" : "Resource 30"
+        }
+      },
+      {
+        "targetClass" : {
+          "type" : "uri",
+          "value" : "http://example.com/resource/resource31"
+        },
+        "label" : {
+          "type" : "literal",
+          "value" : "Resource 31"
+        }
+      },
+      {
+        "targetClass" : {
+          "type" : "uri",
+          "value" : "http://example.com/resource/resource32"
+        },
+        "label" : {
+          "type" : "literal",
+          "value" : "Resource 32"
+        }
+      },
+      {
+        "targetClass" : {
+          "type" : "uri",
+          "value" : "http://example.com/resource/resource33"
+        },
+        "label" : {
+          "type" : "literal",
+          "value" : "Resource 33"
+        }
+      },
+      {
+        "targetClass" : {
+          "type" : "uri",
+          "value" : "http://example.com/resource/resource34"
+        },
+        "label" : {
+          "type" : "literal",
+          "value" : "Resource 34"
+        }
+      },
+      {
+        "targetClass" : {
+          "type" : "uri",
+          "value" : "http://example.com/resource/resource35"
+        },
+        "label" : {
+          "type" : "literal",
+          "value" : "Resource 35"
+        }
+      },
+      {
+        "targetClass" : {
+          "type" : "uri",
+          "value" : "http://example.com/resource/resource36"
+        },
+        "label" : {
+          "type" : "literal",
+          "value" : "Resource 36"
+        }
+      },
+      {
+        "targetClass" : {
+          "type" : "uri",
+          "value" : "http://example.com/resource/resource37"
+        },
+        "label" : {
+          "type" : "literal",
+          "value" : "Resource 37"
+        }
+      },
+      {
+        "targetClass" : {
+          "type" : "uri",
+          "value" : "http://example.com/resource/resource38"
+        },
+        "label" : {
+          "type" : "literal",
+          "value" : "Resource 38"
+        }
+      },
+      {
+        "targetClass" : {
+          "type" : "uri",
+          "value" : "http://example.com/resource/resource39"
+        },
+        "label" : {
+          "type" : "literal",
+          "value" : "Resource 39"
+        }
+      },
+      {
+        "targetClass" : {
+          "type" : "uri",
+          "value" : "http://example.com/resource/resource40"
+        },
+        "label" : {
+          "type" : "literal",
+          "value" : "Resource 40"
+        }
+      },
+      {
+        "targetClass" : {
+          "type" : "uri",
+          "value" : "http://example.com/resource/resource41"
+        },
+        "label" : {
+          "type" : "literal",
+          "value" : "Resource 41"
+        }
+      },
+      {
+        "targetClass" : {
+          "type" : "uri",
+          "value" : "http://example.com/resource/resource42"
+        },
+        "label" : {
+          "type" : "literal",
+          "value" : "Resource 42"
+        }
+      },
+      {
+        "targetClass" : {
+          "type" : "uri",
+          "value" : "http://example.com/resource/resource43"
+        },
+        "label" : {
+          "type" : "literal",
+          "value" : "Resource 43"
+        }
+      },
+      {
+        "targetClass" : {
+          "type" : "uri",
+          "value" : "http://example.com/resource/resource44"
+        },
+        "label" : {
+          "type" : "literal",
+          "value" : "Resource 44"
+        }
+      },
+      {
+        "targetClass" : {
+          "type" : "uri",
+          "value" : "http://example.com/resource/resource45"
+        },
+        "label" : {
+          "type" : "literal",
+          "value" : "Resource 45"
+        }
+      },
+      {
+        "targetClass" : {
+          "type" : "uri",
+          "value" : "http://example.com/resource/resource46"
+        },
+        "label" : {
+          "type" : "literal",
+          "value" : "Resource 46"
+        }
+      },
+      {
+        "targetClass" : {
+          "type" : "uri",
+          "value" : "http://example.com/resource/resource47"
+        },
+        "label" : {
+          "type" : "literal",
+          "value" : "Resource 47"
+        }
+      },
+      {
+        "targetClass" : {
+          "type" : "uri",
+          "value" : "http://example.com/resource/resource48"
+        },
+        "label" : {
+          "type" : "literal",
+          "value" : "Resource 48"
+        }
+      },
+      {
+        "targetClass" : {
+          "type" : "uri",
+          "value" : "http://example.com/resource/resource49"
+        },
+        "label" : {
+          "type" : "literal",
+          "value" : "Resource 49"
+        }
+      },
+      {
+        "targetClass" : {
+          "type" : "uri",
+          "value" : "http://example.com/resource/resource50"
+        },
+        "label" : {
+          "type" : "literal",
+          "value" : "Resource 50"
+        }
+      },
+      {
+        "targetClass" : {
+          "type" : "uri",
+          "value" : "http://example.com/resource/resource51"
+        },
+        "label" : {
+          "type" : "literal",
+          "value" : "Resource 51"
+        }
+      },
+      {
+        "targetClass" : {
+          "type" : "uri",
+          "value" : "http://example.com/resource/resource52"
+        },
+        "label" : {
+          "type" : "literal",
+          "value" : "Resource 52"
+        }
+      },
+      {
+        "targetClass" : {
+          "type" : "uri",
+          "value" : "http://example.com/resource/resource53"
+        },
+        "label" : {
+          "type" : "literal",
+          "value" : "Resource 53"
+        }
+      },
+      {
+        "targetClass" : {
+          "type" : "uri",
+          "value" : "http://example.com/resource/resource54"
+        },
+        "label" : {
+          "type" : "literal",
+          "value" : "Resource 54"
+        }
+      },
+      {
+        "targetClass" : {
+          "type" : "uri",
+          "value" : "http://example.com/resource/resource55"
+        },
+        "label" : {
+          "type" : "literal",
+          "value" : "Resource 55"
+        }
+      },
+      {
+        "targetClass" : {
+          "type" : "uri",
+          "value" : "http://example.com/resource/resource56"
+        },
+        "label" : {
+          "type" : "literal",
+          "value" : "Resource 56"
+        }
+      },
+      {
+        "targetClass" : {
+          "type" : "uri",
+          "value" : "http://example.com/resource/resource57"
+        },
+        "label" : {
+          "type" : "literal",
+          "value" : "Resource 57"
+        }
+      },
+      {
+        "targetClass" : {
+          "type" : "uri",
+          "value" : "http://example.com/resource/resource58"
+        },
+        "label" : {
+          "type" : "literal",
+          "value" : "Resource 58"
+        }
+      },
+      {
+        "targetClass" : {
+          "type" : "uri",
+          "value" : "http://example.com/resource/resource59"
+        },
+        "label" : {
+          "type" : "literal",
+          "value" : "Resource 59"
+        }
+      },
+      {
+        "targetClass" : {
+          "type" : "uri",
+          "value" : "http://example.com/resource/resource60"
+        },
+        "label" : {
+          "type" : "literal",
+          "value" : "Resource 60"
+        }
+      },
+      {
+        "targetClass" : {
+          "type" : "uri",
+          "value" : "http://example.com/resource/resource61"
+        },
+        "label" : {
+          "type" : "literal",
+          "value" : "Resource 61"
+        }
+      },
+      {
+        "targetClass" : {
+          "type" : "uri",
+          "value" : "http://example.com/resource/resource62"
+        },
+        "label" : {
+          "type" : "literal",
+          "value" : "Resource 62"
+        }
+      },
+      {
+        "targetClass" : {
+          "type" : "uri",
+          "value" : "http://example.com/resource/resource63"
+        },
+        "label" : {
+          "type" : "literal",
+          "value" : "Resource 63"
+        }
+      },
+      {
+        "targetClass" : {
+          "type" : "uri",
+          "value" : "http://example.com/resource/resource64"
+        },
+        "label" : {
+          "type" : "literal",
+          "value" : "Resource 64"
+        }
+      },
+      {
+        "targetClass" : {
+          "type" : "uri",
+          "value" : "http://example.com/resource/resource65"
+        },
+        "label" : {
+          "type" : "literal",
+          "value" : "Resource 65"
+        }
+      },
+      {
+        "targetClass" : {
+          "type" : "uri",
+          "value" : "http://example.com/resource/resource66"
+        },
+        "label" : {
+          "type" : "literal",
+          "value" : "Resource 66"
+        }
+      },
+      {
+        "targetClass" : {
+          "type" : "uri",
+          "value" : "http://example.com/resource/resource67"
+        },
+        "label" : {
+          "type" : "literal",
+          "value" : "Resource 67"
+        }
+      },
+      {
+        "targetClass" : {
+          "type" : "uri",
+          "value" : "http://example.com/resource/resource68"
+        },
+        "label" : {
+          "type" : "literal",
+          "value" : "Resource 68"
+        }
+      },
+      {
+        "targetClass" : {
+          "type" : "uri",
+          "value" : "http://example.com/resource/resource69"
+        },
+        "label" : {
+          "type" : "literal",
+          "value" : "Resource 69"
+        }
+      },
+      {
+        "targetClass" : {
+          "type" : "uri",
+          "value" : "http://example.com/resource/resource70"
+        },
+        "label" : {
+          "type" : "literal",
+          "value" : "Resource 70"
+        }
+      },
+      {
+        "targetClass" : {
+          "type" : "uri",
+          "value" : "http://example.com/resource/resource71"
+        },
+        "label" : {
+          "type" : "literal",
+          "value" : "Resource 71"
+        }
+      },
+      {
+        "targetClass" : {
+          "type" : "uri",
+          "value" : "http://example.com/resource/resource72"
+        },
+        "label" : {
+          "type" : "literal",
+          "value" : "Resource 72"
+        }
+      },
+      {
+        "targetClass" : {
+          "type" : "uri",
+          "value" : "http://example.com/resource/resource73"
+        },
+        "label" : {
+          "type" : "literal",
+          "value" : "Resource 73"
+        }
+      },
+      {
+        "targetClass" : {
+          "type" : "uri",
+          "value" : "http://example.com/resource/resource74"
+        },
+        "label" : {
+          "type" : "literal",
+          "value" : "Resource 74"
+        }
+      },
+      {
+        "targetClass" : {
+          "type" : "uri",
+          "value" : "http://example.com/resource/resource75"
+        },
+        "label" : {
+          "type" : "literal",
+          "value" : "Resource 75"
+        }
+      },
+      {
+        "targetClass" : {
+          "type" : "uri",
+          "value" : "http://example.com/resource/resource76"
+        },
+        "label" : {
+          "type" : "literal",
+          "value" : "Resource 76"
+        }
+      },
+      {
+        "targetClass" : {
+          "type" : "uri",
+          "value" : "http://example.com/resource/resource77"
+        },
+        "label" : {
+          "type" : "literal",
+          "value" : "Resource 77"
+        }
+      },
+      {
+        "targetClass" : {
+          "type" : "uri",
+          "value" : "http://example.com/resource/resource78"
+        },
+        "label" : {
+          "type" : "literal",
+          "value" : "Resource 78"
+        }
+      },
+      {
+        "targetClass" : {
+          "type" : "uri",
+          "value" : "http://example.com/resource/resource79"
+        },
+        "label" : {
+          "type" : "literal",
+          "value" : "Resource 79"
+        }
+      },
+      {
+        "targetClass" : {
+          "type" : "uri",
+          "value" : "http://example.com/resource/resource80"
+        },
+        "label" : {
+          "type" : "literal",
+          "value" : "Resource 80"
+        }
+      },
+      {
+        "targetClass" : {
+          "type" : "uri",
+          "value" : "http://example.com/resource/resource81"
+        },
+        "label" : {
+          "type" : "literal",
+          "value" : "Resource 81"
+        }
+      },
+      {
+        "targetClass" : {
+          "type" : "uri",
+          "value" : "http://example.com/resource/resource82"
+        },
+        "label" : {
+          "type" : "literal",
+          "value" : "Resource 82"
+        }
+      },
+      {
+        "targetClass" : {
+          "type" : "uri",
+          "value" : "http://example.com/resource/resource83"
+        },
+        "label" : {
+          "type" : "literal",
+          "value" : "Resource 83"
+        }
+      },
+      {
+        "targetClass" : {
+          "type" : "uri",
+          "value" : "http://example.com/resource/resource84"
+        },
+        "label" : {
+          "type" : "literal",
+          "value" : "Resource 84"
+        }
+      },
+      {
+        "targetClass" : {
+          "type" : "uri",
+          "value" : "http://example.com/resource/resource85"
+        },
+        "label" : {
+          "type" : "literal",
+          "value" : "Resource 85"
+        }
+      },
+      {
+        "targetClass" : {
+          "type" : "uri",
+          "value" : "http://example.com/resource/resource86"
+        },
+        "label" : {
+          "type" : "literal",
+          "value" : "Resource 86"
+        }
+      },
+      {
+        "targetClass" : {
+          "type" : "uri",
+          "value" : "http://example.com/resource/resource87"
+        },
+        "label" : {
+          "type" : "literal",
+          "value" : "Resource 87"
+        }
+      },
+      {
+        "targetClass" : {
+          "type" : "uri",
+          "value" : "http://example.com/resource/resource88"
+        },
+        "label" : {
+          "type" : "literal",
+          "value" : "Resource 88"
+        }
+      },
+      {
+        "targetClass" : {
+          "type" : "uri",
+          "value" : "http://example.com/resource/resource89"
+        },
+        "label" : {
+          "type" : "literal",
+          "value" : "Resource 89"
+        }
+      },
+      {
+        "targetClass" : {
+          "type" : "uri",
+          "value" : "http://example.com/resource/resource90"
+        },
+        "label" : {
+          "type" : "literal",
+          "value" : "Resource 90"
+        }
+      },
+      {
+        "targetClass" : {
+          "type" : "uri",
+          "value" : "http://example.com/resource/resource91"
+        },
+        "label" : {
+          "type" : "literal",
+          "value" : "Resource 91"
+        }
+      },
+      {
+        "targetClass" : {
+          "type" : "uri",
+          "value" : "http://example.com/resource/resource92"
+        },
+        "label" : {
+          "type" : "literal",
+          "value" : "Resource 92"
+        }
+      },
+      {
+        "targetClass" : {
+          "type" : "uri",
+          "value" : "http://example.com/resource/resource93"
+        },
+        "label" : {
+          "type" : "literal",
+          "value" : "Resource 93"
+        }
+      },
+      {
+        "targetClass" : {
+          "type" : "uri",
+          "value" : "http://example.com/resource/resource94"
+        },
+        "label" : {
+          "type" : "literal",
+          "value" : "Resource 94"
+        }
+      },
+      {
+        "targetClass" : {
+          "type" : "uri",
+          "value" : "http://example.com/resource/resource95"
+        },
+        "label" : {
+          "type" : "literal",
+          "value" : "Resource 95"
+        }
+      },
+      {
+        "targetClass" : {
+          "type" : "uri",
+          "value" : "http://example.com/resource/resource96"
+        },
+        "label" : {
+          "type" : "literal",
+          "value" : "Resource 96"
+        }
+      },
+      {
+        "targetClass" : {
+          "type" : "uri",
+          "value" : "http://example.com/resource/resource97"
+        },
+        "label" : {
+          "type" : "literal",
+          "value" : "Resource 97"
+        }
+      },
+      {
+        "targetClass" : {
+          "type" : "uri",
+          "value" : "http://example.com/resource/resource98"
+        },
+        "label" : {
+          "type" : "literal",
+          "value" : "Resource 98"
+        }
+      },
+      {
+        "targetClass" : {
+          "type" : "uri",
+          "value" : "http://example.com/resource/resource99"
+        },
+        "label" : {
+          "type" : "literal",
+          "value" : "Resource 99"
+        }
+      },
+      {
+        "targetClass" : {
+          "type" : "uri",
+          "value" : "http://example.com/resource/resource100"
+        },
+        "label" : {
+          "type" : "literal",
+          "value" : "Resource 100"
+        }
+      }
+    ]
+  }
+}

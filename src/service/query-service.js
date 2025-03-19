@@ -4,6 +4,10 @@ const ServiceRequest = require('./service-request');
 const PATH_STATEMENTS = require('./service-paths').PATH_STATEMENTS;
 
 const LoggingUtils = require('../logging/logging-utils');
+const QueryContentType = require('../http/query-content-type');
+const GetQueryPayload = require('../query/get-query-payload');
+const UpdateQueryPayload = require('../query/update-query-payload');
+const HttpUtils = require('../util/http-utils');
 
 /**
  * Service for executing queries via {@link GetQueryPayload} or
@@ -40,15 +44,61 @@ class QueryService extends Service {
    * @throws {Error} if the payload is misconfigured
    */
   query(payload) {
+    payload.validatePayload();
     const requestBuilder = HttpRequestBuilder.httpPost('')
-      .setParams(payload.getPayloadParams())
-      .setData(payload.getParams())
       .setResponseType('stream')
       .addAcceptHeader(payload.getResponseType())
       .addContentTypeHeader(payload.getContentType());
-
+    this.setPostRequestPayload(requestBuilder, payload);
     return new ServiceRequest(requestBuilder,
       () => this.executeQuery(payload, requestBuilder));
+  }
+
+  /**
+   * Populates parameters and body data in the <code>httpRequestBuilder</code>
+   * to comply with the SPARQL specification
+   * {@link https://www.w3.org/TR/sparql11-protocol/}.
+   *
+   * For POST requests, there are two scenarios:
+   *  - When the content type is "application/x-www-form-urlencoded",
+   *    all parameters are sent as body content. The SPARQL query is added to
+   *    the parameters: if the query is a SELECT (or similar read query),
+   *    the parameter name is "query", otherwise, for updates,
+   *    the parameter name is "update".
+   *  - When the content type is "application/sparql-update" or
+   *    "application/sparql-query", all parameters are sent as URL parameters,
+   *    and the SPARQL query is sent as the raw body content without
+   *    URL encoding.
+   *
+   * For more information about "application/sparql-update"
+   * see {@link https://www.w3.org/TR/sparql11-protocol/#update-operation},
+   * and for "application/sparql-query"
+   * see {@link https://www.w3.org/TR/sparql11-protocol/#query-operation}.
+   *
+   * @private
+   *
+   * @param {HttpRequestBuilder} httpRequestBuilder - The HTTP request builder
+   *             that holds all necessary information for a {@link HttpClient}.
+   * @param {QueryPayload} payload - An object holding request parameters
+   *              required by the query endpoint.
+   */
+  setPostRequestPayload(httpRequestBuilder, payload) {
+    const params = Object.assign({}, payload.getParams());
+    const query = payload.getQuery();
+
+    if (payload.getContentType() === QueryContentType.X_WWW_FORM_URLENCODED) {
+      if (payload instanceof GetQueryPayload) {
+        params.query = query;
+      } else {
+        params.update = query;
+      }
+      httpRequestBuilder.setData(HttpUtils.serialize(params));
+    } else {
+      httpRequestBuilder.setData(query);
+      if (params && Object.keys(params).length > 0) {
+        httpRequestBuilder.setParams(params);
+      }
+    }
   }
 
   /**
@@ -100,10 +150,10 @@ class QueryService extends Service {
    * @throws {Error} if the payload is misconfigured
    */
   update(payload) {
+    payload.validatePayload();
     const requestBuilder = HttpRequestBuilder.httpPost(PATH_STATEMENTS)
-      .setData(payload.getParams())
       .addContentTypeHeader(payload.getContentType());
-
+    this.setPostRequestPayload(requestBuilder, payload);
     return new ServiceRequest(requestBuilder, () => {
       return this.httpRequestExecutor(requestBuilder).then((response) => {
         const logPayload = LoggingUtils.getLogPayload(response,

@@ -4,8 +4,8 @@ describe('QueryPayload', () => {
   describe('constructor', () => {
     test('should set defaults', () => {
       const queryPayload = new QueryPayload();
-      expect(queryPayload.payload).toEqual({});
-      expect(queryPayload.contentType).toEqual(null);
+      expect(queryPayload.params).toEqual({});
+      expect(queryPayload.contentType).toEqual('application/x-www-form-urlencoded');
     });
   });
 
@@ -29,8 +29,8 @@ describe('QueryPayload', () => {
   });
 
   describe('validateParams', () => {
-    test('should return false by default as the method should be implemented from successors', () => {
-      expect(new QueryPayload().validateParams()).toBeFalsy();
+    test('should throw an error when query is not passed', () => {
+      expect(() => new QueryPayload().validatePayload()).toThrowError('Parameter query is mandatory!');
     });
   });
 });
