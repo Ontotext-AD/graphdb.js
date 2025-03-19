@@ -7,7 +7,9 @@ pipeline {
         // Tells NPM and co. not to use color output (looks like garbage in Jenkins)
         NO_COLOR = "1"
         SONAR_ENVIRONMENT = "SonarCloud"
+        LEGACY_JENKINS = "https://jenkins.ontotext.com"
         NEW_JENKINS = "https://new-jenkins.ontotext.com"
+        LEGACY_AGENT = 'graphdb-jenkins-node'
         NEW_AGENT = 'aws-small'
     }
 
@@ -21,6 +23,19 @@ pipeline {
     }
 
     stages {
+        // TODO remove when migration is complete
+        stage('Check Jenkins environment') {
+            steps {
+                script {
+                    if (env.JENKINS_URL?.contains(env.LEGACY_JENKINS)) {
+                        echo "Legacy Jenkins detected. Skipping pipeline execution and finishing build with SUCCESS."
+                        currentBuild.result = 'SUCCESS'
+                        return
+                    }
+                }
+            }
+        }
+
         stage('Prepare') {
           steps {
             sh "node --version"
