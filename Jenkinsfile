@@ -89,8 +89,10 @@ pipeline {
         always {
           dir("test-e2e/") {
             sh "docker logs graphdb"
-            dockerCompose.downCmd(options: [removeOrphans=true, removeVolumes=true, removeImages='local'])
-//             sh "docker-compose down -v --remove-orphans --rmi=local || true"
+            // sh "docker-compose down -v --remove-orphans --rmi=local || true"
+            script {
+                dockerCompose.downCmd(options: [removeOrphans=true, removeVolumes=true, removeImages='local'])
+            }
           }
         }
     }
