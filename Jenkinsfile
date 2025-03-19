@@ -87,16 +87,16 @@ pipeline {
           }
         }
 
-        stage('Sonar') {
-          steps {
-            withSonarQubeEnv('SonarCloud') {
-              sh """
-                node sonar-project.js \
-                ${sonar.resolveBranchArguments()}
-              """
-            }
-          }
-        }
+//         stage('Sonar') {
+//           steps {
+//             withSonarQubeEnv('SonarCloud') {
+//               sh """
+//                 node sonar-project.js \
+//                 ${sonar.resolveBranchArguments()}
+//               """
+//             }
+//           }
+//         }
     }
 
     post {
