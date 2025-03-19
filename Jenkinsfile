@@ -40,10 +40,14 @@ pipeline {
           steps {
             sh "node --version"
 //             sh "docker-compose -f test-e2e/docker-compose.yml up -d"
-            script {
-                dockerCompose.buildCmd(composeFile: 'test-e2e/docker-compose-e2e.yml', options: ["--force-rm", "--no-cache", "--parallel"])
-                dockerCompose.upCmd(composeFile: 'test-e2e/docker-compose-e2e.yml', options: ["--abort-on-container-exit", "--exit-code-from e2e-tests"])
-            }
+//             script {
+//               dockerCompose.buildCmd(composeFile: 'test-e2e/docker-compose-e2e.yml',
+//                                     options: ["--force-rm", "--no-cache", "--parallel",
+//                                              "--project-name graphdbjs"])
+//               dockerCompose.upCmd(composeFile: 'test-e2e/docker-compose-e2e.yml',
+//                                  options: ["--abort-on-container-exit", "--exit-code-from e2e-tests",
+//                                           "--project-name graphdbjs"])
+//             }
           }
         }
 
@@ -69,8 +73,12 @@ pipeline {
               def packageName = sh(script: "ls graphdb-*.tgz", returnStdout: true).trim()
               sh "cp ${packageName} test-e2e/"
 
-              dockerCompose.buildCmd(composeFile: 'test-e2e/docker-compose-e2e.yml', options: ["--force-rm", "--no-cache", "--parallel"])
-              dockerCompose.upCmd(composeFile: 'test-e2e/docker-compose-e2e.yml', options: ["--abort-on-container-exit", "--exit-code-from e2e-tests"])
+              dockerCompose.buildCmd(composeFile: 'test-e2e/docker-compose-e2e.yml',
+                                    options: ["--force-rm", "--no-cache", "--parallel",
+                                             "--project-name graphdbjs"])
+              dockerCompose.upCmd(composeFile: 'test-e2e/docker-compose-e2e.yml',
+                                 options: ["--abort-on-container-exit", "--exit-code-from e2e-tests",
+                                          "--project-name graphdbjs"])
             }
 //             sh "npm run build"
 //             sh "npm run install:local"
@@ -97,7 +105,10 @@ pipeline {
 //             sh "docker logs graphdb"
             // sh "docker-compose down -v --remove-orphans --rmi=local || true"
             script {
-                dockerCompose.downCmd(options: [removeOrphans=true, removeVolumes=true, removeImages='local'])
+                dockerCompose.downCmd(options: [removeOrphans: true,
+                                              removeVolumes: true,
+                                              removeImages: 'local',
+                                              projectName: 'graphdbjs'])
             }
           }
         }
