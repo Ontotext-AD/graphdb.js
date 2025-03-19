@@ -39,7 +39,11 @@ pipeline {
         stage('Prepare') {
           steps {
             sh "node --version"
-            sh "docker-compose -f test-e2e/docker-compose.yml up -d"
+//             sh "docker-compose -f test-e2e/docker-compose.yml up -d"
+            script {
+                dockerCompose.buildCmd(composeFile: 'test-e2e/docker-compose-e2e.yml', options: ["--force-rm", "--no-cache", "--parallel"])
+                dockerCompose.upCmd(composeFile: 'test-e2e/docker-compose-e2e.yml', options: ["--abort-on-container-exit", "--exit-code-from e2e-tests"])
+            }
           }
         }
 
@@ -61,8 +65,11 @@ pipeline {
           steps {
             sh "npm run build"
             sh "npm run install:local"
-            sh "wait-on http://localhost:7200/protocol -t 60000"
-            sh "(cd test-e2e/ && npm install && npm link graphdb && npm run test)"
+            sh "GRAPHDB_VERSION=10.8.4 npm run test:docker"
+//             sh "npm run build"
+//             sh "npm run install:local"
+//             sh "wait-on http://localhost:7200/protocol -t 60000"
+//             sh "(cd test-e2e/ && npm install && npm link graphdb && npm run test)"
           }
         }
 
@@ -82,35 +89,9 @@ pipeline {
         always {
           dir("test-e2e/") {
             sh "docker logs graphdb"
-            sh "docker-compose down -v --remove-orphans --rmi=local || true"
+            dockerCompose.downCmd(options: [removeOrphans=true, removeVolumes=true, removeImages='local'])
+//             sh "docker-compose down -v --remove-orphans --rmi=local || true"
           }
         }
-
-        failure {
-            script {
-                node(env.NEW_AGENT) {
-                    archiveArtifacts()
-                }
-            }
-        }
     }
-}
-
-def cleanup() {
-    // upload failed tests report and artifacts
-    junit allowEmptyResults: true, testResults: 'cypress/results/**/*.xml'
-    archiveArtifacts allowEmptyArchive: true, artifacts: 'report/screenshots/**/*.png, report/videos/**/*.mp4, cypress/logs/*.log'
-
-    script {
-        dockerCompose.downCmd(removeVolumes: true, removeOrphans: true, removeImages: 'local', ignoreErrors: true)
-    }
-    // clean root owned resources from docker volumes, just in case
-    sh "sudo rm -rf ./coverage"
-    sh "sudo rm -rf ./cypress"
-    sh "sudo rm -rf ./report"
-}
-
-
-def archiveArtifacts() {
-    archiveArtifacts artifacts: 'translation-validation-result.json', onlyIfSuccessful: false
 }

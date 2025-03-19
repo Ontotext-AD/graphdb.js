@@ -1,0 +1,15 @@
+FROM node:18-alpine
+
+WORKDIR /app
+
+COPY package*.json ./
+
+RUN npm install
+
+COPY . .
+
+RUN rm -rf node_modules/graphdb || true
+
+RUN npm link /app/graphdb-js
+
+CMD ["npm", "run", "test"]
