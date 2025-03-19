@@ -11,7 +11,7 @@ services:
     ports:
       - '7200:7200'
     networks:
-      - graphdbjs-network
+      - graphdbjsnetwork
     healthcheck:
       test: ["CMD-SHELL", "curl -f -H 'Accept: text/html' ${GRAPHDB_URL}/index.html"]
       interval: 10s
@@ -27,7 +27,7 @@ services:
       graphdb:
         condition: service_healthy
     networks:
-      - graphdbjs-network
+      - graphdbjsnetwork
     environment:
       - GRAPHDB_BASE_URL=http://graphdb:7200
     volumes:
@@ -35,5 +35,5 @@ services:
       - ..:/app/graphdb-js
 
 networks:
-  graphdbjs-network:
+  graphdbjsnetwork:
     driver: bridge

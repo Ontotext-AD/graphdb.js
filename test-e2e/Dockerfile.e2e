@@ -4,12 +4,14 @@ WORKDIR /app
 
 COPY package*.json ./
 
+COPY graphdb-*.tgz ./
+
+RUN ls -la
+
 RUN npm install
 
+RUN PACKAGE=$(find . -name "graphdb-*.tgz") && npm install $PACKAGE
+
 COPY . .
-
-RUN rm -rf node_modules/graphdb || true
-
-RUN npm link /app/graphdb-js
 
 CMD ["npm", "run", "test"]

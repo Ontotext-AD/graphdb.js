@@ -65,7 +65,13 @@ pipeline {
           steps {
             sh "npm run build"
             sh "npm run install:local"
-            sh "GRAPHDB_VERSION=10.8.4 npm run test:docker"
+            script {
+              def packageName = sh(script: "ls graphdb-*.tgz", returnStdout: true).trim()
+              sh "cp ${packageName} test-e2e/"
+
+              dockerCompose.buildCmd(composeFile: 'test-e2e/docker-compose-e2e.yml', options: ["--force-rm", "--no-cache", "--parallel"])
+              dockerCompose.upCmd(composeFile: 'test-e2e/docker-compose-e2e.yml', options: ["--abort-on-container-exit", "--exit-code-from e2e-tests"])
+            }
 //             sh "npm run build"
 //             sh "npm run install:local"
 //             sh "wait-on http://localhost:7200/protocol -t 60000"
@@ -88,7 +94,7 @@ pipeline {
     post {
         always {
           dir("test-e2e/") {
-            sh "docker logs graphdb"
+//             sh "docker logs graphdb"
             // sh "docker-compose down -v --remove-orphans --rmi=local || true"
             script {
                 dockerCompose.downCmd(options: [removeOrphans=true, removeVolumes=true, removeImages='local'])
