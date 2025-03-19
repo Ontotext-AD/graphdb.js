@@ -76,23 +76,17 @@ pipeline {
               dockerCompose.buildCmd(composeFile: 'test-e2e/docker-compose-e2e.yml',
                                     options: ["--force-rm", "--no-cache", "--parallel",
                                              "--project-name graphdbjs"])
-//               dockerCompose.upCmd(composeFile: 'test-e2e/docker-compose-e2e.yml',
-//                                  options: ["--abort-on-container-exit", "--exit-code-from e2e-tests",
-//                                           "--project-name graphdbjs"])
-              // Run the tests and capture the exit code
-              def exitCode = sh(
-//                 script: "docker-compose -f test-e2e/docker-compose-e2e.yml --project-name graphdbjs up --abort-on-container-exit --exit-code-from e2e-tests",
-                script: {
-                  dockerCompose.upCmd(composeFile: 'test-e2e/docker-compose-e2e.yml',
-                                     options: ["--abort-on-container-exit", "--exit-code-from e2e-tests",
-                                              "--project-name graphdbjs"])
-                },
-                returnStatus: true
-              )
+              withEnv(['COMPOSE_PROJECT_NAME=graphdbjs']) {
+                // Run the tests and capture the exit code
+                def exitCode = sh(
+                  script: "docker-compose -f test-e2e/docker-compose-e2e.yml up --abort-on-container-exit --exit-code-from e2e-tests",
+                  returnStatus: true
+                )
 
-              // Fail the build if the tests failed
-              if (exitCode != 0) {
-                error "E2E tests failed with exit code ${exitCode}"
+                // Fail the build if the tests failed
+                if (exitCode != 0) {
+                  error "E2E tests failed with exit code ${exitCode}"
+                }
               }
             }
 //             sh "npm run build"
