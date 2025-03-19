@@ -34,7 +34,7 @@ describe('UpdateQueryPayload', () => {
     });
   });
 
-  test('should populate graphs parameters in the update payload', () => {
+  test('should populate graphs parameters in the update params', () => {
     let payload = new UpdateQueryPayload()
       .setDefaultGraphs('<http://example.org/graph1>')
       .setNamedGraphs('<http://example.org/graph2>')
@@ -46,7 +46,7 @@ describe('UpdateQueryPayload', () => {
     expect(payload.getInsertGraphs()).toEqual('<http://example.org/graph4>');
     expect(payload).toEqual({
       contentType: QueryContentType.SPARQL_UPDATE,
-      payload: {
+      params: {
         'using-graph-uri': '<http://example.org/graph1>',
         'using-named-graph-uri': '<http://example.org/graph2>',
         'remove-graph-uri': '<http://example.org/graph3>',

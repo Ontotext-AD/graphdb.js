@@ -350,7 +350,6 @@ describe('RDFRepositoryClient - transactions', () => {
             })
             .setParams({
               'action': 'QUERY',
-              'query': 'ask {?s ?p ?o}',
               'timeout': 5
             })
             .setResponseType('stream');

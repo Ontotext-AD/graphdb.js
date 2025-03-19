@@ -1,8 +1,10 @@
 const QueryContentType = require('../http/query-content-type');
 
 /**
- * Base class from which all query payload classes derives. Successors must
- * implement {@link #validateParams} and {@link #getSupportedContentTypes}.
+ * Base class from which all query payload classes derives.
+ * Subclasses must implement {@link #getSupportedContentTypes}
+ * and may override {@link #validatePayload} if additional validation is needed
+ * according to the subclass.
  *
  * @abstract
  * @class
@@ -14,8 +16,29 @@ class QueryPayload {
    * Does basic initialization.
    */
   constructor() {
-    this.payload = {};
-    this.contentType = null;
+    /**
+     * Holds common request parameters applicable to the query endpoint.
+     *
+     * @type {Object}
+     */
+    this.params = {};
+
+    /**
+     * Holds the SPARQL query to be used in the request to the query endpoint.
+     *
+     * @type {string|undefined}
+     */
+    this.query = undefined;
+
+    /**
+     * Holds the content type value to be used in the request to the query
+     * endpoint. This value will be set as the HTTP 'Content-Type' header when
+     * sending the request. The value is one of the {@link QueryContentType}
+     * enum values.
+     *
+     * @type {string}
+     */
+    this.contentType = QueryContentType.X_WWW_FORM_URLENCODED;
   }
 
   /**
@@ -28,7 +51,7 @@ class QueryPayload {
       throw new Error('Inference must be a boolean!');
     }
 
-    this.payload.infer = inference;
+    this.params.infer = inference;
     return this;
   }
 
@@ -42,15 +65,16 @@ class QueryPayload {
       throw new Error('Timeout must be a number!');
     }
 
-    this.payload.timeout = timeout;
+    this.params.timeout = timeout;
     return this;
   }
 
   /**
    * An optional parameter which is used for defining the request Content-Type.
    *
-   * @param {string} [contentType] One of the supported content types for given
-   * operation.
+   * @param {string} [contentType] The value is one of the
+   * {@link QueryContentType} enum values.
+   *
    * @return {QueryPayload}
    */
   setContentType(contentType) {
@@ -66,83 +90,53 @@ class QueryPayload {
 
   /**
    * @return {string} content type which was populated in this payload.
+   * The value is one of the {@link QueryContentType} enum values.
    */
   getContentType() {
     return this.contentType;
   }
 
   /**
-   * Serializes all query parameters populated in the payload. Only parameters
-   * which are present will be returned.
    *
-   * Mandatory and dependent parameters are validated and errors are thrown if
-   * necessary.
-   *
-   * @return {string} a serialized payload which holds all available query
-   * parameters in this payload object.
+   * @return {Object} the query payload that contains all parameters.
    */
   getParams() {
-    // when contentType is 'x-www-form-urlencoded', then all parameters should
-    // be considered
-    if (this.getContentType() === QueryContentType.X_WWW_FORM_URLENCODED) {
-      const isValid = this.validateParams();
-      return isValid && this.serialize(this.payload);
-    }
-
-    const query = this.getQuery();
-    if (!query) {
-      throw new Error('Parameter query is mandatory!');
-    }
-    return query;
+    return this.params;
   }
 
   /**
-   * @return {{}} the entire payload.
-   */
-  getPayloadParams() {
-    return this.payload;
-  }
-
-  /**
-   * Utility method which serializes a single level json object to properly
-   * encoded string that can be used in a request.
+   * Sets the SPARQL query string to be used.
    *
-   * @protected
-   * @param {Object} data object which holds request parameter key:value pairs.
-   * @return {string} provided object serialized and encoded to string.
+   * @param {string} query - The query string to set.
+   * @return {QueryPayload}
    */
-  serialize(data) {
-    return Object.entries(data)
-      .filter((x) => x[1] !== undefined)
-      .map((x) => `${encodeURIComponent(x[0])}=${encodeURIComponent(x[1])}`)
-      .join('&');
+  setQuery(query) {
+    if (typeof query !== 'string') {
+      throw new Error('Query must be a string!');
+    }
+    this.query = query;
+    return this;
   }
 
   /**
-   * Must be implemented in successors.
+   * Retrieves the current SPARQL query string.
+   *
+   * @return {string} The currently set SPARQL query string.
+   */
+  getQuery() {
+    return this.query;
+  }
+
+  /**
    *
    * Validates payload for mandatory and invalid parameters.
    *
-   * @abstract
-   * @protected
-   *
-   * @return {boolean} <code>true</code> if parameters are valid and
-   * <code>false</code> otherwise.
+   * @throws {Error} if the payload is misconfigured
    */
-  validateParams() {
-    return false;
-  }
-
-  /**
-   * Must be implemented in successors and should return a list with supported
-   * content types.
-   * @abstract
-   * @protected
-   *
-   * @return {Array<string>}
-   */
-  getSupportedContentTypes() {
-    return [];
+  validatePayload() {
+    if (!this.query) {
+      throw new Error('Parameter query is mandatory!');
+    }
   }
 }
 
