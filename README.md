@@ -115,12 +115,20 @@ npm publish
 
 ## Usage
 
+GraphDB supports two REST APIs for working with RDF data: the RDF4J REST API and the GraphDB API.
+Two classes are used to interact with these APIs: `ServerClient` and `GraphDBServerClient`.
+
+GraphDB allows connections to remote locations and data sources from a GraphDB instance.
+Locations represent individual servers or endpoints that store data.
+These can be other GraphDB instances or remote endpoints and can be attached, edited, and detached as needed.
+
 ### ServerClient
 
-The `ServerClient` deals with operations on server level like obtaining a list 
-with available repositories, concrete repository or deleting repositories. In 
-order to work with the `ServerClient` it should be configured `ServerClientConfig`
-first.
+The `ServerClient` implements the RDF4J REST API and handles server-level operations,
+such as retrieving a list of available repositories, accessing a specific repository,
+and deleting repositories. It works only with a local instance of GraphDB.
+
+To use the `ServerClient`, it must first be configured with `ServerClientConfig`.
 
 * Configure `ServerClient`
 
@@ -185,16 +193,18 @@ server.getRepository('repository-name').then(repository => {
 ``` 
 
 ### GraphDBServerClient
-Implementation of the GraphDB server operations. Extends the `ServerClient` class.
 
-Used to automate the security user management API: add, edit, or remove users.  Also used to add, edit, or remove a repository to/from any attached location.
+The `GraphDBServerClient` extends the functionality of `ServerClient` by enabling operations with remote locations.
+
+It is used to automate security user management, including adding, editing, and removing users. 
+Additionally, it allows adding, editing, or removing repositories from any attached location.
 
 * Setup client
 ```javascript
 // Import all classes needed for work
 const {GraphDBServerClient, ServerClientConfig} = require('graphdb').server; 
 // Instance the server configuration
-const serverConfig = new ServerClientConfig('http://rdf4j-compliant-server/')
+const serverConfig = new ServerClientConfig('http://GraphDB-server/')
     .useGdbTokenAuthentication('admin', 'root');
 // Instance the server client
 const serverClient = new GraphDBServerClient(serverConfig);
@@ -223,6 +233,41 @@ const serverClient = new GraphDBServerClient(serverConfig);
   return serverClient.updateUserData('test_user', '111222', newAppSettings);
 ```
 
+* Fetch repository ids
+  - From a local GraphDB instance:
+    ```javascript
+      serverClient.getRepositoryIDs().then((ids) => {
+        console.log(ids);
+        // [ 'Test_repo' ]
+      });
+    ```
+  - From a remote GraphDB instance:
+    ```javascript
+      serverClient.getRepositoryIDs('http://remote-GraphDB-server').then((ids) => {
+        console.log(ids);
+        // [ 'Test_repo' ]
+      });
+    ```
+
+* Check if a repository with the given name exists
+
+  - From a local GraphDB instance:
+    ```javascript
+      server.hasRepository('Test_repo').then(exists => {
+        if (exists) {
+            // Repository exists -> delete it, for example
+        }
+      }).catch(err => console.log(err));
+    ```
+  - From a remote GraphDB instance:
+    ```javascript
+      server.hasRepository('Test_repo', 'http://remote-GraphDB-server').then(exists => {
+        if (exists) {
+            // Repository exists -> delete it, for example
+        }
+      }).catch(err => console.log(err));
+    ```
+
 * Get repo type default config
 ```javascript
  serverClient.getDefaultConfig(RepositoryType.GRAPHDB).then((response) => {
@@ -230,41 +275,78 @@ const serverClient = new GraphDBServerClient(serverConfig);
  });
 ```
 
-* Get concrete repo configuration
-```javascript
- serverClient.getRepositoryConfig('Test_repo').then((response) => {
+* Get concrete repo configuration 
+  - From a local GraphDB instance:
+   ```javascript
+    serverClient.getRepositoryConfig('Test_repo').then((response) => {
     console.log(response);
- });
-```
+    });
+   ```
+  - From a remote GraphDB instance:
+   ```javascript
+    serverClient.getRepositoryConfig('Test_repo', 'http://remote-GraphDB-server').then((response) => {
+    console.log(response);
+    });
+   ```
 
 * Get concrete repo configuration as stream in turtle format.
-```javascript
- serverClient.downloadRepositoryConfig('Test_repo').then((stream) => {
-   stream.on('data', (data) => {
-       	// data contains requested configuration in turtle format
+  - From a local GraphDB instance:
+    ```javascript
+     serverClient.downloadRepositoryConfig('Test_repo').then((stream) => {
+     stream.on('data', (data) => {
+          // data contains requested configuration in turtle format
+       });
      });
-    
- });
-```
+     ```
+  - From a remote GraphDB instance:
+     ```javascript
+     serverClient.downloadRepositoryConfig('Test_repo', 'http://remote-GraphDB-server').then((stream) => {
+     stream.on('data', (data) => {
+          // data contains requested configuration in turtle format
+       });
+     });
+     ```
 
 * Create repository
-```javascript
-  // Import repository configuration class
-  const {RepositoryConfig} = require('graphdb').repository;  
-    // Create repository configuration
-  const config = new RepositoryConfig('repo_id', '', new Map(), '',  'Repo title', RepositoryType.GRAPHDB);
-  // Use the configuration to create new repository
-  serverClient.createRepository(config)
-      .then(() => {
-        // do work
-  });
-```
+  - On a local GraphDB instance:
+    ```javascript
+      // Import repository configuration class
+      const {RepositoryConfig} = require('graphdb').repository;  
+      // Create repository configuration
+      const config = new RepositoryConfig('repo_id', '', new Map(), '',  'Repo title', RepositoryType.GRAPHDB);
+      // Use the configuration to create new repository
+      serverClient.createRepository(config)
+          .then(() => {
+            // do work
+      });
+    ```
+  - On a remote GraphDB instance:
+     ```javascript
+      // Import repository configuration class
+      const {RepositoryConfig} = require('graphdb').repository;  
+      // Create repository configuration
+      // The second argument is the location of the remote GraphDB instnace where the repository will be created.
+      const config = new RepositoryConfig('repo_id', 'http://remote-GraphDB-server', new Map(), '',  'Repo title', RepositoryType.GRAPHDB);
+      // Use the configuration to create new repository
+      serverClient.createRepository(config)
+          .then(() => {
+            // do work
+      });
+    ```
+
 * Delete repository
-```javascript
-  serverClient.deleteRepository('new_repo').then(() => {
-    // do work  
-  });
-```
+  - From a local GraphDB instance:
+    ```javascript
+      serverClient.deleteRepository('new_repo').then(() => {
+        // do work  
+      });
+    ```
+  - From a remote GraphDB instance:
+    ```javascript
+      serverClient.deleteRepository('new_repo', 'http://remote-GraphDB-server').then(() => {
+        // do work  
+      });
+    ```
 
 * Checks if GraphDB security is enabled
 ```javascript

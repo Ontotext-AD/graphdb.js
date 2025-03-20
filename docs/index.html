@@ -132,11 +132,16 @@ pointing the archive is provided.</p>
 <pre class="prettyprint source"><code>npm publish
 </code></pre>
 <h2>Usage</h2>
+<p>GraphDB supports two REST APIs for working with RDF data: the RDF4J REST API and the GraphDB API.
+Two classes are used to interact with these APIs: <code>ServerClient</code> and <code>GraphDBServerClient</code>.</p>
+<p>GraphDB allows connections to remote locations and data sources from a GraphDB instance.
+Locations represent individual servers or endpoints that store data.
+These can be other GraphDB instances or remote endpoints and can be attached, edited, and detached as needed.</p>
 <h3>ServerClient</h3>
-<p>The <code>ServerClient</code> deals with operations on server level like obtaining a list
-with available repositories, concrete repository or deleting repositories. In
-order to work with the <code>ServerClient</code> it should be configured <code>ServerClientConfig</code>
-first.</p>
+<p>The <code>ServerClient</code> implements the RDF4J REST API and handles server-level operations,
+such as retrieving a list of available repositories, accessing a specific repository,
+and deleting repositories. It works only with a local instance of GraphDB.</p>
+<p>To use the <code>ServerClient</code>, it must first be configured with <code>ServerClientConfig</code>.</p>
 <ul>
 <li>Configure <code>ServerClient</code></li>
 </ul>
@@ -193,15 +198,16 @@ through the server client</li>
 }).catch(err => console.log(err));
 </code></pre>
 <h3>GraphDBServerClient</h3>
-<p>Implementation of the GraphDB server operations. Extends the <code>ServerClient</code> class.</p>
-<p>Used to automate the security user management API: add, edit, or remove users.  Also used to add, edit, or remove a repository to/from any attached location.</p>
+<p>The <code>GraphDBServerClient</code> extends the functionality of <code>ServerClient</code> by enabling operations with remote locations.</p>
+<p>It is used to automate security user management, including adding, editing, and removing users.
+Additionally, it allows adding, editing, or removing repositories from any attached location.</p>
 <ul>
 <li>Setup client</li>
 </ul>
 <pre class="prettyprint source lang-javascript"><code>// Import all classes needed for work
 const {GraphDBServerClient, ServerClientConfig} = require('graphdb').server; 
 // Instance the server configuration
-const serverConfig = new ServerClientConfig('http://rdf4j-compliant-server/')
+const serverConfig = new ServerClientConfig('http://GraphDB-server/')
     .useGdbTokenAuthentication('admin', 'root');
 // Instance the server client
 const serverClient = new GraphDBServerClient(serverConfig);
@@ -231,35 +237,93 @@ const serverClient = new GraphDBServerClient(serverConfig);
   return serverClient.updateUserData('test_user', '111222', newAppSettings);
 </code></pre>
 <ul>
-<li>Get repo type default config</li>
+<li>
+<p>Fetch repository ids</p>
+<ul>
+<li>From a local GraphDB instance:<pre class="prettyprint source lang-javascript"><code>  serverClient.getRepositoryIDs().then((ids) => {
+    console.log(ids);
+    // [ 'Test_repo' ]
+  });
+</code></pre>
+</li>
+<li>From a remote GraphDB instance:<pre class="prettyprint source lang-javascript"><code>  serverClient.getRepositoryIDs('http://remote-GraphDB-server').then((ids) => {
+    console.log(ids);
+    // [ 'Test_repo' ]
+  });
+</code></pre>
+</li>
+</ul>
+</li>
+<li>
+<p>Check if a repository with the given name exists</p>
+<ul>
+<li>From a local GraphDB instance:<pre class="prettyprint source lang-javascript"><code>  server.hasRepository('Test_repo').then(exists => {
+    if (exists) {
+        // Repository exists -> delete it, for example
+    }
+  }).catch(err => console.log(err));
+</code></pre>
+</li>
+<li>From a remote GraphDB instance:<pre class="prettyprint source lang-javascript"><code>  server.hasRepository('Test_repo', 'http://remote-GraphDB-server').then(exists => {
+    if (exists) {
+        // Repository exists -> delete it, for example
+    }
+  }).catch(err => console.log(err));
+</code></pre>
+</li>
+</ul>
+</li>
+<li>
+<p>Get repo type default config</p>
+</li>
 </ul>
 <pre class="prettyprint source lang-javascript"><code> serverClient.getDefaultConfig(RepositoryType.GRAPHDB).then((response) => {
     console.log(response);
  });
 </code></pre>
 <ul>
-<li>Get concrete repo configuration</li>
+<li>
+<p>Get concrete repo configuration</p>
+<ul>
+<li>From a local GraphDB instance:</li>
 </ul>
 <pre class="prettyprint source lang-javascript"><code> serverClient.getRepositoryConfig('Test_repo').then((response) => {
-    console.log(response);
+ console.log(response);
  });
 </code></pre>
 <ul>
-<li>Get concrete repo configuration as stream in turtle format.</li>
+<li>From a remote GraphDB instance:</li>
 </ul>
-<pre class="prettyprint source lang-javascript"><code> serverClient.downloadRepositoryConfig('Test_repo').then((stream) => {
-   stream.on('data', (data) => {
-       	// data contains requested configuration in turtle format
-     });
-    
+<pre class="prettyprint source lang-javascript"><code> serverClient.getRepositoryConfig('Test_repo', 'http://remote-GraphDB-server').then((response) => {
+ console.log(response);
  });
 </code></pre>
+</li>
+<li>
+<p>Get concrete repo configuration as stream in turtle format.</p>
 <ul>
-<li>Create repository</li>
+<li>From a local GraphDB instance:<pre class="prettyprint source lang-javascript"><code> serverClient.downloadRepositoryConfig('Test_repo').then((stream) => {
+ stream.on('data', (data) => {
+      // data contains requested configuration in turtle format
+   });
+ });
+</code></pre>
+</li>
+<li>From a remote GraphDB instance:<pre class="prettyprint source lang-javascript"><code>serverClient.downloadRepositoryConfig('Test_repo', 'http://remote-GraphDB-server').then((stream) => {
+stream.on('data', (data) => {
+     // data contains requested configuration in turtle format
+  });
+});
+</code></pre>
+</li>
 </ul>
-<pre class="prettyprint source lang-javascript"><code>  // Import repository configuration class
+</li>
+<li>
+<p>Create repository</p>
+<ul>
+<li>On a local GraphDB instance:<pre class="prettyprint source lang-javascript"><code>  // Import repository configuration class
   const {RepositoryConfig} = require('graphdb').repository;  
-    // Create repository configuration
+  // Create repository configuration
   const config = new RepositoryConfig('repo_id', '', new Map(), '',  'Repo title', RepositoryType.GRAPHDB);
   // Use the configuration to create new repository
   serverClient.createRepository(config)
@@ -267,15 +331,39 @@ const serverClient = new GraphDBServerClient(serverConfig);
         // do work
   });
 </code></pre>
-<ul>
-<li>Delete repository</li>
+</li>
+<li>On a remote GraphDB instance:<pre class="prettyprint source lang-javascript"><code> // Import repository configuration class
+ const {RepositoryConfig} = require('graphdb').repository;  
+ // Create repository configuration
+ // The second argument is the location of the remote GraphDB instnace where the repository will be created.
+ const config = new RepositoryConfig('repo_id', 'http://remote-GraphDB-server', new Map(), '',  'Repo title', RepositoryType.GRAPHDB);
+ // Use the configuration to create new repository
+ serverClient.createRepository(config)
+     .then(() => {
+       // do work
+ });
+</code></pre>
+</li>
 </ul>
-<pre class="prettyprint source lang-javascript"><code>  serverClient.deleteRepository('new_repo').then(() => {
+</li>
+<li>
+<p>Delete repository</p>
+<ul>
+<li>From a local GraphDB instance:<pre class="prettyprint source lang-javascript"><code>  serverClient.deleteRepository('new_repo').then(() => {
     // do work  
   });
 </code></pre>
-<ul>
-<li>Checks if GraphDB security is enabled</li>
+</li>
+<li>From a remote GraphDB instance:<pre class="prettyprint source lang-javascript"><code>  serverClient.deleteRepository('new_repo', 'http://remote-GraphDB-server').then(() => {
+    // do work  
+  });
+</code></pre>
+</li>
+</ul>
+</li>
+<li>
+<p>Checks if GraphDB security is enabled</p>
+</li>
 </ul>
 <pre class="prettyprint source lang-javascript"><code> serverClient.isSecurityEnabled().then((response) => {
    console.log(response.response.data)
@@ -762,13 +850,13 @@ return repository.query(payload).then((stream) => {
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="AddStatementPayload.html">AddStatementPayload</a></li><li><a href="AppSettings.html">AppSettings</a></li><li><a href="Authentication.html">Authentication</a></li><li><a href="AuthenticationFactory.html">AuthenticationFactory</a></li><li><a href="AuthenticationService.html">AuthenticationService</a></li><li><a href="BaseRepositoryClient.html">BaseRepositoryClient</a></li><li><a href="BasicAuthentication.html">BasicAuthentication</a></li><li><a href="ClientConfig.html">ClientConfig</a></li><li><a href="CommonUtils.html">CommonUtils</a></li><li><a href="ConsoleLogger.html">ConsoleLogger</a></li><li><a href="ContentParser.html">ContentParser</a></li><li><a href="DownloadService.html">DownloadService</a></li><li><a href="FileUtils.html">FileUtils</a></li><li><a href="GdbTokenAuthentication.html">GdbTokenAuthentication</a></li><li><a href="GetQueryPayload.html">GetQueryPayload</a></li><li><a href="GetStatementsPayload.html">GetStatementsPayload</a></li><li><a href="GraphDBServerClient.html">GraphDBServerClient</a></li><li><a href="HttpClient.html">HttpClient</a></li><li><a href="HttpRequestBuilder.html">HttpRequestBuilder</a></li><li><a href="HttpResponse.html">HttpResponse</a></li><li><a href="HttpUtils.html">HttpUtils</a></li><li><a href="Iterable.html">Iterable</a></li><li><a href="JsonLDParser.html">JsonLDParser</a></li><li><a href="LoggingUtils.html">LoggingUtils</a></li><li><a href="N3Parser.html">N3Parser</a></li><li><a href="NQuadsParser.html">NQuadsParser</a></li><li><a href="NTriplesParser.html">NTriplesParser</a></li><li><a href="Namespace.html">Namespace</a></li><li><a href="NamespaceService.html">NamespaceService</a></li><li><a href="PagedResponse.html">PagedResponse</a></li><li><a href="ParserRegistry.html">ParserRegistry</a></li><li><a href="QueryPayload.html">QueryPayload</a></li><li><a href="QueryService.html">QueryService</a></li><li><a href="RDFRepositoryClient.html">RDFRepositoryClient</a></li><li><a href="RDFXmlParser.html">RDFXmlParser</a></li><li><a href="RepositoryClientConfig.html">RepositoryClientConfig</a></li><li><a href="RepositoryConfig.html">RepositoryConfig</a></li><li><a href="RepositoryService.html">RepositoryService</a></li><li><a href="ResponseIterator.html">ResponseIterator</a></li><li><a href="ServerClient.html">ServerClient</a></li><li><a href="ServerClientConfig.html">ServerClientConfig</a></li><li><a href="Service.html">Service</a></li><li><a href="ServiceRequest.html">ServiceRequest</a></li><li><a href="SparqlJsonResultParser.html">SparqlJsonResultParser</a></li><li><a href="SparqlXmlResultParser.html">SparqlXmlResultParser</a></li><li><a href="StatementPayload.html">StatementPayload</a></li><li><a href="StatementsService.html">StatementsService</a></li><li><a href="StringUtils.html">StringUtils</a></li><li><a href="TermConverter.html">TermConverter</a></li><li><a href="TransactionService.html">TransactionService</a></li><li><a href="TransactionalRepositoryClient.html">TransactionalRepositoryClient</a></li><li><a href="TriGParser.html">TriGParser</a></li><li><a href="TurtleParser.html">TurtleParser</a></li><li><a href="UpdateQueryPayload.html">UpdateQueryPayload</a></li><li><a href="UploadService.html">UploadService</a></li><li><a href="User.html">User</a></li></ul><h3>Interfaces</h3><ul><li><a href="Logger.html">Logger</a></li></ul><h3>Global</h3><ul><li><a href="global.html#Authority">Authority</a></li><li><a href="global.html#MediaType">MediaType</a></li><li><a href="global.html#PATH_NAMESPACES">PATH_NAMESPACES</a></li><li><a href="global.html#PATH_SIZE">PATH_SIZE</a></li><li><a href="global.html#PATH_STATEMENTS">PATH_STATEMENTS</a></li><li><a href="global.html#PATH_TRANSACTIONS">PATH_TRANSACTIONS</a></li><li><a href="global.html#QueryContentType">QueryContentType</a></li><li><a href="global.html#QueryLanguage">QueryLanguage</a></li><li><a href="global.html#QueryType">QueryType</a></li><li><a href="global.html#RDFMimeType">RDFMimeType</a></li><li><a href="global.html#RETRIABLE_STATUSES">RETRIABLE_STATUSES</a></li><li><a href="global.html#RepositoryType">RepositoryType</a></li><li><a href="global.html#TransactionIsolationLevel">TransactionIsolationLevel</a></li><li><a href="global.html#XSD">XSD</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="AddStatementPayload.html">AddStatementPayload</a></li><li><a href="AppSettings.html">AppSettings</a></li><li><a href="Authentication.html">Authentication</a></li><li><a href="AuthenticationFactory.html">AuthenticationFactory</a></li><li><a href="AuthenticationService.html">AuthenticationService</a></li><li><a href="BaseRepositoryClient.html">BaseRepositoryClient</a></li><li><a href="BasicAuthentication.html">BasicAuthentication</a></li><li><a href="ClientConfig.html">ClientConfig</a></li><li><a href="CommonUtils.html">CommonUtils</a></li><li><a href="ConsoleLogger.html">ConsoleLogger</a></li><li><a href="ContentParser.html">ContentParser</a></li><li><a href="DownloadService.html">DownloadService</a></li><li><a href="FileUtils.html">FileUtils</a></li><li><a href="GdbTokenAuthentication.html">GdbTokenAuthentication</a></li><li><a href="GetQueryPayload.html">GetQueryPayload</a></li><li><a href="GetStatementsPayload.html">GetStatementsPayload</a></li><li><a href="GraphDBServerClient.html">GraphDBServerClient</a></li><li><a href="HttpClient.html">HttpClient</a></li><li><a href="HttpRequestBuilder.html">HttpRequestBuilder</a></li><li><a href="HttpResponse.html">HttpResponse</a></li><li><a href="HttpUtils.html">HttpUtils</a></li><li><a href="Iterable.html">Iterable</a></li><li><a href="JsonLDParser.html">JsonLDParser</a></li><li><a href="LoggingUtils.html">LoggingUtils</a></li><li><a href="N3Parser.html">N3Parser</a></li><li><a href="NQuadsParser.html">NQuadsParser</a></li><li><a href="NTriplesParser.html">NTriplesParser</a></li><li><a href="Namespace.html">Namespace</a></li><li><a href="NamespaceService.html">NamespaceService</a></li><li><a href="ObjectUtils.html">ObjectUtils</a></li><li><a href="PagedResponse.html">PagedResponse</a></li><li><a href="ParserRegistry.html">ParserRegistry</a></li><li><a href="QueryPayload.html">QueryPayload</a></li><li><a href="QueryService.html">QueryService</a></li><li><a href="RDFRepositoryClient.html">RDFRepositoryClient</a></li><li><a href="RDFXmlParser.html">RDFXmlParser</a></li><li><a href="RepositoryClientConfig.html">RepositoryClientConfig</a></li><li><a href="RepositoryConfig.html">RepositoryConfig</a></li><li><a href="RepositoryService.html">RepositoryService</a></li><li><a href="ResponseIterator.html">ResponseIterator</a></li><li><a href="Server.html">Server</a></li><li><a href="ServerClient.html">ServerClient</a></li><li><a href="ServerClientConfig.html">ServerClientConfig</a></li><li><a href="Service.html">Service</a></li><li><a href="ServiceRequest.html">ServiceRequest</a></li><li><a href="SparqlJsonResultParser.html">SparqlJsonResultParser</a></li><li><a href="SparqlXmlResultParser.html">SparqlXmlResultParser</a></li><li><a href="StatementPayload.html">StatementPayload</a></li><li><a href="StatementsService.html">StatementsService</a></li><li><a href="StringUtils.html">StringUtils</a></li><li><a href="TermConverter.html">TermConverter</a></li><li><a href="TransactionService.html">TransactionService</a></li><li><a href="TransactionalRepositoryClient.html">TransactionalRepositoryClient</a></li><li><a href="TriGParser.html">TriGParser</a></li><li><a href="TurtleParser.html">TurtleParser</a></li><li><a href="UpdateQueryPayload.html">UpdateQueryPayload</a></li><li><a href="UploadService.html">UploadService</a></li><li><a href="User.html">User</a></li></ul><h3>Interfaces</h3><ul><li><a href="Logger.html">Logger</a></li></ul><h3>Global</h3><ul><li><a href="global.html#Authority">Authority</a></li><li><a href="global.html#MediaType">MediaType</a></li><li><a href="global.html#PATH_NAMESPACES">PATH_NAMESPACES</a></li><li><a href="global.html#PATH_SIZE">PATH_SIZE</a></li><li><a href="global.html#PATH_STATEMENTS">PATH_STATEMENTS</a></li><li><a href="global.html#PATH_TRANSACTIONS">PATH_TRANSACTIONS</a></li><li><a href="global.html#QueryContentType">QueryContentType</a></li><li><a href="global.html#QueryLanguage">QueryLanguage</a></li><li><a href="global.html#QueryType">QueryType</a></li><li><a href="global.html#RDFMimeType">RDFMimeType</a></li><li><a href="global.html#RETRIABLE_STATUSES">RETRIABLE_STATUSES</a></li><li><a href="global.html#RepositoryType">RepositoryType</a></li><li><a href="global.html#TransactionIsolationLevel">TransactionIsolationLevel</a></li><li><a href="global.html#XSD">XSD</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.2</a> on Thu Mar 20 2025 10:58:19 GMT+0200 (Eastern European Standard Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.2</a> on Tue Mar 25 2025 16:22:36 GMT+0200 (Eastern European Standard Time)
 </footer>
 
 <script> prettyPrint(); </script>

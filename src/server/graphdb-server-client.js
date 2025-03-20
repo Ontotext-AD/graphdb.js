@@ -1,13 +1,24 @@
-const ServerClient = require('./server-client');
 const LoggingUtils = require('../logging/logging-utils');
 const MediaType = require('../http/media-type');
 const HttpRequestBuilder = require('../http/http-request-builder');
+const ObjectUtils = require('../util/object-utils');
+const Server = require('./server');
+const RepositoryClientConfig =
+    require('../repository/repository-client-config');
+const RDFRepositoryClient = require('../repository/rdf-repository-client');
+
+// Imports used by TypeScript type generation
+const ServerClientConfig = require('./server-client-config');
+const RepositoryConfig = require('../repository/repository-config');
+const RepositoryType = require('../repository/repository-type');
+const HttpResponse = require('../http/http-response');
+const AppSettings = require('./app-settings');
 
 const REPOSITORY_SERVICE_URL = '/rest/repositories';
 const SECURITY_SERVICE_URL = '/rest/security';
 
 /**
- * Implementation of the graphDB server operations.
+ * Extends the {@link Server} with GraphDB API provided by GraphDB.
  *
  *  Used to automate the security user management API:
  *  add, edit, or remove users.  Also used to add, edit,
@@ -19,12 +30,91 @@ const SECURITY_SERVICE_URL = '/rest/security';
  *  @author Teodossi Dossev
  *
  */
-class GraphDBServerClient extends ServerClient {
+class GraphDBServerClient extends Server {
   /**
-   * @param {ServerClientConfig} config for the server client.
-   **/
-  constructor(config) {
-    super(config);
+  * Retrieves the list of repository IDs from the specified location.
+  *
+  * @param {string} [location] - Optional repository location. If provided,
+  *                              the request will be executed for
+  *                              the specified location.
+  * @return {Promise<string[]>} A promise that resolves to an array
+  *                             of repository IDs.
+  */
+  getRepositoryIDs(location) {
+    const locationParameter = this.getLocationParameter(location);
+    const url = `${REPOSITORY_SERVICE_URL}${locationParameter}`;
+    const requestBuilder = HttpRequestBuilder
+      .httpGet(url)
+      .addAcceptHeader(MediaType.APPLICATION_JSON);
+    return this.execute(requestBuilder).then((response) => {
+      return response.getData().map((repository) => repository.id);
+    });
+  }
+
+  /**
+   * Checks if a repository with the provided ID exists.
+   *
+   * @param {string} id The ID of the repository to check.
+   * @param {string} [location] The location of the repository (optional).
+   *
+   * @return {Promise<boolean>} A promise that resolves with a boolean value
+   *                            indicating whether the repository exists.
+   */
+  hasRepository(id, location) {
+    if (!id) {
+      throw new Error('Repository id is required parameter!');
+    }
+    return this.getRepositoryIDs(location).then((repositories) => {
+      return repositories.indexOf(id) !== -1;
+    });
+  }
+
+  /**
+   * Creates a repository client instance with the provided id and
+   * configuration.
+   * @param {string} id of the repository
+   * @param {RepositoryClientConfig} config for the overridable repository
+   *    configuration.
+   * @return {Promise<RDFRepositoryClient>} promise which resolves with
+   *    new RDFRepositoryClient instance.
+   */
+  getRepository(id, config) {
+    if (!id) {
+      throw new Error('Repository id is required parameter!');
+    }
+    if (!config || !(config instanceof RepositoryClientConfig)) {
+      throw new Error('RepositoryClientConfig is required parameter!');
+    }
+    return this.hasRepository(id).then((exists) => {
+      if (exists) {
+        return new RDFRepositoryClient(config);
+      }
+      this.logger.error({repoId: id}, 'Repository does not exist');
+      return Promise
+        .reject(new Error(`Repository with id ${id} does not exists.`));
+    });
+  }
+
+  /**
+   * Deletes the repository with the provided ID.
+   *
+   * @param {string} id The ID of the repository to delete.
+   * @param {string} [location] The location of the repository (optional).
+   *
+   * @return {Promise<any>} A promise that resolves with the result of
+   *                        the delete operation.
+   */
+  deleteRepository(id, location) {
+    if (!id) {
+      throw new Error('Repository id is required parameter!');
+    }
+    const loc = this.getLocationParameter(location);
+    const requestBuilder =
+        HttpRequestBuilder.httpDelete(`${REPOSITORY_SERVICE_URL}/${id}${loc}`);
+    return this.execute(requestBuilder).then((response) => {
+      this.logger.info(LoggingUtils.getLogPayload(response, {repoId: id}),
+        'Deleted repository');
+    });
   }
 
   /**
@@ -32,6 +122,7 @@ class GraphDBServerClient extends ServerClient {
    *
    * @param {RepositoryType|String} repositoryType the type for which a
    * default configuration is required
+   *
    * @return {Promise<HttpResponse|Error>} a promise which resolves to response
    * wrapper or rejects with error if thrown during execution.
    */
@@ -48,38 +139,42 @@ class GraphDBServerClient extends ServerClient {
   }
 
   /**
-   * Get the repository configuration
+   * Retrieves the configuration of a repository.
    *
-   * @param {string} repositoryId the repository id
-   * @param {string} [location] optional repository location
-   * @return {Promise<HttpResponse|string|Error>} a promise which resolves
-   * to response wrapper or rejects with error if thrown during execution.
+   * @param {string} repositoryId The ID of the repository whose configuration
+   *                              is to be retrieved.
+   * @param {string} [location] The optional location of the repository.
+   *
+   * @return {Promise<HttpResponse|string|Error>} A promise that resolves to
+   *         the response wrapper, or rejects with an error if one occurs
+   *         during the execution.
    */
   getRepositoryConfig(repositoryId, location) {
     if (!repositoryId) {
       throw new Error('Repository id is required parameter!');
     }
 
-    const repositoryLocation = location ? `?location=${location}` : '';
-    const url =
-      `${REPOSITORY_SERVICE_URL}/${repositoryId}${repositoryLocation}`;
+    const loc = this.getLocationParameter(location);
     const requestBuilder = HttpRequestBuilder
-      .httpGet(url)
+      .httpGet(`${REPOSITORY_SERVICE_URL}/${repositoryId}${loc}`)
       .addContentTypeHeader(MediaType.APPLICATION_JSON);
     return this.execute(requestBuilder);
   }
 
   /**
    * Download the repository configuration in turtle format
+   *
    * @param {string} repositoryId the repository id
    * @param {string} [location] optional repository location
+   *
    * @return {Promise<string | any>} a service request that will resolve to a
    * readable stream to which the client can subscribe and consume the emitted
    * strings as soon as they are available. Resolves to turtle format.
    */
   downloadRepositoryConfig(repositoryId, location) {
+    const loc = this.getLocationParameter(location);
     const requestBuilder = HttpRequestBuilder
-      .httpGet(`${REPOSITORY_SERVICE_URL}/${repositoryId}/download-ttl`)
+      .httpGet(`${REPOSITORY_SERVICE_URL}/${repositoryId}/download-ttl${loc}`)
       .addContentTypeHeader(MediaType.TEXT_TURTLE)
       .setResponseType('stream');
     return this.execute(requestBuilder).then((response) => {
@@ -90,36 +185,23 @@ class GraphDBServerClient extends ServerClient {
   }
 
   /**
-   * Create repository according to the provided configuration
-   * @param {RepositoryConfig} repositoryConfig
-   * @return {Promise<HttpResponse|Error>} a promise which resolves
-   * to response wrapper or rejects with error if thrown during execution.
+   * Creates a repository based on the provided configuration.
+   *
+   * @param {RepositoryConfig} repositoryConfig The configuration of
+   *                                    the repository to be created.
+   *
+   * @return {Promise<HttpResponse|Error>} A promise that resolves to
+   *         the response wrapper, or rejects with an error if one occurs
+   *         during execution.
    */
   createRepository(repositoryConfig) {
+    const location = this.getLocationParameter(repositoryConfig.location);
     const requestBuilder = HttpRequestBuilder
-      .httpPut(`${REPOSITORY_SERVICE_URL}/${repositoryConfig.id}`)
+      .httpPut(`${REPOSITORY_SERVICE_URL}/${repositoryConfig.id}${location}`)
       .setData(this.objectToJson(repositoryConfig))
       .addContentTypeHeader(MediaType.APPLICATION_JSON)
       .addAcceptHeader(MediaType.TEXT_PLAIN);
     return this.execute(requestBuilder);
-  }
-
-  /**
-   * Delete repository with the provided id.
-   * @override
-   * @param {string} id of the repository which should be deleted.
-   * @return {Promise<any>} promise which resolves with the delete result.
-   */
-  deleteRepository(id) {
-    if (!id) {
-      throw new Error('Repository id is required parameter!');
-    }
-    const requestBuilder =
-      HttpRequestBuilder.httpDelete(`${REPOSITORY_SERVICE_URL}/${id}`);
-    return this.execute(requestBuilder).then((response) => {
-      this.logger.info(LoggingUtils.getLogPayload(response, {repoId: id}),
-        'Deleted repository');
-    });
   }
 
   /**
@@ -316,7 +398,26 @@ class GraphDBServerClient extends ServerClient {
    * or empty object if undefined
    */
   objectToJson(object) {
-    return object && object.toJson() || {};
+    if (object && typeof object.toJson === 'function' ) {
+      return object.toJson();
+    }
+    return {};
+  }
+
+  /**
+   * Returns the query parameter for the repository location if it's provided,
+   * otherwise returns an empty string.
+   *
+   * @private
+   *
+   * @param {string} [location] The location of the repository.
+   *
+   * @return {string} The query string representing the location parameter,
+   *         or an empty string if the location is null or undefined.
+   */
+  getLocationParameter(location) {
+    return ObjectUtils.isNullOrUndefined(location) ?
+      '' : `?location=${location}`;
   }
 }
 
