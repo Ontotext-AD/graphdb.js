@@ -3,7 +3,7 @@ const RepositoryClientConfig = require('repository/repository-client-config');
 const BaseRepositoryClient = require('repository/base-repository-client');
 const HttpRequestBuilder = require('http/http-request-builder');
 const httpClientStub = require('../http/http-client.stub');
-const User = require('../../lib/auth/user');
+const User = require('auth/user');
 import data from './data/read-statements';
 
 jest.mock('http/http-client');

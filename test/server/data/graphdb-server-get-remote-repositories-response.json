@@ -1,0 +1,16 @@
+[
+  {
+    "id": "remoteRepoOneId",
+    "location": "http://example.com:7200",
+    "sesameType": "graphdb:SailRepository",
+    "title": "Title of repo one",
+    "type": "graphdb"
+  },
+  {
+    "id": "remoteRepoTwoId",
+    "location": "http://example.com:7200",
+    "sesameType": "graphdb:SailRepository",
+    "title": "Title of repo two",
+    "type": "ontop"
+  }
+]

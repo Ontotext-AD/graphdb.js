@@ -5,8 +5,8 @@ const {RepositoryClientConfig} = require('graphdb').repository;
 
 // Variables used in tests
 const serverAddress = 'http://localhost:7200';
-const testRepoPath = './tests/data/repositories/GDB_Free/repository1.ttl';
-const testRepo2Path = './tests/data/repositories/GDB_Free/repository2.ttl';
+const testRepoPath = './tests/data/repositories/GDB/repository1.ttl';
+const testRepo2Path = './tests/data/repositories/GDB/repository2.ttl';
 
 const restApiConfig = new RepositoryClientConfig(serverAddress)
   .setEndpoints([`${serverAddress}/repositories/Test_repo`])

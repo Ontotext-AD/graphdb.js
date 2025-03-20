@@ -26,7 +26,7 @@ export class RepositoryConfig {
   constructor(id, location, params, sesameType, title, type) {
     this.id = id;
     this.location = location;
-    this.params = params;
+    this.params = params || {};
     this.sesameType = sesameType;
     this.title = title;
     this.type = type;
