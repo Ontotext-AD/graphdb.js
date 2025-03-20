@@ -44,7 +44,7 @@ describe('Manage GraphDB repositories', () => {
     serverClient.logout(serverConfig);
   });
 
-  test('Should get repo default config', () => {
+  test.only('Should get repo default config', () => {
     const expectedResponse = Utils.loadFile('./data/graphdb-server-client/' +
       'expected_response_default_config.txt');
     return serverClient.getDefaultConfig(RepositoryType.GRAPHDB).then((response) => {

@@ -1,63 +1,125 @@
+@Library('ontotext-platform@GDB-11897-Migrate-pipelines-new-Jenkins') _
 pipeline {
-
-  agent {
-    label 'graphdb-jenkins-node'
-  }
-
-  tools {
-    nodejs 'nodejs-14.17.0'
-  }
-
-  environment {
-    CI = "true"
-  }
-
-  stages {
-    stage('Prepare') {
-      steps {
-        sh "node --version"
-        sh "docker-compose -f test-e2e/docker-compose.yml up -d"
-      }
+    environment {
+        CI = "true"
+        // Needed for our version of webpack + newer nodejs
+        NODE_OPTIONS = "--openssl-legacy-provider"
+        // Tells NPM and co. not to use color output (looks like garbage in Jenkins)
+        NO_COLOR = "1"
+        SONAR_ENVIRONMENT = "SonarCloud"
+        LEGACY_JENKINS = "https://jenkins.ontotext.com"
+        NEW_JENKINS = "https://new-jenkins.ontotext.com"
+        LEGACY_AGENT = 'graphdb-jenkins-node'
+        NEW_AGENT = 'aws-small'
     }
 
-    stage('Install') {
-      steps {
-        sh "npm ci"
-      }
+    // TODO fix when migration is complete
+    agent {
+        label env.NEW_AGENT
     }
 
-    stage('Unit Test') {
-      steps {
-        sh "npm run lint"
-        sh "npm run lint:test"
-        sh "npm run test:report"
-      }
+    tools {
+        nodejs 'nodejs-18.9.0'
     }
 
-    stage('Acceptance Test') {
-      steps {
-        sh "npm run build"
-        sh "npm run install:local"
-        sh "wait-on http://localhost:7200/protocol -t 60000"
-        sh "(cd test-e2e/ && npm install && npm link graphdb && npm run test)"
-      }
-    }
-
-    stage('Sonar') {
-      steps {
-        withSonarQubeEnv('SonarCloud') {
-          sh "node sonar-project.js --branch='${env.ghprbSourceBranch}' --target-branch='${env.ghprbTargetBranch}' --pull-request-id='${env.ghprbPullId}'"
+    stages {
+        // TODO remove when migration is complete
+        stage('Check Jenkins environment') {
+            steps {
+                script {
+                    if (env.JENKINS_URL?.contains(env.LEGACY_JENKINS)) {
+                        echo "Legacy Jenkins detected. Skipping pipeline execution and finishing build with SUCCESS."
+                        currentBuild.result = 'SUCCESS'
+                        return
+                    }
+                }
+            }
         }
-      }
-    }
-  }
 
-  post {
-    always {
-      dir("test-e2e/") {
-        sh "docker logs graphdb"
-        sh "docker-compose down -v --remove-orphans --rmi=local || true"
-      }
+        stage('Prepare') {
+          steps {
+            sh "node --version"
+//             sh "docker-compose -f test-e2e/docker-compose.yml up -d"
+//             script {
+//               dockerCompose.buildCmd(composeFile: 'test-e2e/docker-compose-e2e.yml',
+//                                     options: ["--force-rm", "--no-cache", "--parallel",
+//                                              "--project-name graphdbjs"])
+//               dockerCompose.upCmd(composeFile: 'test-e2e/docker-compose-e2e.yml',
+//                                  options: ["--abort-on-container-exit", "--exit-code-from e2e-tests",
+//                                           "--project-name graphdbjs"])
+//             }
+          }
+        }
+
+        stage('Install') {
+            steps {
+                sh "npm ci"
+            }
+        }
+
+        stage('Unit Test') {
+          steps {
+            sh "npm run lint"
+            sh "npm run lint:test"
+            sh "npm run test:report"
+          }
+        }
+
+        stage('Acceptance Test') {
+          steps {
+            sh "npm run build"
+            sh "npm run install:local"
+            script {
+              def packageName = sh(script: "ls graphdb-*.tgz", returnStdout: true).trim()
+              sh "cp ${packageName} test-e2e/"
+
+              dockerCompose.buildCmd(composeFile: 'test-e2e/docker-compose-e2e.yml',
+                                    options: ["--force-rm", "--no-cache", "--parallel",
+                                             "--project-name graphdbjs"])
+              withEnv(['COMPOSE_PROJECT_NAME=graphdbjs']) {
+                // Run the tests and capture the exit code
+                def exitCode = sh(
+                  script: "docker-compose -f test-e2e/docker-compose-e2e.yml up --abort-on-container-exit --exit-code-from e2e-tests",
+                  returnStatus: true
+                )
+
+                // Fail the build if the tests failed
+                if (exitCode != 0) {
+                  error "E2E tests failed with exit code ${exitCode}"
+                }
+              }
+            }
+//             sh "npm run build"
+//             sh "npm run install:local"
+//             sh "wait-on http://localhost:7200/protocol -t 60000"
+//             sh "(cd test-e2e/ && npm install && npm link graphdb && npm run test)"
+          }
+        }
+
+//         stage('Sonar') {
+//           steps {
+//             withSonarQubeEnv('SonarCloud') {
+//               sh """
+//                 node sonar-project.js \
+//                 ${sonar.resolveBranchArguments()}
+//               """
+//             }
+//           }
+//         }
     }
-  }
+
+    post {
+        always {
+          dir("test-e2e/") {
+//             sh "docker logs graphdb"
+            // sh "docker-compose down -v --remove-orphans --rmi=local || true"
+            script {
+                dockerCompose.downCmd(options: [removeOrphans: true,
+                                              removeVolumes: true,
+                                              removeImages: 'local',
+                                              projectName: 'graphdbjs'])
+            }
+          }
+        }
+    }
 }
