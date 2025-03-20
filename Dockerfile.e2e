@@ -1,0 +1,31 @@
+FROM node:18-alpine
+
+# First build the main library
+WORKDIR /app
+
+# Copy main project files
+COPY package*.json ./
+COPY src/ ./src/
+COPY scripts/ ./scripts/
+COPY *.js ./
+COPY tsconfig.json ./
+COPY jsdoc.conf.json ./
+
+# Install dependencies and build
+RUN npm ci
+RUN npm run build
+RUN npm pack
+
+# Setup test-e2e environment
+WORKDIR /app/test-e2e
+
+# Copy test-e2e files
+COPY test-e2e/package*.json ./
+COPY test-e2e/ ./
+
+# Install test-e2e dependencies and the built package
+RUN npm ci
+RUN npm install --no-save ../graphdb-*.tgz
+
+# Run tests
+CMD ["npm", "test"]

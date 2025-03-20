@@ -54,6 +54,7 @@
   },
   "scripts": {
     "build": "node ./scripts/build.js && npm run doc && npm run tsd",
+    "build:only": "node ./scripts/build.js",
     "prepare": "npm run build",
     "test": "jest",
     "test:watch": "jest --watch",
@@ -66,8 +67,8 @@
     "install:local": "npm pack && npm link",
     "install:e2e": "cd test-e2e/ && npm clean-install && npm link graphdb",
     "e2e:local": "npm run install:local && npm run install:e2e",
-    "e2e:run": "npm run e2e:local && cd test-e2e/ && npm run test",
-    "test:docker": "GRAPHDB_VERSION=${GRAPHDB_VERSION:-10.8.4} GRAPHDB_URL=${GRAPHDB_URL:-http://graphdb:7200} docker compose -f test-e2e/docker-compose-e2e.yml build --no-cache && GRAPHDB_VERSION=${GRAPHDB_VERSION:-10.8.4} GRAPHDB_URL=${GRAPHDB_URL:-http://graphdb:7200} docker compose -f test-e2e/docker-compose-e2e.yml up --abort-on-container-exit --exit-code-from e2e-tests",
+    "e2e:run": "npm run e2e:local && cd test-e2e/ && npm run test:single",
+    "test:docker": "GRAPHDB_VERSION=${GRAPHDB_VERSION:-10.8.4} GRAPHDB_URL=${GRAPHDB_URL:-http://graphdb:7200} docker compose -f docker-compose-e2e.yml build --no-cache && GRAPHDB_VERSION=${GRAPHDB_VERSION:-10.8.4} GRAPHDB_URL=${GRAPHDB_URL:-http://graphdb:7200} docker compose -f docker-compose-e2e.yml up --abort-on-container-exit --exit-code-from e2e-tests",
     "test:docker:clean": "npm run test:docker && docker compose -f test-e2e/docker-compose-e2e.yml down -v --remove-orphans --rmi=local"
   },
   "devDependencies": {

@@ -1,5 +1,3 @@
-version: '3.3'
-
 services:
 
   graphdb:
@@ -33,6 +31,7 @@ services:
     volumes:
       - .:/app
       - ..:/app/graphdb-js
+#    entrypoint: [ "sh", "-c", "sleep infinity" ]
 
 networks:
   graphdbjsnetwork:
