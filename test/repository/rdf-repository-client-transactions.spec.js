@@ -21,6 +21,7 @@ const {namedNode, literal, quad} = require('n3').DataFactory;
 const httpClientStub = require('../http/http-client.stub');
 const testUtils = require('../utils');
 const path = require('path');
+const MediaType = require('http/media-type');
 
 jest.mock('http/http-client');
 
@@ -705,7 +706,7 @@ describe('RDFRepositoryClient - transactions', () => {
         baseURI,
         context
       });
-      expect(requestBuilder.getResponseType()).toEqual('stream');
+      expect(requestBuilder.getResponseType()).toEqual(MediaType.TEXT_PLAIN);
     }
 
     function getStatementPayload() {

@@ -514,7 +514,7 @@ return repository.query(payload).then((data) => {
 
 #### Writing
 
-* Uploading data in repository (POST) using ReadStream
+* Uploading data in repository (PUT) using ReadStream
 
 ```javascript
 const contentType = RDFMimeType.TURTLE;

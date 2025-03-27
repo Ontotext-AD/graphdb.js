@@ -6,6 +6,7 @@ const HttpRequestBuilder = require('http/http-request-builder');
 const {ObjectReadableMock} = require('stream-mock');
 
 const httpClientStub = require('../http/http-client.stub');
+const MediaType = require('http/media-type');
 
 jest.mock('http/http-client');
 
@@ -71,14 +72,14 @@ describe('RdfRepositoryClient - streaming data', () => {
     });
 
     function verifyUploadRequest() {
-      const expectedRequestConfig = HttpRequestBuilder.httpPost('/statements')
+      const expectedRequestConfig = HttpRequestBuilder.httpPut('/statements')
         .setData({})
         .setHeaders({
           'Content-Type': 'text/turtle'
         }).setParams({
           context,
           baseURI
-        }).setResponseType('stream');
+        }).setResponseType(MediaType.TEXT_PLAIN);
 
       expect(httpRequest).toHaveBeenCalledTimes(1);
       expect(httpRequest).toHaveBeenCalledWith(expectedRequestConfig);
