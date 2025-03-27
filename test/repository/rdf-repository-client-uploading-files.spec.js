@@ -8,6 +8,7 @@ const Stream = require('stream');
 const httpClientStub = require('../http/http-client.stub');
 const testUtils = require('../utils');
 const path = require('path');
+const MediaType = require("http/media-type");
 
 jest.mock('http/http-client');
 
@@ -47,7 +48,7 @@ describe('RdfRepositoryClient - uploading files', () => {
         .then(() => {
           expect(httpRequest).toHaveBeenCalledTimes(1);
           const requestBuilder = httpRequest.mock.calls[0][0];
-          verifyUploadRequestBuilder(requestBuilder, 'post');
+          verifyUploadRequestBuilder(requestBuilder, MediaType.TEXT_PLAIN);
           return testUtils.readStream(requestBuilder.getData());
         }).then((streamData) => {
           const expectedData = testUtils.loadFile(testFilePath).trim();
@@ -91,7 +92,7 @@ describe('RdfRepositoryClient - uploading files', () => {
         .then(() => {
           expect(httpRequest).toHaveBeenCalledTimes(1);
           const requestBuilder = httpRequest.mock.calls[0][0];
-          verifyUploadRequestBuilder(requestBuilder, 'put');
+          verifyUploadRequestBuilder(requestBuilder);
           return testUtils.readStream(requestBuilder.getData());
         }).then((streamData) => {
           const expectedData = testUtils.loadFile(testFilePath).trim();
@@ -128,9 +129,9 @@ describe('RdfRepositoryClient - uploading files', () => {
     });
   });
 
-  function verifyUploadRequestBuilder(requestBuilder, method) {
+  function verifyUploadRequestBuilder(requestBuilder, responseType = 'stream') {
     expect(requestBuilder).toBeInstanceOf(HttpRequestBuilder);
-    expect(requestBuilder.getMethod()).toEqual(method);
+    expect(requestBuilder.getMethod()).toEqual('put');
     expect(requestBuilder.getUrl()).toEqual('/statements');
     expect(requestBuilder.getData()).toBeInstanceOf(Stream);
     expect(requestBuilder.getHeaders()).toEqual({
@@ -140,6 +141,6 @@ describe('RdfRepositoryClient - uploading files', () => {
       baseURI,
       context
     });
-    expect(requestBuilder.getResponseType()).toEqual('stream');
+    expect(requestBuilder.getResponseType()).toEqual(responseType);
   }
 });

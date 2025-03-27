@@ -6,6 +6,7 @@ const PATH_STATEMENTS = require('./service-paths').PATH_STATEMENTS;
 const TermConverter = require('../model/term-converter');
 const LoggingUtils = require('../logging/logging-utils');
 const FileUtils = require('../util/file-utils');
+const MediaType = require('../http/media-type');
 
 /**
  * Service for uploading data streams.
@@ -164,10 +165,10 @@ class UploadService extends Service {
    * the stream has been successfully consumed by the server
    */
   getUploadRequest(readStream, contentType, context, baseURI) {
-    return HttpRequestBuilder.httpPost(PATH_STATEMENTS)
+    return HttpRequestBuilder.httpPut(PATH_STATEMENTS)
       .setData(readStream)
       .addContentTypeHeader(contentType)
-      .setResponseType('stream')
+      .setResponseType(MediaType.TEXT_PLAIN)
       .setParams({
         baseURI,
         context: TermConverter.toNTripleValues(context)
