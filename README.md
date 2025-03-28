@@ -383,22 +383,46 @@ Use with extreme caution, as the changes that are made to the application settin
 ### RDFRepositoryClient
 
 * Instantiating repository client
-
-```javascript
-const endpoint = 'http://GDB';
-const readTimeout = 30000;
-const writeTimeout = 30000;
-const config = new RepositoryClientConfig(endpoint)
-    .setEndpoints(['http://GDB/repositories/my-repo'])
-    .setHeaders({
-      'Accept': RDFMimeType.TURTLE
-    })
-    .setReadTimeout(readTimeout)
-    .setWriteTimeout(writeTimeout);
-const repository = new RDFRepositoryClient(config);
-```
-When created, configurations receive the following default parameters:
-```javascript
+   - Repository client that interacts with a local GraphDB instance
+     ```javascript
+      const endpoint = 'http://GDB';
+      const readTimeout = 30000;
+      const writeTimeout = 30000;
+      const config = new RepositoryClientConfig(endpoint)
+        .setEndpoints(['http://GDB/repositories/my-repo'])
+        .setHeaders({
+          'Accept': RDFMimeType.TURTLE
+        })
+        .setReadTimeout(readTimeout)
+        .setWriteTimeout(writeTimeout);
+        const repository = new RDFRepositoryClient(config);
+     ```
+   - Repository client that interacts with a remote GraphDB instance
+     ```javascript
+      const endpoint = 'http://GDB';
+      const readTimeout = 30000;
+      const writeTimeout = 30000;
+      const config = new RepositoryClientConfig(endpoint)
+        .setEndpoints(['http://GDB/repositories/my-repo']);
+     /**
+     * When the `setLocation(location)` method is called on the repository
+     * client configuration, it specifies the remote GraphDB repository's location,
+     * e.g., `http://graphdb2:7200`.
+     */
+     config.setLocation('http://remote-GraphDB-server');
+     /**
+     * Once the client is instantiated, any HTTP request sent through the client will include
+     * the custom header `x-graphdb-repository-location`. The value of this header will be
+     * the location passed into `setLocation()`.
+     * For example, if the location is `http://graphdb2:7200`, each request will include this header:
+     * {
+     *   'x-graphdb-repository-location': 'http://graphdb2:7200'
+     * }
+     */
+     const repository = new RDFRepositoryClient(config);
+     ```
+   When created, configurations receive the following default parameters:
+   ```javascript
     /**
     * The Repository client configuration constructor
     * sets configuration default value to 
@@ -407,7 +431,7 @@ When created, configurations receive the following default parameters:
     * readTimeout = 10000,
     * writeTimeout = 10000
     */
-```
+  ```
 
 * Obtaining repository client instance through a ServerClient
 

@@ -1,5 +1,6 @@
 const ClientConfig = require('../http/client-config');
 const RDFMimeType = require('../http/rdf-mime-type');
+const ObjectUtils = require('../../lib/util/object-utils');
 
 const defaultTimeout = 10000;
 
@@ -132,6 +133,24 @@ class RepositoryClientConfig extends ClientConfig {
    */
   getWriteTimeout() {
     return this.writeTimeout;
+  }
+
+  /**
+   * Sets the location of the remote GraphDB instance.
+   * <p>
+   * This method updates the request headers with
+   * the "x-graphdb-repository-location" header to specify the location of
+   * the target GraphDB instance.
+   * </p>
+   *
+   * @param {string} location - The location of the remote GraphDB instance.
+   * @return {this} current config for method chaining
+   */
+  setLocation(location) {
+    if (!ObjectUtils.isNullOrUndefined(location)) {
+      this.headers['x-graphdb-repository-location'] = location;
+    }
+    return this;
   }
 }
 

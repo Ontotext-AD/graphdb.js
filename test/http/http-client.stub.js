@@ -2,14 +2,15 @@
  * Creates stub of HttpClient with default method spies.
  */
 function stub(baseUrl) {
-  return {
+  const instance = {
     baseUrl,
-    setDefaultHeaders: jest.fn().mockReturnThis(),
-    setDefaultReadTimeout: jest.fn().mockReturnThis(),
-    setDefaultWriteTimeout: jest.fn().mockReturnThis(),
+    setDefaultHeaders: jest.fn().mockImplementation(() => instance),
+    setDefaultReadTimeout: jest.fn().mockImplementation(() => instance),
+    setDefaultWriteTimeout: jest.fn().mockImplementation(() => instance),
     request: jest.fn().mockResolvedValue({}),
     getBaseURL: () => baseUrl
   };
+  return instance;
 }
 
 module.exports = stub;

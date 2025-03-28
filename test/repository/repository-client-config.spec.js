@@ -62,4 +62,32 @@ describe('RepositoryClientConfig', () => {
     endpoints.forEach((endpoint) => config.addEndpoint(endpoint));
     expect(config.getEndpoints()).toEqual(endpoints);
   });
+
+  test('should not set GraphDb location header when crete an instance of RepositoryClientConfig', () => {
+    // When: I create an instance of RepositoryClientConfig.
+    const config = new RepositoryClientConfig(endpoint);
+    // Then: I expect the Location header to not be set.
+    expect(config.getHeaders()).toEqual({});
+  });
+
+  test('setLocation should not add the GraphDB Location header if an invalid location is passed', () => {
+    [undefined, null].forEach((location) => {
+      const config = new RepositoryClientConfig(endpoint);
+      // When: I try to set an invalid location.
+      config.setLocation(location);
+      // Then: I expect the Location header to not be set.
+      expect(config.getHeaders()).toEqual({});
+    });
+  });
+
+  test('setLocation should add the GraphDB Location header if a valid location is passed', () => {
+    ['', 'http://graphdb2:7200'].forEach((location) => {
+      const config = new RepositoryClientConfig(endpoint);
+      // When: I try to set a valid location.
+      config.setLocation(location);
+      // Then: I expect the Location header to be set.
+      expect(config.getHeaders()).toEqual({ "x-graphdb-repository-location": location });
+    });
+  });
+
 });
