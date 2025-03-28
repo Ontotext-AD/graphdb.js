@@ -1,0 +1,36 @@
+services:
+
+  graphdb:
+    image: docker-registry.ontotext.com/graphdb:${GDB_VERSION}
+    container_name: graphdb
+    ports:
+      - '7200:7200'
+    networks:
+      - graphdbjsnetwork
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f -H 'Accept: text/html' ${GDB_URL}/index.html"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  e2e-tests:
+    build:
+      context: .
+      dockerfile: Dockerfile.e2e
+    container_name: e2e-tests
+    depends_on:
+      graphdb:
+        condition: service_healthy
+    networks:
+      - graphdbjsnetwork
+    environment:
+      - GDB_URL=${GDB_URL}
+
+networks:
+  graphdbjsnetwork:
+    driver: bridge
