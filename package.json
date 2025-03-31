@@ -1,6 +1,6 @@
 {
   "name": "graphdb",
-  "version": "3.1.0-newjenkins12",
+  "version": "3.1.0-newjenkins28",
   "description": "Javascript client library supporting GraphDB and RDF4J REST API.",
   "author": {
     "name": "\"Sirma AI\" JSC, trading as Ontotext",
