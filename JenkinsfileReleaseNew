@@ -112,10 +112,8 @@ pipeline {
 
             def gitMessages = getReleaseMessagesFromGit(latest)
             echo "Recent merge commit messages collected"
-            def token = GIT_TOKEN.replaceFirst(/^JWT: /, '')
-            echo "First 4 chars of GIT_TOKEN: ${token.take(4)}****"
 
-            def result = postRelease(composeReleaseMessage(gitMessages), "$token")
+            def result = postRelease(composeReleaseMessage(gitMessages), "$GIT_TOKEN")
             echo result
           }
         }
