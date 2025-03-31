@@ -177,16 +177,18 @@ def composeReleaseMessage(String gitMessages) {
 // returns response from the operation
 def postRelease(String desc, String auth) {
   def body = [
-    tag_name       : "v${params.RELEASE_VERSION}",
+    tag_name: "v${params.RELEASE_VERSION}",
     target_commitish: "${params.GIT_BRANCH}",
-    name           : "v${params.RELEASE_VERSION}",
-    body           : desc,
-    draft          : false,
-    prerelease     : params.PRE_RELEASE
+    name: "v${params.RELEASE_VERSION}",
+    body: desc,
+    draft: false,
+    prerelease: params.PRE_RELEASE
   ]
 
   def json = JsonOutput.toJson(body)
-  def curlCommand = "curl -X POST -H \"Accept: application/vnd.github.v3+json\" -H \"Authorization: Bearer ${auth}\" --data '${json}' ${API_URL}/releases"
+  writeFile file: 'release.json', text: json
+
+  def curlCommand = "curl -X POST -H \"Accept: application/vnd.github.v3+json\" -H \"Authorization: Bearer ${auth}\" --data @release.json ${API_URL}/releases"
   return sh(script: curlCommand, returnStdout: true)
 }
 
