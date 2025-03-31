@@ -40,33 +40,15 @@ pipeline {
   }
 
   environment {
-    // CI = "true"
-    // NPM_TOKEN = credentials('npm-token')
     API_URL = "https://api.github.com/repos/Ontotext-AD/graphdb.js"
   }
 
   stages {
     stage ('Prepare') {
       steps {
-        // show node version
-        sh "node --version"
-
-        echo "Checking out branch: ${params.GIT_BRANCH}"
-
-        // Switch to branch
-        sh "git checkout ${params.GIT_BRANCH}"
-
-        // Change versions
-        sh "npm version --git-tag-version=false --allow-same-version=true ${params.RELEASE_VERSION}"
-        dir("test-e2e/") {
-          sh "npm version --git-tag-version=false --allow-same-version=true ${params.RELEASE_VERSION}"
-        }
-
-        // Install
-        sh "npm ci"
-
-        // Build
-        sh "npm run build"
+        git_cmd.checkout(branch: params.GIT_BRANCH)
+        npm.prepareRelease(version: params.RELEASE_VERSION, scripts: ['build'])
+        npm.prepareRelease(version: params.RELEASE_VERSION, dir: "test-e2e/")
       }
     }
 
