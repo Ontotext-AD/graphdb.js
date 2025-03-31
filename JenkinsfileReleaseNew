@@ -23,9 +23,6 @@ pipeline {
     booleanParam name: 'PRE_RELEASE',
            description: 'This is a pre-release. Will not publish to npm if selected',
            defaultValue: false
-
-    string name: 'JENKINS_CREDENTIAL_ID',
-           description: 'Jenkins credential ID'
   }
 
   agent {
@@ -46,7 +43,6 @@ pipeline {
     // CI = "true"
     // NPM_TOKEN = credentials('npm-token')
     API_URL = "https://api.github.com/repos/Ontotext-AD/graphdb.js"
-    // AUTH = credentials("${params.JENKINS_CREDENTIAL_ID}")
   }
 
   stages {
@@ -126,6 +122,11 @@ pipeline {
           sh "git push --tags"
 
           script {
+            echo "DEBUG: GIT_TOKEN=${GIT_TOKEN}"
+            echo "DEBUG: RELEASE_VERSION=${params.RELEASE_VERSION}"
+            echo "DEBUG: GIT_BRANCH=${params.GIT_BRANCH}"
+            echo "DEBUG: Release message = ${composeReleaseMessage(getReleaseMessagesFromGit(getLatestReleaseTagName()))}"
+
             def latest = getLatestReleaseTagName()
             echo "Last revision ${latest}"
 
