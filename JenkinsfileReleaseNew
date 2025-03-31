@@ -184,14 +184,7 @@ def postRelease(String desc, String auth) {
   ]
 
   def json = JsonOutput.toJson(body)
-  def curlCommand = """
-    curl -X POST \
-      -H "Accept: application/vnd.github.v3+json" \
-      -H "Authorization: token ${auth}" \
-      --data '${json}' \
-      ${API_URL}/releases
-  """
-
+  def curlCommand = "curl -X POST -H \"Accept: application/vnd.github.v3+json\" -H \"Authorization: token ${auth}\" --data '${json}' ${API_URL}/releases"
   return sh(script: curlCommand.trim(), returnStdout: true)
 }
 
