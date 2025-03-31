@@ -1,4 +1,5 @@
 @Library('ontotext-platform@v0.1.49') _
+import groovy.json.JsonOutput
 
 pipeline {
 
@@ -173,16 +174,21 @@ def composeReleaseMessage(String gitMessages) {
 // Post release to github
 // returns response from the operation
 def postRelease(String desc, String auth) {
-  def safeDesc = desc
-    .replaceAll('\\\\', '\\\\\\\\')
-    .replaceAll('"', '\\"')
-    .replaceAll('\n', '\\n')
+  def body = [
+    tag_name       : "v${params.RELEASE_VERSION}",
+    target_commitish: "${params.GIT_BRANCH}",
+    name           : "v${params.RELEASE_VERSION}",
+    body           : desc,
+    draft          : false,
+    prerelease     : params.PRE_RELEASE
+  ]
 
+  def json = JsonOutput.toJson(body)
   def curlCommand = """
     curl -X POST \
       -H "Accept: application/vnd.github.v3+json" \
       -H "Authorization: token ${auth}" \
-      --data "{\\"tag_name\\": \\"v${params.RELEASE_VERSION}\\", \\"target_commitish\\": \\"${params.GIT_BRANCH}\\", \\"name\\": \\"v${params.RELEASE_VERSION}\\", \\"body\\": \\"${safeDesc}\\", \\"draft\\": false, \\"prerelease\\": ${params.PRE_RELEASE}}" \
+      --data '${json}' \
       ${API_URL}/releases
   """
 
