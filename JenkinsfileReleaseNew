@@ -122,11 +122,6 @@ pipeline {
           sh "git push --tags"
 
           script {
-            echo "DEBUG: GIT_TOKEN=${GIT_TOKEN}"
-            echo "DEBUG: RELEASE_VERSION=${params.RELEASE_VERSION}"
-            echo "DEBUG: GIT_BRANCH=${params.GIT_BRANCH}"
-            echo "DEBUG: Release message = ${composeReleaseMessage(getReleaseMessagesFromGit(getLatestReleaseTagName()))}"
-
             def latest = getLatestReleaseTagName()
             echo "Last revision ${latest}"
 
@@ -194,7 +189,20 @@ def composeReleaseMessage(String gitMessages) {
 // Post release to github
 // returns response from the operation
 def postRelease(String desc, String auth) {
-  return sh(script: "curl -X POST -H \"Accept: application/vnd.github.v3+json\" -H \"Authorization: token ${auth}\" --data '{\"tag_name\": \"v${params.RELEASE_VERSION}\", \"target_commitish\": \"${params.GIT_BRANCH}\", \"name\": \"v${params.RELEASE_VERSION}\", \"body\": \"${desc}\", \"draft\": false, \"prerelease\": ${params.PRE_RELEASE}}' ${API_URL}/releases" , returnStdout: true)
+  def safeDesc = desc
+    .replaceAll('\\\\', '\\\\\\\\')
+    .replaceAll('"', '\\"')
+    .replaceAll('\n', '\\n')
+
+  def curlCommand = """
+    curl -X POST \
+      -H "Accept: application/vnd.github.v3+json" \
+      -H "Authorization: token ${auth}" \
+      --data "{\\"tag_name\\": \\"v${params.RELEASE_VERSION}\\", \\"target_commitish\\": \\"${params.GIT_BRANCH}\\", \\"name\\": \\"v${params.RELEASE_VERSION}\\", \\"body\\": \\"${safeDesc}\\", \\"draft\\": false, \\"prerelease\\": ${params.PRE_RELEASE}}" \
+      ${API_URL}/releases
+  """
+
+  return sh(script: curlCommand.trim(), returnStdout: true)
 }
 
 // New line symbol to html br tag converter.
