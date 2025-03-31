@@ -185,9 +185,15 @@ def postRelease(String desc, String auth) {
   ]
 
   def json = JsonOutput.toJson(body)
-  echo "Posting GitHub release with body: ${json}"
-  def curlCommand = "curl -X POST -H 'Accept: application/vnd.github.v3+json' -H 'Authorization: token ${auth}' --data '${json}' ${API_URL}/releases"
-  return sh(script: "bash -c ${curlCommand.inspect()}", returnStdout: true)
+  def curlCommand = """
+    curl -X POST \
+      -H "Accept: application/vnd.github.v3+json" \
+      -H "Authorization: Bearer ${auth}" \
+      --data '${json}' \
+      ${API_URL}/releases
+  """
+
+  return sh(script: curlCommand.trim(), returnStdout: true)
 }
 
 // New line symbol to html br tag converter.
