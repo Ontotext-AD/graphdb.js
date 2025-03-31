@@ -112,9 +112,10 @@ pipeline {
 
             def gitMessages = getReleaseMessagesFromGit(latest)
             echo "Recent merge commit messages collected"
-            echo "First 4 chars of GIT_TOKEN: ${GIT_TOKEN.take(4)}****"
+            def token = GIT_TOKEN.replaceFirst(/^JWT:/, '')
+            echo "First 4 chars of GIT_TOKEN: ${token.take(4)}****"
 
-            def result = postRelease(composeReleaseMessage(gitMessages), "$GIT_TOKEN")
+            def result = postRelease(composeReleaseMessage(gitMessages), "$token")
             echo result
           }
         }
@@ -185,9 +186,15 @@ def postRelease(String desc, String auth) {
   ]
 
   def json = JsonOutput.toJson(body)
-  echo "Posting GitHub release with body: ${json}"
-  def curlCommand = "curl -X POST -H 'Accept: application/vnd.github.v3+json' -H 'Authorization: token ${auth}' --data '${json}' ${API_URL}/releases"
-  return sh(script: "bash -c ${curlCommand.inspect()}", returnStdout: true)
+  def curlCommand = """
+    curl -X POST \
+      -H "Accept: application/vnd.github.v3+json" \
+      -H "Authorization: Bearer ${auth}" \
+      --data '${json}' \
+      ${API_URL}/releases
+  """
+
+  return sh(script: curlCommand.trim(), returnStdout: true)
 }
 
 // New line symbol to html br tag converter.
