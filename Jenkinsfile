@@ -39,7 +39,7 @@ pipeline {
         stage('Prepare') {
           steps {
             sh "node --version"
-            sh "export \$(grep -v '^#' .env | xargs) && echo 'GraphDB Version: \$GDB_VERSION'"
+            sh "echo 'GraphDB Version:' && grep GDB_VERSION .env | cut -d= -f2"
           }
         }
 
