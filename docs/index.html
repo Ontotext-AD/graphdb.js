@@ -52,18 +52,17 @@
 <h2>Installation</h2>
 <h3>Prerequisites</h3>
 <ul>
-<li>Node &gt;= 8</li>
+<li>Node &gt;= 8, tested up to v18</li>
 <li>NPM (<a href="https://npmjs.org/">npm</a>)</li>
 </ul>
 <pre class="prettyprint source"><code>npm install graphdb
 </code></pre>
 <h2>Development</h2>
-<p><em>Library documentation</em> can be found <a href="https://ontotext-ad.github.io/graphdb.js/">here</a></p>
 <p>The library is written in ES2016. During the build process source files <code>src/</code>
 are transpiled to ES2015 and copied to <code>lib/</code> directory.</p>
 <p>A typescript definition file <code>index.d.ts</code> is generated in the <code>lib/</code> as well.</p>
 <p>Documentation is generated in <code>docs/</code> from the JSDoc annotations in the source
-code.</p>
+code. Source code documentation can be found <a href="https://ontotext-ad.github.io/graphdb.js/">here</a></p>
 <h3>Project Structure</h3>
 <ul>
 <li><code>src</code> : The source code of the library.</li>
@@ -76,34 +75,30 @@ code.</p>
 </ul>
 <h3>Setup Environment</h3>
 <ul>
-<li>Checkout or clone the project.</li>
-<li>Make sure prerequisites are covered: node js and npm must be present and versions
-should be supported.</li>
-<li>Enter the project directory and execute</li>
+<li>Make sure prerequisites are covered: node.js and npm must be present and versions should be supported.</li>
+<li>Clone the project from GitHub.</li>
+<li>In project root directory and execute <code>npm install</code> to install all dependencies. Do the same in <code>test-e2e</code> directory.</li>
 </ul>
-<pre class="prettyprint source"><code>npm install
-</code></pre>
 <h3>Running Tests</h3>
-<p>After any change the tests should be run and check if any existing functionality
-is not broken in result.</p>
-<pre class="prettyprint source"><code>npm run test
-</code></pre>
-<p>or constantly watching for changes in source files and tests and re-execute the
-test suite</p>
-<pre class="prettyprint source"><code>npm run test:watch
-</code></pre>
-<h3>Running e2e test locally</h3>
-<p>This will pack the project locally, install it and run all e2e test against it.</p>
-<pre class="prettyprint source"><code>npm run e2e:run
-</code></pre>
-<p>or run a single e2e spec file</p>
-<pre class="prettyprint source"><code>npm run e2e:run -t '{test_file_name.spec.js}'
-</code></pre>
+<p>The library has two types of tests: unit tests and e2e tests. Both are written with Jest.</p>
+<h4>Unit Tests</h4>
+<p>After any change the tests should be run and check if any existing functionality is not broken in result. To do so, run
+<code>npm run test</code>. This will run all tests in the <code>test</code> directory.</p>
+<p>It is sometimes more convenient to run the tests in watch mode in which the tests are run every time a file is changed.
+To do so, run <code>npm run test:watch</code>.</p>
+<h4>e2e tests</h4>
+<p>All e2e tests are run against a local GraphDB instance. The tests are located in the <code>test-e2e</code> directory and can be run
+with the following command from the project root <code>npm run e2e:run</code>. This command will pack the project locally, install
+it and run all e2e tests against it. A graphdb instance must be running on <code>http://localhost:7200</code>. Using the
+<code>docker-compose.yml</code> file, a GraphDB instance can be started with the following command <code>docker-compose up -d --build</code>.</p>
+<p>During development, it might be useful to run only a single test file. This can be done with the following command
+<code>npm run e2e:run -t '{test_file_name.spec.js}</code> or the <code>npm run test:single</code> command from the <code>test-e2e</code> package.</p>
+<p>For convenience, there is a command that can be used to do a dry build and run all tests in a docker container. This can
+be done with the following command <code>npm run e2e:test:docker</code>. The command will build the project, start an instance of
+GraphDB and run all e2e tests against it the same way as the library is tested in the CI pipeline.</p>
 <h3>Checking the codestyle</h3>
-<p>The library uses Google <a href="https://google.github.io/styleguide/jsguide.html">style</a>
-in conjunction with ESLint's recommended ruleset.</p>
-<pre class="prettyprint source"><code>npm run lint
-</code></pre>
+<p>The library uses Google <a href="https://google.github.io/styleguide/jsguide.html">style</a> in conjunction with ESLint's recommended ruleset. The codestyle can be checked with
+the following command <code>npm run lint</code></p>
 <h3>Testing the packaging</h3>
 <p>Library is managed by NPM package manager. During publishing npm consults the
 <code>.gitignore</code>, <code>.npmignore</code> and <code>package.json#files</code> property in order to decide
@@ -116,6 +111,8 @@ resources.
 Furture the archive could be used as a source for <code>npm install</code> where the path
 pointing the archive is provided.</p>
 <h3>Publishing</h3>
+<p>The library is published to npmjs.com. The publishing process is automated and the version is increased automatically.</p>
+<p>Below are steps for manual publishing (usually this should not be needed):</p>
 <ul>
 <li>Increase the package version.</li>
 </ul>
@@ -631,7 +628,7 @@ including any changes that are not yet committed:</p>
 <p>Deleting data during a transaction is different than the one in
 <code>RDFRepositoryClient</code>, it expects RDF data document instead of statements
 filter parameters.</p>
-<p>Currently it supports only Turtle or TriG formatted RDF data:</p>
+<p>Currently, it supports only Turtle or TriG formatted RDF data:</p>
 <pre class="prettyprint source lang-javascript"><code>const turtlePath = __dirname + '/statements.ttl';
 const turtleData = fs.readFileSync(turtlePath, 'utf8');
 return transaction.deleteData(turtleData);
@@ -673,7 +670,7 @@ array of <code>Namespace</code> instances.</li>
 <p>Repository operations like create, edit, delete, shutdown are not supported by the library at the moment. Supporting these is planned for next versions. Follow the <a href="https://github.com/Ontotext-AD/graphdb.js/issues/25">issue</a>.</p>
 <h3>Authentication</h3>
 <h4>GDB token</h4>
-<p>If the library is going to be used agains a secured server, then all API calls must be authenticated by sending an http authorization header with a token which is obtained after a call to <code>rest/login/user_name</code> with a password provided as a specific header.</p>
+<p>If the library is going to be used against a secured server, then all API calls must be authenticated by sending an http authorization header with a token which is obtained after a call to <code>rest/login/user_name</code> with a password provided as a specific header.</p>
 <p>In case the server requires that requests should be authenticated, then in the <code>ServerClientConfig</code> and <code>RepositoryClientConfig</code> must be configured the <code>username</code> and <code>password</code> which to be used for the authentication. If those are provided, then the client assumes that authentication is mandatory and the login with the provided credentials is performed authomatically before the first API call. After a successful login, user details which are received and the JWT auth token are stored in the <code>AuthenticationService</code>. From that moment on, with every API call is sent also an <code>authorization</code> header with the GDB token as value.</p>
 <h5>ServerClient</h5>
 <pre class="prettyprint source lang-javascript"><code> const headers = {'Accept': 'text/plain'};
@@ -706,7 +703,7 @@ const httpRequest = repository.httpClients[0].request;
 <p><strong>Note:</strong><br>
 GDB token is serialized as “Authorization: GDB” header in every request, so it is vulnerable to a man-in-the-middle attack. Everyone who intercepts the GDB token can reuse the session. To prevent this, we recommend to always enable encryption in transit.</p>
 </blockquote>
-<h4>Basic Authentication¶</h4>
+<h4>Basic Authentication</h4>
 <p>Instead of using GDB token, users can access secured GraphDB by passing valid base-64 encoded username:password combinations as a header.
 In case Basic authentication will be used, then the headers in the <code>ServerClientConfig</code> and <code>RepositoryClientConfig</code> must be configured to send the <code>username</code> and <code>password</code> which to be used for the authentication. From this moment on, with every API call is sent also an <code>authorization</code> header with the encoded credentials as value.</p>
 <pre class="prettyprint source lang-javascript"><code>config.useBasicAuthentication('admin', 'root');
@@ -856,7 +853,7 @@ return repository.query(payload).then((stream) => {
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.2</a> on Thu Mar 27 2025 15:34:40 GMT+0200 (Eastern European Standard Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.4</a> on Mon Mar 31 2025 07:33:27 GMT+0000 (Coordinated Universal Time)
 </footer>
 
 <script> prettyPrint(); </script>
