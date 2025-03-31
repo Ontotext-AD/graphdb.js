@@ -46,9 +46,11 @@ pipeline {
   stages {
     stage ('Prepare') {
       steps {
-        git_cmd.checkout(branch: params.GIT_BRANCH)
-        npm.prepareRelease(version: params.RELEASE_VERSION, scripts: ['build'])
-        npm.prepareRelease(version: params.RELEASE_VERSION, dir: "test-e2e/")
+        script {
+          git_cmd.checkout(branch: params.GIT_BRANCH)
+          npm.prepareRelease(version: params.RELEASE_VERSION, scripts: ['build'])
+          npm.prepareRelease(version: params.RELEASE_VERSION, dir: "test-e2e/")
+        }
       }
     }
 
