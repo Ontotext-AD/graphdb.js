@@ -90,7 +90,7 @@ pipeline {
             credentialsId: 'ksm-jenkins',
             secrets: [
               [destination: 'env', envVar: 'GIT_USER', filePath: '', notation: 'keeper://8hm1g9HCfBPgoWAmpiHn6w/field/login'],
-              [destination: 'env', envVar: 'GIT_TOKEN', filePath: '', notation: 'keeper://8hm1g9HCfBPgoWAmpiHn6w/field/password']
+              [destination: 'env', envVar: 'GIT_TOKEN', filePath: '', notation: 'keeper://BsykE_Za61bPoY8a1KwH_Q/field/note']
             ]
           ]
         ]) {
