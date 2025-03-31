@@ -12,8 +12,8 @@ through the NPM registry similarly to all other dependencies
 * In a terminal, navigate to `/test-e2e` and run `npm install` to install all
 required dependencies.
 * Make sure that you have a running GraphDB instance accessible on 
-`localhost:7200`. You can run one using the `docker-compose.yml` in the same
-directory by executing: `docker-compose up`.
+`localhost:7200`. You can run one using the `docker-compose.yml` in the project 
+* root by executing: `GDB_VERSION=10.8.4 docker compose -f docker-compose.yml up -d`.
 * Run the tests with `npm run test`.
  
 > Important note: For local development, you need to publish and install the 
@@ -28,10 +28,8 @@ in the test package.
 > by using `npm run build` in the root in order to get the latest version in the
 > test project after each change in the source code.
 
-
 ## Running single test
+
 Want to run a single test? Execute 
 `jest -t "Namespaces management" --config=jest-e2e.config.js`
 
-
-TODO: Update guide that these tests can be run with node 9 or above because of some error

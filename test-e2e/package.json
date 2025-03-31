@@ -1,6 +1,6 @@
 {
   "name": "graphdb-acceptance-tests",
-  "version": "3.1.0-RC1",
+  "version": "3.1.0-newjenkins20",
   "author": {
     "name": "\"Sirma AI\" JSC, trading as Ontotext",
     "url": "https://www.ontotext.com/"
@@ -9,6 +9,7 @@
   "license": "Apache-2.0",
   "scripts": {
     "test": "jest --runInBand --config=jest-e2e.config.js",
+    "test:single": "jest --runInBand --config=jest-e2e.config.js -- tests/graphdb-server-client/manage-repositories.spec.js",
     "debug": "node --inspect-brk node_modules/.bin/jest --runInBand --config=jest-e2e.config.js"
   },
   "devDependencies": {
