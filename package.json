@@ -66,7 +66,7 @@
     "install:local": "npm pack && npm link",
     "install:e2e": "cd test-e2e/ && npm clean-install && npm link graphdb",
     "e2e:local": "npm run install:local && npm run install:e2e",
-    "e2e:run": "npm run e2e:local && cd test-e2e/ && npm run test:single",
+    "e2e:run": "npm run e2e:local && cd test-e2e/ && npm run test",
     "e2e:test:docker": "sh ./scripts/run-e2e.sh"
   },
   "devDependencies": {
