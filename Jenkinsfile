@@ -82,25 +82,23 @@ pipeline {
           }
         }
 
-//         stage('Sonar') {
-//           steps {
-//             withSonarQubeEnv(SONAR_ENVIRONMENT) {
-//               script {
-//                 if (scmUtil.isMaster()) {
-//                   sh "node sonar-project.js --branch='${scmUtil.getCurrentBranch()}'"
-//                 } else {
-//                   sh "node sonar-project.js --branch='${scmUtil.getSourceBranch}' --target-branch='${scmUtil.getTargetBranch()}' --pull-request-id='${scmUtil.getMergeRequestId()}'"
-//                 }
-//               }
-//             }
-//             withSonarQubeEnv('SonarCloud') {
-//               sh """
-//                 node sonar-project.js \
-//                 ${sonar.resolveBranchArguments()}
-//               """
-//             }
-//           }
-//         }
+        stage('Sonar') {
+          steps {
+            withSonarQubeEnv(SONAR_ENVIRONMENT) {
+              script {
+                try {
+                  if (scmUtil.isMaster()) {
+                    sh "node sonar-project.js --branch='${scmUtil.getCurrentBranch()}'"
+                  } else {
+                    sh "node sonar-project.js --branch='${scmUtil.getSourceBranch()}' --target-branch='${scmUtil.getTargetBranch()}' --pull-request-id='${scmUtil.getMergeRequestId()}'"
+                  }
+                } catch (e) {
+                  echo "Sonar analysis failed, but continuing the pipeline. Error: ${e.getMessage()}"
+                }
+              }
+            }
+          }
+        }
     }
 
     post {
