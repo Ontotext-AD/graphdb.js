@@ -99,7 +99,7 @@ pipeline {
 
   post {
     success {
-      node('aws-small') {
+      dir("${env.WORKSPACE}") {
         // Commit, tag and push the changes in Git
         sh "git commit -a -m 'Release ${params.RELEASE_VERSION}'"
         sh "git tag -a v${params.RELEASE_VERSION} -m 'Release v${params.RELEASE_VERSION}'"
@@ -140,7 +140,7 @@ pipeline {
     }
 
     failure {
-      node('aws-small') {
+      dir("${env.WORKSPACE}") {
         wrap([$class: 'BuildUser']) {
           sendMail(env.BUILD_USER_EMAIL)
         }
@@ -148,7 +148,7 @@ pipeline {
     }
 
     always {
-      node('aws-small') {
+      dir("${env.WORKSPACE}") {
         sh "rm -f .npmrc"
       }
     }
