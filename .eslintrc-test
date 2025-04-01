@@ -7,9 +7,6 @@
     "no-debugger": "error",
     "no-only-tests/no-only-tests": "error"
   },
-  "settings": {
-    "import/resolver": "webpack"
-  },
   "parserOptions": {
     "ecmaVersion": 2016,
     "sourceType": "module"
