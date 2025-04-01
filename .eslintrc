@@ -13,9 +13,6 @@
       }
     }]
   },
-  "settings": {
-    "import/resolver": "webpack"
-  },
   "parserOptions": {
     "ecmaVersion": 2016,
     "sourceType": "module"
