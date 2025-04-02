@@ -62,7 +62,7 @@
     "lint:fix": "eslint --fix ./src",
     "lint:test": "eslint --no-eslintrc --config .eslintrc-test ./test",
     "doc": "jsdoc -c jsdoc.conf.json",
-    "tsd": "tsc",
+    "tsd": "tsc && node scripts/generate-types.js",
     "install:local": "npm pack && npm install -g ./$npm_package_name-$npm_package_version.tgz",
     "install:e2e": "cd test-e2e/ && npm clean-install && npm link graphdb",
     "e2e:local": "npm run install:local && npm run install:e2e",
