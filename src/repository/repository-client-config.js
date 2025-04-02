@@ -1,6 +1,6 @@
 const ClientConfig = require('../http/client-config');
 const RDFMimeType = require('../http/rdf-mime-type');
-const ObjectUtils = require('../../lib/util/object-utils');
+const ObjectUtils = require('../util/object-utils');
 
 const defaultTimeout = 10000;
 
