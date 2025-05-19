@@ -8,9 +8,16 @@
 
 ## Unreleased
 * Fix passing of credentials to the TransactionalRepositoryClient configuration, if set in the RepositoryClientConfig
-* Enable static code analysis in the Jenkins pipeline and updated GraphDB version in docker-compose file
-* Updated third party libraries and fixed vulnerabilities
-* Changed TS types generation to use TypeScript
+
+## 3.1.0 (2024-05-19)
+* Fixed an issue where a 400 error occurred when attempting to execute long queries;
+* Fixed issues where some methods in graphdb.js were not properly utilizing the repository 
+  location parameter, causing incorrect behavior when working with repositories that are 
+  not located in the default location.
+* Resolved a problem with UploadService where the request remained active until timeout, 
+  even after a successful RDF statement upload;
+* Addressed an issue reported by clients where type definitions were not accessible in versions after 3.0.0;
+* Updated dependencies to fix the latest security vulnerabilities and improve performance and stability.
 
 ## 3.0.4 (2024-06-19)
 * When executing a query with a POST request and a valid QueryPayload, 
