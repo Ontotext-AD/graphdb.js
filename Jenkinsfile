@@ -16,7 +16,19 @@ pipeline {
     stage('Prepare') {
       steps {
         sh "node --version"
-        sh "docker-compose -f test-e2e/docker-compose.yml up -d"
+        withCredentials([
+          file(
+            credentialsId: 'graphdb-ee.license',
+            variable: 'GRAPHDB_LICENSE'
+          )
+        ]) {
+          sh "cp \"$GRAPHDB_LICENSE\" ./test-e2e/graphdb.license"
+          sh "ls ./test-e2e/"
+          archiveArtifacts allowEmptyArchive: true, artifacts: 'test-e2e/graphdb.license'
+          dir('test-e2e') {
+            sh 'docker-compose up -d --force-recreate --remove-orphans'
+          }
+        }
       }
     }
 
@@ -54,8 +66,8 @@ pipeline {
 
   post {
     always {
-      dir("test-e2e/") {
-        sh "docker logs graphdb"
+      dir('test-e2e') {
+        sh "docker logs graphdb || true"
         sh "docker-compose down -v --remove-orphans --rmi=local || true"
       }
     }
