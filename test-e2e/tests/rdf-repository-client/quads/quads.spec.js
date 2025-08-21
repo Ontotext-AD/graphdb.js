@@ -1,8 +1,8 @@
 const {RDFMimeType} = require('graphdb').http;
 const {RDFRepositoryClient, GetStatementsPayload} = require('graphdb').repository;
-const {N3Parser} = require('graphdb').parser;
+const {N3Parser, TriGParser} = require('graphdb').parser;
 const N3 = require('n3');
-const {DataFactory} = N3;
+const {DataFactory, Writer} = N3;
 const {namedNode, literal, quad, defaultGraph} = DataFactory;
 const Utils = require('utils.js');
 const Config = require('config.js');
@@ -85,22 +85,27 @@ describe('Manage quads', () => {
   test('Should add quads and retrieve them in different format', () => {
     rdfClient.registerParser((new N3Parser()));
     let payload = buildPayload(RDFMimeType.TRIG);
-    let expected = Utils.loadFile('./data/quads/expectedResponseTrig.txt').trim();
+    const expectedTriG = Utils.loadFile('./data/quads/expectedResponseTrig.txt').trim();
 
     return rdfClient.addQuads(quads).then(() => {
       return rdfClient.get(payload);
     }).then((resp) => {
-      expect(resp.trim()).toEqual(expected);
+      return Promise.all([
+        toSortedNQuads(resp),
+        toSortedNQuads(expectedTriG)
+      ]);
+    }).then(([actualCanon, expectedCanon]) => {
+      expect(actualCanon).toEqual(expectedCanon);
       payload = buildPayload(RDFMimeType.N3);
       return rdfClient.get(payload);
     }).then((resp) => {
-      expected = [quad(
+      const expectedN3 = [quad(
         namedNode('http://domain/resource/resource-3'),
         namedNode('http://domain/property/relation-1'),
         namedNode('http://domain/value/uri-4'),
         defaultGraph())];
 
-      expect(resp).toEqual(expected);
+      expect(resp).toEqual(expectedN3);
     });
   });
 });
@@ -139,4 +144,33 @@ function obj(id) {
 
 function context(id) {
   return `http://domain/graph/${id}`;
+}
+
+function toSortedNQuads(trigOrTurtleString) {
+  let quadsParsed;
+  try {
+    const trigParser = new TriGParser();
+    quadsParsed = trigParser.parse(trigOrTurtleString);
+  } catch (e) {
+    const turtleParser = new N3Parser();
+    quadsParsed = turtleParser.parse(trigOrTurtleString);
+  }
+
+  return new Promise((resolve, reject) => {
+    const writer = new Writer({ format: 'N-Quads' });
+    writer.addQuads(quadsParsed);
+    writer.end((err, nquads) => {
+      if (err) {
+        reject(err);
+        return;
+      }
+      const sorted = nquads
+        .split('\n')
+        .map((l) => l.trim())
+        .filter((l) => l.length > 0)
+        .sort()
+        .join('\n');
+      resolve(sorted);
+    });
+  });
 }
