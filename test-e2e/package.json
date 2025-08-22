@@ -15,7 +15,7 @@
   "devDependencies": {
     "axios": "^1.8.4",
     "express": "^4.21.2",
-    "form-data": "^4.0.2",
+    "form-data": "^4.0.4",
     "graphdb": "^3.0.4",
     "jest": "^29.7.0",
     "jest-junit": "^16.0.0",
