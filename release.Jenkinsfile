@@ -24,6 +24,18 @@ pipeline {
     booleanParam name: 'PRE_RELEASE',
            description: 'This is a pre-release. Will not publish to npm if selected',
            defaultValue: false
+
+    booleanParam(
+      name: 'NOTIFY_SLACK',
+      defaultValue: false,
+      description: 'Send Slack notification after successful build'
+    )
+
+    string(
+      name: 'SLACK_CHANNEL',
+      defaultValue: '#frontend-notifications',
+      description: 'Slack channel for notification (only used if checkbox above is selected)'
+    )
   }
 
   agent {
@@ -116,6 +128,15 @@ pipeline {
             def result = postRelease(composeReleaseMessage(gitMessages), "$GIT_TOKEN")
             echo result
           }
+        }
+      }
+
+      // Optional Slack notification if enabled and channel is provided
+      if (params.NOTIFY_SLACK && params.SLACK_CHANNEL?.trim()) {
+        try {
+          slack.notifyResult(channel: params.SLACK_CHANNEL, color:'good', message:"Released graphdb-workbench v${params.RELEASE_VERSION}")
+        } catch (e) {
+          echo "Slack notification failed: ${e.getMessage()}"
         }
       }
     }
