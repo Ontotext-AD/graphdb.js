@@ -205,6 +205,32 @@ class GraphDBServerClient extends Server {
   }
 
   /**
+   * Rotates the data encryption key of an encrypted repository.
+   *
+   * New writes use the new key; existing data stays encrypted with the
+   * previous keys. Needs GraphDB 11.4+ and a repository created with
+   * <code>storageEncryption</code>, see {@link RepositoryConfig}.
+   *
+   * @param {string} repositoryId The ID of the encrypted repository.
+   * @param {string} [location] The optional location of the repository.
+   *
+   * @return {Promise<HttpResponse|Error>} A promise that resolves to
+   *         the response wrapper, or rejects with an error if one occurs
+   *         during execution.
+   */
+  rotateDataEncryptionKey(repositoryId, location) {
+    if (!repositoryId) {
+      throw new Error('Repository id is required parameter!');
+    }
+
+    const loc = this.getLocationParameter(location);
+    const url = `${REPOSITORY_SERVICE_URL}/${repositoryId}` +
+      `/rotate-data-encryption-key${loc}`;
+    const requestBuilder = HttpRequestBuilder.httpPost(url);
+    return this.execute(requestBuilder);
+  }
+
+  /**
    * Checks if GraphDB security is enabled.
    * @return {Promise<HttpResponse|Error>} a promise which resolves
    * to response wrapper or rejects with error if thrown during execution.

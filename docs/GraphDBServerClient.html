@@ -535,7 +535,7 @@ of the GraphDB Workbench</p></td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="server_graphdb-server-client.js.html">server/graphdb-server-client.js</a>, <a href="server_graphdb-server-client.js.html#line294">line 294</a>
+        <a href="server_graphdb-server-client.js.html">server/graphdb-server-client.js</a>, <a href="server_graphdb-server-client.js.html#line320">line 320</a>
     </li></ul></dd>
     
 
@@ -898,7 +898,7 @@ the delete operation.</p>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="server_graphdb-server-client.js.html">server/graphdb-server-client.js</a>, <a href="server_graphdb-server-client.js.html#line386">line 386</a>
+        <a href="server_graphdb-server-client.js.html">server/graphdb-server-client.js</a>, <a href="server_graphdb-server-client.js.html#line412">line 412</a>
     </li></ul></dd>
     
 
@@ -1377,7 +1377,7 @@ wrapper or rejects with error if thrown during execution.</p>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="server_graphdb-server-client.js.html">server/graphdb-server-client.js</a>, <a href="server_graphdb-server-client.js.html#line273">line 273</a>
+        <a href="server_graphdb-server-client.js.html">server/graphdb-server-client.js</a>, <a href="server_graphdb-server-client.js.html#line299">line 299</a>
     </li></ul></dd>
     
 
@@ -2101,7 +2101,7 @@ of repository IDs.</p>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="server_graphdb-server-client.js.html">server/graphdb-server-client.js</a>, <a href="server_graphdb-server-client.js.html#line372">line 372</a>
+        <a href="server_graphdb-server-client.js.html">server/graphdb-server-client.js</a>, <a href="server_graphdb-server-client.js.html#line398">line 398</a>
     </li></ul></dd>
     
 
@@ -2415,7 +2415,7 @@ indicating whether the repository exists.</p>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="server_graphdb-server-client.js.html">server/graphdb-server-client.js</a>, <a href="server_graphdb-server-client.js.html#line212">line 212</a>
+        <a href="server_graphdb-server-client.js.html">server/graphdb-server-client.js</a>, <a href="server_graphdb-server-client.js.html#line238">line 238</a>
     </li></ul></dd>
     
 
@@ -2446,6 +2446,213 @@ indicating whether the repository exists.</p>
 <div class="param-desc">
     <p>a promise which resolves
 to response wrapper or rejects with error if thrown during execution.</p>
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise.&lt;(<a href="HttpResponse.html">HttpResponse</a>|Error)></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="rotateDataEncryptionKey"><span class="type-signature"></span>rotateDataEncryptionKey<span class="signature">(repositoryId, location<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {Promise.&lt;(<a href="HttpResponse.html">HttpResponse</a>|Error)>}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    <p>Rotates the data encryption key of an encrypted repository.</p>
+<p>New writes use the new key; existing data stays encrypted with the
+previous keys. Needs GraphDB 11.4+ and a repository created with
+<code>storageEncryption</code>, see <a href="RepositoryConfig.html"><code>RepositoryConfig</code></a>.</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>repositoryId</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>The ID of the encrypted repository.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>location</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>The optional location of the repository.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="server_graphdb-server-client.js.html">server/graphdb-server-client.js</a>, <a href="server_graphdb-server-client.js.html#line221">line 221</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    <p>A promise that resolves to
+the response wrapper, or rejects with an error if one occurs
+during execution.</p>
 </div>
 
 
@@ -2576,7 +2783,7 @@ to response wrapper or rejects with error if thrown during execution.</p>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="server_graphdb-server-client.js.html">server/graphdb-server-client.js</a>, <a href="server_graphdb-server-client.js.html#line226">line 226</a>
+        <a href="server_graphdb-server-client.js.html">server/graphdb-server-client.js</a>, <a href="server_graphdb-server-client.js.html#line252">line 252</a>
     </li></ul></dd>
     
 
@@ -2793,7 +3000,7 @@ of the GraphDB Workbench</p></td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="server_graphdb-server-client.js.html">server/graphdb-server-client.js</a>, <a href="server_graphdb-server-client.js.html#line254">line 254</a>
+        <a href="server_graphdb-server-client.js.html">server/graphdb-server-client.js</a>, <a href="server_graphdb-server-client.js.html#line280">line 280</a>
     </li></ul></dd>
     
 
@@ -3069,7 +3276,7 @@ of the GraphDB Workbench</p></td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="server_graphdb-server-client.js.html">server/graphdb-server-client.js</a>, <a href="server_graphdb-server-client.js.html#line325">line 325</a>
+        <a href="server_graphdb-server-client.js.html">server/graphdb-server-client.js</a>, <a href="server_graphdb-server-client.js.html#line351">line 351</a>
     </li></ul></dd>
     
 
@@ -3309,7 +3516,7 @@ of the GraphDB Workbench</p></td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="server_graphdb-server-client.js.html">server/graphdb-server-client.js</a>, <a href="server_graphdb-server-client.js.html#line352">line 352</a>
+        <a href="server_graphdb-server-client.js.html">server/graphdb-server-client.js</a>, <a href="server_graphdb-server-client.js.html#line378">line 378</a>
     </li></ul></dd>
     
 
@@ -3384,7 +3591,7 @@ to response wrapper or rejects with error if thrown during execution.</p>
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.4</a> on Tue Oct 27 2026 14:44:02 GMT+0200 (Eastern European Standard Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.4</a> on Tue Oct 27 2026 14:47:26 GMT+0200 (Eastern European Standard Time)
 </footer>
 
 <script> prettyPrint(); </script>

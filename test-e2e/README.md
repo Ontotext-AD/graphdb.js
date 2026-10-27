@@ -15,6 +15,9 @@ required dependencies.
 `localhost:7200`. You can run one using the `docker-compose.yml` in the root
 directory by executing: `GRAPHDB_VERSION=11.5.2 docker compose -f docker-compose.yml up -d`.
 The compose file expects a GraphDB license in `graphdb.license` in the root directory.
+It also configures the test master key `test-e2e/encryption/test-master.key`, which the
+encrypted repository tests need. When you run GraphDB in another way, start it with
+`-Dgraphdb.data.encryption.type=file -Dgraphdb.data.encryption.file=<path to the key>`.
 The GraphDB version used in CI is set with `GDB_VERSION` in the root `.env` file.
 * To run the tests against GraphDB on another address, set the `GRAPHDB_URL`
 environment variable, e.g. `GRAPHDB_URL=http://localhost:7210 npm run test`.

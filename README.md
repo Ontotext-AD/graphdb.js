@@ -333,6 +333,33 @@ const serverClient = new GraphDBServerClient(serverConfig);
             // do work
       });
     ```
+  - Encrypted at rest (since GraphDB 11.4):
+    ```javascript
+      const {RepositoryConfig, RepositoryType} = require('graphdb').repository;
+      // Parameters that are not given take their default values
+      const params = {
+        storageEncryption: {name: 'storageEncryption', label: 'Encrypt storage', value: 'true'}
+      };
+      const config = new RepositoryConfig('encrypted_repo', '', params, '', 'Encrypted repo', RepositoryType.GRAPHDB);
+      serverClient.createRepository(config)
+          .then(() => {
+            // do work
+      });
+    ```
+    The GraphDB instance must have a master key configured with `graphdb.data.encryption.type`
+    (`file` or `pkcs12`) and `graphdb.data.encryption.file`, and for `pkcs12` also
+    `graphdb.data.encryption.keystore.password` and `graphdb.data.encryption.keystore.alias`.
+    Otherwise, the creation is rejected with status `400`. Encryption can be enabled only when the
+    repository is created, it cannot be turned on or off later. In a cluster, all nodes must have
+    the same master key. See [Encryption at rest](https://graphdb.ontotext.com/documentation/11.5/encryption.html#encryption-at-rest).
+
+* Rotate the data encryption key of an encrypted repository (since GraphDB 11.4).
+  New writes use the new key, the existing data stays encrypted with the previous keys.
+  ```javascript
+    serverClient.rotateDataEncryptionKey('encrypted_repo').then(() => {
+      // do work
+    });
+  ```
 
 * Delete repository
   - From a local GraphDB instance:

@@ -72,6 +72,9 @@ pipeline {
             ]]) {
               archiveArtifacts allowEmptyArchive: true, artifacts: 'graphdb.license'
 
+              // Package the library built by "npm ci" for Dockerfile.e2e
+              sh "npm pack --ignore-scripts"
+
               def exitCode = sh(
                 script: "docker-compose --env-file .env -f docker-compose-e2e.yml up --build --no-deps --force-recreate --remove-orphans --abort-on-container-exit --exit-code-from e2e-tests",
                 returnStatus: true

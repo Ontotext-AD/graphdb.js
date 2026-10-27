@@ -9,5 +9,9 @@ services:
     # Needed to load data from localhost (see queries.spec.js)
     volumes:
       - ./graphdb.license:/opt/graphdb/home/conf/graphdb.license:ro
+      # Test master key for the encrypted repositories (see manage-encrypted-repositories.spec.js)
+      - ./test-e2e/encryption/test-master.key:/opt/graphdb/encryption/test-master.key:ro
+    environment:
+      - GDB_JAVA_OPTS=-Dgraphdb.data.encryption.type=file -Dgraphdb.data.encryption.file=/opt/graphdb/encryption/test-master.key
     ports:
       - '7200:7200'
