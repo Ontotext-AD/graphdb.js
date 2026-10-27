@@ -2,8 +2,6 @@
 pipeline {
     environment {
       CI = "true"
-      // Needed for our version of webpack + newer nodejs
-      NODE_OPTIONS = "--openssl-legacy-provider"
       // Tells NPM and co. not to use color output (looks like garbage in Jenkins)
       NO_COLOR = "1"
       SONAR_ENVIRONMENT = "SonarCloud"
@@ -15,7 +13,7 @@ pipeline {
     }
 
     tools {
-      nodejs 'nodejs-18.9.0'
+      nodejs 'nodejs-22'
     }
 
     stages {
