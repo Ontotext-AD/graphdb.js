@@ -755,6 +755,8 @@ const httpRequest = repository.httpClients[0].request;
 ````
 If the GDB token expires, then the first API call will be rejected with an http error with status `401`. The client handles this automatically by re-login the user with the same credentials, updates the stored token and retries the API call. This behavior is the default and can be changed if the `ServerClientConfig` or `RepositoryClientConfig` are configured with `keepAlive=false`.
 
+The same happens when the server no longer accepts the token for another reason. Since GraphDB 11.5.2, the secret used to sign the tokens is regenerated on every restart unless `graphdb.auth.token.secret` is set, so all tokens issued before a restart are rejected. With `keepAlive=true` the client logs in again after the restart. With `keepAlive=false` the API call is rejected with status `401`.
+
 
 > **Note:**  
 > GDB token is serialized as “Authorization: GDB” header in every request, so it is vulnerable to a man-in-the-middle attack. Everyone who intercepts the GDB token can reuse the session. To prevent this, we recommend to always enable encryption in transit.
@@ -891,6 +893,7 @@ return repository.query(payload).then((stream) => {
 | 1.1+       | 9+              |
 | 2+         | 9.6+            |
 | 3+         | 10+             |
+| 4+         | 11+             |
 
 
 ### License

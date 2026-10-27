@@ -90,6 +90,11 @@
             "label": "Repository ID",
             "value": "repo-test"
         },
+        "storageEncryption": {
+            "name": "storageEncryption",
+            "label": "Encrypt storage",
+            "value": "false"
+        },
         "storageFolder": {
             "name": "storageFolder",
             "label": "Storage folder",

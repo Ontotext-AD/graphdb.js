@@ -85,6 +85,11 @@
       "label": "FedX repo members",
       "value": []
     },
+    "storageEncryption": {
+      "name": "storageEncryption",
+      "label": "Encrypt storage",
+      "value": "false"
+    },
     "storageFolder": {
       "name": "storageFolder",
       "label": "Storage folder",

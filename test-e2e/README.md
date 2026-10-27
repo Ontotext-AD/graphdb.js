@@ -12,8 +12,12 @@ through the NPM registry similarly to all other dependencies
 * In a terminal, navigate to `/test-e2e` and run `npm install` to install all
 required dependencies.
 * Make sure that you have a running GraphDB instance accessible on 
-`localhost:7200`. You can run one using the `docker-compose.yml` in the same
-directory by executing: `GRAPHDB_VERSION=10.8.4 docker compose -f docker-compose.yml up -d`.
+`localhost:7200`. You can run one using the `docker-compose.yml` in the root
+directory by executing: `GRAPHDB_VERSION=11.5.2 docker compose -f docker-compose.yml up -d`.
+The compose file expects a GraphDB license in `graphdb.license` in the root directory.
+The GraphDB version used in CI is set with `GDB_VERSION` in the root `.env` file.
+* To run the tests against GraphDB on another address, set the `GRAPHDB_URL`
+environment variable, e.g. `GRAPHDB_URL=http://localhost:7210 npm run test`.
 * Run the tests with `npm run test`.
  
 > Important note: For local development, you need to publish and install the 

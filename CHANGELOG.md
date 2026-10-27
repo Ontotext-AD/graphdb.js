@@ -7,9 +7,15 @@
 * `Support secured endpoints exposing only HTTPS`
 
 ## Unreleased
-* Fix passing of credentials to the TransactionalRepositoryClient configuration, if set in the RepositoryClientConfig
+* Tested with GraphDB 11.5.2. Since GraphDB 11.4.0, the repository configuration contains the `storageEncryption` parameter.
+* Fixed `GraphDBServerClient` retrying requests endlessly after a `401` response: when the server rejected the token (for example after a GraphDB restart, which regenerates the token secret since 11.5.2) or the login failed, the client did not log in again.
 
-## 3.1.0 (2024-05-19)
+## 4.0.0 (2025-08-20)
+* GraphDB 11 support. Tested with GraphDB 11.0.2.
+
+## 3.1.0 (2025-05-19)
+* Added `RepositoryClientConfig.setLocation` for working with repositories of a remote
+  GraphDB instance. The location is sent in the `x-graphdb-repository-location` header;
 * Fixed an issue where a 400 error occurred when attempting to execute long queries;
 * Fixed issues where some methods in graphdb.js were not properly utilizing the repository 
   location parameter, causing incorrect behavior when working with repositories that are 
@@ -23,9 +29,16 @@
 * When executing a query with a POST request and a valid QueryPayload, 
 regardless of the content type, the parameters will be included in the request.
 
+## 3.0.3 (2024-06-18)
+* No changes, the same as 3.0.2.
+
 ## 3.0.2 (2024-02-14)
 * When the back-end server returns 401, a new attempt to log in will be made, in order to fetch a new token.
   
+## 3.0.1 (2023-07-18)
+* Fix passing of credentials to the TransactionalRepositoryClient configuration, if set in the RepositoryClientConfig
+* Moved `typescript` from the dev dependencies to the dependencies
+
 ## 3.0.0 (2023-03-24)
 **Breaking changes**
 This version won't work with GDB<10 due to changes in the REST API.
@@ -35,6 +48,14 @@ This version won't work with GDB<10 due to changes in the REST API.
     library.
 * Updates in the readme.
 
+## 2.0.2 (2022-06-08)
+* No changes in the library, the same as 2.0.1. Fixed the release pipeline.
+
+## 2.0.1 (2022-06-08)
+* Updated the third party dependencies to fix high CVEs
+* Updated `n3`
+* Documented value bindings in queries in the README
+
 ## 2.0.0 (2021-02-10)
 * Major changes in the construction of server and repository client configurations.
 * Update Readme.md
@@ -43,15 +64,16 @@ This version won't work with GDB<10 due to changes in the REST API.
 * Upgrade to graphDb 9.6.0
 
 ## 1.6.1 (2021-02-09)
+**Bugfixes**
+* Repository client authentication endpoint fix
+
+## 1.6.0 (2021-01-15)
 * Authenticate against a secured GDB server
 * Manage repositories through GraphDBServerClient
 * Fix latest vulnerabilities and lib updates
 * Migrate to Jenkins
 * Update repository tutorials in Readme.md
 * Created README for the e2e-test package
-
-**Bugfixes**
-* Repository client authentication endpoint fix
   
 ## 1.5.0 (2020-12-10)
 * Upgrade to graphDb 9.5.0
