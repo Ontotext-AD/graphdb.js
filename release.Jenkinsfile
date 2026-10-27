@@ -49,7 +49,7 @@ pipeline {
   }
 
   tools {
-    nodejs 'nodejs-18.9.0'
+    nodejs 'nodejs-22'
   }
 
   environment {
