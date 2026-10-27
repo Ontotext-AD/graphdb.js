@@ -200,6 +200,34 @@ describe('ServerClient', () => {
             });
     });
 
+    test('rotateDataEncryptionKey should throw an error if called without a repository ID', () => {
+        expect(() => server.rotateDataEncryptionKey()).toThrow('Repository id is required parameter!');
+    });
+
+    test('rotateDataEncryptionKey should call server to rotate the data encryption key of a local repository', () => {
+        const requestSpy = jest.spyOn(server.httpClient.axios, 'request').mockResolvedValue();
+
+        return server.rotateDataEncryptionKey('repoOneId')
+            .then(() => {
+                expect(requestSpy).toHaveBeenCalled();
+                const config = requestSpy.mock.calls[0][0];
+                expect(config).toHaveProperty('method', 'post');
+                expect(config).toHaveProperty('url', '/rest/repositories/repoOneId/rotate-data-encryption-key');
+            });
+    });
+
+    test('rotateDataEncryptionKey should call server to rotate the data encryption key of a remote repository', () => {
+        const requestSpy = jest.spyOn(server.httpClient.axios, 'request').mockResolvedValue();
+
+        return server.rotateDataEncryptionKey('repoTwoId', 'http://example.com:7200')
+            .then(() => {
+                expect(requestSpy).toHaveBeenCalled();
+                const config = requestSpy.mock.calls[0][0];
+                expect(config).toHaveProperty('method', 'post');
+                expect(config).toHaveProperty('url', '/rest/repositories/repoTwoId/rotate-data-encryption-key?location=http://example.com:7200');
+            });
+    });
+
     test('isSecurityEnabled should return true when security is enabled', () => {
         const requestSpy = jest.spyOn(server.httpClient.axios, 'request').mockResolvedValue({data: true});
 

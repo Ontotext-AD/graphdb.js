@@ -10,7 +10,12 @@ export class RepositoryConfig {
    * @param {string} [location] Repository location
    * @param {Object} [params] Map of repository configuration parameters.
    * See {@link https://graphdb.ontotext.com/documentation/standard/configuring-a-repository.html#configuring-a-repository-configuration-parameters
-   * GraphDB Documentation}
+   * GraphDB Documentation}.
+   * Since GraphDB 11.4, <code>storageEncryption</code> set to
+   * <code>"true"</code> encrypts the repository at rest. It needs a master key
+   * configured on the GraphDB instance and cannot be changed after creation,
+   * see {@link https://graphdb.ontotext.com/documentation/11.5/encryption.html#encryption-at-rest
+   * Encryption at rest}.
    * @param {string} [sesameType] Repository type as sesame rdf type.
    * May be one of the following:
    * <code>owlim:ReplicationCluster</code> for master repository

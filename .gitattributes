@@ -1,0 +1,2 @@
+# Raw binary master key for the e2e tests, must not be normalized
+test-e2e/encryption/*.key binary
