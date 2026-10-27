@@ -5,11 +5,15 @@ const {
   AppSettings,
   ServerClientConfig
 } = require('graphdb').server;
+// Authority is not part of the package entry point
+const Authority = require('graphdb/lib/security/authority');
 const path = require('path');
 const Utils = require('utils.js');
 const Config = require('config.js');
 
 const TEST_REPO_NAME = 'Test_repo';
+const MAINTAINER = 'maintainer';
+const ROLE_USERNAME = 'role_user';
 
 describe('Manage GraphDB users', () => {
   const rdfClient = new RDFRepositoryClient(Config.restApiConfig);
@@ -73,6 +77,80 @@ describe('Manage GraphDB users', () => {
         expect(response.response.status).toBe(204);
       }).catch((e) => {
         serverClient.deleteUser('test_user');
+        throw new Error(e);
+      });
+  });
+
+  test.each([
+    [Authority.USER],
+    [Authority.MONITORING],
+    [Authority.REPO_MANAGER],
+    [Authority.ADMIN],
+    [Authority.CLUSTER],
+    [Authority.USER, Authority.CUSTOM_ROLE_PREFIX + 'TESTER']
+  ])('Should grant the user role %s', (...authorities) => {
+    return serverClient.createUser(ROLE_USERNAME, '123456', authorities)
+      .then(() => {
+        return serverClient.getUser(ROLE_USERNAME);
+      }).then((response) => {
+        expect(response.response.data.grantedAuthorities)
+          .toEqual(expect.arrayContaining(authorities));
+      }).finally(() => {
+        return serverClient.deleteUser(ROLE_USERNAME).catch(() => {});
+      });
+  });
+
+  test('Should grant GraphQL-only additional permissions', () => {
+    const authorities = [
+      Authority.USER,
+      Authority.READ_REPO_PREFIX + TEST_REPO_NAME + Authority.GRAPHQL_ONLY_SUFFIX,
+      Authority.WRITE_REPO_PREFIX + TEST_REPO_NAME + Authority.GRAPHQL_ONLY_SUFFIX
+    ];
+
+    return serverClient.createUser(ROLE_USERNAME, '123456', authorities)
+      .then(() => {
+        return serverClient.getUser(ROLE_USERNAME);
+      }).then((response) => {
+        expect(response.response.data.grantedAuthorities)
+          .toEqual(expect.arrayContaining(authorities));
+      }).finally(() => {
+        return serverClient.deleteUser(ROLE_USERNAME).catch(() => {});
+      });
+  });
+
+  test('Should grant and revoke the repository maintain permission', () => {
+    const readWrite = [
+      Authority.USER,
+      Authority.READ_REPO_PREFIX + TEST_REPO_NAME,
+      Authority.WRITE_REPO_PREFIX + TEST_REPO_NAME
+    ];
+    const maintain = [
+      ...readWrite,
+      Authority.MAINTAIN_REPO_PREFIX + TEST_REPO_NAME
+    ];
+
+    return serverClient.createUser(MAINTAINER, '123456', maintain)
+      .then((response) => {
+        return expect(response.response.status).toBe(201);
+      }).then(() => {
+        return serverClient.getUser(MAINTAINER);
+      }).then((response) => {
+        return expect(response.response.data.grantedAuthorities)
+          .toEqual(expect.arrayContaining(maintain));
+      }).then(() => {
+        return serverClient.updateUser(MAINTAINER, undefined, readWrite);
+      }).then((response) => {
+        expect(response.response.status).toBe(200);
+        return serverClient.getUser(MAINTAINER);
+      }).then((response) => {
+        return expect(response.response.data.grantedAuthorities)
+          .not.toContain(Authority.MAINTAIN_REPO_PREFIX + TEST_REPO_NAME);
+      }).then(() => {
+        return serverClient.deleteUser(MAINTAINER);
+      }).then((response) => {
+        expect(response.response.status).toBe(204);
+      }).catch((e) => {
+        serverClient.deleteUser(MAINTAINER).catch(() => {});
         throw new Error(e);
       });
   });

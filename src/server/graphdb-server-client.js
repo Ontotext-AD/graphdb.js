@@ -268,10 +268,8 @@ class GraphDBServerClient extends Server {
    * if logged in as admin.
    * @param {boolean} enabled <code>true</code> if free access is enabled and
    * <code>false</code> otherwise.
-   * @param {string[]} authorities Array of read and/or write access rights
-   * described in the following template:
-   * <code>READ_REPO_{repository ID}</code> to grant repository read rights
-   * <code>WRITE_REPO_{repository ID}</code> to grant repository write rights
+   * @param {string[]} authorities additional permissions of the free access
+   * user, see {@link Authority}
    * @param {AppSettings} appSettings configure the default behavior
    * of the GraphDB Workbench
    * @return {Promise<HttpResponse|Error>} a promise which resolves
@@ -308,10 +306,8 @@ class GraphDBServerClient extends Server {
    * Create a user
    * @param {string} username User name
    * @param {string} password User password
-   * @param {string[]} [grantedAuthorities] Array of read and/or write access
-   * rights described in the following template:
-   * <code>READ_REPO_{repository ID}</code> to grant repository read rights
-   * <code>WRITE_REPO_{repository ID}</code> to grant repository write rights
+   * @param {string[]} [grantedAuthorities] the user role, additional
+   * permissions and custom roles, see {@link Authority}
    * @param {AppSettings} [appSettings] configure the default behavior
    * of the GraphDB Workbench
    * @return {Promise<HttpResponse|Error>} a promise which resolves
@@ -339,10 +335,8 @@ class GraphDBServerClient extends Server {
    * GraphDB Workbench for the user.
    * @param {string} username User name
    * @param {string} [password] User password
-   * @param {string[]} [grantedAuthorities] Array of read and/or write access
-   * rights described in the following template:
-   * <code>READ_REPO_{repository ID}</code> to grant repository read rights
-   * <code>WRITE_REPO_{repository ID}</code> to grant repository write rights
+   * @param {string[]} [grantedAuthorities] the user role, additional
+   * permissions and custom roles, see {@link Authority}
    * @param {AppSettings} [appSettings] configure the default behavior
    * of the GraphDB Workbench
    * @return {Promise<HttpResponse|Error>} a promise which resolves

@@ -10,6 +10,8 @@
 * Tested with GraphDB 11.5.2. Since GraphDB 11.4.0, the repository configuration contains the `storageEncryption` parameter.
 * Documented creating repositories encrypted at rest with the `storageEncryption` parameter (GraphDB 11.4+).
 * Added `GraphDBServerClient.rotateDataEncryptionKey` for rotating the data encryption key of an encrypted repository (GraphDB 11.4+).
+* Documented the user roles, additional permissions and custom roles for `GraphDBServerClient.createUser`, `GraphDBServerClient.updateUser` and `GraphDBServerClient.updateFreeAccess`, including the repository maintain permission `MAINTAIN_REPO_{repository ID}` (GraphDB 11.5+).
+* Fixed the values of the internal `Authority` enum (`lib/security/authority`) to the spelling GraphDB accepts (`ROLE_ADMIN`, `ROLE_REPO_MANAGER`, `ROLE_USER`, `READ_REPO_`, `WRITE_REPO_`); GraphDB rejected the previous values with `400`. Added `MONITORING`, `CLUSTER`, `CUSTOM_ROLE_PREFIX`, `MAINTAIN_REPO_PREFIX` and `GRAPHQL_ONLY_SUFFIX`.
 * Fixed `GraphDBServerClient` retrying requests endlessly after a `401` response: when the server rejected the token (for example after a GraphDB restart, which regenerates the token secret since 11.5.2) or the login failed, the client did not log in again.
 
 ## 4.0.0 (2025-08-20)

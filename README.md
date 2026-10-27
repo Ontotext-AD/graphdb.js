@@ -221,6 +221,22 @@ const serverClient = new GraphDBServerClient(serverConfig);
  //delete user
  serverClient.deleteUser('test_user'); 
 ```
+* Grant a user role and additional permissions.
+Each user has one user role: `ROLE_USER`, `ROLE_MONITORING`, `ROLE_REPO_MANAGER`, `ROLE_ADMIN` or `ROLE_CLUSTER`.
+A `ROLE_USER` can also get additional permissions for a repository: read (`READ_REPO_`), write (`WRITE_REPO_`)
+and, since GraphDB 11.5, maintain (`MAINTAIN_REPO_`), which lets the user restart the repository and edit its
+permissions, but not delete it. Write requires read, and maintain requires read and write for the same repository.
+The `:GRAPHQL` suffix limits a read or write permission to GraphQL, e.g. `READ_REPO_Test_repo:GRAPHQL`.
+Custom roles for fine-grained access control use the `CUSTOM_` prefix.
+See [User roles and permissions](https://graphdb.ontotext.com/documentation/11.5/user-roles-and-permissions.html).
+```javascript
+ serverClient.createUser('test_user', '123456', [
+   'ROLE_USER',
+   'READ_REPO_Test_repo',
+   'WRITE_REPO_Test_repo',
+   'MAINTAIN_REPO_Test_repo'
+ ]);
+```
 * Update user application settings data
 ```javascript
  // Import application settings class
@@ -395,7 +411,7 @@ const serverClient = new GraphDBServerClient(serverConfig);
  });
 ```
 
-* Update free access.
+* Update free access and the additional permissions of the free access user.
 Use with extreme caution, as the changes that are made to the application settings may possibly change the behavior of the GraphDB Workbench for all users.
 ```javascript
  const authorities = [
