@@ -68,6 +68,46 @@ describe('ServerClient', () => {
         });
     });
 
+    test('should send the new auth token after relogin', () => {
+      createSecuredClient();
+
+      return server.getRepositoryIDs()
+        .then(() => {
+          return server.getRepositoryIDs();
+        }).then(() => {
+          const requestMock = server.httpClient.request;
+          const expectedAPIRequest = HttpRequestBuilder.httpGet('/repositories')
+            .addAcceptHeader(RDFMimeType.SPARQL_RESULTS_JSON)
+            .addAuthorizationHeader('token456');
+          expect(requestMock).toHaveBeenNthCalledWith(5, expectedAPIRequest);
+        });
+    });
+
+    test('should not try relogin if keepAlive is disabled', () => {
+      createSecuredClient();
+      config.setKeepAlive(false);
+
+      return expect(server.getRepositoryIDs()
+        .then(() => server.getRepositoryIDs()))
+        .rejects.toEqual({response: {status: 401}})
+        .then(() => {
+          // login, first getRepositoryIDs, second getRepositoryIDs with 401
+          expect(server.httpClient.request).toHaveBeenCalledTimes(3);
+        });
+    });
+
+    test('should reject if login fails with 401', () => {
+      createSecuredClient();
+      const loginError = {response: {status: 401}};
+      server.httpClient.request.mockRejectedValue(loginError);
+
+      return expect(server.getRepositoryIDs()).rejects.toEqual(loginError)
+        .then(() => {
+          // only the login request, no retries
+          expect(server.httpClient.request).toHaveBeenCalledTimes(1);
+        });
+    });
+
     test('should not pass auth token if there is no authenticated user', () => {
       return server.getRepositoryIDs().then(() => {
         const expectedRequest = HttpRequestBuilder.httpGet('/repositories')
@@ -244,13 +284,14 @@ describe('ServerClient', () => {
 
   function mockClient() {
     let calls = 0;
+    let logins = 0;
 
     server.httpClient.request = jest.fn().mockImplementation((request) => {
       if (request.getMethod() === 'get') {
         calls++;
         if (server.user && calls === 2) {
-          // emulate token expiration
-          server.logout();
+          // emulate token expiration on the server side, e.g. after a restart
+          // with a regenerated token secret. The client still holds the token.
           return Promise.reject({
             response: {
               status: 401
@@ -261,9 +302,10 @@ describe('ServerClient', () => {
       } else if (request.getMethod() === 'delete') {
         return Promise.resolve(true);
       } else if (request.getMethod() === 'post') {
+        logins++;
         return Promise.resolve({
           headers: {
-            authorization: 'token123'
+            authorization: logins === 1 ? 'token123' : 'token456'
           },
           data: userdata
         });

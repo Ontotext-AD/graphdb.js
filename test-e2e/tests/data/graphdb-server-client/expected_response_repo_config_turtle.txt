@@ -17,6 +17,8 @@
 
             graphdb:read-only "false" ;
 
+            graphdb:encrypt-storage "false" ;
+
             # Inference and Validation
             graphdb:ruleset "rdfsplus-optimized" ;
             graphdb:disable-sameAs "true" ;

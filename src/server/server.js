@@ -74,28 +74,30 @@ class Server {
   * @return {Promise<HttpResponse|Error>} a promise which resolves to response
   * wrapper or rejects with error if thrown during execution.
   */
-  execute(requestBuilder) {
+  async execute(requestBuilder) {
     const startTime = Date.now();
-    return this.authenticationService.login(this.config, this.getLoggedUser())
-      .then((user) => {
-        this.setLoggedUser(user);
-        this.decorateRequestConfig(requestBuilder);
-        return this.httpClient.request(requestBuilder);
-      })
-      .then((response) => {
-        const executionResponse = new HttpResponse(response, this.httpClient);
-        executionResponse.setElapsedTime(Date.now() - startTime);
-        return executionResponse;
-      })
-      .catch((error) => {
-        const status = error.response ? error.response.status : null;
-        // Unauthorized
-        if (status && status === 401 && this.config.getKeepAlive()) {
-          // re-execute will try to re-login the user and update it
-          return this.execute(requestBuilder);
-        }
-        return Promise.reject(error);
-      });
+    const user = await this.authenticationService
+      .login(this.config, this.getLoggedUser());
+    this.setLoggedUser(user);
+    this.decorateRequestConfig(requestBuilder);
+
+    let response;
+    try {
+      response = await this.httpClient.request(requestBuilder);
+    } catch (error) {
+      const status = error.response ? error.response.status : null;
+      // Unauthorized
+      if (status === 401 && this.config.getKeepAlive() && this.user) {
+        this.user.clearToken();
+        // re-execute will try to re-login the user and update it
+        return this.execute(requestBuilder);
+      }
+      throw error;
+    }
+
+    const executionResponse = new HttpResponse(response, this.httpClient);
+    executionResponse.setElapsedTime(Date.now() - startTime);
+    return executionResponse;
   }
 
   /**
