@@ -5,8 +5,7 @@ const {
   AppSettings,
   ServerClientConfig
 } = require('graphdb').server;
-// Authority is not part of the package entry point
-const Authority = require('graphdb/lib/security/authority');
+const {Authority} = require('graphdb').security;
 const path = require('path');
 const Utils = require('utils.js');
 const Config = require('config.js');

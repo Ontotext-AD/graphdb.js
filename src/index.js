@@ -14,6 +14,10 @@ module.exports = {
     AppSettings: require('./server/app-settings')
   },
 
+  security: {
+    Authority: require('./security/authority')
+  },
+
   repository: {
     RepositoryClientConfig: require('./repository/repository-client-config'),
     BaseRepositoryClient: require('./repository/base-repository-client'),
