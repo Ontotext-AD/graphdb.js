@@ -50,7 +50,7 @@
     "LICENSE"
   ],
   "engines": {
-    "node": ">=14.17.0"
+    "node": ">=18"
   },
   "scripts": {
     "build": "node ./scripts/build.js && npm run doc && npm run tsd",

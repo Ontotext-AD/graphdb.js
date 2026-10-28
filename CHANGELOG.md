@@ -7,6 +7,9 @@
 * `Support secured endpoints exposing only HTTPS`
 
 ## Unreleased
+**Breaking changes**
+* Node.js 18 or newer is required (`engines.node` is `>=18`, was `>=14.17.0`). Node.js 14, 16 and 18 are past their end of life, and the library is tested only with Node.js 22. npm only warns about the mismatch, but Yarn 1 refuses to install the package on an older Node.js.
+
 * Tested with GraphDB 11.5.2. Since GraphDB 11.4.0, the repository configuration contains the `storageEncryption` parameter.
 * Documented creating repositories encrypted at rest with the `storageEncryption` parameter (GraphDB 11.4+).
 * Added `GraphDBServerClient.rotateDataEncryptionKey` for rotating the data encryption key of an encrypted repository (GraphDB 11.4+).
