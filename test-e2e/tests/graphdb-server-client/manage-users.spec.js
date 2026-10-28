@@ -27,8 +27,6 @@ describe('Manage GraphDB users', () => {
       return rdfClient.addFile(wineRdf, RDFMimeType.RDF_XML, null, null);
     }).then(() => {
       return Utils.toggleSecurity(true);
-    }).catch((e) => {
-      throw new Error(e);
     });
   });
 
@@ -36,8 +34,6 @@ describe('Manage GraphDB users', () => {
     return Utils.toggleSecurity(false)
       .then(() => {
         return Utils.deleteRepo(TEST_REPO_NAME);
-      }).catch((e) => {
-        throw new Error(e);
       });
   });
 
@@ -76,8 +72,10 @@ describe('Manage GraphDB users', () => {
       }).then((response) => {
         expect(response.response.status).toBe(204);
       }).catch((e) => {
-        serverClient.deleteUser('test_user');
-        throw new Error(e);
+        return serverClient.deleteUser('test_user').catch(() => {})
+          .then(() => {
+            throw e;
+          });
       });
   });
 
@@ -145,13 +143,8 @@ describe('Manage GraphDB users', () => {
       }).then((response) => {
         return expect(response.response.data.grantedAuthorities)
           .not.toContain(Authority.MAINTAIN_REPO_PREFIX + TEST_REPO_NAME);
-      }).then(() => {
-        return serverClient.deleteUser(MAINTAINER);
-      }).then((response) => {
-        expect(response.response.status).toBe(204);
-      }).catch((e) => {
-        serverClient.deleteUser(MAINTAINER).catch(() => {});
-        throw new Error(e);
+      }).finally(() => {
+        return serverClient.deleteUser(MAINTAINER).catch(() => {});
       });
   });
 });
