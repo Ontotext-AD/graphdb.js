@@ -29,7 +29,12 @@
       "rules": {
         "require-jsdoc": "off",
         "prefer-promise-reject-errors": "off",
-        "valid-jsdoc": "off"
+        "valid-jsdoc": "off",
+        "max-len": ["error", {
+          "code": 120,
+          "tabWidth": 2,
+          "ignoreUrls": true
+        }]
       }
     }
   ]

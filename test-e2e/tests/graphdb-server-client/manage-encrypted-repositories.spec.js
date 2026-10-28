@@ -12,7 +12,7 @@ const Utils = require('utils.js');
 const Config = require('config.js');
 
 // GraphDB must be started with a master key, see docker-compose-e2e.yml
-const ENCRYPTED_REPO_NAME = 'Encrypted_repo';
+const ENCRYPTED_REPO_NAME = Utils.uniqueName('Encrypted_repo');
 
 describe('Manage encrypted GraphDB repositories', () => {
   const serverClient = new GraphDBServerClient(
