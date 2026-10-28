@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const axios = require('axios');
 const FormData = require('form-data');
-const Config = require('config.js');
+const Config = require('./config');
 const {RDFMimeType} = require('graphdb').http;
 
 function loadFile(relativePath) {
@@ -39,14 +39,40 @@ function getReadStream(filePath) {
   return fs.createReadStream(filePath);
 }
 
-function createRepo(path) {
+/**
+ * Makes a repository name unique, so a test does not fail when a repository
+ * with the same name is left on a local GraphDB.
+ *
+ * @param {string} prefix the base repository name
+ * @return {string} the prefix followed by a timestamp
+ */
+function uniqueName(prefix) {
+  return `${prefix}_${Date.now()}`;
+}
+
+/**
+ * Creates a repository from a Turtle config file.
+ *
+ * @param {string} path the path to the repository config
+ * @param {object} [options]
+ * @param {string} [options.id] overrides the repository ID from the config
+ * @param {number} [options.timeout] request timeout in milliseconds
+ * @return {Promise} resolves when the repository is created
+ */
+function createRepo(path, {id, timeout = 5000} = {}) {
   const data = new FormData();
-  data.append('config', fs.createReadStream(path));
+  if (id) {
+    const config = fs.readFileSync(path, 'utf8')
+      .replace(/rep:repositoryID "[^"]*"/, `rep:repositoryID "${id}"`);
+    data.append('config', Buffer.from(config), {filename: `${id}.ttl`});
+  } else {
+    data.append('config', fs.createReadStream(path));
+  }
   return axios({
     method: 'post',
     url: `${Config.serverAddress}/rest/repositories?local=true`,
     data: data,
-    timeout: 5000,
+    timeout: timeout,
     headers: data.getHeaders()
   });
 }
@@ -108,6 +134,7 @@ module.exports = {
   loadFile,
   readStream,
   getReadStream,
+  uniqueName,
   createRepo,
   createRepositories,
   deleteRepo,

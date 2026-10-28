@@ -1,11 +1,10 @@
-const fs = require('fs');
 const axios = require('axios');
-const FormData = require('form-data');
 const Config = require('./config');
+const Utils = require('./utils');
 
 const READY_TIMEOUT = 120000;
 const WARM_UP_TIMEOUT = 60000;
-const WARM_UP_REPO = 'Test_repo';
+const WARM_UP_REPO = Utils.uniqueName('Warm_up_repo');
 
 /**
  * Waits for GraphDB to answer REST requests and warms it up before the tests.
@@ -18,9 +17,9 @@ const WARM_UP_REPO = 'Test_repo';
  */
 module.exports = function setup() {
   return waitForGraphDB(Date.now() + READY_TIMEOUT)
-    .then(() => createRepo(Config.testRepoPath))
-    .then(() => axios.delete(
-      `${Config.serverAddress}/rest/repositories/${WARM_UP_REPO}`));
+    .then(() => Utils.createRepo(Config.testRepoPath,
+      {id: WARM_UP_REPO, timeout: WARM_UP_TIMEOUT}))
+    .then(() => Utils.deleteRepo(WARM_UP_REPO));
 };
 
 function waitForGraphDB(deadline) {
@@ -32,15 +31,5 @@ function waitForGraphDB(deadline) {
       }
       return new Promise((resolve) => setTimeout(resolve, 2000))
         .then(() => waitForGraphDB(deadline));
-    });
-}
-
-function createRepo(path) {
-  const data = new FormData();
-  data.append('config', fs.createReadStream(path));
-  return axios.post(`${Config.serverAddress}/rest/repositories?local=true`,
-    data, {
-      timeout: WARM_UP_TIMEOUT,
-      headers: data.getHeaders()
     });
 }
