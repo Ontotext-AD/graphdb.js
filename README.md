@@ -229,12 +229,14 @@ permissions, but not delete it. Write requires read, and maintain requires read 
 The `:GRAPHQL` suffix limits a read or write permission to GraphQL, e.g. `READ_REPO_Test_repo:GRAPHQL`.
 Custom roles for fine-grained access control use the `CUSTOM_` prefix.
 See [User roles and permissions](https://graphdb.ontotext.com/documentation/11.5/user-roles-and-permissions.html).
+The `Authority` enum holds these values.
 ```javascript
+ const {Authority} = require('graphdb').security;
  serverClient.createUser('test_user', '123456', [
-   'ROLE_USER',
-   'READ_REPO_Test_repo',
-   'WRITE_REPO_Test_repo',
-   'MAINTAIN_REPO_Test_repo'
+   Authority.USER,
+   Authority.READ_REPO_PREFIX + 'Test_repo',
+   Authority.WRITE_REPO_PREFIX + 'Test_repo',
+   Authority.MAINTAIN_REPO_PREFIX + 'Test_repo'
  ]);
 ```
 * Update user application settings data
