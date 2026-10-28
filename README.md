@@ -1,6 +1,6 @@
 # graphdb.js
 
-[![Build Status](https://jenkins.ontotext.com/view/GraphDB/view/All/job/graphdbjs-pipeline/badge/icon)](https://jenkins.ontotext.com/view/GraphDB/view/All/job/graphdbjs-pipeline/)
+[![Build Status](https://new-jenkins.ontotext.com/buildStatus/icon?job=PRO%2FGraphDB+UI+Jobs%2Fgraphdb.js%2Fgraphdb.js%2Fmaster)](https://new-jenkins.ontotext.com/job/PRO/job/GraphDB%20UI%20Jobs/job/graphdb.js/job/graphdb.js/job/master/)
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=Ontotext-AD_graphdb.js&metric=coverage)](https://sonarcloud.io/dashboard?id=Ontotext-AD_graphdb.js)
 [![install size](https://packagephobia.now.sh/badge?p=graphdb)](https://packagephobia.now.sh/result?p=graphdb)
 [![npm version](https://badge.fury.io/js/graphdb.svg)](https://badge.fury.io/js/graphdb)
