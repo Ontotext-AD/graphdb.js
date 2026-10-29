@@ -583,7 +583,7 @@ return repository.query(payload).then((data) => {
 
 #### Writing
 
-* Uploading data in repository (PUT) using ReadStream
+* Adding data to repository (POST) using ReadStream
 
 ```javascript
 const contentType = RDFMimeType.TURTLE;
@@ -593,7 +593,7 @@ fs.readFile(turtleFile, (err, stream) => {
 });
 ```
 
-* Overwriting data in repository (PUT) using ReadStream
+* Overwriting data in repository (PUT) using ReadStream. Replaces all statements, or only those in the given context
 
 ```javascript
 const contentType = RDFMimeType.TURTLE;

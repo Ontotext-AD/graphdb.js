@@ -72,7 +72,7 @@ describe('RdfRepositoryClient - streaming data', () => {
     });
 
     function verifyUploadRequest() {
-      const expectedRequestConfig = HttpRequestBuilder.httpPut('/statements')
+      const expectedRequestConfig = HttpRequestBuilder.httpPost('/statements')
         .setData({})
         .setHeaders({
           'Content-Type': 'text/turtle'
@@ -133,7 +133,7 @@ describe('RdfRepositoryClient - streaming data', () => {
         }).setParams({
           context,
           baseURI
-        }).setResponseType('stream');
+        }).setResponseType(MediaType.TEXT_PLAIN);
 
       expect(httpRequest).toHaveBeenCalledTimes(1);
       expect(httpRequest).toHaveBeenCalledWith(expectedRequestConfig);

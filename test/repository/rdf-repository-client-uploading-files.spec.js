@@ -48,7 +48,7 @@ describe('RdfRepositoryClient - uploading files', () => {
         .then(() => {
           expect(httpRequest).toHaveBeenCalledTimes(1);
           const requestBuilder = httpRequest.mock.calls[0][0];
-          verifyUploadRequestBuilder(requestBuilder, MediaType.TEXT_PLAIN);
+          verifyUploadRequestBuilder(requestBuilder, 'post');
           return testUtils.readStream(requestBuilder.getData());
         }).then((streamData) => {
           const expectedData = testUtils.loadFile(testFilePath).trim();
@@ -92,7 +92,7 @@ describe('RdfRepositoryClient - uploading files', () => {
         .then(() => {
           expect(httpRequest).toHaveBeenCalledTimes(1);
           const requestBuilder = httpRequest.mock.calls[0][0];
-          verifyUploadRequestBuilder(requestBuilder);
+          verifyUploadRequestBuilder(requestBuilder, 'put');
           return testUtils.readStream(requestBuilder.getData());
         }).then((streamData) => {
           const expectedData = testUtils.loadFile(testFilePath).trim();
@@ -129,9 +129,9 @@ describe('RdfRepositoryClient - uploading files', () => {
     });
   });
 
-  function verifyUploadRequestBuilder(requestBuilder, responseType = 'stream') {
+  function verifyUploadRequestBuilder(requestBuilder, method) {
     expect(requestBuilder).toBeInstanceOf(HttpRequestBuilder);
-    expect(requestBuilder.getMethod()).toEqual('put');
+    expect(requestBuilder.getMethod()).toEqual(method);
     expect(requestBuilder.getUrl()).toEqual('/statements');
     expect(requestBuilder.getData()).toBeInstanceOf(Stream);
     expect(requestBuilder.getHeaders()).toEqual({
@@ -141,6 +141,6 @@ describe('RdfRepositoryClient - uploading files', () => {
       baseURI,
       context
     });
-    expect(requestBuilder.getResponseType()).toEqual(responseType);
+    expect(requestBuilder.getResponseType()).toEqual(MediaType.TEXT_PLAIN);
   }
 });
