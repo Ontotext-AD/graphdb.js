@@ -74,11 +74,11 @@ describe('RDFStar support', () => {
 
     let payload = buildPayload(RDFMimeType.TURTLE_STAR);
     return rdfClient.get(payload).then((resp) => {
-      expect(resp.trim()).toEqual(expectedTurtleStar.trim());
+      expect(sortPrefixes(resp)).toEqual(sortPrefixes(expectedTurtleStar));
       payload = buildPayload(RDFMimeType.TRIG_STAR);
       return rdfClient.get(payload);
     }).then((resp) => {
-      expect(resp.trim()).toEqual(expectedTrigStar.trim());
+      expect(sortPrefixes(resp)).toEqual(sortPrefixes(expectedTrigStar));
     });
   });
 
@@ -115,6 +115,15 @@ describe('RDFStar support', () => {
       response.on('data', onData);
     });
   });
+
+  // GraphDB returns the namespaces in an order that depends on how they were
+  // added, so the prefixes are compared regardless of their order.
+  function sortPrefixes(rdf) {
+    const lines = rdf.trim().split('\n');
+    const prefixes = lines.filter((line) => line.startsWith('@prefix')).sort();
+    const rest = lines.filter((line) => !line.startsWith('@prefix'));
+    return [...prefixes, ...rest].join('\n');
+  }
 
   function onData(data) {
     expect(data.toString().trim()).toEqual(expected.trim());

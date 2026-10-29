@@ -350,7 +350,8 @@ class RDFRepositoryClient extends BaseRepositoryClient {
   }
 
   /**
-   * Uploads the file specified by the provided file path to the server.
+   * Uploads the file specified by the provided file path to the server,
+   * adding its statements to the existing ones.
    *
    * See {@link #upload}
    *

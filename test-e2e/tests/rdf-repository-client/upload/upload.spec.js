@@ -1,5 +1,5 @@
 const path = require('path');
-const {RDFRepositoryClient, GetStatementsPayload} = require('graphdb').repository;
+const {RDFRepositoryClient, GetStatementsPayload, AddStatementPayload} = require('graphdb').repository;
 const {RDFMimeType} = require('graphdb').http;
 const Config = require('config.js');
 const Utils = require('utils.js');
@@ -42,6 +42,92 @@ describe('Upload data', () => {
       return rdfClient.get(params);
     }).then((resp) => {
       expect(resp).toEqual(JSON.parse(expectedResponseOverwritten));
+    });
+  });
+
+  describe('adding or replacing the existing statements', () => {
+    const existingContext = 'http://domain/graph/existing';
+    const otherContext = 'http://domain/graph/other';
+    const incomingStatementFile = path.resolve(__dirname, './../../data/upload_overwrite/statement-b.ttl');
+
+    const writes = {
+      upload: (context) => rdfClient.upload(Utils.getReadStream(incomingStatementFile), RDFMimeType.TURTLE, context, null),
+      addFile: (context) => rdfClient.addFile(incomingStatementFile, RDFMimeType.TURTLE, context, null),
+      overwrite: (context) => rdfClient.overwrite(Utils.getReadStream(incomingStatementFile), RDFMimeType.TURTLE, context, null),
+      putFile: (context) => rdfClient.putFile(incomingStatementFile, RDFMimeType.TURTLE, context, null)
+    };
+
+    function addExistingStatement(context) {
+      return rdfClient.add(new AddStatementPayload()
+        .setSubject('http://domain/resource/a')
+        .setPredicate('http://domain/property/p')
+        .setObject('A')
+        .setLanguage('en')
+        .setContext(context));
+    }
+
+    function writeIncomingStatement(method, context) {
+      return writes[method](context && `<${context}>`);
+    }
+
+    function sizeOf(context) {
+      return rdfClient.getSize(context && `<${context}>`);
+    }
+
+    beforeEach(() => {
+      return rdfClient.deleteAllStatements();
+    });
+
+    describe.each(['upload', 'addFile'])('%s', (method) => {
+      test('should keep the existing statements when no context is given', async () => {
+        await addExistingStatement();
+        await writeIncomingStatement(method);
+        expect(await sizeOf()).toEqual(2);
+      });
+
+      test('should keep the existing statements in the same context', async () => {
+        await addExistingStatement(existingContext);
+        await writeIncomingStatement(method, existingContext);
+        expect(await sizeOf(existingContext)).toEqual(2);
+      });
+
+      test('should keep the existing statements in another context', async () => {
+        await addExistingStatement(existingContext);
+        await writeIncomingStatement(method, otherContext);
+        expect(await sizeOf(existingContext)).toEqual(1);
+        expect(await sizeOf(otherContext)).toEqual(1);
+      });
+
+      test('should keep the existing statements in named graphs when no context is given', async () => {
+        await addExistingStatement(existingContext);
+        await writeIncomingStatement(method);
+        expect(await sizeOf(existingContext)).toEqual(1);
+        expect(await sizeOf()).toEqual(2);
+      });
+    });
+
+    describe.each(['overwrite', 'putFile'])('%s', (method) => {
+      test('should replace all statements when no context is given', async () => {
+        await addExistingStatement();
+        await addExistingStatement(existingContext);
+        await writeIncomingStatement(method);
+        expect(await sizeOf(existingContext)).toEqual(0);
+        expect(await sizeOf()).toEqual(1);
+      });
+
+      test('should replace the statements in the same context', async () => {
+        await addExistingStatement(existingContext);
+        await writeIncomingStatement(method, existingContext);
+        expect(await sizeOf(existingContext)).toEqual(1);
+        expect(await sizeOf()).toEqual(1);
+      });
+
+      test('should keep the statements in another context', async () => {
+        await addExistingStatement(existingContext);
+        await writeIncomingStatement(method, otherContext);
+        expect(await sizeOf(existingContext)).toEqual(1);
+        expect(await sizeOf(otherContext)).toEqual(1);
+      });
     });
   });
 });

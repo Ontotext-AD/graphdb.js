@@ -80,7 +80,8 @@ class UploadService extends Service {
   }
 
   /**
-   * Uploads the file specified by the provided file path to the server.
+   * Uploads the file specified by the provided file path to the server,
+   * adding its statements to the existing ones.
    *
    * See {@link #upload}
    *
@@ -165,7 +166,7 @@ class UploadService extends Service {
    * the stream has been successfully consumed by the server
    */
   getUploadRequest(readStream, contentType, context, baseURI) {
-    return HttpRequestBuilder.httpPut(PATH_STATEMENTS)
+    return HttpRequestBuilder.httpPost(PATH_STATEMENTS)
       .setData(readStream)
       .addContentTypeHeader(contentType)
       .setResponseType(MediaType.TEXT_PLAIN)
@@ -197,7 +198,7 @@ class UploadService extends Service {
     return HttpRequestBuilder.httpPut(PATH_STATEMENTS)
       .setData(readStream)
       .addContentTypeHeader(contentType)
-      .setResponseType('stream')
+      .setResponseType(MediaType.TEXT_PLAIN)
       .setParams({
         baseURI,
         context: TermConverter.toNTripleValues(context)
