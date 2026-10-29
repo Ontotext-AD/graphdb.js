@@ -63,6 +63,50 @@ describe('RepositoryClientConfig', () => {
     expect(config.getEndpoints()).toEqual(endpoints);
   });
 
+  test('should return an empty array when endpoints are not set', () => {
+    const config = new RepositoryClientConfig(endpoint).setEndpoints(null);
+    expect(config.getEndpoints()).toEqual([]);
+  });
+
+  describe('relative repository endpoints', () => {
+    test('should prepend the server base URL to relative endpoints', () => {
+      const config = new RepositoryClientConfig('http://localhost:8081')
+        .setEndpoints(['/repositories/test1', 'repositories/test2']);
+      expect(config.getEndpoints()).toEqual([
+        'http://localhost:8081/repositories/test1',
+        'http://localhost:8081/repositories/test2'
+      ]);
+    });
+
+    test('should keep the base URL path when prepending it', () => {
+      const config = new RepositoryClientConfig('http://localhost:8081/graphdb/')
+        .addEndpoint('/repositories/test1');
+      expect(config.getEndpoints())
+        .toEqual(['http://localhost:8081/graphdb/repositories/test1']);
+    });
+
+    test('should prepend a relative base URL', () => {
+      const config = new RepositoryClientConfig('/graphdb')
+        .addEndpoint('repositories/test1');
+      expect(config.getEndpoints()).toEqual(['/graphdb/repositories/test1']);
+    });
+
+    test('should not modify absolute endpoints', () => {
+      const config = new RepositoryClientConfig('http://localhost:8081')
+        .setEndpoints([...endpoints, '//localhost:8084/repositories/test4']);
+      expect(config.getEndpoints())
+        .toEqual([...endpoints, '//localhost:8084/repositories/test4']);
+    });
+
+    test('should use the current base URL when resolving endpoints', () => {
+      const config = new RepositoryClientConfig('http://localhost:8081')
+        .setEndpoints(['/repositories/test1']);
+      config.setEndpoint('http://localhost:8082');
+      expect(config.getEndpoints())
+        .toEqual(['http://localhost:8082/repositories/test1']);
+    });
+  });
+
   test('should not set GraphDb location header when crete an instance of RepositoryClientConfig', () => {
     // When: I create an instance of RepositoryClientConfig.
     const config = new RepositoryClientConfig(endpoint);

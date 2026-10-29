@@ -5,6 +5,13 @@ const ObjectUtils = require('../util/object-utils');
 const defaultTimeout = 10000;
 
 /**
+ * Matches URLs that start with a scheme or are protocol-relative.
+ *
+ * @type {RegExp}
+ */
+const ABSOLUTE_URL_PATTERN = /^([a-z][a-z\d+\-.]*:)?\/\//i;
+
+/**
  * Configuration wrapper used for initialization of {@link BaseRepositoryClient}
  * implementations.
  *
@@ -37,7 +44,8 @@ class RepositoryClientConfig extends ClientConfig {
   }
 
   /**
-   * Sets the repository endpoint URLs.
+   * Sets the repository endpoint URLs, absolute or relative to the server
+   * base URL (see {@link RepositoryClientConfig#getEndpoints}).
    *
    * @param {string[]} endpoints the endpoint URLs
    *
@@ -49,7 +57,9 @@ class RepositoryClientConfig extends ClientConfig {
   }
 
   /**
-   * Inserts a repository endpoint URL to the rest of the endpoints.
+   * Inserts a repository endpoint URL to the rest of the endpoints. It may be
+   * relative to the server base URL
+   * (see {@link RepositoryClientConfig#getEndpoints}).
    *
    * @param {string} endpoint repository endpoint URL
    *
@@ -64,12 +74,36 @@ class RepositoryClientConfig extends ClientConfig {
   }
 
   /**
-   * Gets the repository endpoint URLs.
+   * Gets the repository endpoint URLs. Relative endpoints are prefixed with
+   * the server base [endpoint]{@link ClientConfig#getEndpoint}, while
+   * absolute ones are returned unchanged.
    *
-   * @return {string[]}
+   * @return {string[]} the resolved endpoint URLs
    */
   getEndpoints() {
-    return this.endpoints;
+    return (this.endpoints || [])
+      .map((endpoint) => this.resolveEndpoint(endpoint));
+  }
+
+  /**
+   * Prepends the server base URL to the provided endpoint unless it is an
+   * absolute URL.
+   *
+   * @private
+   * @param {string} endpoint repository endpoint URL
+   * @return {string} the resolved repository endpoint URL
+   */
+  resolveEndpoint(endpoint) {
+    if (ABSOLUTE_URL_PATTERN.test(endpoint)) {
+      return endpoint;
+    }
+    const baseUrl = this.getEndpoint();
+    let baseUrlEnd = baseUrl.length;
+    while (baseUrlEnd > 0 && baseUrl[baseUrlEnd - 1] === '/') {
+      baseUrlEnd--;
+    }
+    return baseUrl.substring(0, baseUrlEnd) + '/' +
+      endpoint.replace(/^\/+/, '');
   }
 
   /**
