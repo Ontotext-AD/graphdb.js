@@ -317,6 +317,19 @@ describe('RDFRepositoryClient - transactions', () => {
         });
       });
 
+      test('should retrieve binary RDF statements as a Buffer', () => {
+        const data = Buffer.from([0x52, 0x44, 0x46, 0xbf, 0xc3, 0xa9]);
+        transactionHttpRequest.mockResolvedValue({data});
+        const payload = getStatementPayload()
+          .setResponseType(RDFMimeType.BINARY_RDF);
+        return transaction.get(payload).then((result) => {
+          const request = transactionHttpRequest.mock.calls[0][0];
+          expect(request.getResponseType()).toEqual('arraybuffer');
+          expect(Buffer.isBuffer(result)).toBe(true);
+          expect(result).toEqual(data);
+        });
+      });
+
       test('should reject if the transaction cannot ' +
         'retrieve statements', () => {
         transactionHttpRequest.mockRejectedValue('Error during retrieve');

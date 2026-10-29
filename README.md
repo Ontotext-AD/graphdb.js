@@ -533,6 +533,8 @@ return repository.get(payload).then((data) => {
 });
 ```
 
+With the response type `RDFMimeType.BINARY_RDF`, `get` resolves with a `Buffer` holding the binary RDF data.
+
 * Downloading data from repository by consuming a WritableStream
 
 ```javascript

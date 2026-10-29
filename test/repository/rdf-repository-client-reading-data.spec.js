@@ -268,6 +268,34 @@ describe('RDFRepositoryClient - reading statements', () => {
     });
   });
 
+  describe('statements#get returning binary RDF', () => {
+    test('should fetch binary RDF as binary data and return it as a ' +
+      'Buffer', () => {
+      const binaryData = Buffer.from([0x52, 0x44, 0x46, 0xbf, 0xc3, 0xa9]);
+      httpRequest.mockResolvedValue({data: binaryData});
+
+      const payload = new GetStatementsPayload()
+        .setResponseType(RDFMimeType.BINARY_RDF);
+
+      return repository.get(payload).then((result) => {
+        const expectedRequestConfig = HttpRequestBuilder.httpGet('/statements')
+          .setHeaders({
+            'Accept': RDFMimeType.BINARY_RDF
+          }).setParams({
+            subj: undefined,
+            pred: undefined,
+            obj: undefined,
+            context: undefined,
+            infer: undefined
+          })
+          .setResponseType('arraybuffer');
+        expect(httpRequest).toHaveBeenCalledWith(expectedRequestConfig);
+        expect(Buffer.isBuffer(result)).toBe(true);
+        expect(result).toEqual(binaryData);
+      });
+    });
+  });
+
   describe('download', () => {
     test('should fetch data and return readable stream to ' +
       'the client', (done) => {

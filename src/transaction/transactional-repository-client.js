@@ -131,8 +131,8 @@ class TransactionalRepositoryClient extends BaseRepositoryClient {
    *
    * @param {GetStatementsPayload} payload is an object holding the request
    * parameters.
-   * @return {Promise<string|Quad>} resolves with plain string or Quad according
-   *      to provided response type.
+   * @return {Promise<string|Quad|Buffer>} resolves with plain string, Quad or,
+   *      for binary RDF, Buffer according to provided response type.
    */
   get(payload) {
     const serviceRequest = this.statementsService.get(payload);
