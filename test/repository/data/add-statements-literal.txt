@@ -1,1 +1,1 @@
-<http://domain/resource/resource-1> <http://domain/property/property-string> "Some value"^^<xsd:string>.
+<http://domain/resource/resource-1> <http://domain/property/property-string> "Some value".

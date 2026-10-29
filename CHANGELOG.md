@@ -15,6 +15,21 @@
 * Added `GraphDBServerClient.rotateDataEncryptionKey` for rotating the data encryption key of an encrypted repository (GraphDB 11.4+).
 * Documented the user roles, additional permissions and custom roles for `GraphDBServerClient.createUser`, `GraphDBServerClient.updateUser` and `GraphDBServerClient.updateFreeAccess`, including the repository maintain permission `MAINTAIN_REPO_{repository ID}` (GraphDB 11.5+).
 * Fixed the values of the internal `Authority` enum (`lib/security/authority`) to the spelling GraphDB accepts (`ROLE_ADMIN`, `ROLE_REPO_MANAGER`, `ROLE_USER`, `READ_REPO_`, `WRITE_REPO_`); GraphDB rejected the previous values with `400`. Added `MONITORING`, `CLUSTER`, `CUSTOM_ROLE_PREFIX`, `MAINTAIN_REPO_PREFIX` and `GRAPHQL_ONLY_SUFFIX`.
+* Fixed `AddStatementPayload` sending literal data types with the `xsd:` prefix, such as the values of `Types.XSD` and the data types that `setObjectLiteral` detects for numbers and booleans, as the IRI `xsd:integer` instead of `http://www.w3.org/2001/XMLSchema#integer`. GraphDB stored these literals with the wrong data type, so they were not numeric and did not match a query by value such as `ASK { ?s ?p 5 }`. The `xsd:` prefix is now expanded to the XSD namespace. Data added earlier this way keeps the wrong data type and has to be fixed in the repository, for example with this SPARQL update, which fixes the named graphs first and then the default graph:
+  ```sparql
+  DELETE { GRAPH ?g { ?s ?p ?o } } INSERT { GRAPH ?g { ?s ?p ?fixed } }
+  WHERE {
+    GRAPH ?g { ?s ?p ?o }
+    FILTER(isLiteral(?o) && STRSTARTS(STR(DATATYPE(?o)), "xsd:"))
+    BIND(STRDT(STR(?o), IRI(CONCAT("http://www.w3.org/2001/XMLSchema#", STRAFTER(STR(DATATYPE(?o)), "xsd:")))) AS ?fixed)
+  };
+  DELETE { ?s ?p ?o } INSERT { ?s ?p ?fixed }
+  WHERE {
+    ?s ?p ?o
+    FILTER(isLiteral(?o) && STRSTARTS(STR(DATATYPE(?o)), "xsd:"))
+    BIND(STRDT(STR(?o), IRI(CONCAT("http://www.w3.org/2001/XMLSchema#", STRAFTER(STR(DATATYPE(?o)), "xsd:")))) AS ?fixed)
+  }
+  ```
 * Fixed `GraphDBServerClient` retrying requests endlessly after a `401` response: when the server rejected the token (for example after a GraphDB restart, which regenerates the token secret since 11.5.2) or the login failed, the client did not log in again.
 * Fixed a regression in 3.1.0: `RDFRepositoryClient.upload` and `RDFRepositoryClient.addFile` replaced the repository data instead of adding to it. In 3.1.0–4.0.0 they sent `PUT` instead of `POST` to `/statements`, so they deleted the existing statements, like `overwrite` and `putFile`: all statements when no context was given, including those in named graphs, or the statements in the given context. `TransactionalRepositoryClient` was not affected.
 * Fixed `RDFRepositoryClient.overwrite` and `RDFRepositoryClient.putFile` keeping the connection open until the read timeout, which kept the Node.js process alive after the request completed.

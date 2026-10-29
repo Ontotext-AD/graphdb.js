@@ -127,6 +127,44 @@ describe('RDFRepositoryClient - adding data', () => {
         .then(() => verifyAddPayload(expected));
     });
 
+    test('should expand the xsd prefix of an explicit data type ' +
+      'to the XSD namespace', () => {
+      const payload = new AddStatementPayload()
+        .setSubject(subj('resource-1'))
+        .setPredicate(pred('property-int'))
+        .setObjectLiteral('4', XSD.INTEGER);
+
+      const expected = testUtils
+        .loadFile('repository/data/add-statements-literal-integer.txt').trim();
+      return rdfRepositoryClient.add(payload)
+        .then(() => verifyAddPayload(expected));
+    });
+
+    test('should expand the xsd prefix of a data type without ' +
+      'a Turtle shorthand', () => {
+      const payload = new AddStatementPayload()
+        .setSubject(subj('resource-1'))
+        .setPredicate(pred('property-date'))
+        .setObjectLiteral('2026-10-29', 'xsd:date');
+
+      const expected = testUtils
+        .loadFile('repository/data/add-statements-literal-date.txt').trim();
+      return rdfRepositoryClient.add(payload)
+        .then(() => verifyAddPayload(expected));
+    });
+
+    test('should keep a data type without the xsd prefix as is', () => {
+      const payload = new AddStatementPayload()
+        .setSubject(subj('resource-1'))
+        .setPredicate(pred('property-custom'))
+        .setObjectLiteral('value', 'http://domain/datatype/custom');
+
+      const expected = testUtils
+        .loadFile('repository/data/add-statements-literal-custom.txt').trim();
+      return rdfRepositoryClient.add(payload)
+        .then(() => verifyAddPayload(expected));
+    });
+
     test('should properly convert float literal payload ' +
       'to quad and send a request', () => {
       const payload = new AddStatementPayload()

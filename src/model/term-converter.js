@@ -4,6 +4,8 @@ const {namedNode, literal, quad, blankNode, variable} = DataFactory;
 const StringUtils = require('../util/string-utils');
 const base64url = require('base64url');
 const ENCODED_RDFSTAR_TRIPLE_PREFIX = 'urn:rdf4j:triple:';
+const XSD_PREFIX = 'xsd:';
+const XSD_NAMESPACE = 'http://www.w3.org/2001/XMLSchema#';
 
 /**
  * Utility class for converting strings to terms, terms to quads and
@@ -228,7 +230,22 @@ class TermConverter {
    * @return {Literal} the provided object as Literal
    */
   static toObjectWithDataType(object, dataType) {
-    return literal(object, namedNode(dataType));
+    return literal(object, namedNode(TermConverter.expandXsdPrefix(dataType)));
+  }
+
+  /**
+   * Expands the <code>xsd:</code> prefix of the provided data type to the XSD
+   * namespace. Any other data type is returned as is.
+   *
+   * @private
+   * @param {string} dataType the data type to expand
+   * @return {string} the data type as a full IRI
+   */
+  static expandXsdPrefix(dataType) {
+    if (dataType.startsWith(XSD_PREFIX)) {
+      return XSD_NAMESPACE + dataType.substring(XSD_PREFIX.length);
+    }
+    return dataType;
   }
 
   /**
