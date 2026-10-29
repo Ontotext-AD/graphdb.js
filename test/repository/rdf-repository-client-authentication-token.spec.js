@@ -4,6 +4,7 @@ const RepositoryClientConfig = require('repository/repository-client-config');
 const GetStatementsPayload = require('repository/get-statements-payload');
 const RDFMimeType = require('http/rdf-mime-type');
 const HttpRequestBuilder = require('http/http-request-builder');
+const MediaType = require('http/media-type');
 
 const httpClientStub = require('../http/http-client.stub');
 
@@ -71,8 +72,9 @@ describe('RDFRepositoryClient - authentication', () => {
 
       // first request was a login with expected parameters
       const expectedLoginRequest = HttpRequestBuilder
-        .httpPost('/rest/login/testuser')
-        .addGraphDBPasswordHeader('pass123');
+        .httpPost('/rest/login')
+        .addContentTypeHeader(MediaType.APPLICATION_JSON)
+        .setData({username: 'testuser', password: 'pass123'});
       expect(loginMock).toHaveBeenNthCalledWith(1, expectedLoginRequest);
 
       // second request was the API call with expected parameters

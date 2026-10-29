@@ -3,6 +3,7 @@ const ServerClientConfig = require('server/server-client-config');
 const RepositoryClientConfig = require('repository/repository-client-config');
 const RDFRepositoryClient = require('repository/rdf-repository-client');
 const HttpRequestBuilder = require('http/http-request-builder');
+const MediaType = require('http/media-type');
 const RDFMimeType = require('http/rdf-mime-type');
 const User = require('auth/user');
 
@@ -39,8 +40,9 @@ describe('ServerClient', () => {
         expect(requestMock).toHaveBeenCalledTimes(2);
 
         const expectedLoginRequest = HttpRequestBuilder
-          .httpPost('/rest/login/testuser')
-          .addGraphDBPasswordHeader('pass123');
+          .httpPost('/rest/login')
+          .addContentTypeHeader(MediaType.APPLICATION_JSON)
+          .setData({username: 'testuser', password: 'pass123'});
         expect(requestMock).toHaveBeenNthCalledWith(1, expectedLoginRequest);
 
         const expectedAPIRequest = HttpRequestBuilder.httpGet('/repositories')

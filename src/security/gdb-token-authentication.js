@@ -1,5 +1,6 @@
 const Authentication = require('./authentication');
 const HttpRequestBuilder = require('../http/http-request-builder');
+const MediaType = require('../http/media-type');
 
 /**
  * Gdb token authentication type class.
@@ -17,8 +18,9 @@ export class GdbTokenAuthentication extends Authentication {
     const username = this.clientConfig.getUsername();
     const pass = this.clientConfig.getPass();
 
-    return HttpRequestBuilder.httpPost(`/rest/login/${username}`)
-      .addGraphDBPasswordHeader(pass);
+    return HttpRequestBuilder.httpPost('/rest/login')
+      .addContentTypeHeader(MediaType.APPLICATION_JSON)
+      .setData({username, password: pass});
   }
 
   /**
