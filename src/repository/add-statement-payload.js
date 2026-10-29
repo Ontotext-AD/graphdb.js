@@ -36,7 +36,9 @@ class AddStatementPayload extends StatementPayload {
   /**
    * Sets the data type this statement's object.
    *
-   * This makes the statement a literal.
+   * This makes the statement a literal. A data type with the
+   * <code>xsd:</code> prefix, such as the values of {@link XSD}, is expanded
+   * to the XSD namespace when the statement is sent.
    *
    * @param {string} [dataType] the object's data type
    * @return {AddStatementPayload} the payload for method chaining
