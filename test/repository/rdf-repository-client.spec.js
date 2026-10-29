@@ -138,5 +138,14 @@ describe('RDFRepositoryClient', () => {
       return expect(rdfRepositoryClient.getSize()).rejects
         .toEqual('get-size-error');
     });
+
+    test('should reject with the 401 error when no credentials are set', () => {
+      rdfRepositoryClient.repositoryClientConfig.setKeepAlive(true);
+      const unauthorizedError = {request: {}, response: {status: 401}};
+      httpRequest.mockRejectedValue(unauthorizedError);
+      return expect(rdfRepositoryClient.getSize()).rejects
+        .toBe(unauthorizedError)
+        .then(() => expect(httpRequest).toHaveBeenCalledTimes(1));
+    });
   });
 });
