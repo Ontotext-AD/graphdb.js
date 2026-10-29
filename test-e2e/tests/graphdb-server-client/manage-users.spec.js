@@ -146,4 +146,63 @@ describe('Manage GraphDB users', () => {
         return serverClient.deleteUser(MAINTAINER).catch(() => {});
       });
   });
+
+  // GraphDB rejects an encoded '%' in the path with 400 when security is
+  // enabled, so a username with '%' can be managed only without security.
+  test.each(['a#b', 'a+b', 'a/b'])(
+    'Should manage and log in the user %s', (username) => {
+      const userConfig = new ServerClientConfig(Config.serverAddress)
+        .useGdbTokenAuthentication(username, '123456');
+      const userClient = new GraphDBServerClient(userConfig);
+
+      return serverClient.createUser(username, '123456', [Authority.USER])
+        .then((response) => {
+          expect(response.response.status).toBe(201);
+          return serverClient.getUser(username);
+        }).then((response) => {
+          expect(response.response.data.username).toBe(username);
+          return serverClient.updateUser(username, '123456',
+            [Authority.USER, Authority.READ_REPO_PREFIX + TEST_REPO_NAME]);
+        }).then(() => {
+          return serverClient.getUser(username);
+        }).then((response) => {
+          expect(response.response.data.grantedAuthorities)
+            .toContain(Authority.READ_REPO_PREFIX + TEST_REPO_NAME);
+          return userClient.getRepositoryIDs();
+        }).then((repositoryIDs) => {
+          expect(repositoryIDs).toContain(TEST_REPO_NAME);
+          expect(userClient.user.getUsername()).toBe(username);
+          return serverClient.deleteUser(username);
+        }).then((response) => {
+          expect(response.response.status).toBe(204);
+          return expect(serverClient.getUser(username)).rejects
+            .toHaveProperty('response.status', 404);
+        }).finally(() => {
+          return serverClient.deleteUser(username).catch(() => {});
+        });
+    });
+
+  test('Should manage the user a%b when security is disabled', () => {
+    const username = 'a%b';
+    return Utils.toggleSecurity(false)
+      .then(() => {
+        return serverClient.createUser(username, '123456', [Authority.USER]);
+      }).then((response) => {
+        expect(response.response.status).toBe(201);
+        return serverClient.updateUser(username, '123456',
+          [Authority.USER, Authority.MONITORING]);
+      }).then(() => {
+        return serverClient.getUser(username);
+      }).then((response) => {
+        expect(response.response.data.username).toBe(username);
+        expect(response.response.data.grantedAuthorities)
+          .toContain(Authority.MONITORING);
+        return serverClient.deleteUser(username);
+      }).then((response) => {
+        expect(response.response.status).toBe(204);
+      }).finally(() => {
+        return serverClient.deleteUser(username).catch(() => {})
+          .then(() => Utils.toggleSecurity(true));
+      });
+  });
 });

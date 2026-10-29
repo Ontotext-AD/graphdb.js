@@ -86,7 +86,17 @@ describe('ServerClient', () => {
                 expect(requestSpy).toHaveBeenCalled();
                 const config = requestSpy.mock.calls[0][0];
                 expect(config).toHaveProperty('method', 'delete');
-                expect(config).toHaveProperty('url', '/rest/repositories/repositoryTwoId?location=http://example.com:7200');
+                expect(config).toHaveProperty('url', '/rest/repositories/repositoryTwoId?location=http%3A%2F%2Fexample.com%3A7200');
+            });
+    });
+
+    test('should URL-encode the location query parameter', () => {
+        const requestSpy = jest.spyOn(server.httpClient.axios, 'request').mockResolvedValue();
+
+        return server.deleteRepository('repositoryTwoId', 'http://example.com:7200/a&b=c')
+            .then(() => {
+                const config = requestSpy.mock.calls[0][0];
+                expect(config).toHaveProperty('url', '/rest/repositories/repositoryTwoId?location=http%3A%2F%2Fexample.com%3A7200%2Fa%26b%3Dc');
             });
     });
 
@@ -130,7 +140,7 @@ describe('ServerClient', () => {
                 expect(requestSpy).toHaveBeenCalled();
                 const config = requestSpy.mock.calls[0][0];
                 expect(config).toHaveProperty('method', 'get');
-                expect(config).toHaveProperty('url', '/rest/repositories/repoTwoId?location=http://example.com:7200');
+                expect(config).toHaveProperty('url', '/rest/repositories/repoTwoId?location=http%3A%2F%2Fexample.com%3A7200');
             });
     });
 
@@ -154,7 +164,7 @@ describe('ServerClient', () => {
                 expect(requestSpy).toHaveBeenCalled();
                 const config = requestSpy.mock.calls[0][0];
                 expect(config).toHaveProperty('method', 'get');
-                expect(config).toHaveProperty('url', '/rest/repositories/repoTwoId/download-ttl?location=http://example.com:7200');
+                expect(config).toHaveProperty('url', '/rest/repositories/repoTwoId/download-ttl?location=http%3A%2F%2Fexample.com%3A7200');
             });
     });
 
@@ -188,7 +198,7 @@ describe('ServerClient', () => {
                 expect(requestSpy).toHaveBeenCalled();
                 const config = requestSpy.mock.calls[0][0];
                 expect(config).toHaveProperty('method', 'put');
-                expect(config).toHaveProperty('url', '/rest/repositories/new-repo-id?location=http://example.com:7200');
+                expect(config).toHaveProperty('url', '/rest/repositories/new-repo-id?location=http%3A%2F%2Fexample.com%3A7200');
                 expect(config).toHaveProperty('data', {
                     "id": "new-repo-id",
                     "location": "http://example.com:7200",
@@ -224,7 +234,7 @@ describe('ServerClient', () => {
                 expect(requestSpy).toHaveBeenCalled();
                 const config = requestSpy.mock.calls[0][0];
                 expect(config).toHaveProperty('method', 'post');
-                expect(config).toHaveProperty('url', '/rest/repositories/repoTwoId/rotate-data-encryption-key?location=http://example.com:7200');
+                expect(config).toHaveProperty('url', '/rest/repositories/repoTwoId/rotate-data-encryption-key?location=http%3A%2F%2Fexample.com%3A7200');
             });
     });
 
@@ -453,6 +463,23 @@ describe('ServerClient', () => {
                 const config = requestSpy.mock.calls[0][0];
                 expect(config).toHaveProperty('method', 'delete');
                 expect(config).toHaveProperty('url', '/rest/security/users/user_name');
+            });
+    });
+
+    test.each([
+        ['createUser', 'post', (username) => server.createUser(username, 'user_password')],
+        ['updateUser', 'put', (username) => server.updateUser(username, 'user_password')],
+        ['updateUserData', 'patch', (username) => server.updateUserData(username, 'user_password')],
+        ['getUser', 'get', (username) => server.getUser(username)],
+        ['deleteUser', 'delete', (username) => server.deleteUser(username)]
+    ])('%s should URL-encode the username in the request path', (name, method, call) => {
+        const requestSpy = jest.spyOn(server.httpClient.axios, 'request').mockResolvedValue();
+
+        return call("a#b+c%d?e f!'()*/g")
+            .then(() => {
+                const config = requestSpy.mock.calls[0][0];
+                expect(config).toHaveProperty('method', method);
+                expect(config).toHaveProperty('url', '/rest/security/users/a%23b%2Bc%25d%3Fe%20f%21%27%28%29%2A/g');
             });
     });
 });

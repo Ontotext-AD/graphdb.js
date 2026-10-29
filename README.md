@@ -775,7 +775,7 @@ Repository operations like create, edit, delete, shutdown are not supported by t
 
 #### GDB token
 
-If the library is going to be used agains a secured server, then all API calls must be authenticated by sending an http authorization header with a token which is obtained after a call to `rest/login/user_name` with a password provided as a specific header.
+If the library is going to be used agains a secured server, then all API calls must be authenticated by sending an http authorization header with a token which is obtained after a `POST` to `rest/login` with the username and password in a JSON body.
 
 In case the server requires that requests should be authenticated, then in the `ServerClientConfig` and `RepositoryClientConfig` must be configured the `username` and `password` which to be used for the authentication. If those are provided, then the client assumes that authentication is mandatory and the login with the provided credentials is performed authomatically before the first API call. After a successful login, user details which are received and the JWT auth token are stored in the `AuthenticationService`. From that moment on, with every API call is sent also an `authorization` header with the GDB token as value.
 ##### ServerClient
