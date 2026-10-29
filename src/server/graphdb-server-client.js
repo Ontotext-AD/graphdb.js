@@ -316,7 +316,7 @@ class GraphDBServerClient extends Server {
   createUser(username, password, grantedAuthorities, appSettings) {
     const requestBuilder =
       HttpRequestBuilder
-        .httpPost(`${SECURITY_SERVICE_URL}/users/${username}`)
+        .httpPost(this.getUserUrl(username))
         .addContentTypeHeader(MediaType.APPLICATION_JSON)
         .addAcceptHeader(MediaType.TEXT_PLAIN)
         .setData({
@@ -345,7 +345,7 @@ class GraphDBServerClient extends Server {
   updateUser(username, password, grantedAuthorities, appSettings) {
     const requestBuilder =
       HttpRequestBuilder
-        .httpPut(`${SECURITY_SERVICE_URL}/users/${username}`)
+        .httpPut(this.getUserUrl(username))
         .addContentTypeHeader(MediaType.APPLICATION_JSON)
         .addAcceptHeader(MediaType.TEXT_PLAIN)
         .setData({
@@ -372,7 +372,7 @@ class GraphDBServerClient extends Server {
   updateUserData(username, password, appSettings) {
     const requestBuilder =
       HttpRequestBuilder
-        .httpPatch(`${SECURITY_SERVICE_URL}/users/${username}`)
+        .httpPatch(this.getUserUrl(username))
         .addContentTypeHeader(MediaType.APPLICATION_JSON)
         .addAcceptHeader(MediaType.TEXT_PLAIN)
         .setData({
@@ -392,7 +392,7 @@ class GraphDBServerClient extends Server {
   getUser(username) {
     const requestBuilder =
       HttpRequestBuilder
-        .httpGet(`${SECURITY_SERVICE_URL}/users/${username}`)
+        .httpGet(this.getUserUrl(username))
         .addContentTypeHeader(MediaType.APPLICATION_JSON);
     return this.execute(requestBuilder);
   }
@@ -406,7 +406,7 @@ class GraphDBServerClient extends Server {
   deleteUser(username) {
     const requestBuilder =
       HttpRequestBuilder
-        .httpDelete(`${SECURITY_SERVICE_URL}/users/${username}`)
+        .httpDelete(this.getUserUrl(username))
         .addAcceptHeader(MediaType.TEXT_PLAIN);
     return this.execute(requestBuilder);
   }
@@ -425,8 +425,8 @@ class GraphDBServerClient extends Server {
   }
 
   /**
-   * Returns the query parameter for the repository location if it's provided,
-   * otherwise returns an empty string.
+   * Returns the URL-encoded query parameter for the repository location if
+   * it's provided, otherwise returns an empty string.
    *
    * @private
    *
@@ -437,7 +437,27 @@ class GraphDBServerClient extends Server {
    */
   getLocationParameter(location) {
     return ObjectUtils.isNullOrUndefined(location) ?
-      '' : `?location=${location}`;
+      '' : `?location=${encodeURIComponent(location)}`;
+  }
+
+  /**
+   * Returns the URL of the user with the provided username. The username is
+   * percent-encoded, including <code>!'()*</code>, except for <code>/</code>,
+   * which GraphDB rejects when encoded.
+   *
+   * @private
+   *
+   * @param {string} username User name
+   *
+   * @return {string} the URL of the user
+   */
+  getUserUrl(username) {
+    // encodeURIComponent leaves !'()* as they are
+    const encodedUsername = encodeURIComponent(username)
+      .replace(/[!'()*]/g,
+        (c) => `%${c.codePointAt(0).toString(16).toUpperCase()}`)
+      .replaceAll('%2F', '/');
+    return `${SECURITY_SERVICE_URL}/users/${encodedUsername}`;
   }
 }
 
