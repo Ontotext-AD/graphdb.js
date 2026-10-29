@@ -18,6 +18,7 @@
 * Fixed `GraphDBServerClient` retrying requests endlessly after a `401` response: when the server rejected the token (for example after a GraphDB restart, which regenerates the token secret since 11.5.2) or the login failed, the client did not log in again.
 * Fixed a regression in 3.1.0: `RDFRepositoryClient.upload` and `RDFRepositoryClient.addFile` replaced the repository data instead of adding to it. In 3.1.0–4.0.0 they sent `PUT` instead of `POST` to `/statements`, so they deleted the existing statements, like `overwrite` and `putFile`: all statements when no context was given, including those in named graphs, or the statements in the given context. `TransactionalRepositoryClient` was not affected.
 * Fixed `RDFRepositoryClient.overwrite` and `RDFRepositoryClient.putFile` keeping the connection open until the read timeout, which kept the Node.js process alive after the request completed.
+* Fixed `RepositoryClientConfig` ignoring the server base URL for relative repository endpoints: endpoints such as `/repositories/my-repo` are now prefixed with the URL passed to the constructor. Absolute endpoints are used unchanged.
 
 ## 4.0.0 (2025-08-20)
 * GraphDB 11 support. Tested with GraphDB 11.0.2.

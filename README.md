@@ -442,6 +442,14 @@ Use with extreme caution, as the changes that are made to the application settin
         .setWriteTimeout(writeTimeout);
         const repository = new RDFRepositoryClient(config);
      ```
+   - Repository endpoints can be relative to the server base URL. Relative
+     endpoints are prefixed with the URL passed to the constructor, while
+     absolute ones are used unchanged.
+     ```javascript
+      const config = new RepositoryClientConfig('http://GDB')
+        // Resolved to 'http://GDB/repositories/my-repo'
+        .setEndpoints(['/repositories/my-repo']);
+     ```
    - Repository client that interacts with a remote GraphDB instance
      ```javascript
       const endpoint = 'http://GDB';

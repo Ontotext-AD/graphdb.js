@@ -66,6 +66,22 @@ describe('RDFRepositoryClient', () => {
     });
   });
 
+  test('should prepend the server base URL to relative endpoints', () => {
+    HttpClient.mockClear();
+    const repoClientConfig = new RepositoryClientConfig('http://localhost:8080')
+      .setEndpoints([
+        '/repositories/test1',
+        'http://localhost:8082/repositories/test2'
+      ]);
+
+    new RDFRepositoryClient(repoClientConfig);
+
+    expect(HttpClient).toHaveBeenCalledWith(
+      'http://localhost:8080/repositories/test1');
+    expect(HttpClient).toHaveBeenCalledWith(
+      'http://localhost:8082/repositories/test2');
+  });
+
   test('should not allow to be instantiated with improper ' +
     'configuration', () => {
     expect(() => new RDFRepositoryClient()).toThrow(Error);
