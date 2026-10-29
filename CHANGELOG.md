@@ -34,6 +34,7 @@
 * Fixed a regression in 3.1.0: `RDFRepositoryClient.upload` and `RDFRepositoryClient.addFile` replaced the repository data instead of adding to it. In 3.1.0–4.0.0 they sent `PUT` instead of `POST` to `/statements`, so they deleted the existing statements, like `overwrite` and `putFile`: all statements when no context was given, including those in named graphs, or the statements in the given context. `TransactionalRepositoryClient` was not affected.
 * Fixed `RDFRepositoryClient.overwrite` and `RDFRepositoryClient.putFile` keeping the connection open until the read timeout, which kept the Node.js process alive after the request completed.
 * Fixed `RepositoryClientConfig` ignoring the server base URL for relative repository endpoints: endpoints such as `/repositories/my-repo` are now prefixed with the URL passed to the constructor. Absolute endpoints are used unchanged.
+* Fixed `TransactionalRepositoryClient.query` and `TransactionalRepositoryClient.update` failing with the `application/x-www-form-urlencoded` content type, the default for `GetQueryPayload`: GraphDB answered `503 Query execution interrupted` to queries and `406 Could not read SPARQL update string from body` to updates. In a transaction, the query is now sent as an `application/sparql-query` or `application/sparql-update` body and the other payload parameters in the URL.
 
 ## 4.0.0 (2025-08-20)
 * GraphDB 11 support. Tested with GraphDB 11.0.2.

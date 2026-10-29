@@ -9,6 +9,7 @@ const DownloadService = require('../service/download-service');
 
 const ConsoleLogger = require('../logging/console-logger');
 const RDFMimeType = require('../http/rdf-mime-type');
+const QueryContentType = require('../http/query-content-type');
 const StringUtils = require('../util/string-utils');
 
 /**
@@ -85,6 +86,26 @@ class TransactionalRepositoryClient extends BaseRepositoryClient {
   }
 
   /**
+   * Moves a form-urlencoded SPARQL query from the request body to a raw body
+   * of the given content type, and its parameters to the URL.
+   *
+   * @private
+   * @param {ServiceRequest} serviceRequest the request to mutate
+   * @param {QueryPayload} payload the payload the request was built from
+   * @param {string} contentType the raw body content type
+   */
+  rewriteFormQueryAsRawBody(serviceRequest, payload, contentType) {
+    // The server reads a form-urlencoded body only for POST, not for PUT
+    if (payload.getContentType() !== QueryContentType.X_WWW_FORM_URLENCODED) {
+      return;
+    }
+    const requestBuilder = serviceRequest.getHttpRequestBuilder();
+    requestBuilder.addContentTypeHeader(contentType)
+      .setData(payload.getQuery())
+      .setParams({...payload.getParams(), ...requestBuilder.getParams()});
+  }
+
+  /**
    * Retrieves the size of the repository during the transaction and its
    * isolation level.
    *
@@ -122,6 +143,9 @@ class TransactionalRepositoryClient extends BaseRepositoryClient {
   /**
    * Executes request to query a repository.
    *
+   * The query is sent as an <code>application/sparql-query</code> body,
+   * whatever the content type of the payload.
+   *
    * @param {GetQueryPayload} payload is an object holding request parameters
    *
    * @return {Promise} the client can subscribe to the stream events and consume
@@ -132,11 +156,16 @@ class TransactionalRepositoryClient extends BaseRepositoryClient {
   query(payload) {
     const serviceRequest = this.queryService.query(payload);
     this.decorateServiceRequest(serviceRequest, 'QUERY');
+    this.rewriteFormQueryAsRawBody(serviceRequest, payload,
+      QueryContentType.SPARQL_QUERY);
     return serviceRequest.execute();
   }
 
   /**
    * Executes a request with a SPARQL query to update repository data.
+   *
+   * The query is sent as an <code>application/sparql-update</code> body,
+   * whatever the content type of the payload.
    *
    * @param {UpdateQueryPayload} payload request object containing the query
    * @return {Promise<void>} promise that will be resolved if the update is
@@ -146,6 +175,8 @@ class TransactionalRepositoryClient extends BaseRepositoryClient {
   update(payload) {
     const serviceRequest = this.queryService.update(payload);
     this.decorateServiceRequest(serviceRequest, 'UPDATE');
+    this.rewriteFormQueryAsRawBody(serviceRequest, payload,
+      QueryContentType.SPARQL_UPDATE);
     return serviceRequest.execute();
   }
 
