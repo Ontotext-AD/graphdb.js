@@ -455,8 +455,8 @@ class GraphDBServerClient extends Server {
     // encodeURIComponent leaves !'()* as they are
     const encodedUsername = encodeURIComponent(username)
       .replace(/[!'()*]/g,
-        (c) => `%${c.charCodeAt(0).toString(16).toUpperCase()}`)
-      .replace(/%2F/g, '/');
+        (c) => `%${c.codePointAt(0).toString(16).toUpperCase()}`)
+      .replaceAll('%2F', '/');
     return `${SECURITY_SERVICE_URL}/users/${encodedUsername}`;
   }
 }
