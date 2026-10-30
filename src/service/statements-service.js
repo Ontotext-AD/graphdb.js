@@ -38,8 +38,8 @@ class StatementsService extends Service {
    * @param {GetStatementsPayload} payload is an object holding the request
    * parameters.
    *
-   * @return {ServiceRequest} service request that resolves to plain string or
-   * Quad according to provided response type.
+   * @return {ServiceRequest} service request that resolves to plain string,
+   * Quad or, for binary RDF, Buffer according to provided response type.
    */
   get(payload) {
     const requestBuilder = HttpRequestBuilder.httpGet(PATH_STATEMENTS)
@@ -55,6 +55,9 @@ class StatementsService extends Service {
     const parser = this.parserRegistry.get(payload.getResponseType());
     if (parser && parser.isStreaming()) {
       requestBuilder.setResponseType('stream');
+    } else if (payload.getResponseType() === RDFMimeType.BINARY_RDF) {
+      // Otherwise axios decodes the binary data as UTF-8 text and corrupts it
+      requestBuilder.setResponseType('arraybuffer');
     }
 
     return new ServiceRequest(requestBuilder, () => {
