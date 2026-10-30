@@ -6,10 +6,7 @@
 * `Check the GDB server version and report mismatches if the client version implements a different version unless the check is stopped.`
 * `Support secured endpoints exposing only HTTPS`
 
-## Unreleased
-**Breaking changes**
-* Node.js 18 or newer is required (`engines.node` is `>=18`, was `>=14.17.0`). Node.js 14, 16 and 18 are past their end of life, and the library is tested only with Node.js 22. npm only warns about the mismatch, but Yarn 1 refuses to install the package on an older Node.js.
-
+## 4.1.0 (2026-10-30)
 * Tested with GraphDB 11.5.2. Since GraphDB 11.4.0, the repository configuration contains the `storageEncryption` parameter.
 * Documented creating repositories encrypted at rest with the `storageEncryption` parameter (GraphDB 11.4+).
 * Added `GraphDBServerClient.rotateDataEncryptionKey` for rotating the data encryption key of an encrypted repository (GraphDB 11.4+).
@@ -39,6 +36,7 @@
 * Fixed `GraphDBServerClient` not URL-encoding the username in the `createUser`, `updateUser`, `updateUserData`, `getUser` and `deleteUser` requests and the `location` query parameter. A username with `#` or `?` sent the request to another user (`deleteUser('a#b')` deleted the user `a`), `+` was read as a space and `%` was rejected with `400`; a location with `&` was cut. The username is encoded as in the GraphDB Workbench, except for `/`, which GraphDB rejects when encoded. A username with `%` still works only when security is disabled: with security enabled, GraphDB rejects it in the path with `400`. A caller who encoded the username or location before passing it must stop doing so, or it is encoded twice.
 * Fixed the GraphDB token authentication (`useGdbTokenAuthentication`) failing for a username with `#`, `?`, `+` or `%`: the client now logs in with `POST /rest/login` and the username and password in a JSON body, as the GraphDB Workbench does, instead of putting the username in the URL path.
 * Fixed `TransactionalRepositoryClient.query` and `TransactionalRepositoryClient.update` failing with the `application/x-www-form-urlencoded` content type, the default for `GetQueryPayload`: GraphDB answered `503 Query execution interrupted` to queries and `406 Could not read SPARQL update string from body` to updates. In a transaction, the query is now sent as an `application/sparql-query` or `application/sparql-update` body and the other payload parameters in the URL.
+* Raised the minimum Node.js version to 18 (`engines.node` is `>=18`, was `>=14.17.0`); the library is tested with Node.js 22. npm only warns on an older Node.js, but Yarn 1 refuses to install the package.
 
 ## 4.0.0 (2025-08-20)
 * GraphDB 11 support. Tested with GraphDB 11.0.2.
