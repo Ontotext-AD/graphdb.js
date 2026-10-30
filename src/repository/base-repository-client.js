@@ -181,7 +181,9 @@ class BaseRepositoryClient {
         }).catch((error) => {
           const status = error.response ? error.response.status : null;
           const isUnauthorized = status && status === 401;
-          if (isUnauthorized && this.repositoryClientConfig.getKeepAlive()) {
+          // without credentials there is no user to log in again
+          if (isUnauthorized && this.repositoryClientConfig.getKeepAlive() &&
+            this.user) {
             this.user.clearToken();
             // re-execute will try to re-login the user and update it
             return this.retryExecution(httpClients, requestBuilder, httpClient);
