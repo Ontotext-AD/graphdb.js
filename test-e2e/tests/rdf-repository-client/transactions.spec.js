@@ -264,6 +264,28 @@ describe('Transactional operations', () => {
       return rdfClient.addFile(wineRdf, RDFMimeType.RDF_XML, null, null);
     });
 
+    test('Should test SELECT query in transaction with the default payload', () => {
+      const payload = new GetQueryPayload()
+        .setQuery('select * where {<http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#StonleighSauvignonBlanc> ?p ?o}')
+        .setQueryType(QueryType.SELECT)
+        .setResponseType(RDFMimeType.SPARQL_RESULTS_JSON)
+        .setInference(true);
+
+      let transactionalClient;
+
+      return rdfClient.beginTransaction().then((transaction) => {
+        transactionalClient = transaction;
+        return transactionalClient.query(payload);
+      }).then((resp) => {
+        return Utils.readStream(resp);
+      }).then((stream) => {
+        const expectedResponse = Utils.loadFile(
+          './data/queries/expected_results_payload_inference_true.json');
+        expect(JSON.parse(stream)).toEqual(JSON.parse(expectedResponse));
+        return transactionalClient.commit();
+      });
+    });
+
     test('Should test SELECT query in transaction', () => {
       const payloadWithInferenceTrue = new GetQueryPayload()
         .setQuery('select * where {<http://www.w3.org/TR/2003/PR-owl-guide-20031209/wine#StonleighSauvignonBlanc> ?p ?o}')
@@ -324,6 +346,37 @@ describe('Transactional operations', () => {
       }).then(() => {
         return rdfClient.beginTransaction();
       }).then((transaction) => {
+        transactionalClient = transaction;
+        return transactionalClient.update(insertData);
+      }).then(() => {
+        return transactionalClient.commit();
+      }).then(() => {
+        return rdfClient.query(selectData);
+      }).then((resp) => {
+        return Utils.readStream(resp);
+      }).then((stream) => {
+        expect(JSON.parse(stream)).toEqual(JSON.parse(expected));
+        return rdfClient.deleteAllStatements();
+      });
+    });
+
+    test('Should test form-urlencoded update in a transaction', () => {
+      const query = Utils.loadFile('./data/queries/insert_query.sparql');
+      const expected = Utils
+        .loadFile('./data/queries/expected_results_named_graph.json');
+
+      const insertData = new UpdateQueryPayload()
+        .setContentType(QueryContentType.X_WWW_FORM_URLENCODED)
+        .setQuery(query);
+
+      const selectData = new GetQueryPayload()
+        .setQuery('SELECT ?s ?p ?o FROM <http://wine.com/graph/wine2> WHERE {?s ?p ?o}')
+        .setQueryType(QueryType.SELECT)
+        .setResponseType(RDFMimeType.SPARQL_RESULTS_JSON);
+
+      let transactionalClient;
+
+      return rdfClient.beginTransaction().then((transaction) => {
         transactionalClient = transaction;
         return transactionalClient.update(insertData);
       }).then(() => {

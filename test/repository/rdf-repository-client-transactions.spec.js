@@ -359,6 +359,34 @@ describe('RDFRepositoryClient - transactions', () => {
         });
       });
 
+      test('should send a form-urlencoded query as a raw SPARQL query ' +
+        'body', () => {
+        const formPayload = new GetQueryPayload()
+          .setContentType(QueryContentType.X_WWW_FORM_URLENCODED)
+          .setQuery('ask {?s ?p ?o}')
+          .setQueryType(QueryType.ASK)
+          .setResponseType(RDFMimeType.BOOLEAN_RESULT)
+          .setInference(false)
+          .setTimeout(5);
+        transactionHttpRequest.mockResolvedValue({data: true});
+        return transaction.query(formPayload).then(() => {
+          const expectedRequest = HttpRequestBuilder.httpPut('')
+            .setData('ask {?s ?p ?o}')
+            .setHeaders({
+              'Accept': 'text/boolean',
+              'Content-Type': QueryContentType.SPARQL_QUERY
+            })
+            .setParams({
+              'action': 'QUERY',
+              'infer': false,
+              'timeout': 5
+            })
+            .setResponseType('stream');
+          expect(transactionHttpRequest).toHaveBeenCalledTimes(1);
+          expect(transactionHttpRequest).toHaveBeenCalledWith(expectedRequest);
+        });
+      });
+
       test('should reject if the transaction cannot perform ' +
         'a query request', () => {
         const err = new Error('Cannot query');
@@ -381,6 +409,27 @@ describe('RDFRepositoryClient - transactions', () => {
             })
             .setParams({
               action: 'UPDATE'
+            });
+          expect(transactionHttpRequest).toHaveBeenCalledTimes(1);
+          expect(transactionHttpRequest).toHaveBeenCalledWith(expectedRequest);
+        });
+      });
+
+      test('should send a form-urlencoded update as a raw SPARQL update ' +
+        'body', () => {
+        const formPayload = new UpdateQueryPayload()
+          .setContentType(QueryContentType.X_WWW_FORM_URLENCODED)
+          .setQuery('INSERT {?s ?p ?o} WHERE {?s ?p ?o}')
+          .setInference(true);
+        return transaction.update(formPayload).then(() => {
+          const expectedRequest = HttpRequestBuilder.httpPut('')
+            .setData('INSERT {?s ?p ?o} WHERE {?s ?p ?o}')
+            .setHeaders({
+              'Content-Type': QueryContentType.SPARQL_UPDATE
+            })
+            .setParams({
+              action: 'UPDATE',
+              infer: true
             });
           expect(transactionHttpRequest).toHaveBeenCalledTimes(1);
           expect(transactionHttpRequest).toHaveBeenCalledWith(expectedRequest);
