@@ -59,7 +59,7 @@ function uniqueName(prefix) {
  * @param {number} [options.timeout] request timeout in milliseconds
  * @return {Promise} resolves when the repository is created
  */
-function createRepo(path, {id, timeout = 5000} = {}) {
+function createRepo(path, {id, timeout = 10000} = {}) {
   const data = new FormData();
   if (id) {
     const config = fs.readFileSync(path, 'utf8')
@@ -77,9 +77,18 @@ function createRepo(path, {id, timeout = 5000} = {}) {
   });
 }
 
+/**
+ * Creates the repositories one after another: GraphDB initializes
+ * repositories created in parallel slowly enough to exceed the request
+ * timeout on a small CI agent.
+ *
+ * @param {string[]} repositoryNames the paths to the repository configs
+ * @return {Promise} resolves when all repositories are created
+ */
 function createRepositories(repositoryNames) {
-  const requests = repositoryNames.map((repoName) => createRepo(repoName));
-  return Promise.all(requests).catch((e) => {
+  return repositoryNames.reduce((previous, repoName) => {
+    return previous.then(() => createRepo(repoName));
+  }, Promise.resolve()).catch((e) => {
     throw new Error(e);
   });
 }
