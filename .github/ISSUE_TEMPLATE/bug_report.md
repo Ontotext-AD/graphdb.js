@@ -9,7 +9,7 @@ assignees: ''
 
 **Library version [e.g. 1.1.2]**
 
-**Node.js version [e.g. 8.16.0]**
+**Node.js version [e.g. 22.12.0]**
 
 **Describe the bug**
 A clear and concise description of what the bug is.

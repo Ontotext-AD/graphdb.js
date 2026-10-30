@@ -3,7 +3,7 @@
 First of all we thank you for your effort and contribution!
 
 ## Contribution Prerequisites
-* Node version 8.16.0 or greater must be installed.
+* Node.js 18 or newer must be installed.
 * Familiarity with Git and the Git workflow. 
 
 ## Found a Bug?
