@@ -354,12 +354,14 @@ The `Authority` enum holds these values.
   - Encrypted at rest (since GraphDB 11.4):
     ```javascript
       const {RepositoryConfig, RepositoryType} = require('graphdb').repository;
-      // Parameters that are not given take their default values
-      const params = {
-        storageEncryption: {name: 'storageEncryption', label: 'Encrypt storage', value: 'true'}
-      };
-      const config = new RepositoryConfig('encrypted_repo', '', params, '', 'Encrypted repo', RepositoryType.GRAPHDB);
-      serverClient.createRepository(config)
+      // GraphDB needs all parameters, so start from the default configuration
+      serverClient.getDefaultConfig(RepositoryType.GRAPHDB)
+          .then((response) => {
+            const params = response.response.data.params;
+            params.storageEncryption.value = 'true';
+            const config = new RepositoryConfig('encrypted_repo', '', params, '', 'Encrypted repo', RepositoryType.GRAPHDB);
+            return serverClient.createRepository(config);
+          })
           .then(() => {
             // do work
       });
