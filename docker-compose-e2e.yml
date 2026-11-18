@@ -15,11 +15,35 @@ services:
       - '7200:7200'
     networks:
       - graphdbjsnetwork
+    # Original health check:
+    # healthcheck:
+    #   test: ["CMD-SHELL", "curl -f -H 'Accept: text/html' ${GRAPHDB_URL}/index.html"]
+    #   interval: 10s
+    #   timeout: 5s
+    #   retries: 5
+    #   start_period: 60s
+
+    # The GraphDB 12.0.0-TR15 image ships without curl, wget or nc, so the previous
+    # `curl -f .../index.html` check failed with "curl: not found" (exit 127) on every
+    # probe and left the container permanently unhealthy, even though GraphDB was running.
+    # This check uses only bash: it opens a TCP connection through /dev/tcp, sends a
+    # plain HTTP request to /rest/repositories and requires a "200" status line.
+    # It runs inside the container, so it uses localhost rather than ${GRAPHDB_URL}.
+    # "$$" escapes "$" so Compose does not interpolate it.
     healthcheck:
-      test: ["CMD-SHELL", "curl -f -H 'Accept: text/html' ${GRAPHDB_URL}/index.html"]
+      test:
+        - CMD
+        - bash
+        - -c
+        - |
+          exec 3<>/dev/tcp/localhost/7200
+          printf 'GET /rest/repositories HTTP/1.0\r\nHost: localhost\r\n\r\n' >&3
+          read -r status <&3
+          [[ "$$status" == *" 200 "* ]]
       interval: 10s
       timeout: 5s
       retries: 5
+      start_period: 60s
 
   e2e-tests:
     build:

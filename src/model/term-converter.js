@@ -107,7 +107,7 @@ class TermConverter {
       if (error) {
         throw new Error(error);
       } else {
-        converted = result.trim();
+        converted = result.trim().replace(/\r\n/g, '\n');
       }
     });
     return converted;

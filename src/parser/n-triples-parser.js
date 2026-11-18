@@ -17,10 +17,8 @@ class NTriplesParser extends ContentParser {
     super(config);
 
     this.parser = new Parser({
-      // Not using the supported type as it is text/plain which is the default
-      // content type supported by the repository but is not recognizable from
-      // N3 library.
-      format: 'N-Triples'
+      format: 'N-Triples',
+      allowTripleTerms: true
     });
   }
 
