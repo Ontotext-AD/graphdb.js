@@ -4,6 +4,7 @@ const {namedNode, literal, quad, blankNode, variable} = DataFactory;
 const StringUtils = require('../util/string-utils');
 const base64url = require('base64url');
 const ENCODED_RDFSTAR_TRIPLE_PREFIX = 'urn:rdf4j:triple:';
+const ENCODED_TRIPLE_TERM_PREFIX = 'urn:rdf4j:tripleTerm:';
 const XSD_PREFIX = 'xsd:';
 const XSD_NAMESPACE = 'http://www.w3.org/2001/XMLSchema#';
 
@@ -349,16 +350,20 @@ class TermConverter {
   }
 
   /**
-   * Decodes from Base64 encoded RDFStar triple.
+   * Decodes from Base64 encoded RDFStar triple or RDF 1.2 triple term.
    *
    * @param {string} encodedTriple to be decoded from base64 url string
-   * @return {string} decoded RDFStar triple, returns unchanged if the provided
+   * @return {string} decoded triple, returns unchanged if the provided
    * triple is not in the expected format
    */
   static fromBase64RdfStarTriple(encodedTriple) {
-    if (encodedTriple.startsWith(ENCODED_RDFSTAR_TRIPLE_PREFIX)) {
-      return base64url
-        .decode(encodedTriple.slice(ENCODED_RDFSTAR_TRIPLE_PREFIX.length));
+    const prefixes = [
+      ENCODED_RDFSTAR_TRIPLE_PREFIX,
+      ENCODED_TRIPLE_TERM_PREFIX
+    ];
+    const prefix = prefixes.find((p) => encodedTriple.startsWith(p));
+    if (prefix) {
+      return base64url.decode(encodedTriple.slice(prefix.length));
     }
     return encodedTriple;
   }
