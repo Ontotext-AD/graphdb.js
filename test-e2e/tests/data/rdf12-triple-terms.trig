@@ -1,0 +1,7 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix ex: <http://example.com/> .
+
+<http://example.com/graph1> {
+  ex:statement3 rdf:reifies <<( ex:dave ex:knows ex:erin )>> ;
+    ex:confidence 0.5 .
+}

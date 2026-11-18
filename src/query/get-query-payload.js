@@ -7,10 +7,9 @@ const QueryContentType = require('../http/query-content-type');
 const SELECT_QUERY_RESULT_TYPES = [
   RDFMimeType.SPARQL_RESULTS_XML,
   RDFMimeType.SPARQL_RESULTS_JSON,
+  RDFMimeType.SPARQL_RESULTS_TSV,
   RDFMimeType.BINARY_RDF_RESULTS_TABLE,
-  RDFMimeType.BOOLEAN_RESULT,
-  RDFMimeType.SPARQL_STAR_RESULTS_JSON,
-  RDFMimeType.SPARQL_STAR_RESULTS_TSV
+  RDFMimeType.BOOLEAN_RESULT
 ];
 
 const ASK_QUERY_RESULT_TYPES = [
@@ -29,9 +28,7 @@ const RDF_FORMATS = [
   RDFMimeType.RDF_JSON,
   RDFMimeType.TRIX,
   RDFMimeType.TRIG,
-  RDFMimeType.BINARY_RDF,
-  RDFMimeType.TURTLE_STAR,
-  RDFMimeType.TRIG_STAR
+  RDFMimeType.BINARY_RDF
 ];
 
 const QUERY_OPERATION_TYPES = [

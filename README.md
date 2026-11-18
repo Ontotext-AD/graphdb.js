@@ -888,6 +888,7 @@ The library provides convenient parser wrappers for the rdf formats using third 
 * `text/plain` (`N-Triples`): NTriplesParser ([N3](https://github.com/rdfjs/N3.js))
 * `application/x-trig`: TrigParser ([N3](https://github.com/rdfjs/N3.js))
 * `application/ld-json`: JsonLDParser ([jsonld-streaming-parser](https://github.com/rubensworks/jsonld-streaming-parser.js))
+* `application/rdf+json`: RDFJsonParser, which converts triple terms to Quad objects. It is not registered by default.
 * `application/rdf+xml`: RDFXmlParser ([rdfxml-streaming-parser](https://github.com/rdfjs/rdfxml-streaming-parser.js))
 
 For SELECT query results in `json` and `xml` formats as well as boolean results from ASK queries following parsers are wrapped and exposed:
@@ -896,50 +897,66 @@ For SELECT query results in `json` and `xml` formats as well as boolean results 
 * `text/boolean`: BooleanResultParser, registered by default. It resolves ASK results to `true` or `false`.
 
 ### rdf*/sparql*
- The library provides basic support of extend RDF with a notion of nested triples, also known as [reification](https://www.w3.org/TR/rdf-mt/#Reif).
- Parsers for RDFStar triples are planned for next versions.
- 
- When used against server with RDFStar support, for SELECT queries the following Mime-Types are used:
- * `application/x-sparqlstar-results+json`
- * `application/x-sparqlstar-results+tsv`
-  
- For DESCRIBE and CONSTRUCT queries, the following Mime-Types can be used:
- * `application/x-turtlestar`
- * `application/x-trigstar`
- 
+ The library supports RDF 1.2 triple terms, which GraphDB 12 uses in place of RDF-star. A triple term is written
+ `<<( subject predicate object )>>` and is only valid in the object position. RDF-star data such as `<< s p o >> :p :o`
+ is stored as a reifier: a new blank node with `rdf:reifies <<( s p o )>>` and `:p :o`.
+
+ For SELECT queries the following Mime-Types can be used:
+ * `application/sparql-results+json`
+ * `text/tab-separated-values`
+
+ For DESCRIBE and CONSTRUCT queries, the RDF formats can be used, for example:
+ * `text/turtle`
+ * `application/x-trig`
+
+ Because the reifier is a blank node, deleting statements with the same RDF-star data removes nothing.
+
  ```javascript
 const payload = new GetQueryPayload()
-     .setQuery('describe <<<http://www.wikidata.org/entity/Q472> <http://www.wikidata.org/prop/direct/P1889> <http://www.wikidata.org/entity/Q202904>>>')
-     .setQueryType(QueryType.DESCRIBE)
-     .setResponseType(RDFMimeType.TRIG_STAR)
+     .setQuery(`CONSTRUCT { ?s ?p ?o } WHERE {
+       ?s <http://www.w3.org/1999/02/22-rdf-syntax-ns#reifies> <<( <http://www.wikidata.org/entity/Q472> <http://www.wikidata.org/prop/direct/P1889> <http://www.wikidata.org/entity/Q202904> )>> .
+       ?s ?p ?o
+     }`)
+     .setQueryType(QueryType.CONSTRUCT)
+     .setResponseType(RDFMimeType.TRIG)
      .setLimit(100);
 
 return repository.query(payload).then((stream) => {
      stream.on('data', (data) => {
-       	// data contains requested statements in trig star format
+       	// data contains the requested statements in TriG
      });
 });
 ```
 
-When RDFStart triple is requested with non supportive Mime-Types, it resolves to an encoded Base64url string.
-It can be decoded using `TermConverter` util class.
+In JSON-LD, GraphDB returns a triple term as an IRI in the form `urn:rdf4j:tripleTerm:<base64url>`. It can be decoded
+using the `TermConverter` util class.
  ```javascript
 const payload = new GetQueryPayload()
-     .setQuery('describe <<<http://www.wikidata.org/entity/Q472> <http://www.wikidata.org/prop/direct/P1889> <http://www.wikidata.org/entity/Q202904>>>')
-     .setQueryType(QueryType.DESCRIBE)
-     .setResponseType(RDFMimeType.RDF_XML)
+     .setQuery(`CONSTRUCT { ?s ?p ?o } WHERE {
+       ?s <http://www.w3.org/1999/02/22-rdf-syntax-ns#reifies> <<( <http://www.wikidata.org/entity/Q472> <http://www.wikidata.org/prop/direct/P1889> <http://www.wikidata.org/entity/Q202904> )>> .
+       ?s ?p ?o
+     }`)
+     .setQueryType(QueryType.CONSTRUCT)
+     .setResponseType(RDFMimeType.JSON_LD)
      .setLimit(100);
 
-repository.registerParser(new RDFXmlParser());
 return repository.query(payload).then((stream) => {
      stream.on('data', (data) => {
-        console.log(data.subject.value);
-       	// urn:rdf4j:triple:PDw8aHR0cDovL3d3dy53aWtpZGF0YS5vcmcvZW50aXR5L1E0NzI-IDxodHRwOi8vd3d3Lndpa2lkYXRhLm9yZy9wcm9wL2RpcmVjdC9QMTg4OT4gPGh0dHA6Ly93d3cud2lraWRhdGEub3JnL2VudGl0eS9RMjAyOTA0Pj4-
+        console.log(data.object.value);
+       	// urn:rdf4j:tripleTerm:PDwoIDxodHRwOi8vd3d3Lndpa2lkYXRhLm9yZy9lbnRpdHkvUTQ3Mj4gPGh0dHA6Ly93d3cud2lraWRhdGEub3JnL3Byb3AvZGlyZWN0L1AxODg5PiA8aHR0cDovL3d3dy53aWtpZGF0YS5vcmcvZW50aXR5L1EyMDI5MDQ-ICk-Pg
 
-        console.log(TermConverter.fromBase64RdfStarTriple(data.subject.value));
-        // <<<http://www.wikidata.org/entity/Q472> <http://www.wikidata.org/prop/direct/P1889> <http://www.wikidata.org/entity/Q202904>>>
+        console.log(TermConverter.fromBase64TripleTerm(data.object.value));
+        // <<( <http://www.wikidata.org/entity/Q472> <http://www.wikidata.org/prop/direct/P1889> <http://www.wikidata.org/entity/Q202904> )>>
      });
 });
+```
+
+In RDF/JSON, GraphDB also returns a triple term as an IRI in the form `urn:rdf4j:tripleTerm:<base64url>`. Register
+`RDFJsonParser` to receive these triple terms as Quad objects in the object position. RDF/JSON has no named graphs, so
+the quads are in the default graph.
+```javascript
+const {RDFJsonParser} = require('graphdb').parser;
+repository.registerParser(new RDFJsonParser());
 ```
 
 ### GraphDB and graphdb.js Version Compatibility

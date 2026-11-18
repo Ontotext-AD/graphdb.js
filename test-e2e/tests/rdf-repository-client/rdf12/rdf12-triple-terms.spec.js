@@ -1,7 +1,9 @@
+const path = require('path');
 const {RDFRepositoryClient, GetStatementsPayload} = require('graphdb').repository;
-const {JsonLDParser} = require('graphdb').parser;
+const {JsonLDParser, RDFJsonParser} = require('graphdb').parser;
 const {GetQueryPayload, UpdateQueryPayload, QueryType, QueryLanguage} = require('graphdb').query;
 const {RDFMimeType} = require('graphdb').http;
+const {TermConverter} = require('graphdb').model;
 const {Readable} = require('stream');
 const N3 = require('n3');
 const {RdfXmlParser} = require('rdfxml-streaming-parser');
@@ -12,24 +14,18 @@ const Config = require('config.js');
 
 /**
  * Reads RDF 1.2 triple terms back from GraphDB 12 and checks that every parser used by the client turns them into
- * RDF/JS Quad terms (termType 'Quad').
+ * RDF/JS Quad terms (termType 'Quad'). The exact responses of GraphDB are checked against the expected files in
+ * data/rdf12.
  *
  * Triple terms are only inserted in object position (via rdf:reifies). RDF 1.2 does not allow a triple term as a
- * subject, and n3 2.x rejects such documents.
+ * subject, and GraphDB 12 rejects such a request.
  */
 const EX = 'http://example.com/';
 const RDF_REIFIES = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#reifies';
-
-const INSERT_QUERY = `
-  PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
-  PREFIX ex: <http://example.com/>
-  INSERT {
-    ex:statement1 rdf:reifies <<( ex:alice ex:knows ex:bob )>> .
-    ex:statement1 ex:confidence 0.95 .
-    ex:statement2 rdf:reifies <<( ex:carol ex:name "Carol" )>> .
-    ex:statement2 ex:source "test-source" .
-  } WHERE {}
-`;
+const FIXTURE = path.resolve(__dirname, './../../data/rdf12-triple-terms.ttl');
+const TRIG_FIXTURE = path.resolve(__dirname, './../../data/rdf12-triple-terms.trig');
+const STATEMENT1 = `<${EX}statement1>`;
+const TRIPLE_TERM = '<<( <http://example.com/alice> <http://example.com/knows> <http://example.com/bob> )>>';
 
 const SELECT_QUERY = `
   PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
@@ -40,6 +36,18 @@ const SELECT_QUERY = `
 
 const CONSTRUCT_QUERY = `
   CONSTRUCT { ?s ?p ?o } WHERE { ?s ?p ?o }
+`;
+
+const REIFIER_CONSTRUCT_QUERY = `
+  PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+  CONSTRUCT { ?s ?p ?o } WHERE { ?s rdf:reifies ?triple . ?s ?p ?o }
+`;
+
+const NAMED_GRAPH_QUERY = `
+  PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+  SELECT ?graph ?statement ?triple WHERE {
+    GRAPH ?graph { ?statement rdf:reifies ?triple }
+  }
 `;
 
 // --- helpers -----------------------------------------------------------------------------------------------------
@@ -70,6 +78,20 @@ function toText(response) {
 function getStatements(mimeType) {
   const payload = new GetStatementsPayload().setResponseType(mimeType);
   return rdfClient.get(payload).then(toText);
+}
+
+function getStatementsAbout(subject, mimeType) {
+  const payload = new GetStatementsPayload().setSubject(subject).setResponseType(mimeType);
+  return rdfClient.get(payload).then(toText);
+}
+
+// GraphDB returns the namespaces in an order that depends on how they were added, so the prefixes are compared
+// regardless of their order.
+function sortPrefixes(rdf) {
+  const lines = rdf.trim().split('\n');
+  const prefixes = lines.filter((line) => line.startsWith('@prefix')).sort();
+  const rest = lines.filter((line) => !line.startsWith('@prefix'));
+  return [...prefixes, ...rest].join('\n');
 }
 
 /**
@@ -105,6 +127,11 @@ function parseRdfXml(text) {
 // The client's own JSON-LD parser turns the triple terms that GraphDB encodes as IRIs into Quad terms.
 function parseJsonLd(text) {
   return collect(new JsonLDParser().parse(Readable.from([text])));
+}
+
+// The client's own RDF/JSON parser turns the triple terms that GraphDB encodes as IRIs into Quad terms.
+function parseRdfJson(text) {
+  return Promise.resolve(new RDFJsonParser().parse(text));
 }
 
 function parseSparqlJson(text) {
@@ -168,7 +195,8 @@ const RDF_FORMATS = [
   ['N-Quads', RDFMimeType.N_QUADS, parseWithN3('application/n-quads')],
   ['N3', RDFMimeType.N3, parseWithN3('text/turtle')],
   ['RDF/XML', RDFMimeType.RDF_XML, parseRdfXml],
-  ['JSON-LD', RDFMimeType.JSON_LD, parseJsonLd]
+  ['JSON-LD', RDFMimeType.JSON_LD, parseJsonLd],
+  ['RDF/JSON', RDFMimeType.RDF_JSON, parseRdfJson]
 ];
 
 // [name, response mime type, parser from response text to an array of result rows]
@@ -180,7 +208,7 @@ const SPARQL_RESULT_FORMATS = [
 describe('RDF 1.2 triple terms', () => {
   beforeAll(async () => {
     await Utils.createRepo(Config.testRepoPath);
-    await rdfClient.update(new UpdateQueryPayload().setQuery(INSERT_QUERY));
+    await rdfClient.addFile(FIXTURE, RDFMimeType.TURTLE, null, null);
   });
 
   afterAll(() => {
@@ -207,6 +235,78 @@ describe('RDF 1.2 triple terms', () => {
     test.each(SPARQL_RESULT_FORMATS)('Should read triple terms as Quad terms in %s', async (name, mimeType, parse) => {
       const text = await runQuery(SELECT_QUERY, QueryType.SELECT, mimeType);
       expectSelectRows(await parse(text));
+    });
+  });
+
+  describe('exact responses', () => {
+    test('Should return the reified triple term in Turtle', async () => {
+      const text = await getStatementsAbout(STATEMENT1, RDFMimeType.TURTLE);
+      expect(sortPrefixes(text)).toEqual(sortPrefixes(Utils.loadFile('./data/rdf12/expected_response_turtle.txt')));
+    });
+
+    test('Should return the reified triple term in TriG', async () => {
+      const text = await getStatementsAbout(STATEMENT1, RDFMimeType.TRIG);
+      expect(sortPrefixes(text)).toEqual(sortPrefixes(Utils.loadFile('./data/rdf12/expected_response_trig.txt')));
+    });
+
+    test('Should return the reifier and its triple term in CONSTRUCT Turtle output', async () => {
+      const text = await runQuery(REIFIER_CONSTRUCT_QUERY, QueryType.CONSTRUCT, RDFMimeType.TURTLE);
+      expect(text).toMatch(/rdf:reifies <<\( \S*alice>? \S*knows>? \S*bob>? \)>>/);
+      expect(text).toMatch(/rdf:reifies <<\( \S*carol>? \S*name>? "Carol" \)>>/);
+    });
+
+    test('Should return the triple terms in SPARQL JSON', async () => {
+      const text = await runQuery(SELECT_QUERY, QueryType.SELECT, RDFMimeType.SPARQL_RESULTS_JSON);
+      expect(text.trim()).toEqual(Utils.loadFile('./data/rdf12/expected_response_sparql_json.txt').trim());
+    });
+
+    test('Should return the triple terms in SPARQL TSV', async () => {
+      const text = await runQuery(SELECT_QUERY, QueryType.SELECT, RDFMimeType.SPARQL_RESULTS_TSV);
+      expect(text.trim()).toEqual(Utils.loadFile('./data/rdf12/expected_response_sparql_tsv.txt').trim());
+    });
+  });
+
+  describe('JSON-LD', () => {
+    test('Should return a triple term as a urn:rdf4j:tripleTerm IRI that TermConverter decodes', async () => {
+      const text = await getStatementsAbout(STATEMENT1, RDFMimeType.JSON_LD);
+      const [encodedTripleTerm] = text.match(/urn:rdf4j:tripleTerm:[\w-]+/);
+      expect(TermConverter.fromBase64TripleTerm(encodedTripleTerm)).toEqual(TRIPLE_TERM);
+    });
+  });
+
+  describe('triple terms outside the object position', () => {
+    test('Should reject a triple term as the subject with HTTP 400', async () => {
+      await expect(getStatementsAbout(TRIPLE_TERM, RDFMimeType.TURTLE))
+        .rejects.toMatchObject({response: {status: 400}});
+    });
+  });
+
+  describe('named graph upload', () => {
+    const GRAPH = `${EX}graph1`;
+
+    beforeAll(async () => {
+      await rdfClient.addFile(TRIG_FIXTURE, RDFMimeType.TRIG, null, null);
+    });
+
+    afterAll(async () => {
+      await rdfClient.update(new UpdateQueryPayload().setQuery(`CLEAR GRAPH <${GRAPH}>`));
+    });
+
+    test('Should read a triple term uploaded in a TriG named graph', async () => {
+      const text = await runQuery(NAMED_GRAPH_QUERY, QueryType.SELECT, RDFMimeType.SPARQL_RESULTS_JSON);
+      const rows = await parseSparqlJson(text);
+      expect(rows).toHaveLength(1);
+      expect(getVar(rows[0], 'graph').value).toBe(GRAPH);
+      expect(getVar(rows[0], 'statement').value).toBe(`${EX}statement3`);
+      expectTripleTerm(getVar(rows[0], 'triple'), `${EX}dave`, `${EX}knows`, `${EX}erin`);
+    });
+  });
+
+  describe('RDF-star Content-Type', () => {
+    test('Should accept Turtle sent with the deprecated RDF-star Content-Type as RDF 1.2', async () => {
+      await rdfClient.addFile(FIXTURE, RDFMimeType.TURTLE_STAR, null, null);
+      const text = await getStatementsAbout(STATEMENT1, RDFMimeType.TURTLE);
+      expect(text).toMatch(/rdf:reifies <<\( \S*alice>? \S*knows>? \S*bob>? \)>>/);
     });
   });
 });

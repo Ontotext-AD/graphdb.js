@@ -48,8 +48,8 @@ class TripleTermTransform extends Transform {
 
     const obj = inputQuad.object;
     if (obj.termType === 'NamedNode') {
-      const decodedTriple = TermConverter.fromBase64RdfStarTriple(obj.value);
-      const tripleQuad = this._parseTripleTerm(decodedTriple);
+      const decodedTriple = TermConverter.fromBase64TripleTerm(obj.value);
+      const tripleQuad = TermConverter.parseTripleTerm(decodedTriple);
       if (tripleQuad) {
         return quad(inputQuad.subject, inputQuad.predicate, tripleQuad,
           inputQuad.graph);
@@ -57,39 +57,6 @@ class TripleTermTransform extends Transform {
     }
 
     return inputQuad;
-  }
-
-  /**
-   * Parse triple term string to a Quad object.
-   * @param {string} tripleStr
-   * @return {Quad|null}
-   * @private
-   */
-  _parseTripleTerm(tripleStr) {
-    if (!tripleStr) {
-      return null;
-    }
-
-    let content = tripleStr;
-    if (content.startsWith('<<(') && content.endsWith(')>>')) {
-      content = content.slice(3, -3);
-    } else if (content.startsWith('<<') && content.endsWith('>>')) {
-      content = content.slice(2, -2);
-    } else {
-      return null;
-    }
-
-    try {
-      const parser = new (require('n3').Parser)();
-      const quads = parser.parse(`${content} .`);
-      if (quads.length > 0) {
-        return quads[0];
-      }
-    } catch (e) {
-      // Parsing failed, return null
-    }
-
-    return null;
   }
 }
 

@@ -84,7 +84,6 @@
   },
   "dependencies": {
     "axios": "^1.21.0",
-    "base64url": "^3.0.1",
     "jsonld-streaming-parser": "^5.0.2",
     "n3": "^2.13.12",
     "pino": "^8.21.0",

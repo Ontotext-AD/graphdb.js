@@ -149,6 +149,46 @@ describe('GetQueryPayload', () => {
         .setResponseType(RDFMimeType.BINARY_RDF_RESULTS_TABLE);
       expect(() => payload.validatePayload()).toThrowError();
     });
+
+    test('should accept SPARQL TSV results for the SELECT queryType', () => {
+      const payload = new GetQueryPayload()
+        .setQuery('select * where {?s ?p ?o}')
+        .setQueryType(QueryType.SELECT)
+        .setResponseType(RDFMimeType.SPARQL_RESULTS_TSV);
+      expect(() => payload.validatePayload()).not.toThrow();
+    });
+
+    test('should throw error if the RDF-star JSON results type is used for the SELECT queryType', () => {
+      const payload = new GetQueryPayload()
+        .setQuery('select * where {?s ?p ?o}')
+        .setQueryType(QueryType.SELECT)
+        .setResponseType(RDFMimeType.SPARQL_STAR_RESULTS_JSON);
+      expect(() => payload.validatePayload()).toThrowError();
+    });
+
+    test('should throw error if the RDF-star TSV results type is used for the SELECT queryType', () => {
+      const payload = new GetQueryPayload()
+        .setQuery('select * where {?s ?p ?o}')
+        .setQueryType(QueryType.SELECT)
+        .setResponseType(RDFMimeType.SPARQL_STAR_RESULTS_TSV);
+      expect(() => payload.validatePayload()).toThrowError();
+    });
+
+    test('should throw error if the RDF-star Turtle type is used for the CONSTRUCT queryType', () => {
+      const payload = new GetQueryPayload()
+        .setQuery('construct {?s ?p ?o} where {?s ?p ?o}')
+        .setQueryType(QueryType.CONSTRUCT)
+        .setResponseType(RDFMimeType.TURTLE_STAR);
+      expect(() => payload.validatePayload()).toThrowError();
+    });
+
+    test('should throw error if the RDF-star TriG type is used for the CONSTRUCT queryType', () => {
+      const payload = new GetQueryPayload()
+        .setQuery('construct {?s ?p ?o} where {?s ?p ?o}')
+        .setQueryType(QueryType.CONSTRUCT)
+        .setResponseType(RDFMimeType.TRIG_STAR);
+      expect(() => payload.validatePayload()).toThrowError();
+    });
   });
 
   describe('getSupportedContentTypes', () => {

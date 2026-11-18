@@ -2,7 +2,6 @@ const N3 = require('n3');
 const {DataFactory} = N3;
 const {namedNode, literal, quad, blankNode, variable} = DataFactory;
 const StringUtils = require('../util/string-utils');
-const base64url = require('base64url');
 const ENCODED_RDFSTAR_TRIPLE_PREFIX = 'urn:rdf4j:triple:';
 const ENCODED_TRIPLE_TERM_PREFIX = 'urn:rdf4j:tripleTerm:';
 const XSD_PREFIX = 'xsd:';
@@ -350,36 +349,91 @@ class TermConverter {
   }
 
   /**
-   * Decodes from Base64 encoded RDFStar triple or RDF 1.2 triple term.
+   * Decodes a Base64url triple term with the
+   * <code>urn:rdf4j:tripleTerm:</code> prefix returned by GraphDB 12, or with
+   * the <code>urn:rdf4j:triple:</code> prefix returned by GraphDB 11.
    *
    * @param {string} encodedTriple to be decoded from base64 url string
    * @return {string} decoded triple, returns unchanged if the provided
    * triple is not in the expected format
    */
-  static fromBase64RdfStarTriple(encodedTriple) {
+  static fromBase64TripleTerm(encodedTriple) {
     const prefixes = [
       ENCODED_RDFSTAR_TRIPLE_PREFIX,
       ENCODED_TRIPLE_TERM_PREFIX
     ];
     const prefix = prefixes.find((p) => encodedTriple.startsWith(p));
     if (prefix) {
-      return base64url.decode(encodedTriple.slice(prefix.length));
+      const payload = encodedTriple.slice(prefix.length);
+      return Buffer.from(payload, 'base64url').toString('utf8');
     }
     return encodedTriple;
   }
 
   /**
-   * Encodes RDFStarTriple to Base64 string.
+   * Encodes a triple term to a Base64url string with the
+   * <code>urn:rdf4j:tripleTerm:</code> prefix.
    *
-   * @param {string} triple to be encoded as base64 url string
-   * @return {string} encoded RDFStart triple, returns unchanged if the provided
-   * triple is not in the expected format
+   * @param {string} triple the triple term to encode
+   * @return {string} the encoded triple term, returns unchanged if the provided
+   * value is not in the expected format
    */
-  static toBase64RdfStarTriple(triple) {
-    if (triple.startsWith('<<') && triple.endsWith('>>')) {
-      return ENCODED_RDFSTAR_TRIPLE_PREFIX + base64url.encode(triple);
+  static toBase64TripleTerm(triple) {
+    if (triple.startsWith('<<(') && triple.endsWith(')>>')) {
+      const encoded = Buffer.from(triple, 'utf8').toString('base64url');
+      return ENCODED_TRIPLE_TERM_PREFIX + encoded;
     }
     return triple;
+  }
+
+  /**
+   * Parses a triple term in the <code><<( s p o )>></code> syntax to a Quad.
+   *
+   * @param {string} tripleTerm the triple term to parse
+   * @return {Quad|null} the triple term as a Quad, or <code>null</code> if the
+   * value is not a triple term or cannot be parsed
+   */
+  static parseTripleTerm(tripleTerm) {
+    if (!tripleTerm) {
+      return null;
+    }
+
+    let content;
+    if (tripleTerm.startsWith('<<(') && tripleTerm.endsWith(')>>')) {
+      content = tripleTerm.slice(3, -3);
+    } else if (tripleTerm.startsWith('<<') && tripleTerm.endsWith('>>')) {
+      content = tripleTerm.slice(2, -2);
+    } else {
+      return null;
+    }
+
+    try {
+      const quads = new N3.Parser().parse(`${content} .`);
+      if (quads.length > 0) {
+        return quads[0];
+      }
+    } catch (e) {
+      // Parsing failed, return null
+    }
+    return null;
+  }
+
+  /**
+   * @deprecated Use {@link TermConverter#fromBase64TripleTerm} instead.
+   * @param {string} encodedTriple the encoded triple term
+   * @return {string} the decoded triple term
+   */
+  static fromBase64RdfStarTriple(encodedTriple) {
+    return TermConverter.fromBase64TripleTerm(encodedTriple);
+  }
+
+  /**
+   * @deprecated Use {@link TermConverter#toBase64TripleTerm} instead.
+   * @param {string} triple the triple term to encode
+   * @return {string} the encoded triple term
+   */
+  static toBase64RdfStarTriple(triple) {
+    return TermConverter.toBase64TripleTerm(triple);
   }
 }
 

@@ -1,0 +1,58 @@
+{
+  "head" : {
+    "vars" : [
+      "statement",
+      "triple"
+    ]
+  },
+  "results" : {
+    "bindings" : [
+      {
+        "statement" : {
+          "type" : "uri",
+          "value" : "http://example.com/statement1"
+        },
+        "triple" : {
+          "type" : "triple",
+          "value" : {
+            "subject" : {
+              "type" : "uri",
+              "value" : "http://example.com/alice"
+            },
+            "predicate" : {
+              "type" : "uri",
+              "value" : "http://example.com/knows"
+            },
+            "object" : {
+              "type" : "uri",
+              "value" : "http://example.com/bob"
+            }
+          }
+        }
+      },
+      {
+        "statement" : {
+          "type" : "uri",
+          "value" : "http://example.com/statement2"
+        },
+        "triple" : {
+          "type" : "triple",
+          "value" : {
+            "subject" : {
+              "type" : "uri",
+              "value" : "http://example.com/carol"
+            },
+            "predicate" : {
+              "type" : "uri",
+              "value" : "http://example.com/name"
+            },
+            "object" : {
+              "type" : "literal",
+              "value" : "Carol"
+            }
+          }
+        }
+      }
+    ]
+  }
+}
