@@ -9,6 +9,11 @@ const N3 = require('n3');
 const {DataFactory} = N3;
 const {namedNode, quad, defaultGraph} = DataFactory;
 
+/**
+ * RDFStar tests are skipped for GraphDB 12+ as it has migrated to RDF 1.2 triple terms.
+ * RDF 1.2 triple terms use the syntax <<(s p o)>> instead of the old RDFStar <<<s p o>>> syntax.
+ * RDF 1.2 triple terms are tested in rdf12-triple-terms.spec.js
+ */
 describe('RDFStar support', () => {
   let rdfClient = new RDFRepositoryClient(Config.restApiConfig);
   let expected;
@@ -27,7 +32,7 @@ describe('RDFStar support', () => {
     return Utils.deleteRepo('Test_repo');
   });
 
-  test('Should get RDFStar triples as string when no appropriate parser', () => {
+  test.skip('Should get RDFStar triples as string when no appropriate parser', () => {
     let payload = new GetQueryPayload()
       .setQuery('describe <<<http://www.wikidata.org/entity/Q472> <http://www.wikidata.org/prop/direct/P1889> <http://www.wikidata.org/entity/Q202904>>>')
       .setQueryType(QueryType.DESCRIBE)
@@ -51,7 +56,7 @@ describe('RDFStar support', () => {
     });
   });
 
-  test('Should get RDFStar triples base64 encoded when got with not RDFStar header', () => {
+  test.skip('Should get RDFStar triples base64 encoded when got with not RDFStar header', () => {
     let expected = [quad(
       namedNode('urn:rdf4j:triple:PDw8aHR0cDovL3d3dy53aWtpZGF0YS5vcmcvZW50aXR5L1E0NzI-IDxodHRwOi8vd3d3Lndpa2lkYXRhLm9yZy9wcm9wL2RpcmVjdC9QMTg4OT4gPGh0dHA6Ly93d3cud2lraWRhdGEub3JnL2VudGl0eS9RMjAyOTA0Pj4-'),
       namedNode('http://www.wikidata.org/prop/reference/P3452'),
@@ -68,7 +73,7 @@ describe('RDFStar support', () => {
     });
   });
 
-  test('Should receive proper STAR responses', () => {
+  test.skip('Should receive proper STAR responses', () => {
     let expectedTurtleStar = Utils.loadFile('./data/rdfstar/expected_response_turtle_star.txt');
     let expectedTrigStar = Utils.loadFile('./data/rdfstar/expected_response_trig_star.txt');
 
@@ -82,7 +87,7 @@ describe('RDFStar support', () => {
     });
   });
 
-  test('Should get RDFStar triples as JSON string when querying', () => {
+  test.skip('Should get RDFStar triples as JSON string when querying', () => {
     let payload = new GetQueryPayload()
       .setQuery('select ?s where { \n' +
         '\t?s ?p ?o .\n' +
@@ -99,7 +104,7 @@ describe('RDFStar support', () => {
     });
   });
 
-  test('Should get RDFStar triples as TSV string when querying', () => {
+  test.skip('Should get RDFStar triples as TSV string when querying', () => {
     let payload = new GetQueryPayload()
       .setQuery('select ?s where { \n' +
         '\t?s ?p ?o .\n' +
