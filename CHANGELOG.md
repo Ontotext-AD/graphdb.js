@@ -4,6 +4,47 @@
 **Breaking changes:**
 * Upgraded `n3` to 2.x for RDF 1.2 support. `n3` 2.x formats Turtle/TriG output with different whitespace than 1.x, which may affect snapshots or string comparisons of serialized data, but does not affect semantic correctness or data round-tripping. Triple terms (RDF 1.2 feature) are now parsed as Quad instances in the object position of the quad; applications using triple terms should handle this new representation.
 * RDFStar tests (old `<<<s p o>>>` syntax) are skipped for GraphDB 12+ because GraphDB 12 migrated to RDF 1.2 triple terms (`<<(s p o)>>` syntax). The old RDFStar syntax is no longer supported in GraphDB 12.
+* **Response Models**: Server client methods now return strongly-typed response model objects instead of raw HTTP responses:
+  * `GraphDBServerClient.getRepositoryIDs()` renamed to `getRepositories()`, which returns `RepositoryListResponse` with `getRepositories()` (descriptors) and `getRepositoryIds()` methods instead of a string array
+  * `GraphDBServerClient.getDefaultConfig()` returns `RepositoryConfig` instead of `HttpResponse`
+  * `GraphDBServerClient.getRepositoryConfig()` returns `RepositoryConfig` instead of `HttpResponse`
+  * `GraphDBServerClient.isSecurityEnabled()` returns `boolean` instead of `response.response.data`
+  * `GraphDBServerClient.getFreeAccess()` returns `AuthSettingsResponse` with `isEnabled()`, `getAuthorities()` and `getAppSettings()` methods instead of raw response
+  * `GraphDBServerClient.getUser()` returns `UserResponse` with accessor methods (`getUsername()`, `getPassword()`, `getGrantedAuthorities()`, etc.) instead of raw response
+  * `UserResponse.getAppSettings()` returns the raw application settings object, not an `AppSettings` instance
+
+* **Constructor Changes**: Model classes now use options objects instead of positional parameters:
+  * `AppSettings`: Changed from positional constructor `new AppSettings(inference, sameas, sharedQueries, executeCount)` to options object `new AppSettings({DEFAULT_INFERENCE: true, DEFAULT_SAMEAS: true, ...})`
+  * `AppSettings` now includes `DEFAULT_VIS_GRAPH_SCHEMA` property for visualization configuration
+  * `AppSettings` fields are upper case (`DEFAULT_INFERENCE`, `DEFAULT_SAMEAS`, `IGNORE_SHARED_QUERIES`, `EXECUTE_COUNT`, `DEFAULT_VIS_GRAPH_SCHEMA`) instead of camel case, and `DEFAULT_INFERENCE`, `DEFAULT_SAMEAS` and `EXECUTE_COUNT` default to `true`
+  * `AppSettings.setDefaultSameas()` renamed to `setDefaultSameAs()`
+  * `RepositoryConfig`: Changed from positional constructor `new RepositoryConfig(id, location, params, sesameType, title, type)` to options object `new RepositoryConfig({id, location, params, sesameType, title, type})`
+
+* **HTTP Methods**: Updated to match GraphDB API semantics:
+  * GET requests now use `Accept` header instead of `Content-Type`
+  * GET requests no longer include `Content-Type` header
+  * Repository creation now uses `POST /rest/repositories` instead of `PUT /rest/repositories/{id}`
+  * Repository configuration download now uses content negotiation on `/rest/repositories/{id}` with `Accept: text/turtle` instead of `/rest/repositories/{id}/download-ttl`
+
+* **Return Types**: Methods that previously returned `HttpResponse` now return `void` where appropriate:
+  * `GraphDBServerClient.createRepository()` returns `Promise<void>` instead of `HttpResponse`
+  * `GraphDBServerClient.toggleSecurity()` returns `Promise<void>` instead of `HttpResponse`
+  * `GraphDBServerClient.updateFreeAccess()` returns `Promise<void>` instead of `HttpResponse`
+  * `GraphDBServerClient.createUser()` returns `Promise<void>` instead of `HttpResponse`
+  * `GraphDBServerClient.updateUser()` returns `Promise<void>` instead of `HttpResponse`
+  * `GraphDBServerClient.updateUserData()` returns `Promise<void>` instead of `HttpResponse`
+  * `GraphDBServerClient.deleteUser()` returns `Promise<void>` instead of `HttpResponse`
+
+* **New Methods**: 
+  * `GraphDBServerClient.updateRepository(repositoryConfig)` for updating existing repositories using `PUT /rest/repositories/{id}`
+  * `GraphDBServerClient.restartRepository(repositoryId, location)` for restarting repositories via `POST /rest/repositories/{id}/restart`
+
+* **Repository Types**: Added `RepositoryType.FEDX` for federation support
+
+* **Authentication**: `ClientConfig.getPass()` renamed to `getPassword()` for clarity
+  * `ClientConfig.disableAuthentication()` returns the `ClientConfig` so calls can be chained; it returned nothing before
+
+* **Default Headers**: `setDefaultHeaders()` merges the given headers into the existing default headers instead of replacing them
 
 **New features:**
 * GraphDB 12 support with RDF 1.2. GraphDB 12 returns RDF 1.2 by default (`graphdb.default.rdf.writer.version`, GDB-14480), which includes support for triple terms (`<<( s p o )>>` syntax in Turtle, TriG, and N-Triples formats). The library now correctly parses these responses.

@@ -47,8 +47,8 @@ describe('Manage GraphDB repositories', () => {
   test('Should get repo default config', () => {
     const expectedResponse = Utils.loadFile('./data/graphdb-server-client/' +
       'expected_response_default_config.txt');
-    return serverClient.getDefaultConfig(RepositoryType.GRAPHDB).then((response) => {
-      expect(response.response.data).toStrictEqual(JSON.parse(expectedResponse));
+    return serverClient.getDefaultConfig(RepositoryType.GRAPHDB).then((config) => {
+      expect(config.toJson()).toStrictEqual(JSON.parse(expectedResponse));
     }).catch((e) => {
       throw new Error(e);
     });
@@ -57,8 +57,8 @@ describe('Manage GraphDB repositories', () => {
   test('Should get repo config', () => {
     const expectedResponse = Utils.loadFile('./data/graphdb-server-client/' +
       'expected_response_repo_config.txt');
-    return serverClient.getRepositoryConfig(TEST_REPO_NAME).then((response) => {
-      expect(response.response.data).toStrictEqual(JSON.parse(expectedResponse));
+    return serverClient.getRepositoryConfig(TEST_REPO_NAME).then((config) => {
+      expect(config.toJson()).toStrictEqual(JSON.parse(expectedResponse));
     }).catch((e) => {
       throw new Error(e);
     });
@@ -93,27 +93,32 @@ describe('Manage GraphDB repositories', () => {
         "value": ""
       }
     };
-    const config = new RepositoryConfig(NEW_REPO_NAME, '',
-      params, '', 'Repo title', RepositoryType.GRAPHDB);
+    const config = new RepositoryConfig({
+      id: NEW_REPO_NAME,
+      location: '',
+      params: params,
+      sesameType: '',
+      title: 'Repo title',
+      type: RepositoryType.GRAPHDB});
 
-    return serverClient.getRepositoryIDs()
+    return serverClient.getRepositories()
       .then((response) => {
         const expected = [TEST_REPO_NAME];
-        expect(response.sort()).toEqual(expected);
+        expect(response.getRepositoryIds().sort()).toEqual(expected);
       }).then(() => {
         return serverClient.createRepository(config);
       }).then(() => {
-        return serverClient.getRepositoryIDs();
+        return serverClient.getRepositories();
       }).then((response) => {
         const expected = [NEW_REPO_NAME, TEST_REPO_NAME];
-        expect(response.sort()).toEqual(expected);
+        expect(response.getRepositoryIds().sort()).toEqual(expected);
       }).then(() => {
         return serverClient.deleteRepository(config.id);
       }).then(() => {
-        return serverClient.getRepositoryIDs();
+        return serverClient.getRepositories();
       }).then((response) => {
         const expected = [TEST_REPO_NAME];
-        expect(response).toEqual(expected);
+        expect(response.getRepositoryIds()).toEqual(expected);
       }).catch((e) => {
         throw new Error(e);
       });

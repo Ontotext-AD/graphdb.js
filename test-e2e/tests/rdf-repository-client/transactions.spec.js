@@ -258,6 +258,57 @@ describe('Transactional operations', () => {
     });
   });
 
+  test('Should replace a statement in a transaction by deleting it and adding a new one', () => {
+    let transactionalClient;
+    const getResource1 = new GetStatementsPayload()
+      .setResponseType(RDFMimeType.RDF_JSON)
+      .setSubject('<http://domain/resource/resource-1>');
+    const getResource2 = new GetStatementsPayload()
+      .setResponseType(RDFMimeType.RDF_JSON)
+      .setSubject('<http://domain/resource/resource-2>');
+
+    return rdfClient.deleteAllStatements()
+      .then(() => {
+        return rdfClient.addQuads([getQuad('resource-1', 'relation-1', 'uri-1')]);
+      }).then(() => {
+        return rdfClient.beginTransaction();
+      }).then((transaction) => {
+        transactionalClient = transaction;
+        const data = '<http://domain/resource/resource-1> <http://domain/property/relation-1> <http://domain/value/uri-1>.';
+        return transactionalClient.deleteData(data);
+      }).then(() => {
+        return transactionalClient.addQuads([
+          getQuad('resource-2', 'relation-2', 'uri-2')]);
+      }).then(() => {
+        return transactionalClient.getSize();
+      }).then((resp) => {
+        expect(resp).toBe(1);
+        return rdfClient.get(getResource1);
+      }).then((resp) => {
+        // Changes are not visible outside the transaction until it is committed
+        expect(resp).not.toEqual({});
+        return transactionalClient.commit();
+      }).then(() => {
+        return rdfClient.get(getResource1);
+      }).then((resp) => {
+        expect(resp).toEqual({});
+        return rdfClient.get(getResource2);
+      }).then((resp) => {
+        expect(resp).toEqual({
+          'http://domain/resource/resource-2': {
+            'http://domain/property/relation-2': [
+              {
+                'value': 'http://domain/value/uri-2',
+                'type': 'uri'
+              }
+            ]
+          }
+        });
+      }).then(() => {
+        return rdfClient.deleteAllStatements();
+      });
+  });
+
   describe('Should test queries in transactions', () => {
     beforeAll(() => {
       const wineRdf = path.resolve(__dirname, './../data/wine.rdf');

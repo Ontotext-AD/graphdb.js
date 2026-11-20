@@ -43,20 +43,20 @@ describe('Manage GraphDB security', () => {
 
   test('Should check and toggle security repo', () => {
     return serverClient.isSecurityEnabled()
-      .then((response) => {
-        return expect(response.response.data).toBe(true);
+      .then((enabled) => {
+        return expect(enabled).toBe(true);
       }).then(() => {
         return serverClient.toggleSecurity(false);
       }).then(() => {
         return serverClient.isSecurityEnabled();
-      }).then((response) => {
-        return expect(response.response.data).toBe(false);
+      }).then((enabled) => {
+        return expect(enabled).toBe(false);
       }).then(() => {
         return serverClient.toggleSecurity(true);
       }).then(() => {
         return serverClient.isSecurityEnabled();
-      }).then((response) => {
-        expect(response.response.data).toBe(true);
+      }).then((enabled) => {
+        expect(enabled).toBe(true);
       }).catch((e) => {
         throw new Error(e);
       });
@@ -67,28 +67,24 @@ describe('Manage GraphDB security', () => {
       'WRITE_REPO_Test_repo',
       'READ_REPO_Test_repo'
     ];
-    const appSettings = new AppSettings(true,
-      true, false, true);
+    const appSettings = new AppSettings({
+      DEFAULT_INFERENCE: true, DEFAULT_SAMEAS: true, IGNORE_SHARED_QUERIES: false, EXECUTE_COUNT: true});
 
     return serverClient.getFreeAccess()
       .then((response) => {
-        return expect(response.response.data.enabled).toStrictEqual(false);
+        return expect(response.isEnabled()).toStrictEqual(false);
       }).then(() => {
         return serverClient.updateFreeAccess(true, authorities, appSettings);
-      }).then((response) => {
-        return expect(response.response.status).toBe(200);
       }).then(() => {
         return serverClient.getFreeAccess();
       }).then((response) => {
-        return expect(response.response.data.enabled).toStrictEqual(true);
+        return expect(response.isEnabled()).toStrictEqual(true);
       }).then(() => {
         return serverClient.updateFreeAccess(false, authorities, appSettings);
-      }).then((response) => {
-        return expect(response.response.status).toBe(200);
       }).then(() => {
         return serverClient.getFreeAccess();
       }).then((response) => {
-        expect(response.response.data.enabled).toStrictEqual(false);
+        expect(response.isEnabled()).toStrictEqual(false);
       }).catch((e) => {
         throw new Error(e);
       });

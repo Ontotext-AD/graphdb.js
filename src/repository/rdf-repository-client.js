@@ -8,6 +8,7 @@ const QueryService = require('../service/query-service');
 const UploadService = require('../service/upload-service');
 const DownloadService = require('../service/download-service');
 const TransactionService = require('../service/transaction-service');
+const StringUtils = require('../util/string-utils');
 
 /**
  * RDF repository client implementation realizing specific operations.
@@ -284,6 +285,27 @@ class RDFRepositoryClient extends BaseRepositoryClient {
    */
   deleteAllStatements() {
     return this.statementsService.deleteAllStatements().execute();
+  }
+
+  /**
+   * Deletes the statements in the provided Turtle or Trig formatted data.
+   * The deletion runs in its own transaction, which is committed on success
+   * and rolled back on failure.
+   *
+   * @param {string} data payload data in Turtle or Trig format
+   * @return {Promise<void>} promise resolving after the data has been deleted
+   * successfully
+   * @throws {Error} if no data is provided for deleting
+   */
+  deleteData(data) {
+    if (StringUtils.isBlank(data)) {
+      throw new Error('Turtle data is required when deleting statements');
+    }
+    return this.beginTransaction().then((transaction) => {
+      return transaction.deleteData(data)
+        .then(() => transaction.commit())
+        .catch((err) => transaction.rollback().then(() => Promise.reject(err)));
+    });
   }
 
   /**

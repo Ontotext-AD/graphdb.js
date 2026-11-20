@@ -10,7 +10,7 @@ describe('ServerClientConfig', () => {
     expect(config.getHeaders()).toEqual({});
     expect(config.getTimeout()).toEqual(10000);
     expect(config.getUsername()).toEqual(undefined);
-    expect(config.getPass()).toEqual(undefined);
+    expect(config.getPassword()).toEqual(undefined);
     expect(config.getBasicAuthentication()).toBeFalsy();
     expect(config.getKeepAlive()).toBeTruthy();
   });
@@ -25,7 +25,7 @@ describe('ServerClientConfig', () => {
     expect(config.getTimeout()).toEqual(1000);
     expect(config.getHeaders()).toEqual(headers);
     expect(config.getUsername()).toEqual('testuser');
-    expect(config.getPass()).toEqual('P@sw0rd');
+    expect(config.getPassword()).toEqual('P@sw0rd');
     expect(config.getBasicAuthentication()).toBeTruthy();
     expect(config.getGdbTokenAuthentication()).toBeFalsy();
     expect(config.getKeepAlive()).toBeTruthy();
@@ -35,7 +35,7 @@ describe('ServerClientConfig', () => {
 
     config.useGdbTokenAuthentication('testuser2', 'P@sw0rd2');
     expect(config.getUsername()).toEqual('testuser2');
-    expect(config.getPass()).toEqual('P@sw0rd2');
+    expect(config.getPassword()).toEqual('P@sw0rd2');
     expect(config.getBasicAuthentication()).toBeFalsy();
     expect(config.getGdbTokenAuthentication()).toBeTruthy();
   });
@@ -56,5 +56,18 @@ describe('ServerClientConfig', () => {
     config.disableAuthentication();
     expect(config.getBasicAuthentication()).toBeFalsy();
     expect(config.getGdbTokenAuthentication()).toBeFalsy();
+  });
+
+  test('disableAuthentication should support method chaining', () => {
+    const config = new ServerClientConfig(endpoint)
+      .useBasicAuthentication('user', 'pass')
+      .disableAuthentication()
+      .setTimeout(5000)
+      .setHeaders({'Accept': 'application/json'});
+
+    expect(config.getBasicAuthentication()).toBeFalsy();
+    expect(config.getGdbTokenAuthentication()).toBeFalsy();
+    expect(config.getTimeout()).toEqual(5000);
+    expect(config.getHeaders()).toEqual({'Accept': 'application/json'});
   });
 });

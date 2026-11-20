@@ -1,16 +1,18 @@
-[
-  {
-    "id": "localRepoOneId",
-    "location": "",
-    "sesameType": "graphdb:SailRepository",
-    "title": "Title of repo one",
-    "type": "graphdb"
-  },
-  {
-    "id": "localRepoTwoId",
-    "location": "",
-    "sesameType": "graphdb:SailRepository",
-    "title": "Title of repo two",
-    "type": "ontop"
-  }
-]
+{
+  "": [
+    {
+      "id": "localRepoOneId",
+      "location": "",
+      "sesameType": "graphdb:SailRepository",
+      "title": "Title of repo one",
+      "type": "graphdb"
+    },
+    {
+      "id": "localRepoTwoId",
+      "location": "",
+      "sesameType": "graphdb:SailRepository",
+      "title": "Title of repo two",
+      "type": "ontop"
+    }
+  ]
+}

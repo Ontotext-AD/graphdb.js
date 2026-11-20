@@ -65,7 +65,8 @@ class HttpClient {
    * @return {HttpClient} the current client for method chaining
    */
   setDefaultHeaders(headers) {
-    this.axios.defaults.headers = headers;
+    this.axios.defaults.headers = this.axios.defaults.headers || {};
+    Object.assign(this.axios.defaults.headers, headers);
     return this;
   }
 
