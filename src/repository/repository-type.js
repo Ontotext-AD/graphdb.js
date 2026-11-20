@@ -8,7 +8,8 @@
 
 const RepositoryType = {
   ONTOP: 'ontop',
-  GRAPHDB: 'graphdb'
+  GRAPHDB: 'graphdb',
+  FEDX: 'fedx'
 };
 
 module.exports = RepositoryType;

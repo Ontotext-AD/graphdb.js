@@ -187,10 +187,15 @@ seen in the examples below a client could obtain an instance of `RDFRepositoryCl
 through the server client
 
 ```javascript
-server.getRepository('repository-name').then(repository => {
+server.getRepository('repository-name', repositoryClientConfig).then(repository => {
     // repository is a configured RDFRepositoryClient instance
 }).catch(err => console.log(err));
-``` 
+```
+
+`GraphDBServerClient.getRepository(id, location)` builds the
+`RepositoryClientConfig` from the server client's own endpoint, timeout,
+keep-alive and credentials, so it needs no configuration parameter;
+the optional `location` addresses a repository on a remote location.
 
 ### GraphDBServerClient
 
@@ -218,6 +223,8 @@ const serverClient = new GraphDBServerClient(serverConfig);
  serverClient.updateUser('test_user', '111222');
  // read
  serverClient.getUser('test_user');
+ // read all users; resolves to an array of UserResponse
+ serverClient.getUsers();
  //delete user
  serverClient.deleteUser('test_user'); 
 ```
@@ -247,22 +254,22 @@ The `Authority` enum holds these values.
  // application settings may possibly change the behavior of the
  // GraphDB Workbench for the logged-in user or for all users
  // if logged in as admin.
-  const newAppSettings = new AppSettings(true, true, true, false);
+  const newAppSettings = new AppSettings({DEFAULT_INFERENCE: true, DEFAULT_SAMEAS: true, IGNORE_SHARED_QUERIES: true, EXECUTE_COUNT: false});
   return serverClient.updateUserData('test_user', '111222', newAppSettings);
 ```
 
 * Fetch repository ids
   - From a local GraphDB instance:
     ```javascript
-      serverClient.getRepositoryIDs().then((ids) => {
-        console.log(ids);
+      serverClient.getRepositories().then((response) => {
+        console.log(response.getRepositoryIds());
         // [ 'Test_repo' ]
       });
     ```
   - From a remote GraphDB instance:
     ```javascript
-      serverClient.getRepositoryIDs('http://remote-GraphDB-server').then((ids) => {
-        console.log(ids);
+      serverClient.getRepositories('http://remote-GraphDB-server').then((response) => {
+        console.log(response.getRepositoryIds());
         // [ 'Test_repo' ]
       });
     ```
@@ -288,22 +295,28 @@ The `Authority` enum holds these values.
 
 * Get repo type default config
 ```javascript
- serverClient.getDefaultConfig(RepositoryType.GRAPHDB).then((response) => {
-    console.log(response);
+ serverClient.getDefaultConfig(RepositoryType.GRAPHDB).then((config) => {
+    // config is a RepositoryConfig instance with properties:
+    // config.id, config.location, config.params, config.sesameType, config.title, config.type
+    console.log(config.id);
+    console.log(config.params);
  });
 ```
 
 * Get concrete repo configuration 
   - From a local GraphDB instance:
    ```javascript
-    serverClient.getRepositoryConfig('Test_repo').then((response) => {
-    console.log(response);
+    serverClient.getRepositoryConfig('Test_repo').then((config) => {
+      // config is a RepositoryConfig instance with properties:
+      // config.id, config.location, config.params, config.sesameType, config.title, config.type
+      console.log(config.id);
+      console.log(config.params);
     });
    ```
   - From a remote GraphDB instance:
    ```javascript
-    serverClient.getRepositoryConfig('Test_repo', 'http://remote-GraphDB-server').then((response) => {
-    console.log(response);
+    serverClient.getRepositoryConfig('Test_repo', 'http://remote-GraphDB-server').then((config) => {
+      console.log(config);
     });
    ```
 
@@ -329,11 +342,15 @@ The `Authority` enum holds these values.
   - On a local GraphDB instance:
     ```javascript
       // Import repository configuration class
-      const {RepositoryConfig} = require('graphdb').repository;  
-      // Create repository configuration
-      const config = new RepositoryConfig('repo_id', '', new Map(), '',  'Repo title', RepositoryType.GRAPHDB);
-      // Use the configuration to create new repository
-      serverClient.createRepository(config)
+      const {RepositoryConfig, RepositoryType} = require('graphdb').repository;
+      // GraphDB needs all configuration parameters, so start from the default
+      // configuration for the repository type
+      serverClient.getDefaultConfig(RepositoryType.GRAPHDB)
+          .then((defaultConfig) => {
+            const config = new RepositoryConfig({id: 'repo_id', location: '', params: defaultConfig.params, sesameType: '', title: 'Repo title', type: RepositoryType.GRAPHDB});
+            // Use the configuration to create new repository
+            return serverClient.createRepository(config);
+          })
           .then(() => {
             // do work
       });
@@ -341,12 +358,14 @@ The `Authority` enum holds these values.
   - On a remote GraphDB instance:
      ```javascript
       // Import repository configuration class
-      const {RepositoryConfig} = require('graphdb').repository;  
-      // Create repository configuration
-      // The second argument is the location of the remote GraphDB instnace where the repository will be created.
-      const config = new RepositoryConfig('repo_id', 'http://remote-GraphDB-server', new Map(), '',  'Repo title', RepositoryType.GRAPHDB);
-      // Use the configuration to create new repository
-      serverClient.createRepository(config)
+      const {RepositoryConfig, RepositoryType} = require('graphdb').repository;
+      serverClient.getDefaultConfig(RepositoryType.GRAPHDB)
+          .then((defaultConfig) => {
+            // The location is the remote GraphDB instance where the repository will be created.
+            const config = new RepositoryConfig({id: 'repo_id', location: 'http://remote-GraphDB-server', params: defaultConfig.params, sesameType: '', title: 'Repo title', type: RepositoryType.GRAPHDB});
+            // Use the configuration to create new repository
+            return serverClient.createRepository(config);
+          })
           .then(() => {
             // do work
       });
@@ -356,11 +375,12 @@ The `Authority` enum holds these values.
       const {RepositoryConfig, RepositoryType} = require('graphdb').repository;
       // GraphDB needs all parameters, so start from the default configuration
       serverClient.getDefaultConfig(RepositoryType.GRAPHDB)
-          .then((response) => {
-            const params = response.response.data.params;
+          .then((config) => {
+            // config is now a RepositoryConfig instance
+            const params = config.params;
             params.storageEncryption.value = 'true';
-            const config = new RepositoryConfig('encrypted_repo', '', params, '', 'Encrypted repo', RepositoryType.GRAPHDB);
-            return serverClient.createRepository(config);
+            const encryptedConfig = new RepositoryConfig({id: 'encrypted_repo', location: '', params: params, sesameType: '', title: 'Encrypted repo', type: RepositoryType.GRAPHDB});
+            return serverClient.createRepository(encryptedConfig);
           })
           .then(() => {
             // do work
@@ -381,6 +401,41 @@ The `Authority` enum holds these values.
     });
   ```
 
+* Restart repository. The second argument is an optional remote location.
+  ```javascript
+    serverClient.restartRepository('repo_id').then(() => {
+      // do work
+    });
+  ```
+
+* Update repository
+  - On a local GraphDB instance (use `updateRepository()` to edit existing repositories):
+    ```javascript
+      // Import repository configuration class
+      const {RepositoryConfig} = require('graphdb').repository;  
+      // Get current configuration and modify it
+      serverClient.getRepositoryConfig('repo_id').then((config) => {
+        config.title = 'Updated title';
+        // Use the updated configuration to edit the repository
+        return serverClient.updateRepository(config);
+      })
+          .then(() => {
+            // do work
+      });
+    ```
+  - On a remote GraphDB instance:
+     ```javascript
+      const {RepositoryConfig} = require('graphdb').repository;
+      serverClient.getRepositoryConfig('repo_id', 'http://remote-GraphDB-server')
+          .then((config) => {
+            config.title = 'Updated title';
+            return serverClient.updateRepository(config);
+          })
+          .then(() => {
+            // do work
+      });
+    ```
+
 * Delete repository
   - From a local GraphDB instance:
     ```javascript
@@ -397,8 +452,8 @@ The `Authority` enum holds these values.
 
 * Checks if GraphDB security is enabled
 ```javascript
- serverClient.isSecurityEnabled().then((response) => {
-   console.log(response.response.data)
+ serverClient.isSecurityEnabled().then((enabled) => {
+   console.log(enabled)
  });
 ```
 
@@ -411,7 +466,7 @@ The `Authority` enum holds these values.
 * Check free access state
 ```javascript
  serverClient.getFreeAccess().then((response) => {
-         console.log(response.response.data.enabled);
+         console.log(response.isEnabled());
  });
 ```
 
@@ -422,7 +477,7 @@ Use with extreme caution, as the changes that are made to the application settin
       'WRITE_REPO_Test_repo',
       'READ_REPO_Test_repo'
     ];
- const appSettings = new AppSettings(true, true, false, true);
+ const appSettings = new AppSettings({DEFAULT_INFERENCE: true, DEFAULT_SAMEAS: true, IGNORE_SHARED_QUERIES: false, EXECUTE_COUNT: true});
  
  serverClient.updateFreeAccess(true, authorities, appSettings);
 ```
@@ -633,6 +688,17 @@ return repository.update(payload).then(() => {
 
 ```javascript
 repository.deleteStatements(subj, pred, obj, contexts).then(() => {
+    // do work
+});
+```
+
+* Delete the statements contained in Turtle or TriG formatted data. The
+  deletion runs in its own transaction, which is committed on success and
+  rolled back on failure.
+
+```javascript
+const turtleData = fs.readFileSync(__dirname + '/statements.ttl', 'utf8');
+repository.deleteData(turtleData).then(() => {
     // do work
 });
 ```
@@ -950,6 +1016,108 @@ return repository.query(payload).then((stream) => {
 | 2+         | 9.6+            |
 | 3+         | 10+             |
 | 4+         | 11+             |
+| 5+         | 12+             |
+
+### Migration Guide: Upgrading from 4.x to 5.0
+
+Version 5.0 introduces breaking API changes to align with the GraphDB Workbench API. Here are the key changes:
+
+#### Response Models
+`GraphDBServerClient` methods now return strongly-typed response models.
+`getRepositoryIDs()` was replaced by `getRepositories()`
+(`ServerClient.getRepositoryIDs()`, which uses the RDF4J endpoint,
+is unchanged):
+
+```javascript
+// Before (4.x)
+graphDBServerClient.getRepositoryIDs().then(ids => {
+  console.log(ids); // string[]
+});
+
+// After (5.0)
+graphDBServerClient.getRepositories().then(response => {
+  console.log(response.getRepositoryIds()); // string[]
+});
+```
+
+#### AppSettings Constructor
+AppSettings now uses an options object:
+
+```javascript
+// Before (4.x)
+const settings = new AppSettings(true, true, true, false);
+
+// After (5.0)
+const settings = new AppSettings({
+  DEFAULT_INFERENCE: true,
+  DEFAULT_SAMEAS: true,
+  IGNORE_SHARED_QUERIES: true,
+  EXECUTE_COUNT: false,
+  DEFAULT_VIS_GRAPH_SCHEMA: true // optional
+});
+```
+
+The `DEFAULT_SAMEAS` setter is now `setDefaultSameAs()`:
+
+```javascript
+// Before (4.x)
+settings.setDefaultSameas(false);
+
+// After (5.0)
+settings.setDefaultSameAs(false);
+```
+
+#### RepositoryConfig Constructor
+RepositoryConfig now uses an options object:
+
+```javascript
+// Before (4.x)
+const config = new RepositoryConfig('my-repo', '', params, 'graphdb', 'My Repo', RepositoryType.GRAPHDB);
+
+// After (5.0)
+const config = new RepositoryConfig({
+  id: 'my-repo',
+  location: '',
+  params: params,
+  sesameType: 'graphdb',
+  title: 'My Repo',
+  type: RepositoryType.GRAPHDB
+});
+```
+
+#### Repository creation and updates
+`createRepository()` is used for new repositories and `updateRepository()` for edits. Both used `PUT` before, so code that relied on `createRepository()` to edit an existing repository must switch to `updateRepository()`.
+
+```javascript
+// After (5.0)
+serverClient.createRepository(newConfig);
+serverClient.updateRepository(existingConfig);
+```
+
+#### Security API
+Checking whether security is enabled now resolves to a boolean, and the free access methods return model objects with accessor methods:
+
+```javascript
+// Before (4.x)
+server.isSecurityEnabled().then(response => {
+  console.log(response.response.data); // boolean
+});
+
+// After (5.0)
+server.isSecurityEnabled().then(enabled => {
+  console.log(enabled); // boolean
+});
+```
+
+#### Users
+`getUser()` returns a `UserResponse`. Its `getAppSettings()` method returns the raw application settings object, not an `AppSettings` instance:
+
+```javascript
+server.getUser('test_user').then(response => {
+  console.log(response.getAppSettings()); // plain object
+});
+```
+
 
 
 ### License

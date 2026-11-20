@@ -16,7 +16,7 @@ export class GdbTokenAuthentication extends Authentication {
    */
   getLoginRequestBuilder() {
     const username = this.clientConfig.getUsername();
-    const pass = this.clientConfig.getPass();
+    const pass = this.clientConfig.getPassword();
 
     return HttpRequestBuilder.httpPost('/rest/login')
       .addContentTypeHeader(MediaType.APPLICATION_JSON)

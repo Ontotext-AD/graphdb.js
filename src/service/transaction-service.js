@@ -88,7 +88,7 @@ class TransactionService extends Service {
 
     if (config.shouldAuthenticate()) {
       const userName = config.getUsername();
-      const password = config.getPass();
+      const password = config.getPassword();
       if (config.getBasicAuthentication()) {
         transactionConfig.useBasicAuthentication(userName, password);
       } else if (config.getGdbTokenAuthentication()) {

@@ -66,6 +66,32 @@ describe('HttpClient', () => {
     expect(axiosMock.defaults.headers).toEqual(headers);
   });
 
+  test('should merge multiple calls to setDefaultHeaders', () => {
+    httpClient.setDefaultHeaders({'Accept': 'application/json'});
+    httpClient.setDefaultHeaders({'Content-Type': 'application/json'});
+    httpClient.setDefaultHeaders({'Authorization': 'Bearer token'});
+
+    expect(axiosMock.defaults.headers).toEqual({
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer token'
+    });
+  });
+
+  test('should allow overwriting default headers in subsequent calls', () => {
+    httpClient.setDefaultHeaders({'Accept': 'application/json'});
+    httpClient.setDefaultHeaders({'Accept': 'text/plain'});
+
+    expect(axiosMock.defaults.headers).toEqual({
+      'Accept': 'text/plain'
+    });
+  });
+
+  test('setDefaultHeaders should return the client for method chaining', () => {
+    const result = httpClient.setDefaultHeaders({'Accept': 'application/json'});
+    expect(result).toBe(httpClient);
+  });
+
   test('should properly serialize query parameters', () => {
     const paramsSerializer = axios.create.mock.calls[0][0].paramsSerializer;
     expect(paramsSerializer({

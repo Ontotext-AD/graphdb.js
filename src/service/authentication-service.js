@@ -40,7 +40,7 @@ class AuthenticationService {
     return this.httpClient.request(this.getLoginRequest(clientConfig))
       .then((response) => {
         const token = authentication.getResponseAuthToken(response);
-        return new User(token, clientConfig.getPass(), response.data);
+        return new User(token, clientConfig.getPassword(), response.data);
       });
   }
 
@@ -81,7 +81,9 @@ class AuthenticationService {
    * @return {boolean} true if authentication should be made
    */
   isAlreadyAuthenticated(clientConfig, user) {
-    const hasCredentials = clientConfig.getUsername() && clientConfig.getPass();
+    const hasCredentials =
+      clientConfig.getUsername() &&
+      clientConfig.getPassword();
     const isAuthenticated = user && user.getToken();
     return hasCredentials && !isAuthenticated;
   }

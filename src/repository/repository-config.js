@@ -4,11 +4,13 @@
  *  @class
  *  @author Teodossi Dossev
  */
-export class RepositoryConfig {
+class RepositoryConfig {
   /**
-   * @param {string} [id] Repository ID
-   * @param {string} [location] Repository location
-   * @param {Object} [params] Map of repository configuration parameters.
+   * @param {Object} options Configuration options
+   * @param {string} [options.id] Repository ID
+   * @param {string} [options.location] Repository location
+   * @param {Object} [options.params]
+   * Map of repository configuration parameters.
    * See {@link https://graphdb.ontotext.com/documentation/standard/configuring-a-repository.html#configuring-a-repository-configuration-parameters
    * GraphDB Documentation}.
    * Since GraphDB 11.4, <code>storageEncryption</code> set to
@@ -16,25 +18,21 @@ export class RepositoryConfig {
    * configured on the GraphDB instance and cannot be changed after creation,
    * see {@link https://graphdb.ontotext.com/documentation/11.5/encryption.html#encryption-at-rest
    * Encryption at rest}.
-   * @param {string} [sesameType] Repository type as sesame rdf type.
-   * May be one of the following:
-   * <code>owlim:ReplicationCluster</code> for master repository
-   * <code>owlim:ReplicationClusterWorker</code> for worker repository
-   * <code>owlim:MonitorRepository</code> for se repository
-   * <code>openrdf:SailRepository</code> for se repository
-   * <code>graphdb:SailRepository</code> for free repository
-   * <code>openrdf:SystemRepository</code> for openrdf-system repository
+   * @param {string} [options.sesameType] Repository type as sesame rdf type.
+   * Supported values (GraphDB 12.0):
+   * <code>graphdb:SailRepository</code> for standard repository
    * <code>graphdb:OntopRepository</code> for ontop repository
-   * @param {string} [title] Repository title
-   * @param {string} [type] Repository type as {@link RepositoryType}
+   * <code>graphdb:FedXRepository</code> for FedX repository
+   * @param {string} [options.title] Repository title
+   * @param {string} [options.type] Repository type as {@link RepositoryType}
     */
-  constructor(id, location, params, sesameType, title, type) {
-    this.id = id;
-    this.location = location;
-    this.params = params || {};
-    this.sesameType = sesameType;
-    this.title = title;
-    this.type = type;
+  constructor(options = {}) {
+    this.id = options.id;
+    this.location = options.location;
+    this.params = options.params || {};
+    this.sesameType = options.sesameType;
+    this.title = options.title;
+    this.type = options.type;
   }
 
   /**

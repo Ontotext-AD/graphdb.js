@@ -25,7 +25,7 @@ describe('RepositoryClientConfig', () => {
     expect(config.getReadTimeout()).toEqual(10000);
     expect(config.getWriteTimeout()).toEqual(10000);
     expect(config.getUsername()).toEqual(undefined);
-    expect(config.getPass()).toEqual(undefined);
+    expect(config.getPassword()).toEqual(undefined);
     expect(config.getBasicAuthentication()).toBeFalsy();
     expect(config.getKeepAlive()).toBeTruthy();
   });
@@ -45,14 +45,14 @@ describe('RepositoryClientConfig', () => {
     expect(config.getReadTimeout()).toEqual(readTimeout);
     expect(config.getWriteTimeout()).toEqual(writeTimeout);
     expect(config.getUsername()).toEqual('testuser');
-    expect(config.getPass()).toEqual('P@ssw0rd');
+    expect(config.getPassword()).toEqual('P@ssw0rd');
     expect(config.getBasicAuthentication()).toBeFalsy();
     expect(config.getGdbTokenAuthentication()).toBeTruthy();
     expect(config.getKeepAlive()).toBeFalsy();
 
     config.useBasicAuthentication('testuser2', 'P@ssw0rd2');
     expect(config.getUsername()).toEqual('testuser2');
-    expect(config.getPass()).toEqual('P@ssw0rd2');
+    expect(config.getPassword()).toEqual('P@ssw0rd2');
     expect(config.getBasicAuthentication()).toBeTruthy();
     expect(config.getGdbTokenAuthentication()).toBeFalsy();
   });
@@ -130,8 +130,7 @@ describe('RepositoryClientConfig', () => {
       // When: I try to set a valid location.
       config.setLocation(location);
       // Then: I expect the Location header to be set.
-      expect(config.getHeaders()).toEqual({ "x-graphdb-repository-location": location });
+      expect(config.getHeaders()).toEqual({'x-graphdb-repository-location': location});
     });
   });
-
 });

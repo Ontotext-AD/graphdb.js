@@ -53,7 +53,7 @@ class ClientConfig {
   /**
    * @return {string} the user password
    */
-  getPass() {
+  getPassword() {
     return this.pass;
   }
 
@@ -131,9 +131,11 @@ class ClientConfig {
 
   /**
    * Disables authentication.
+   * @return {this} the concrete configuration config for method chaining
    */
   disableAuthentication() {
     this.switchAuthentication(OFF);
+    return this;
   }
 
   /**

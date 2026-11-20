@@ -129,4 +129,56 @@ describe('RDFRepositoryClient - Deleting statements', () => {
         .toEqual();
     });
   });
+
+  describe('deleteData(data)', () => {
+    const data = '<http://domain/resource/1> <http://domain/property/1> "value" .';
+    let transaction;
+
+    beforeEach(() => {
+      transaction = {
+        deleteData: jest.fn().mockResolvedValue(),
+        commit: jest.fn().mockResolvedValue(),
+        rollback: jest.fn().mockResolvedValue(),
+        isActive: jest.fn().mockReturnValue(true)
+      };
+      jest.spyOn(rdfRepositoryClient, 'beginTransaction').mockResolvedValue(transaction);
+    });
+
+    test('should delete the data in a transaction and commit it', () => {
+      return rdfRepositoryClient.deleteData(data).then(() => {
+        expect(transaction.deleteData).toHaveBeenCalledWith(data);
+        expect(transaction.commit).toHaveBeenCalledTimes(1);
+        expect(transaction.rollback).not.toHaveBeenCalled();
+      });
+    });
+
+    test('should roll back the transaction and reject when deleting fails', () => {
+      transaction.deleteData.mockRejectedValue(new Error('Delete failed'));
+      return expect(rdfRepositoryClient.deleteData(data))
+        .rejects.toThrow('Delete failed')
+        .then(() => {
+          expect(transaction.commit).not.toHaveBeenCalled();
+          expect(transaction.rollback).toHaveBeenCalledTimes(1);
+        });
+    });
+
+    test('should reject with the commit error without rolling back an ' +
+      'inactive transaction', () => {
+      transaction.commit.mockImplementation(() => {
+        transaction.isActive.mockReturnValue(false);
+        return Promise.reject(new Error('Commit failed'));
+      });
+      return expect(rdfRepositoryClient.deleteData(data))
+        .rejects.toThrow('Commit failed')
+        .then(() => {
+          expect(transaction.rollback).not.toHaveBeenCalled();
+        });
+    });
+
+    test('should throw when no data is provided', () => {
+      expect(() => rdfRepositoryClient.deleteData(' '))
+        .toThrow('Turtle data is required when deleting statements');
+      expect(rdfRepositoryClient.beginTransaction).not.toHaveBeenCalled();
+    });
+  });
 });
