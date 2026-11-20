@@ -53,7 +53,8 @@ module.exports = {
     JsonLDParser: require('./parser/jsonld-parser'),
     RDFXmlParser: require('./parser/rdfxml-parser'),
     SparqlJsonResultParser: require('./parser/sparql-json-result-parser'),
-    SparqlXmlResultParser: require('./parser/sparql-xml-result-parser')
+    SparqlXmlResultParser: require('./parser/sparql-xml-result-parser'),
+    BooleanResultParser: require('./parser/boolean-result-parser')
   },
 
   logger: {
