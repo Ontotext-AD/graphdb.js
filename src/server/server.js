@@ -3,11 +3,6 @@ const HttpClient = require('../http/http-client');
 const ConsoleLogger = require('../logging/console-logger');
 const HttpResponse = require('../http/http-response');
 
-// Imports used by TypeScript type generation
-const ServerClientConfig = require('./server-client-config');
-const HttpRequestBuilder = require('../http/http-request-builder');
-const User = require('../auth/user');
-
 /**
  * Implementation of the server operations.
  *

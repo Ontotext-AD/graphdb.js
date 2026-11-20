@@ -7,13 +7,6 @@ const RepositoryClientConfig =
     require('../repository/repository-client-config');
 const RDFRepositoryClient = require('../repository/rdf-repository-client');
 
-// Imports used by TypeScript type generation
-const ServerClientConfig = require('./server-client-config');
-const RepositoryConfig = require('../repository/repository-config');
-const RepositoryType = require('../repository/repository-type');
-const HttpResponse = require('../http/http-response');
-const AppSettings = require('./app-settings');
-
 const REPOSITORY_SERVICE_URL = '/rest/repositories';
 const SECURITY_SERVICE_URL = '/rest/security';
 

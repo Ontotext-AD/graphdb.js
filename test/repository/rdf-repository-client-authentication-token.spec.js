@@ -83,7 +83,8 @@ describe('RDFRepositoryClient - authentication', () => {
           subj: '<http://eunis.eea.europa.eu/countries/AZ>',
           pred: '<http://eunis.eea.europa.eu/rdf/schema.rdf#population>'
         })
-        .addAcceptHeader(payload.getResponseType());
+        .addAcceptHeader(payload.getResponseType())
+        .setResponseType('stream');
       expect(requestMock).toHaveBeenNthCalledWith(1, expectedAPIRequest);
     });
   });
@@ -118,8 +119,7 @@ describe('RDFRepositoryClient - authentication', () => {
         jest.fn().mockImplementation((request) => {
           if (request.getMethod() === 'get') {
             calls++;
-            if (repository.getLoggedUser()
-              && calls === 2) {
+            if (repository.getLoggedUser() && calls === 2) {
             // emulate token expiration
               repository.getLoggedUser().clearToken();
               return Promise.reject({

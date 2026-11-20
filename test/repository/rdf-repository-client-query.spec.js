@@ -56,6 +56,10 @@ describe('RDFRepositoryClient - query', () => {
         .setResponseType(RDFMimeType.SPARQL_RESULTS_JSON)
         .setLimit(100);
 
+      // Create empty parser registry to allow raw stream testing
+      const ParserRegistry = require('parser/parser-registry');
+      repository.parserRegistry = new ParserRegistry();
+
       repository.query(payload).then((stream) => {
         stream.on('data', (chunk) => {
           expect(chunk).toEqual(expectedIt.next().value);
@@ -70,6 +74,10 @@ describe('RDFRepositoryClient - query', () => {
         .setQueryType(QueryType.DESCRIBE)
         .setResponseType(RDFMimeType.RDF_XML)
         .setLimit(100);
+
+      // Create empty parser registry to allow raw stream testing
+      const ParserRegistry = require('parser/parser-registry');
+      repository.parserRegistry = new ParserRegistry();
 
       repository.query(payload).then((stream) => {
         stream.on('data', (chunk) => {
@@ -86,6 +94,10 @@ describe('RDFRepositoryClient - query', () => {
         .setResponseType(RDFMimeType.RDF_XML)
         .setLimit(100);
 
+      // Create empty parser registry to allow raw stream testing
+      const ParserRegistry = require('parser/parser-registry');
+      repository.parserRegistry = new ParserRegistry();
+
       repository.query(payload).then((stream) => {
         stream.on('data', (chunk) => {
           expect(chunk).toEqual(expectedIt.next().value);
@@ -101,11 +113,14 @@ describe('RDFRepositoryClient - query', () => {
         .setResponseType(RDFMimeType.BOOLEAN_RESULT)
         .setLimit(100);
 
-      repository.query(payload).then((stream) => {
-        stream.on('data', (chunk) => {
-          expect(chunk).toEqual(expectedIt.next().value);
-        });
-        stream.on('end', done);
+      const booleanReader = new ObjectReadableMock(['true']);
+      httpRequest.mockResolvedValueOnce({
+        data: booleanReader
+      });
+
+      repository.query(payload).then((result) => {
+        expect(result).toBe(true);
+        done();
       });
     });
   });

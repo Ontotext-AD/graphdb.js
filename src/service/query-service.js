@@ -8,9 +8,6 @@ const QueryContentType = require('../http/query-content-type');
 const GetQueryPayload = require('../query/get-query-payload');
 const HttpUtils = require('../util/http-utils');
 
-// Imports used by TypeScript type generation
-const UpdateQueryPayload = require('../query/update-query-payload');
-
 /**
  * Service for executing queries via {@link GetQueryPayload} or
  * {@link UpdateQueryPayload}.

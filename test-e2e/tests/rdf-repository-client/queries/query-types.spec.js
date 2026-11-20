@@ -55,6 +55,27 @@ describe('Query types', () => {
     });
   });
 
+  test('Should resolve ASK queries to boolean values', () => {
+    let payloadTrue = new GetQueryPayload()
+      .setQuery('ask { ?s <http://www.w3.org/2000/01/rdf-schema#label> ?o }')
+      .setQueryType(QueryType.ASK)
+      .setResponseType(RDFMimeType.BOOLEAN_RESULT);
+
+    let payloadFalse = new GetQueryPayload()
+      .setQuery('ask { ?s <http://www.w3.org/2000/01/rdf-schema#labels> ?o }')
+      .setQueryType(QueryType.ASK)
+      .setResponseType(RDFMimeType.BOOLEAN_RESULT);
+
+    return rdfClient.query(payloadTrue).then((result) => {
+      expect(typeof result).toBe('boolean');
+      expect(result).toBe(true);
+      return rdfClient.query(payloadFalse);
+    }).then((result) => {
+      expect(typeof result).toBe('boolean');
+      expect(result).toBe(false);
+    });
+  });
+
   test('Should make a CONSTRUCT query', () => {
     let query = Utils.loadFile('./data/queries/construct_query.sparql').trim();
     let expectedResponse = Utils.loadFile('./data/queries/expected_response_construct_query.json').trim();

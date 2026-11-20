@@ -74,6 +74,6 @@ describe('Statements with literal data types', () => {
       .setQuery(query)
       .setQueryType(QueryType.ASK)
       .setResponseType(RDFMimeType.BOOLEAN_RESULT);
-    return rdfClient.query(payload).then((resp) => Utils.readStream(resp));
+    return rdfClient.query(payload);
   }
 });

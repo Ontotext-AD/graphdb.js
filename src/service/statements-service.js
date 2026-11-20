@@ -56,7 +56,6 @@ class StatementsService extends Service {
     if (parser && parser.isStreaming()) {
       requestBuilder.setResponseType('stream');
     } else if (payload.getResponseType() === RDFMimeType.BINARY_RDF) {
-      // Otherwise axios decodes the binary data as UTF-8 text and corrupts it
       requestBuilder.setResponseType('arraybuffer');
     }
 

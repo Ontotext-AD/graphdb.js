@@ -7,6 +7,16 @@ const Iterable = require('../util/iterable');
 const HttpResponse = require('../http/http-response');
 const LoggingUtils = require('../logging/logging-utils');
 const AuthenticationService = require('../service/authentication-service');
+const N3Parser = require('../parser/n3-parser');
+const TurtleParser = require('../parser/turtle-parser');
+const TriGParser = require('../parser/trig-parser');
+const NTriplesParser = require('../parser/n-triples-parser');
+const NQuadsParser = require('../parser/n-quads-parser');
+const RDFXmlParser = require('../parser/rdfxml-parser');
+const JsonLDParser = require('../parser/jsonld-parser');
+const SparqlJsonResultParser = require('../parser/sparql-json-result-parser');
+const SparqlXmlResultParser = require('../parser/sparql-xml-result-parser');
+const BooleanResultParser = require('../parser/boolean-result-parser');
 
 /**
  * Set of HTTP status codes for which requests could be re-attempted.
@@ -54,6 +64,16 @@ class BaseRepositoryClient {
    */
   initParsers() {
     this.parserRegistry = new ParserRegistry();
+    this.parserRegistry.register(new N3Parser());
+    this.parserRegistry.register(new TurtleParser());
+    this.parserRegistry.register(new TriGParser());
+    this.parserRegistry.register(new NTriplesParser());
+    this.parserRegistry.register(new NQuadsParser());
+    this.parserRegistry.register(new RDFXmlParser());
+    this.parserRegistry.register(new JsonLDParser());
+    this.parserRegistry.register(new SparqlJsonResultParser());
+    this.parserRegistry.register(new SparqlXmlResultParser());
+    this.parserRegistry.register(new BooleanResultParser());
   }
 
   /**
@@ -102,13 +122,13 @@ class BaseRepositoryClient {
    * returns the content untouched. If <code>contentType</code> is provided it
    * should be an instance of {@link RDFMimeType} enum and is used as a key
    * for selecting appropriate parser from the parsers registry.
-   * Parsing is done synchronously!
+   * Parsing can be synchronous or asynchronous.
    *
    * @protected
    * @param {string} content
    * @param {string} responseType
    * @param {Object} [parserConfig] optional parser configuration
-   * @return {(string|Term|Term[])}
+   * @return {(string|Term|Term[]|Promise)}
    */
   parse(content, responseType, parserConfig = {}) {
     if (!this.parserRegistry.get(responseType)) {
@@ -116,12 +136,19 @@ class BaseRepositoryClient {
     }
     const parser = this.parserRegistry.get(responseType);
 
-    const startTime = Date.now();
-    const parsed = parser.parse(content, parserConfig);
-    const elapsedTime = Date.now() - startTime;
+    // If content is already a boolean and parser is BooleanResultParser,
+    // return as-is
+    if (typeof content === 'boolean') {
+      return content;
+    }
 
-    this.logger.debug({elapsedTime, responseType}, 'Parsed content');
-    return parsed;
+    // If streaming parser but content is not a stream, return as-is
+    if (parser.isStreaming && parser.isStreaming()) {
+      if (!content || typeof content.on !== 'function') {
+        return content;
+      }
+    }
+    return parser.parse(content, parserConfig);
   }
 
   /**
