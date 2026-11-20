@@ -9,8 +9,6 @@ const RDFMimeType = require('../http/rdf-mime-type');
  * contains a single line with either "true" or "false".
  *
  * @class
- * @author Mihail Radkov
- * @author Svilen Velikov
  */
 class BooleanResultParser extends ContentParser {
   /**
