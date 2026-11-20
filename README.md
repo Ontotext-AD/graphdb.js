@@ -584,7 +584,7 @@ return repository.query(payload).then((stream) => {
 const payload = new GetQueryPayload()
   .setQuery('ask {?s ?p ?o}')
   .setQueryType(QueryType.ASK)
-  .setResponseType(RDFMimeType.BOOLEAN_RESULT);
+  .setResponseType(RDFMimeType.SPARQL_RESULTS_JSON);
 
 repository.registerParser(new SparqlJsonResultParser());
 
