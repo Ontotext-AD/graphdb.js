@@ -16,7 +16,7 @@ class RDFXmlParser extends ContentParser {
   constructor(config) {
     super(config);
 
-    this.parser = new RdfXmlParser(this.config);
+    this.parser = new RdfXmlParser({...this.config, allowTripleTerms: true});
   }
 
   /**

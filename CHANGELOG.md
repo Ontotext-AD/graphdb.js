@@ -1,6 +1,17 @@
 # CHANGELOG
 
 ## Next:
+**Breaking changes:**
+* Upgraded `n3` to 2.x for RDF 1.2 support. `n3` 2.x formats Turtle/TriG output with different whitespace than 1.x, which may affect snapshots or string comparisons of serialized data, but does not affect semantic correctness or data round-tripping. Triple terms (RDF 1.2 feature) are now parsed as Quad objects with the subject as a Quad instance; applications using triple terms should handle this new representation.
+* RDFStar tests (old `<<<s p o>>>` syntax) are skipped for GraphDB 12+ because GraphDB 12 migrated to RDF 1.2 triple terms (`<<(s p o)>>` syntax). The old RDFStar syntax is no longer supported in GraphDB 12.
+
+**New features:**
+* GraphDB 12 support with RDF 1.2. GraphDB 12 returns RDF 1.2 by default (`graphdb.default.rdf.writer.version`, GDB-14480), which includes support for triple terms (`<<( s p o )>>` syntax in Turtle, TriG, and N-Triples formats). The library now correctly parses these responses.
+* JSON-LD parser now converts Base64-encoded triple term IRIs (`urn:rdf4j:triple:*`) to RDF/JS Quad objects with the triple as the subject.
+* Enabled `allowTripleTerms` in all RDF parsers (Turtle, TriG, N-Triples, N-Quads, N3) and SPARQL result parsers (JSON, XML) for RDF 1.2 triple terms support.
+* RDF/XML and JSON-LD parsers configured to handle RDF 1.2 triple terms.
+* Added E2E tests for RDF 1.2 triple terms to verify parsing correctness with GraphDB 12 (note: GraphDB 12.0.0-TR15 has limitations on inserting triple terms via SPARQL, expected to be fixed in final release).
+* Earlier versions (GraphDB 11 and earlier) remain fully supported with RDF 1.1.
 * `Consume SPARQL Query results with iterator.`
 * `Optional: Cluster management - add, remove, stop, check cluster status (GDB API)`
 * `Check the GDB server version and report mismatches if the client version implements a different version unless the check is stopped.`

@@ -2,7 +2,8 @@ const fs = require('fs');
 const path = require('path');
 
 function loadFile(relativePath) {
-  return fs.readFileSync(path.resolve(__dirname, relativePath), 'utf8');
+  const content = fs.readFileSync(path.resolve(__dirname, relativePath), 'utf8');
+  return content.replace(/\r\n/g, '\n');
 }
 
 function readStream(stream, isObjectsStream) {
@@ -19,7 +20,8 @@ function readStream(stream, isObjectsStream) {
       if (isObjectsStream) {
         resolve(chunks);
       } else {
-        resolve(Buffer.concat(chunks).toString().trim());
+        const content = Buffer.concat(chunks).toString().trim();
+        resolve(content.replace(/\r\n/g, '\n'));
       }
     });
   });
