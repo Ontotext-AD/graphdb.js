@@ -13,7 +13,7 @@ through the NPM registry similarly to all other dependencies
 required dependencies.
 * Make sure that you have a running GraphDB instance accessible on 
 `localhost:7200`. You can run one using the `docker-compose.yml` in the root
-directory by executing: `GRAPHDB_VERSION=11.5.2 docker compose -f docker-compose.yml up -d`.
+directory by executing: `GRAPHDB_VERSION=12.0.0-TR21 docker compose -f docker-compose.yml up -d`.
 The compose file expects a GraphDB license in `graphdb.license` in the root directory.
 It also configures the test master key `test-e2e/encryption/test-master.key`, which the
 encrypted repository tests need. When you run GraphDB in another way, start it with
