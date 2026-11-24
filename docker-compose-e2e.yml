@@ -4,7 +4,7 @@ services:
     image: docker-registry.ontotext.com/graphdb:${GDB_VERSION}
     container_name: graphdb
     volumes:
-      - ./graphdb.license:/opt/graphdb/home/conf/graphdb.license:ro
+      - ./graphdb.license:/usr/share/graphdb/conf/graphdb.license:ro
       # Test master key for the encrypted repositories (see manage-encrypted-repositories.spec.js)
       - ./test-e2e/encryption/test-master.key:/opt/graphdb/encryption/test-master.key:ro
     environment:
