@@ -1,10 +1,10 @@
 const {RDFRepositoryClient, GetStatementsPayload} = require('graphdb').repository;
+const {JsonLDParser} = require('graphdb').parser;
 const {GetQueryPayload, UpdateQueryPayload, QueryType, QueryLanguage} = require('graphdb').query;
 const {RDFMimeType} = require('graphdb').http;
 const {Readable} = require('stream');
 const N3 = require('n3');
 const {RdfXmlParser} = require('rdfxml-streaming-parser');
-const {JsonLdParser} = require('jsonld-streaming-parser');
 const {SparqlJsonParser} = require('sparqljson-parse');
 const {SparqlXmlParser} = require('sparqlxml-parse');
 const Utils = require('utils.js');
@@ -102,8 +102,9 @@ function parseRdfXml(text) {
   return collect(Readable.from([text]).pipe(new RdfXmlParser()));
 }
 
+// The client's own JSON-LD parser turns the triple terms that GraphDB encodes as IRIs into Quad terms.
 function parseJsonLd(text) {
-  return collect(Readable.from([text]).pipe(new JsonLdParser()));
+  return collect(new JsonLDParser().parse(Readable.from([text])));
 }
 
 function parseSparqlJson(text) {
