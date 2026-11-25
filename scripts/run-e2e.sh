@@ -6,7 +6,8 @@
 
 COMPOSE="docker compose --env-file .env -f docker-compose-e2e.yml"
 
-$COMPOSE build --no-cache
+# Stops on a failed build, so the tests never run on an older image
+$COMPOSE build --no-cache || exit $?
 
 $COMPOSE up -d --force-recreate --remove-orphans graphdb
 # Removes the tests container left by an interrupted run

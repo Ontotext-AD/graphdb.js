@@ -100,14 +100,25 @@ pipeline {
 
     post {
         always {
-          sh "mkdir -p test-e2e/reports && docker cp e2e-tests:/app/test-e2e/reports/junit.xml test-e2e/reports/ || true"
-          junit allowEmptyResults: true, testResults: 'test-e2e/reports/junit.xml'
-          sh "docker logs graphdb > graphdb.log 2>&1 || rm -f graphdb.log"
-          archiveArtifacts allowEmptyArchive: true, artifacts: 'graphdb.log'
-          sh "docker rm -f e2e-tests || true"
-          dir("test-e2e/") {
-            script {
-              dockerCompose.downCmd(composeFile: '../docker-compose-e2e.yml', removeOrphans: true, removeVolumes: true, removeImages: 'local', projectName: 'graphdbjs')
+          script {
+            // The cleanup runs even when a report step throws
+            try {
+              sh "docker logs graphdb > graphdb.log 2>&1 || rm -f graphdb.log"
+              archiveArtifacts allowEmptyArchive: true, artifacts: 'graphdb.log'
+
+              // Publishes only this build's report, not one left in the workspace by an earlier build
+              def reportCopied = sh(
+                script: "rm -rf test-e2e/reports && mkdir -p test-e2e/reports && docker cp e2e-tests:/app/test-e2e/reports/junit.xml test-e2e/reports/",
+                returnStatus: true
+              ) == 0
+              if (reportCopied) {
+                junit testResults: 'test-e2e/reports/junit.xml'
+              }
+            } finally {
+              sh "docker rm -f e2e-tests || true"
+              dir("test-e2e/") {
+                dockerCompose.downCmd(composeFile: '../docker-compose-e2e.yml', removeOrphans: true, removeVolumes: true, removeImages: 'local', projectName: 'graphdbjs')
+              }
             }
           }
         }
