@@ -1,5 +1,21 @@
-#!/bin/bash
+#!/bin/sh
+# Runs the acceptance tests in Docker. The console shows the build and the test
+# output, but not the GraphDB log, which is written to graphdb.log.
+# The Jenkinsfile mirrors these steps with Compose v1, a fixed project name and
+# no TTY, and publishes the JUnit report.
 
-docker compose --env-file .env -f docker-compose-e2e.yml build --no-cache
+COMPOSE="docker compose --env-file .env -f docker-compose-e2e.yml"
 
-docker compose --env-file .env -f docker-compose-e2e.yml up --abort-on-container-exit --exit-code-from e2e-tests
+$COMPOSE build --no-cache
+
+$COMPOSE up -d --force-recreate --remove-orphans graphdb
+# Removes the tests container left by an interrupted run
+docker rm -f e2e-tests > /dev/null 2>&1
+$COMPOSE run --name e2e-tests e2e-tests
+EXIT_CODE=$?
+
+$COMPOSE logs --no-color graphdb > graphdb.log
+docker rm -f e2e-tests > /dev/null
+$COMPOSE down --remove-orphans
+
+exit $EXIT_CODE

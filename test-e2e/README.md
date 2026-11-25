@@ -22,6 +22,9 @@ The GraphDB version used in CI is set with `GDB_VERSION` in the root `.env` file
 * To run the tests against GraphDB on another address, set the `GRAPHDB_URL`
 environment variable, e.g. `GRAPHDB_URL=http://localhost:7210 npm run test`.
 * Run the tests with `npm run test`.
+* To run GraphDB and the tests in Docker, run `npm run e2e:test:docker` in the
+root directory. The console shows the build and the test output, but not the
+GraphDB log, which is written to `graphdb.log` in the root directory.
  
 > Important note: For local development, you need to publish and install the 
 latest `graphdb.js` either from npm or from a local package created with 

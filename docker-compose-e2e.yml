@@ -33,6 +33,8 @@ services:
       - graphdbjsnetwork
     environment:
       - GRAPHDB_URL=http://graphdb:7200
+      # Keeps the graphdb.js logs out of the test output
+      - LOG_LEVEL=warn
 
 networks:
   graphdbjsnetwork:
