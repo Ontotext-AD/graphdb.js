@@ -12,5 +12,8 @@ module.exports = {
   globalSetup: './tests/global-setup.js',
 
   // Preparation/mocks before each test
-  setupFilesAfterEnv: [...defaults.setupFilesAfterEnv, './tests/jest.setup.js']
+  setupFilesAfterEnv: [...defaults.setupFilesAfterEnv, './tests/jest.setup.js'],
+
+  // Writes reports/junit.xml, which CI publishes in the Tests tab
+  reporters: ['default', ['jest-junit', {outputDirectory: 'reports', outputName: 'junit.xml'}]]
 };
