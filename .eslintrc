@@ -3,6 +3,7 @@
   "rules": {
     "no-console" : "error",
     "no-debugger": "error",
+    "max-len": "off",
     "no-unused-vars": ["warn"],
     "comma-dangle": ["error", {
       "objects": "never"
@@ -29,12 +30,7 @@
       "rules": {
         "require-jsdoc": "off",
         "prefer-promise-reject-errors": "off",
-        "valid-jsdoc": "off",
-        "max-len": ["error", {
-          "code": 120,
-          "tabWidth": 2,
-          "ignoreUrls": true
-        }]
+        "valid-jsdoc": "off"
       }
     }
   ]

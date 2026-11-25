@@ -23,10 +23,10 @@ describe('Statements with literal data types', () => {
     return addLiteral(predicate, 5).then(() => {
       return ask(`ASK { <${SUBJECT}> <${predicate}> 5 }`);
     }).then((result) => {
-      expect(result).toBe('true');
+      expect(result).toBe(true);
       return ask(`ASK { <${SUBJECT}> <${predicate}> ?o FILTER(isNumeric(?o) && ?o > 3) }`);
     }).then((result) => {
-      expect(result).toBe('true');
+      expect(result).toBe(true);
     });
   });
 
@@ -35,10 +35,10 @@ describe('Statements with literal data types', () => {
     return addLiteral(predicate, 1.5).then(() => {
       return ask(`ASK { <${SUBJECT}> <${predicate}> 1.5 }`);
     }).then((result) => {
-      expect(result).toBe('true');
+      expect(result).toBe(true);
       return ask(`ASK { <${SUBJECT}> <${predicate}> ?o FILTER(isNumeric(?o)) }`);
     }).then((result) => {
-      expect(result).toBe('true');
+      expect(result).toBe(true);
     });
   });
 
@@ -47,7 +47,7 @@ describe('Statements with literal data types', () => {
     return addLiteral(predicate, true).then(() => {
       return ask(`ASK { <${SUBJECT}> <${predicate}> true }`);
     }).then((result) => {
-      expect(result).toBe('true');
+      expect(result).toBe(true);
     });
   });
 
@@ -57,7 +57,7 @@ describe('Statements with literal data types', () => {
       return ask(`ASK { <${SUBJECT}> <${predicate}> ?o
         FILTER(datatype(?o) = <http://www.w3.org/2001/XMLSchema#integer>) }`);
     }).then((result) => {
-      expect(result).toBe('true');
+      expect(result).toBe(true);
     });
   });
 
@@ -74,6 +74,6 @@ describe('Statements with literal data types', () => {
       .setQuery(query)
       .setQueryType(QueryType.ASK)
       .setResponseType(RDFMimeType.BOOLEAN_RESULT);
-    return rdfClient.query(payload).then((resp) => Utils.readStream(resp));
+    return rdfClient.query(payload);
   }
 });

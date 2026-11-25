@@ -2,10 +2,12 @@
 
 ## Unreleased
 **Breaking changes:**
+* ASK queries with `RDFMimeType.BOOLEAN_RESULT` as the response type resolve to `true` or `false` instead of a stream. Callers that read the stream must be updated.
 * Upgraded `n3` to 2.x for RDF 1.2 support. `n3` 2.x formats Turtle/TriG output with different whitespace than 1.x, which may affect snapshots or string comparisons of serialized data, but does not affect semantic correctness or data round-tripping. Triple terms (RDF 1.2 feature) are now parsed as Quad instances in the object position of the quad; applications using triple terms should handle this new representation.
 * RDFStar tests (old `<<<s p o>>>` syntax) are skipped for GraphDB 12+ because GraphDB 12 migrated to RDF 1.2 triple terms (`<<(s p o)>>` syntax). The old RDFStar syntax is no longer supported in GraphDB 12.
 
 **New features:**
+* Added `BooleanResultParser`, exported from `parser`, which resolves `text/boolean` results to `true` or `false`. It is registered by default in the repository clients.
 * GraphDB 12 support with RDF 1.2. GraphDB 12 returns RDF 1.2 by default (`graphdb.default.rdf.writer.version`, GDB-14480), which includes support for triple terms (`<<( s p o )>>` syntax in Turtle, TriG, and N-Triples formats). The library now correctly parses these responses.
 * JSON-LD parser now converts Base64-encoded triple term IRIs (`urn:rdf4j:tripleTerm:*` from GraphDB 12, and `urn:rdf4j:triple:*` from GraphDB 11) to RDF/JS Quad objects with the triple as the object.
 * Added E2E tests for RDF 1.2 triple terms to verify parsing correctness with GraphDB 12.

@@ -107,7 +107,7 @@ class JsonLDParser extends ContentParser {
   constructor(config) {
     super(config);
 
-    this.parser = new JsonLdParser(this.config);
+    this.parser = new JsonLdParser({...this.config, allowTripleTerms: true});
   }
 
   /**

@@ -17,7 +17,8 @@ class TurtleParser extends ContentParser {
     super(config);
 
     this.parser = new Parser({
-      format: this.getSupportedType()
+      format: this.getSupportedType(),
+      allowTripleTerms: true
     });
   }
 

@@ -347,14 +347,14 @@ describe('RDFRepositoryClient - transactions', () => {
         .setTimeout(5);
 
       test('should query data', () => {
-        transactionHttpRequest.mockResolvedValue({data: true});
+        transactionHttpRequest.mockResolvedValue({data: Stream.Readable.from(['true'])});
         return transaction.query(payload).then((response) => {
           expect(response).toEqual(true);
         });
       });
 
       test('should properly perform query request', () => {
-        transactionHttpRequest.mockResolvedValue({data: true});
+        transactionHttpRequest.mockResolvedValue({data: Stream.Readable.from(['true'])});
         return transaction.query(payload).then(() => {
           const expectedRequest = HttpRequestBuilder.httpPut('')
             .setData('ask {?s ?p ?o}')
@@ -381,7 +381,7 @@ describe('RDFRepositoryClient - transactions', () => {
           .setResponseType(RDFMimeType.BOOLEAN_RESULT)
           .setInference(false)
           .setTimeout(5);
-        transactionHttpRequest.mockResolvedValue({data: true});
+        transactionHttpRequest.mockResolvedValue({data: Stream.Readable.from(['true'])});
         return transaction.query(formPayload).then(() => {
           const expectedRequest = HttpRequestBuilder.httpPut('')
             .setData('ask {?s ?p ?o}')

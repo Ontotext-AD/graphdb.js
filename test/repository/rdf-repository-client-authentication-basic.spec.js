@@ -120,8 +120,7 @@ describe('RDFRepositoryClient - authentication', () => {
         jest.fn().mockImplementation((request) => {
           if (request.getMethod() === 'get') {
             calls++;
-            if (repository.getLoggedUser()
-              && calls === 2) {
+            if (repository.getLoggedUser() && calls === 2) {
             // emulate token expiration
               repository.getLoggedUser().clearToken();
               return Promise.reject({
