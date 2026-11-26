@@ -129,4 +129,42 @@ describe('RDFRepositoryClient - Deleting statements', () => {
         .toEqual();
     });
   });
+
+  describe('deleteData(data)', () => {
+    const data = '<http://domain/resource/1> <http://domain/property/1> "value" .';
+    let transaction;
+
+    beforeEach(() => {
+      transaction = {
+        deleteData: jest.fn().mockResolvedValue(),
+        commit: jest.fn().mockResolvedValue(),
+        rollback: jest.fn().mockResolvedValue()
+      };
+      jest.spyOn(rdfRepositoryClient, 'beginTransaction').mockResolvedValue(transaction);
+    });
+
+    test('should delete the data in a transaction and commit it', () => {
+      return rdfRepositoryClient.deleteData(data).then(() => {
+        expect(transaction.deleteData).toHaveBeenCalledWith(data);
+        expect(transaction.commit).toHaveBeenCalledTimes(1);
+        expect(transaction.rollback).not.toHaveBeenCalled();
+      });
+    });
+
+    test('should roll back the transaction and reject when deleting fails', () => {
+      transaction.deleteData.mockRejectedValue(new Error('Delete failed'));
+      return expect(rdfRepositoryClient.deleteData(data))
+        .rejects.toThrow('Delete failed')
+        .then(() => {
+          expect(transaction.commit).not.toHaveBeenCalled();
+          expect(transaction.rollback).toHaveBeenCalledTimes(1);
+        });
+    });
+
+    test('should throw when no data is provided', () => {
+      expect(() => rdfRepositoryClient.deleteData(' '))
+        .toThrow('Turtle data is required when deleting statements');
+      expect(rdfRepositoryClient.beginTransaction).not.toHaveBeenCalled();
+    });
+  });
 });

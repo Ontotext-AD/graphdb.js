@@ -64,6 +64,9 @@ module.exports = {
   model: {
     Namespace: require('./model/namespace'),
     TermConverter: require('./model/term-converter'),
-    Types: require('./model/types')
+    Types: require('./model/types'),
+    RepositoryListResponse: require('./model/repository-list-response'),
+    UserResponse: require('./model/user-response'),
+    AuthSettingsResponse: require('./model/auth-settings-response')
   }
 };

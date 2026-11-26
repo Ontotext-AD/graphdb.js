@@ -47,27 +47,27 @@ function createRepository(serverClient) {
       "value": ""
     }
   };
-  const config = new RepositoryConfig(NEW_REPO, '',
-    params, '', 'Repo title', RepositoryType.GRAPHDB);
+  const config = new RepositoryConfig({
+    id: NEW_REPO, location: '', params: params, sesameType: '', title: 'Repo title', type: RepositoryType.GRAPHDB});
 
-  return serverClient.getRepositoryIDs()
+  return serverClient.getRepositories()
     .then((response) => {
       const expected = [];
-      expect(response.sort()).toEqual(expected);
+      expect(response.getRepositoryIds().sort()).toEqual(expected);
     }).then(() => {
       return serverClient.createRepository(config);
     }).then(() => {
-      return serverClient.getRepositoryIDs();
+      return serverClient.getRepositories();
     }).then((response) => {
       const expected = [NEW_REPO];
-      expect(response.sort()).toEqual(expected);
+      expect(response.getRepositoryIds().sort()).toEqual(expected);
     }).then(() => {
       return serverClient.deleteRepository(config.id);
     }).then(() => {
-      return serverClient.getRepositoryIDs();
+      return serverClient.getRepositories();
     }).then((response) => {
       const expected = [];
-      expect(response).toEqual(expected);
+      expect(response.getRepositoryIds()).toEqual(expected);
     }).catch((e) => {
       throw new Error(e);
     });

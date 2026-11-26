@@ -8,11 +8,10 @@ const RepositoryClientConfig =
 const RDFRepositoryClient = require('../repository/rdf-repository-client');
 
 // Imports used by TypeScript type generation
-const ServerClientConfig = require('./server-client-config');
 const RepositoryConfig = require('../repository/repository-config');
-const RepositoryType = require('../repository/repository-type');
-const HttpResponse = require('../http/http-response');
-const AppSettings = require('./app-settings');
+const RepositoryListResponse = require('../model/repository-list-response');
+const UserResponse = require('../model/user-response');
+const AuthSettingsResponse = require('../model/auth-settings-response');
 
 const REPOSITORY_SERVICE_URL = '/rest/repositories';
 const SECURITY_SERVICE_URL = '/rest/security';
@@ -32,22 +31,22 @@ const SECURITY_SERVICE_URL = '/rest/security';
  */
 class GraphDBServerClient extends Server {
   /**
-  * Retrieves the list of repository IDs from the specified location.
-  *
-  * @param {string} [location] - Optional repository location. If provided,
-  *                              the request will be executed for
-  *                              the specified location.
-  * @return {Promise<string[]>} A promise that resolves to an array
-  *                             of repository IDs.
-  */
-  getRepositoryIDs(location) {
+   * Retrieves the list of repositories from the specified location.
+   *
+   * @param {string} [location] - Optional repository location. If provided,
+   *                              the request will be executed for
+   *                              the specified location.
+   * @return {Promise<RepositoryListResponse>} A promise that resolves to
+   *         a RepositoryListResponse containing repository descriptors.
+   */
+  getRepositories(location) {
     const locationParameter = this.getLocationParameter(location);
-    const url = `${REPOSITORY_SERVICE_URL}${locationParameter}`;
+    const url = `${REPOSITORY_SERVICE_URL}/all${locationParameter}`;
     const requestBuilder = HttpRequestBuilder
       .httpGet(url)
       .addAcceptHeader(MediaType.APPLICATION_JSON);
     return this.execute(requestBuilder).then((response) => {
-      return response.getData().map((repository) => repository.id);
+      return new RepositoryListResponse(response.getData());
     });
   }
 
@@ -64,8 +63,8 @@ class GraphDBServerClient extends Server {
     if (!id) {
       throw new Error('Repository id is required parameter!');
     }
-    return this.getRepositoryIDs(location).then((repositories) => {
-      return repositories.indexOf(id) !== -1;
+    return this.getRepositories(location).then((response) => {
+      return response.getRepositoryIds().indexOf(id) !== -1;
     });
   }
 
@@ -75,17 +74,18 @@ class GraphDBServerClient extends Server {
    * @param {string} id of the repository
    * @param {RepositoryClientConfig} config for the overridable repository
    *    configuration.
+   * @param {string} [location] The location of the repository (optional).
    * @return {Promise<RDFRepositoryClient>} promise which resolves with
    *    new RDFRepositoryClient instance.
    */
-  getRepository(id, config) {
+  getRepository(id, config, location) {
     if (!id) {
       throw new Error('Repository id is required parameter!');
     }
     if (!config || !(config instanceof RepositoryClientConfig)) {
       throw new Error('RepositoryClientConfig is required parameter!');
     }
-    return this.hasRepository(id).then((exists) => {
+    return this.hasRepository(id, location).then((exists) => {
       if (exists) {
         return new RDFRepositoryClient(config);
       }
@@ -123,8 +123,8 @@ class GraphDBServerClient extends Server {
    * @param {RepositoryType|String} repositoryType the type for which a
    * default configuration is required
    *
-   * @return {Promise<HttpResponse|Error>} a promise which resolves to response
-   * wrapper or rejects with error if thrown during execution.
+   * @return {Promise<RepositoryConfig>} a promise which resolves to a
+   * RepositoryConfig or rejects with error if thrown during execution.
    */
   getDefaultConfig(repositoryType) {
     if (!repositoryType) {
@@ -135,7 +135,9 @@ class GraphDBServerClient extends Server {
       .httpGet(
         `${REPOSITORY_SERVICE_URL}/default-config/${repositoryType}`)
       .addAcceptHeader(MediaType.APPLICATION_JSON);
-    return this.execute(requestBuilder);
+    return this.execute(requestBuilder).then((response) => {
+      return new RepositoryConfig(response.getData());
+    });
   }
 
   /**
@@ -145,8 +147,8 @@ class GraphDBServerClient extends Server {
    *                              is to be retrieved.
    * @param {string} [location] The optional location of the repository.
    *
-   * @return {Promise<HttpResponse|string|Error>} A promise that resolves to
-   *         the response wrapper, or rejects with an error if one occurs
+   * @return {Promise<RepositoryConfig>} A promise that resolves to
+   *         a RepositoryConfig, or rejects with an error if one occurs
    *         during the execution.
    */
   getRepositoryConfig(repositoryId, location) {
@@ -157,12 +159,15 @@ class GraphDBServerClient extends Server {
     const loc = this.getLocationParameter(location);
     const requestBuilder = HttpRequestBuilder
       .httpGet(`${REPOSITORY_SERVICE_URL}/${repositoryId}${loc}`)
-      .addContentTypeHeader(MediaType.APPLICATION_JSON);
-    return this.execute(requestBuilder);
+      .addAcceptHeader(MediaType.APPLICATION_JSON);
+    return this.execute(requestBuilder).then((response) => {
+      return new RepositoryConfig(response.getData());
+    });
   }
 
   /**
-   * Download the repository configuration in turtle format
+   * Download the repository configuration in turtle format using content
+   * negotiation.
    *
    * @param {string} repositoryId the repository id
    * @param {string} [location] optional repository location
@@ -172,10 +177,13 @@ class GraphDBServerClient extends Server {
    * strings as soon as they are available. Resolves to turtle format.
    */
   downloadRepositoryConfig(repositoryId, location) {
+    if (!repositoryId) {
+      throw new Error('Repository id is required parameter!');
+    }
     const loc = this.getLocationParameter(location);
     const requestBuilder = HttpRequestBuilder
-      .httpGet(`${REPOSITORY_SERVICE_URL}/${repositoryId}/download-ttl${loc}`)
-      .addContentTypeHeader(MediaType.TEXT_TURTLE)
+      .httpGet(`${REPOSITORY_SERVICE_URL}/${repositoryId}${loc}`)
+      .addAcceptHeader(MediaType.TEXT_TURTLE)
       .setResponseType('stream');
     return this.execute(requestBuilder).then((response) => {
       this.logger.debug(LoggingUtils.getLogPayload(response,
@@ -190,18 +198,62 @@ class GraphDBServerClient extends Server {
    * @param {RepositoryConfig} repositoryConfig The configuration of
    *                                    the repository to be created.
    *
-   * @return {Promise<HttpResponse|Error>} A promise that resolves to
-   *         the response wrapper, or rejects with an error if one occurs
+   * @return {Promise<void>} A promise that resolves when the repository
+   *         is successfully created, or rejects with an error if one occurs
    *         during execution.
    */
   createRepository(repositoryConfig) {
-    const location = this.getLocationParameter(repositoryConfig.location);
-    const requestBuilder = HttpRequestBuilder
-      .httpPut(`${REPOSITORY_SERVICE_URL}/${repositoryConfig.id}${location}`)
+    if (!repositoryConfig) {
+      throw new Error('RepositoryConfig is required parameter!');
+    }
+    const requestBuilder = HttpRequestBuilder.httpPost(REPOSITORY_SERVICE_URL);
+    return this.sendRepositoryConfig(requestBuilder, repositoryConfig,
+      'Created repository');
+  }
+
+  /**
+   * Updates an existing repository with the provided configuration.
+   *
+   * @param {RepositoryConfig} repositoryConfig The configuration of
+   *                                    the repository to be updated.
+   *
+   * @return {Promise<void>} A promise that resolves when the repository
+   *         is successfully updated, or rejects with an error if one occurs
+   *         during execution.
+   */
+  updateRepository(repositoryConfig) {
+    if (!repositoryConfig) {
+      throw new Error('RepositoryConfig is required parameter!');
+    }
+    if (!repositoryConfig.id) {
+      throw new Error('Repository id is required parameter!');
+    }
+    const url = `${REPOSITORY_SERVICE_URL}/${repositoryConfig.id}`;
+    return this.sendRepositoryConfig(HttpRequestBuilder.httpPut(url),
+      repositoryConfig, 'Updated repository');
+  }
+
+  /**
+   * Sends the repository configuration as the request body. The location of
+   * the repository is part of the configuration, so no query parameter is
+   * added.
+   *
+   * @private
+   *
+   * @param {HttpRequestBuilder} requestBuilder The create or update request.
+   * @param {RepositoryConfig} repositoryConfig The configuration to send.
+   * @param {string} message The message to log on success.
+   *
+   * @return {Promise<void>} A promise that resolves when the request succeeds.
+   */
+  sendRepositoryConfig(requestBuilder, repositoryConfig, message) {
+    const configuredRequest = requestBuilder
       .setData(this.objectToJson(repositoryConfig))
       .addContentTypeHeader(MediaType.APPLICATION_JSON)
       .addAcceptHeader(MediaType.TEXT_PLAIN);
-    return this.execute(requestBuilder);
+    return this.execute(configuredRequest).then(() => {
+      this.logger.info({repoId: repositoryConfig.id}, message);
+    });
   }
 
   /**
@@ -231,23 +283,49 @@ class GraphDBServerClient extends Server {
   }
 
   /**
+   * Restarts a repository.
+   *
+   * @param {string} repositoryId The ID of the repository to restart.
+   * @param {string} [location] The optional location of the repository.
+   *
+   * @return {Promise<void>} A promise that resolves when the repository
+   *         is successfully restarted, or rejects with an error if one occurs
+   *         during execution.
+   */
+  restartRepository(repositoryId, location) {
+    if (!repositoryId) {
+      throw new Error('Repository id is required parameter!');
+    }
+
+    const loc = this.getLocationParameter(location);
+    const url = `${REPOSITORY_SERVICE_URL}/${repositoryId}/restart${loc}`;
+    const requestBuilder = HttpRequestBuilder.httpPost(url);
+    return this.execute(requestBuilder).then(() => {
+      this.logger.info({repositoryId}, 'Restarted repository');
+    });
+  }
+
+  /**
    * Checks if GraphDB security is enabled.
-   * @return {Promise<HttpResponse|Error>} a promise which resolves
-   * to response wrapper or rejects with error if thrown during execution.
+   * @return {Promise<boolean>} a promise which resolves to <code>true</code>
+   * if security is enabled and <code>false</code> otherwise, or rejects with
+   * error if thrown during execution.
    */
   isSecurityEnabled() {
     const requestBuilder =
       HttpRequestBuilder.httpGet(SECURITY_SERVICE_URL)
         .addAcceptHeader(MediaType.APPLICATION_JSON);
-    return this.execute(requestBuilder);
+    return this.execute(requestBuilder).then((response) => {
+      return response.getData();
+    });
   }
 
   /**
    * Enable or disable GraphDB security.
    * @param {boolean} enabled <code>true</code> if security is enabled and
    * <code>false</code> otherwise.
-   * @return {Promise<HttpResponse|Error>} a promise which resolves
-   * to response wrapper or rejects with error if thrown during execution.
+   * @return {Promise<void>} a promise which resolves when the security setting
+   * is successfully changed, or rejects with error if thrown during execution.
    */
   toggleSecurity(enabled) {
     const requestBuilder =
@@ -255,7 +333,9 @@ class GraphDBServerClient extends Server {
         .httpPost(`${SECURITY_SERVICE_URL}?useSecurity=${enabled}`)
         .addContentTypeHeader(MediaType.APPLICATION_JSON)
         .setData(`${enabled}`);
-    return this.execute(requestBuilder);
+    return this.execute(requestBuilder).then(() => {
+      this.logger.info({enabled}, 'Toggled security');
+    });
   }
 
   /**
@@ -266,14 +346,15 @@ class GraphDBServerClient extends Server {
    * application settings may possibly change the behavior of the
    * GraphDB Workbench for the logged-in user or for all users
    * if logged in as admin.
-   * @param {boolean} enabled <code>true</code> if free access is enabled and
-   * <code>false</code> otherwise.
+   * @param {boolean} enabled <code>true</code> if free access is enabled
+   * and <code>false</code> otherwise.
    * @param {string[]} authorities additional permissions of the free access
    * user, see {@link Authority}
    * @param {AppSettings} appSettings configure the default behavior
    * of the GraphDB Workbench
-   * @return {Promise<HttpResponse|Error>} a promise which resolves
-   * to response wrapper or rejects with error if thrown during execution.
+   * @return {Promise<void>} a promise which resolves when the free access
+   * setting is successfully updated, or rejects with error if thrown
+   * during execution.
    */
   updateFreeAccess(enabled, authorities, appSettings) {
     const requestBuilder =
@@ -286,20 +367,25 @@ class GraphDBServerClient extends Server {
           authorities,
           enabled
         });
-    return this.execute(requestBuilder);
+    return this.execute(requestBuilder).then(() => {
+      this.logger.info({enabled}, 'Updated free access');
+    });
   }
 
   /**
    * Check if free access is enabled
-   * @return {Promise<HttpResponse|Error>} a promise which resolves
-   * to response wrapper or rejects with error if thrown during execution.
+   * @return {Promise<AuthSettingsResponse>} a promise which resolves
+   * to an AuthSettingsResponse or rejects with error if thrown during
+   * execution.
    */
   getFreeAccess() {
     const requestBuilder =
       HttpRequestBuilder
         .httpGet(`${SECURITY_SERVICE_URL}/free-access`)
-        .addContentTypeHeader(MediaType.APPLICATION_JSON);
-    return this.execute(requestBuilder);
+        .addAcceptHeader(MediaType.APPLICATION_JSON);
+    return this.execute(requestBuilder).then((response) => {
+      return new AuthSettingsResponse(response.getData());
+    });
   }
 
   /**
@@ -310,8 +396,8 @@ class GraphDBServerClient extends Server {
    * permissions and custom roles, see {@link Authority}
    * @param {AppSettings} [appSettings] configure the default behavior
    * of the GraphDB Workbench
-   * @return {Promise<HttpResponse|Error>} a promise which resolves
-   * to response wrapper or rejects with error if thrown during execution.
+   * @return {Promise<void>} a promise which resolves when the user is
+   * successfully created, or rejects with error if thrown during execution.
    */
   createUser(username, password, grantedAuthorities, appSettings) {
     const requestBuilder =
@@ -325,7 +411,9 @@ class GraphDBServerClient extends Server {
           grantedAuthorities,
           appSettings: this.objectToJson(appSettings)
         });
-    return this.execute(requestBuilder);
+    return this.execute(requestBuilder).then(() => {
+      this.logger.info({username}, 'Created user');
+    });
   }
 
   /**
@@ -339,8 +427,8 @@ class GraphDBServerClient extends Server {
    * permissions and custom roles, see {@link Authority}
    * @param {AppSettings} [appSettings] configure the default behavior
    * of the GraphDB Workbench
-   * @return {Promise<HttpResponse|Error>} a promise which resolves
-   * to response wrapper or rejects with error if thrown during execution.
+   * @return {Promise<void>} a promise which resolves when the user is
+   * successfully updated, or rejects with error if thrown during execution.
    */
   updateUser(username, password, grantedAuthorities, appSettings) {
     const requestBuilder =
@@ -354,7 +442,9 @@ class GraphDBServerClient extends Server {
           grantedAuthorities,
           appSettings: this.objectToJson(appSettings)
         });
-    return this.execute(requestBuilder);
+    return this.execute(requestBuilder).then(() => {
+      this.logger.info({username}, 'Updated user');
+    });
   }
 
   /**
@@ -366,8 +456,8 @@ class GraphDBServerClient extends Server {
    * @param {string} [password] User password
    * @param {AppSettings} [appSettings] configure the default behavior
    * of the GraphDB Workbench
-   * @return {Promise<HttpResponse|Error>} a promise which resolves
-   * to response wrapper or rejects with error if thrown during execution.
+   * @return {Promise<void>} a promise which resolves when the user data is
+   * successfully updated, or rejects with error if thrown during execution.
    */
   updateUserData(username, password, appSettings) {
     const requestBuilder =
@@ -380,35 +470,57 @@ class GraphDBServerClient extends Server {
           password,
           appSettings: this.objectToJson(appSettings)
         });
-    return this.execute(requestBuilder);
+    return this.execute(requestBuilder).then(() => {
+      this.logger.info({username}, 'Updated user data');
+    });
   }
 
   /**
    * Get a user
    * @param {string} username User name
-   * @return {Promise<HttpResponse|Error>} a promise which resolves
-   * to response wrapper or rejects with error if thrown during execution.
+   * @return {Promise<UserResponse>} a promise which resolves
+   * to a UserResponse or rejects with error if thrown during execution.
    */
   getUser(username) {
     const requestBuilder =
       HttpRequestBuilder
         .httpGet(this.getUserUrl(username))
-        .addContentTypeHeader(MediaType.APPLICATION_JSON);
-    return this.execute(requestBuilder);
+        .addAcceptHeader(MediaType.APPLICATION_JSON);
+    return this.execute(requestBuilder).then((response) => {
+      return new UserResponse(response.getData());
+    });
+  }
+
+  /**
+   * Retrieves all users.
+   * @return {Promise<UserResponse[]>} a promise which resolves
+   * to an array of UserResponse or rejects with error if thrown during
+   * execution.
+   */
+  getUsers() {
+    const requestBuilder =
+      HttpRequestBuilder
+        .httpGet(`${SECURITY_SERVICE_URL}/users`)
+        .addAcceptHeader(MediaType.APPLICATION_JSON);
+    return this.execute(requestBuilder).then((response) => {
+      return response.getData().map((user) => new UserResponse(user));
+    });
   }
 
   /**
    * Deletes a user
    * @param {string} username User name
-   * @return {Promise<HttpResponse|Error>} a promise which resolves
-   * to response wrapper or rejects with error if thrown during execution.
+   * @return {Promise<void>} a promise which resolves when the user is
+   * successfully deleted, or rejects with error if thrown during execution.
    */
   deleteUser(username) {
     const requestBuilder =
       HttpRequestBuilder
         .httpDelete(this.getUserUrl(username))
         .addAcceptHeader(MediaType.TEXT_PLAIN);
-    return this.execute(requestBuilder);
+    return this.execute(requestBuilder).then(() => {
+      this.logger.info({username}, 'Deleted user');
+    });
   }
 
   /**

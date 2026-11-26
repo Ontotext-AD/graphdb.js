@@ -9,27 +9,36 @@
  *  @class
  *  @author Teodossi Dossev
  */
-export class AppSettings {
+class AppSettings {
   /**
    * Constructor.
-   * @param {boolean} defaultInference This is the default value for
+   * @param {Object} options Configuration options
+   * @param {boolean} [options.DEFAULT_INFERENCE] This is the default value for
    * the Include inferred data in results option in the Workbench's SPARQL
-   * editor. It is taken each time a new tab is created.
-   * @param {boolean} defaultSameas This is the default value for
+   * editor. It is taken each time a new tab is created. Default: true
+   * @param {boolean} [options.DEFAULT_SAMEAS] This is the default value for
    * the Expand results over owl:SameAs option in the Workbench's
-   * SPARQL editor. It is taken each time a new tab is created.
-   * @param {boolean} ignoreSharedQueries Whether to ignore
-   * shared between users queries.
-   * @param {boolean} executeCount For each query without limit
+   * SPARQL editor. It is taken each time a new tab is created. Default: true
+   * @param {boolean} [options.IGNORE_SHARED_QUERIES] Whether to ignore
+   * shared between users queries. Default: false
+   * @param {boolean} [options.EXECUTE_COUNT] For each query without limit
    * sent through the SPARQL editor, an additional query is sent
-   * to determine the total number of results.
+   * to determine the total number of results. Default: true
+   * @param {boolean} [options.DEFAULT_VIS_GRAPH_SCHEMA] Default graph schema
+   * for visualization. Default: true
    */
-  constructor(defaultInference, defaultSameas,
-      ignoreSharedQueries, executeCount) {
-    this.defaultInference = defaultInference;
-    this.defaultSameas = defaultSameas;
-    this.ignoreSharedQueries = ignoreSharedQueries;
-    this.executeCount = executeCount;
+  constructor({
+    DEFAULT_INFERENCE = true,
+    DEFAULT_SAMEAS = true,
+    IGNORE_SHARED_QUERIES = false,
+    EXECUTE_COUNT = true,
+    DEFAULT_VIS_GRAPH_SCHEMA = true
+  } = {}) {
+    this.DEFAULT_INFERENCE = DEFAULT_INFERENCE;
+    this.DEFAULT_SAMEAS = DEFAULT_SAMEAS;
+    this.IGNORE_SHARED_QUERIES = IGNORE_SHARED_QUERIES;
+    this.EXECUTE_COUNT = EXECUTE_COUNT;
+    this.DEFAULT_VIS_GRAPH_SCHEMA = DEFAULT_VIS_GRAPH_SCHEMA;
   }
 
   /**
@@ -39,18 +48,18 @@ export class AppSettings {
    * @return {AppSettings}
    */
   setDefaultInference(defaultInference) {
-    this.defaultInference = defaultInference;
+    this.DEFAULT_INFERENCE = defaultInference;
     return this;
   }
 
   /**
-   * DefaultSameas setter.
-   * @param {boolean} defaultSameas <code>true</code> if is enabled and
+   * DefaultSameAs setter.
+   * @param {boolean} defaultSameAs <code>true</code> if is enabled and
    * <code>false</code> otherwise.
    * @return {AppSettings}
    */
-  setDefaultSameas(defaultSameas) {
-    this.defaultSameas = defaultSameas;
+  setDefaultSameAs(defaultSameAs) {
+    this.DEFAULT_SAMEAS = defaultSameAs;
     return this;
   }
 
@@ -61,7 +70,7 @@ export class AppSettings {
    * @return {AppSettings}
    */
   setIgnoreSharedQueries(ignoreSharedQueries) {
-    this.ignoreSharedQueries = ignoreSharedQueries;
+    this.IGNORE_SHARED_QUERIES = ignoreSharedQueries;
     return this;
   }
 
@@ -72,7 +81,18 @@ export class AppSettings {
    * @return {AppSettings}
    */
   setExecuteCount(executeCount) {
-    this.executeCount = executeCount;
+    this.EXECUTE_COUNT = executeCount;
+    return this;
+  }
+
+  /**
+   * Default vis graph schema setter.
+   * @param {boolean} defaultVisGraphSchema The default graph schema
+   * for visualization
+   * @return {AppSettings}
+   */
+  setDefaultVisGraphSchema(defaultVisGraphSchema) {
+    this.DEFAULT_VIS_GRAPH_SCHEMA = defaultVisGraphSchema;
     return this;
   }
 
@@ -82,10 +102,11 @@ export class AppSettings {
    */
   toJson() {
     return {
-      DEFAULT_INFERENCE: this.defaultInference,
-      DEFAULT_SAMEAS: this.defaultSameas,
-      IGNORE_SHARED_QUERIES: this.ignoreSharedQueries,
-      EXECUTE_COUNT: this.executeCount
+      DEFAULT_INFERENCE: this.DEFAULT_INFERENCE,
+      DEFAULT_SAMEAS: this.DEFAULT_SAMEAS,
+      IGNORE_SHARED_QUERIES: this.IGNORE_SHARED_QUERIES,
+      EXECUTE_COUNT: this.EXECUTE_COUNT,
+      DEFAULT_VIS_GRAPH_SCHEMA: this.DEFAULT_VIS_GRAPH_SCHEMA
     };
   }
 }

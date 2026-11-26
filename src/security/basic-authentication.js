@@ -15,7 +15,7 @@ export class BasicAuthentication extends Authentication {
    */
   getLoginRequestBuilder() {
     const username = this.clientConfig.getUsername();
-    const pass = this.clientConfig.getPass();
+    const pass = this.clientConfig.getPassword();
     const credentials = `${username}:${pass}`;
     return HttpRequestBuilder.httpGet(`/rest/security/authenticated-user`)
       .addAuthorizationHeader(`Basic ${this.toBase64(credentials)}`);

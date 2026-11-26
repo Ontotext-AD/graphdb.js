@@ -23,12 +23,17 @@ describe('Manage encrypted GraphDB repositories', () => {
 
   beforeAll(() => {
     return serverClient.getDefaultConfig(RepositoryType.GRAPHDB)
-      .then((response) => {
-        const params = response.response.data.params;
+      .then((config) => {
+        const params = config.params;
         params.storageEncryption.value = 'true';
-        const config = new RepositoryConfig(ENCRYPTED_REPO_NAME, '', params,
-          '', 'Encrypted repo', RepositoryType.GRAPHDB);
-        return serverClient.createRepository(config);
+        const repositoryConfig = new RepositoryConfig({
+          id: ENCRYPTED_REPO_NAME,
+          location: '',
+          params: params,
+          sesameType: '',
+          title: 'Encrypted repo',
+          type: RepositoryType.GRAPHDB});
+        return serverClient.createRepository(repositoryConfig);
       }).then(() => {
         const sampleTurtle = path.resolve(__dirname, './../data/sample-turtle.ttl');
         return rdfClient.addFile(sampleTurtle, RDFMimeType.TURTLE, null, null);
@@ -40,8 +45,8 @@ describe('Manage encrypted GraphDB repositories', () => {
   });
 
   test('Should get the storage encryption of the repo config', () => {
-    return serverClient.getRepositoryConfig(ENCRYPTED_REPO_NAME).then((response) => {
-      expect(response.response.data.params.storageEncryption).toEqual({
+    return serverClient.getRepositoryConfig(ENCRYPTED_REPO_NAME).then((config) => {
+      expect(config.params.storageEncryption).toEqual({
         name: 'storageEncryption',
         label: 'Encrypt storage',
         value: 'true'
