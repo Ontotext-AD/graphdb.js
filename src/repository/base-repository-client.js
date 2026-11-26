@@ -7,6 +7,7 @@ const Iterable = require('../util/iterable');
 const HttpResponse = require('../http/http-response');
 const LoggingUtils = require('../logging/logging-utils');
 const AuthenticationService = require('../service/authentication-service');
+const BooleanResultParser = require('../parser/boolean-result-parser');
 
 /**
  * Set of HTTP status codes for which requests could be re-attempted.
@@ -54,6 +55,7 @@ class BaseRepositoryClient {
    */
   initParsers() {
     this.parserRegistry = new ParserRegistry();
+    this.parserRegistry.register(new BooleanResultParser());
   }
 
   /**
@@ -102,19 +104,26 @@ class BaseRepositoryClient {
    * returns the content untouched. If <code>contentType</code> is provided it
    * should be an instance of {@link RDFMimeType} enum and is used as a key
    * for selecting appropriate parser from the parsers registry.
-   * Parsing is done synchronously!
+   * Parsing can be synchronous or asynchronous.
    *
    * @protected
    * @param {string} content
    * @param {string} responseType
    * @param {Object} [parserConfig] optional parser configuration
-   * @return {(string|Term|Term[])}
+   * @return {(string|Term|Term[]|Promise)}
    */
   parse(content, responseType, parserConfig = {}) {
     if (!this.parserRegistry.get(responseType)) {
       return content;
     }
     const parser = this.parserRegistry.get(responseType);
+
+    // If streaming parser but content is not a stream, return as-is
+    if (parser.isStreaming()) {
+      if (!content || typeof content.on !== 'function') {
+        return content;
+      }
+    }
 
     const startTime = Date.now();
     const parsed = parser.parse(content, parserConfig);

@@ -586,8 +586,6 @@ const payload = new GetQueryPayload()
   .setQueryType(QueryType.ASK)
   .setResponseType(RDFMimeType.BOOLEAN_RESULT);
 
-repository.registerParser(new SparqlJsonResultParser());
-
 return repository.query(payload).then((data) => {
   // data => true|false
 });
@@ -867,7 +865,7 @@ that type.
 
 #### Registering parser in the repository
 
-Parsers should be registered in the repository before executing any request.
+Parsers for response types other than `text/boolean` should be registered in the repository before executing a request that uses them. `BooleanResultParser` is registered by default.
 
 ```javascript
 // Import any of the predefined parsers
@@ -893,8 +891,9 @@ The library provides convenient parser wrappers for the rdf formats using third 
 * `application/rdf+xml`: RDFXmlParser ([rdfxml-streaming-parser](https://github.com/rdfjs/rdfxml-streaming-parser.js))
 
 For SELECT query results in `json` and `xml` formats as well as boolean results from ASK queries following parsers are wrapped and exposed:
-* `application/sparql-results+xml`, `text/boolean`: SparqlXmlResultParser ([sparqlxml-parse](https://github.com/rubensworks/sparqlxml-parse.js))
-* `application/sparql-results+json`, `text/boolean`: SparqlJsonResultParser ([sparqljson-parse](https://github.com/rubensworks/sparqljson-parse.js))
+* `application/sparql-results+xml`: SparqlXmlResultParser ([sparqlxml-parse](https://github.com/rubensworks/sparqlxml-parse.js))
+* `application/sparql-results+json`: SparqlJsonResultParser ([sparqljson-parse](https://github.com/rubensworks/sparqljson-parse.js))
+* `text/boolean`: BooleanResultParser, registered by default. It resolves ASK results to `true` or `false`.
 
 ### rdf*/sparql*
  The library provides basic support of extend RDF with a notion of nested triples, also known as [reification](https://www.w3.org/TR/rdf-mt/#Reif).
