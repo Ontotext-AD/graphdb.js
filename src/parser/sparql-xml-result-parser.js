@@ -25,7 +25,8 @@ class SparqlXmlResultParser extends ContentParser {
     super(config);
 
     this.parser = new SparqlXmlParser({
-      dataFactory: DataFactory
+      dataFactory: DataFactory,
+      allowTripleTerms: true
     });
   }
 

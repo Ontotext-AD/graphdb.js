@@ -25,7 +25,8 @@ class SparqlJsonResultParser extends ContentParser {
     super(config);
 
     this.parser = new SparqlJsonParser({
-      dataFactory: DataFactory
+      dataFactory: DataFactory,
+      allowTripleTerms: true
     });
   }
 

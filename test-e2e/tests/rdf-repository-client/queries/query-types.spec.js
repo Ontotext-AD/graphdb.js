@@ -3,6 +3,7 @@ const Utils = require('utils.js');
 const Config = require('config.js');
 const {GetQueryPayload, QueryType, QueryLanguage, UpdateQueryPayload} = require('graphdb').query;
 const {RDFMimeType} = require('graphdb').http;
+const {SparqlJsonResultParser} = require('graphdb').parser;
 
 describe('Query types', () => {
   let rdfClient = new RDFRepositoryClient(Config.restApiConfig);
@@ -30,28 +31,46 @@ describe('Query types', () => {
     });
   });
 
-  test('Should make an ASK query', () => {
+  test('Should resolve ASK queries with SPARQL JSON results to boolean values', () => {
+    const jsonClient = new RDFRepositoryClient(Config.restApiConfig);
+    jsonClient.registerParser(new SparqlJsonResultParser());
+
     let payloadTrue = new GetQueryPayload()
       .setQuery('ask { ?s <http://www.w3.org/2000/01/rdf-schema#label> ?o }')
       .setQueryType(QueryType.ASK)
-      .setResponseType(RDFMimeType.SPARQL_RESULTS_JSON)
+      .setResponseType(RDFMimeType.SPARQL_RESULTS_JSON);
+
+    let payloadFalse = new GetQueryPayload()
+      .setQuery('ask { ?s <http://www.w3.org/2000/01/rdf-schema#labels> ?o }')
+      .setQueryType(QueryType.ASK)
+      .setResponseType(RDFMimeType.SPARQL_RESULTS_JSON);
+
+    return jsonClient.query(payloadTrue).then((result) => {
+      expect(result).toBe(true);
+      return jsonClient.query(payloadFalse);
+    }).then((result) => {
+      expect(result).toBe(false);
+    });
+  });
+
+  test('Should resolve ASK queries to boolean values', () => {
+    let payloadTrue = new GetQueryPayload()
+      .setQuery('ask { ?s <http://www.w3.org/2000/01/rdf-schema#label> ?o }')
+      .setQueryType(QueryType.ASK)
       .setResponseType(RDFMimeType.BOOLEAN_RESULT);
 
     let payloadFalse = new GetQueryPayload()
       .setQuery('ask { ?s <http://www.w3.org/2000/01/rdf-schema#labels> ?o }')
       .setQueryType(QueryType.ASK)
-      .setResponseType(RDFMimeType.SPARQL_RESULTS_JSON)
       .setResponseType(RDFMimeType.BOOLEAN_RESULT);
 
-    return rdfClient.query(payloadTrue).then((resp) => {
-      return Utils.readStream(resp);
-    }).then((stream) => {
-      expect(stream).toBe('true');
+    return rdfClient.query(payloadTrue).then((result) => {
+      expect(typeof result).toBe('boolean');
+      expect(result).toBe(true);
       return rdfClient.query(payloadFalse);
-    }).then((resp) => {
-      return Utils.readStream(resp);
-    }).then((stream) => {
-      expect(stream).toBe('false');
+    }).then((result) => {
+      expect(typeof result).toBe('boolean');
+      expect(result).toBe(false);
     });
   });
 

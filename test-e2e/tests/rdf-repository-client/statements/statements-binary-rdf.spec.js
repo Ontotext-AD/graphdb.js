@@ -48,8 +48,8 @@ describe('Statements as binary RDF', () => {
         .setQueryType(QueryType.ASK)
         .setResponseType(RDFMimeType.BOOLEAN_RESULT);
       return targetClient.query(query);
-    }).then((resp) => Utils.readStream(resp)).then((result) => {
-      expect(result).toBe('true');
+    }).then((result) => {
+      expect(result).toBe(true);
     });
   });
 });
