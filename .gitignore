@@ -11,3 +11,5 @@ dist
 .vscode
 coverage/
 .npmrc
+graphdb.log
+test-e2e/reports/

@@ -25,6 +25,11 @@
             "label": "Enable the SHACL validation",
             "value": "true"
         },
+        "validationReportSkipShapesAndGraphs": {
+            "name": "validationReportSkipShapesAndGraphs",
+            "label": "Skip shapes and graphs in the validation report",
+            "value": "false"
+        },
         "ftsStringLiteralsIndex": {
             "name": "ftsStringLiteralsIndex",
             "label": "FTS index for xsd:string literals",

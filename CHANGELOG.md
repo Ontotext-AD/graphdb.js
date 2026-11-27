@@ -1,10 +1,27 @@
 # CHANGELOG
 
-## Next:
-* `Consume SPARQL Query results with iterator.`
-* `Optional: Cluster management - add, remove, stop, check cluster status (GDB API)`
-* `Check the GDB server version and report mismatches if the client version implements a different version unless the check is stopped.`
-* `Support secured endpoints exposing only HTTPS`
+## Unreleased
+**Breaking changes:**
+* ASK queries with `RDFMimeType.BOOLEAN_RESULT` as the response type resolve to `true` or `false` instead of a stream. Callers that read the stream must be updated.
+* Upgraded `n3` to 2.x for RDF 1.2 support. `n3` 2.x formats Turtle/TriG output with different whitespace than 1.x, which may affect snapshots or string comparisons of serialized data, but does not affect semantic correctness or data round-tripping. Triple terms (RDF 1.2 feature) are now parsed as Quad instances in the object position of the quad; applications using triple terms should handle this new representation.
+* Removed `RDFMimeType.SPARQL_STAR_RESULTS_JSON` and `RDFMimeType.SPARQL_STAR_RESULTS_TSV` from the supported response types of SELECT queries. GraphDB 12 returns HTTP 406 for them. Use `RDFMimeType.SPARQL_RESULTS_JSON` and `RDFMimeType.SPARQL_RESULTS_TSV`, which carry triple terms in RDF 1.2.
+* Removed `RDFMimeType.TURTLE_STAR` and `RDFMimeType.TRIG_STAR` from the supported response types of DESCRIBE and CONSTRUCT queries. GraphDB 12 returns HTTP 406 for them. Use `RDFMimeType.TURTLE` and `RDFMimeType.TRIG`.
+* RDF-star data is stored by GraphDB 12 as RDF 1.2 triple terms. `<< s p o >> :p :o` becomes a reifier: a new blank node with `rdf:reifies <<( s p o )>>`. A DELETE with the same RDF-star data returns 200 but removes nothing. Triple terms are only valid in the object position.
+
+**Deprecated:**
+* `RDFMimeType.TURTLE_STAR` and `RDFMimeType.TRIG_STAR` are deprecated. GraphDB 12 accepts them only as the `Content-Type` of uploaded data. Use `RDFMimeType.TURTLE` and `RDFMimeType.TRIG`.
+* `RDFMimeType.SPARQL_STAR_RESULTS_JSON` and `RDFMimeType.SPARQL_STAR_RESULTS_TSV` are deprecated. Use `RDFMimeType.SPARQL_RESULTS_JSON` and `RDFMimeType.SPARQL_RESULTS_TSV`.
+* `TermConverter.fromBase64RdfStarTriple` and `TermConverter.toBase64RdfStarTriple` are deprecated. Use `TermConverter.fromBase64TripleTerm` and `TermConverter.toBase64TripleTerm`.
+
+**New features:**
+* Added `BooleanResultParser`, exported from `parser`, which resolves `text/boolean` results to `true` or `false`. It is registered by default in the repository clients.
+* GraphDB 12 support with RDF 1.2. GraphDB 12 returns RDF 1.2 by default (`graphdb.default.rdf.writer.version`, GDB-14480), which includes support for triple terms (`<<( s p o )>>` syntax in Turtle, TriG, and N-Triples formats). The library now correctly parses these responses.
+* JSON-LD parser now converts Base64-encoded triple term IRIs (`urn:rdf4j:tripleTerm:*` from GraphDB 12, and `urn:rdf4j:triple:*` from GraphDB 11) to RDF/JS Quad objects with the triple as the object.
+* Added `RDFJsonParser`, exported from `parser`, which parses `application/rdf+json` responses to RDF/JS Quad objects. It converts `urn:rdf4j:tripleTerm:*` IRIs from GraphDB 12 to Quad objects with the triple as the object. It is not registered by default; register it with `repository.registerParser(new RDFJsonParser())`. RDF/JSON has no named graphs, so the quads are in the default graph.
+* Added `TermConverter.parseTripleTerm`, which parses a triple term in the `<<( s p o )>>` syntax to a Quad. The JSON-LD parser uses it too.
+* Added `RDFMimeType.SPARQL_RESULTS_TSV` (`text/tab-separated-values`) as a supported response type for SELECT queries. It carries triple terms in RDF 1.2.
+* Added E2E tests for RDF 1.2 triple terms to verify parsing correctness with GraphDB 12.
+* Earlier versions (GraphDB 11 and earlier) remain fully supported with RDF 1.1.
 
 ## 4.1.0 (2026-10-30)
 * Tested with GraphDB 11.5.2. Since GraphDB 11.4.0, the repository configuration contains the `storageEncryption` parameter.

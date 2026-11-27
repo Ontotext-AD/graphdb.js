@@ -73,8 +73,18 @@ pipeline {
               // Package the library built by "npm ci" for Dockerfile.e2e
               sh "npm pack --ignore-scripts"
 
+              // The same project name as the cleanup in "post"
+              def compose = "docker-compose --env-file .env -f docker-compose-e2e.yml -p graphdbjs"
+              sh "${compose} build"
+              sh "${compose} up -d --force-recreate --remove-orphans graphdb"
+
+              // Removes the tests container left by an aborted build
+              sh "docker rm -f e2e-tests || true"
+
+              // Mirrors scripts/run-e2e.sh, with Compose v1, a fixed project name and no TTY
+              // Attaches only to the tests, so the GraphDB log stays out of the console
               def exitCode = sh(
-                script: "docker-compose --env-file .env -f docker-compose-e2e.yml up --build --no-deps --force-recreate --remove-orphans --abort-on-container-exit --exit-code-from e2e-tests",
+                script: "${compose} run -T --name e2e-tests e2e-tests",
                 returnStatus: true
               )
 
@@ -90,10 +100,25 @@ pipeline {
 
     post {
         always {
-          dir("test-e2e/") {
-            script {
-              sh "docker logs graphdb"
-              dockerCompose.downCmd(composeFile: '../docker-compose-e2e.yml', removeOrphans: true, removeVolumes: true, removeImages: 'local', projectName: 'graphdbjs')
+          script {
+            // The cleanup runs even when a report step throws
+            try {
+              sh "docker logs graphdb > graphdb.log 2>&1 || rm -f graphdb.log"
+              archiveArtifacts allowEmptyArchive: true, artifacts: 'graphdb.log'
+
+              // Publishes only this build's report, not one left in the workspace by an earlier build
+              def reportCopied = sh(
+                script: "rm -rf test-e2e/reports && mkdir -p test-e2e/reports && docker cp e2e-tests:/app/test-e2e/reports/junit.xml test-e2e/reports/",
+                returnStatus: true
+              ) == 0
+              if (reportCopied) {
+                junit testResults: 'test-e2e/reports/junit.xml'
+              }
+            } finally {
+              sh "docker rm -f e2e-tests || true"
+              dir("test-e2e/") {
+                dockerCompose.downCmd(composeFile: '../docker-compose-e2e.yml', removeOrphans: true, removeVolumes: true, removeImages: 'local', projectName: 'graphdbjs')
+              }
             }
           }
         }

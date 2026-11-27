@@ -51,9 +51,11 @@ module.exports = {
     TriGParser: require('./parser/trig-parser'),
     TurtleParser: require('./parser/turtle-parser'),
     JsonLDParser: require('./parser/jsonld-parser'),
+    RDFJsonParser: require('./parser/rdf-json-parser'),
     RDFXmlParser: require('./parser/rdfxml-parser'),
     SparqlJsonResultParser: require('./parser/sparql-json-result-parser'),
-    SparqlXmlResultParser: require('./parser/sparql-xml-result-parser')
+    SparqlXmlResultParser: require('./parser/sparql-xml-result-parser'),
+    BooleanResultParser: require('./parser/boolean-result-parser')
   },
 
   logger: {

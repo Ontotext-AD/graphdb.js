@@ -1,0 +1,3 @@
+?statement	?triple
+<http://example.com/statement1>	<<( <http://example.com/alice> <http://example.com/knows> <http://example.com/bob> )>>
+<http://example.com/statement2>	<<( <http://example.com/carol> <http://example.com/name> "Carol" )>>

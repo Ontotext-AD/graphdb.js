@@ -1,0 +1,8 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix ex: <http://example.com/> .
+
+ex:statement1 rdf:reifies <<( ex:alice ex:knows ex:bob )>> ;
+  ex:confidence 0.95 .
+
+ex:statement2 rdf:reifies <<( ex:carol ex:name "Carol" )>> ;
+  ex:source "test-source" .

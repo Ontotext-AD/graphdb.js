@@ -101,11 +101,14 @@ describe('RDFRepositoryClient - query', () => {
         .setResponseType(RDFMimeType.BOOLEAN_RESULT)
         .setLimit(100);
 
-      repository.query(payload).then((stream) => {
-        stream.on('data', (chunk) => {
-          expect(chunk).toEqual(expectedIt.next().value);
-        });
-        stream.on('end', done);
+      const booleanReader = new ObjectReadableMock(['true']);
+      httpRequest.mockResolvedValueOnce({
+        data: booleanReader
+      });
+
+      repository.query(payload).then((result) => {
+        expect(result).toBe(true);
+        done();
       });
     });
   });
